@@ -1,7 +1,9 @@
 """
 Audit log models for tracking sensitive operations.
 """
+
 from django.db import models
+
 from apps.core.models import TimeStampedModel
 
 
@@ -9,32 +11,29 @@ class AuditLog(TimeStampedModel):
     """
     Audit log for tracking sensitive operations.
     """
+
     ACTION_CHOICES = [
-        ('login', 'User Login'),
-        ('logout', 'User Logout'),
-        ('login_failed', 'Failed Login'),
-        ('password_change', 'Password Change'),
-        ('password_reset', 'Password Reset'),
-        ('user_create', 'User Created'),
-        ('user_update', 'User Updated'),
-        ('user_delete', 'User Deleted'),
-        ('staff_add', 'Staff Added'),
-        ('staff_remove', 'Staff Removed'),
-        ('order_create', 'Order Created'),
-        ('order_update', 'Order Updated'),
-        ('order_cancel', 'Order Cancelled'),
-        ('payment_collect', 'Payment Collected'),
-        ('settings_update', 'Settings Updated'),
-        ('data_export', 'Data Exported'),
+        ("login", "User Login"),
+        ("logout", "User Logout"),
+        ("login_failed", "Failed Login"),
+        ("password_change", "Password Change"),
+        ("password_reset", "Password Reset"),
+        ("user_create", "User Created"),
+        ("user_update", "User Updated"),
+        ("user_delete", "User Deleted"),
+        ("staff_add", "Staff Added"),
+        ("staff_remove", "Staff Removed"),
+        ("order_create", "Order Created"),
+        ("order_update", "Order Updated"),
+        ("order_cancel", "Order Cancelled"),
+        ("payment_collect", "Payment Collected"),
+        ("settings_update", "Settings Updated"),
+        ("data_export", "Data Exported"),
     ]
 
     # Actor
     user = models.ForeignKey(
-        'accounts.User',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='audit_logs'
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs"
     )
     user_email = models.EmailField(blank=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
@@ -42,11 +41,7 @@ class AuditLog(TimeStampedModel):
 
     # Context
     restaurant = models.ForeignKey(
-        'tenants.Restaurant',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='audit_logs'
+        "tenants.Restaurant", on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs"
     )
 
     # Action
@@ -66,15 +61,15 @@ class AuditLog(TimeStampedModel):
     response_status = models.PositiveSmallIntegerField(null=True, blank=True)
 
     class Meta:
-        db_table = 'audit_logs'
-        verbose_name = 'Audit Log'
-        verbose_name_plural = 'Audit Logs'
-        ordering = ['-created_at']
+        db_table = "audit_logs"
+        verbose_name = "Audit Log"
+        verbose_name_plural = "Audit Logs"
+        ordering = ["-created_at"]
         indexes = [
-            models.Index(fields=['user', 'created_at']),
-            models.Index(fields=['restaurant', 'created_at']),
-            models.Index(fields=['action', 'created_at']),
-            models.Index(fields=['target_model', 'target_id']),
+            models.Index(fields=["user", "created_at"]),
+            models.Index(fields=["restaurant", "created_at"]),
+            models.Index(fields=["action", "created_at"]),
+            models.Index(fields=["target_model", "target_id"]),
         ]
 
     def __str__(self):

@@ -1,11 +1,13 @@
 """
 Field-level encryption utilities for sensitive data.
 """
+
 import base64
 import logging
 
-from cryptography.fernet import Fernet, InvalidToken
 from django.conf import settings
+
+from cryptography.fernet import Fernet, InvalidToken
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +16,7 @@ def get_fernet_key():
     """
     Get or generate a Fernet encryption key.
     """
-    key = getattr(settings, 'FIELD_ENCRYPTION_KEY', None)
+    key = getattr(settings, "FIELD_ENCRYPTION_KEY", None)
     if not key:
         raise ValueError("FIELD_ENCRYPTION_KEY must be set in settings")
 

@@ -1,6 +1,7 @@
 """
 Audit logging middleware for sensitive operations.
 """
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ class AuditMiddleware:
         response = self.get_response(request)
 
         # Check if audit attributes are set
-        if hasattr(request, '_audit_action'):
+        if hasattr(request, "_audit_action"):
             self._create_audit_log(request, response)
 
         return response
@@ -37,19 +38,19 @@ class AuditMiddleware:
             from apps.audit.models import AuditLog
 
             user = request.user if request.user.is_authenticated else None
-            user_email = user.email if user else 'anonymous'
+            user_email = user.email if user else "anonymous"
 
             AuditLog.objects.create(
                 user=user,
                 user_email=user_email,
                 ip_address=self._get_client_ip(request),
-                user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
-                restaurant=getattr(request, 'restaurant', None),
+                user_agent=request.META.get("HTTP_USER_AGENT", "")[:500],
+                restaurant=getattr(request, "restaurant", None),
                 action=request._audit_action,
-                target_model=getattr(request, '_audit_target_model', ''),
-                target_id=getattr(request, '_audit_target_id', ''),
-                description=getattr(request, '_audit_description', ''),
-                changes=getattr(request, '_audit_changes', {}),
+                target_model=getattr(request, "_audit_target_model", ""),
+                target_id=getattr(request, "_audit_target_id", ""),
+                description=getattr(request, "_audit_description", ""),
+                changes=getattr(request, "_audit_changes", {}),
                 request_method=request.method,
                 request_path=request.path[:500],
                 response_status=response.status_code,
@@ -60,11 +61,11 @@ class AuditMiddleware:
 
     def _get_client_ip(self, request):
         """Get the client's IP address from the request."""
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
         if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0].strip()
+            ip = x_forwarded_for.split(",")[0].strip()
         else:
-            ip = request.META.get('REMOTE_ADDR')
+            ip = request.META.get("REMOTE_ADDR")
         return ip
 
 
@@ -77,6 +78,7 @@ def audit_action(action, target_model=None, target_id=None, description=None, ch
         def update_user(request, user_id):
             ...
     """
+
     def decorator(view_func):
         from functools import wraps
 

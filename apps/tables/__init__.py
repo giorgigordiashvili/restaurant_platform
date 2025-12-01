@@ -1,2 +1,2 @@
 # Tables app
-default_app_config = 'apps.tables.apps.TablesConfig'
+default_app_config = "apps.tables.apps.TablesConfig"

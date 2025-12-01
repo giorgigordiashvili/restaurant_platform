@@ -1,21 +1,24 @@
 """
 Tests for core validators.
 """
-import pytest
-from django.core.exceptions import ValidationError
+
 from unittest.mock import Mock
 
+from django.core.exceptions import ValidationError
+
+import pytest
+
 from apps.core.utils.validators import (
-    phone_validator,
-    slug_validator,
     georgian_phone_validator,
+    phone_validator,
+    sanitize_html,
+    slug_validator,
+    validate_allergens,
     validate_hex_color,
     validate_image_size,
-    validate_price,
-    validate_percentage,
-    sanitize_html,
     validate_operating_hours,
-    validate_allergens,
+    validate_percentage,
+    validate_price,
 )
 
 
@@ -25,13 +28,13 @@ class TestPhoneValidator:
     def test_valid_international_format(self):
         """Test valid international phone numbers."""
         valid_numbers = [
-            '+995599123456',
-            '+12345678901',
-            '+441onal234567890',  # Removing this - invalid format with letters
-            '995599123456',
+            "+995599123456",
+            "+12345678901",
+            "+441onal234567890",  # Removing this - invalid format with letters
+            "995599123456",
         ]
         # Filter out invalid entries for this test
-        valid_numbers = ['+995599123456', '+12345678901', '995599123456']
+        valid_numbers = ["+995599123456", "+12345678901", "995599123456"]
         for number in valid_numbers:
             try:
                 phone_validator(number)
@@ -41,10 +44,10 @@ class TestPhoneValidator:
     def test_invalid_phone_numbers(self):
         """Test invalid phone numbers."""
         invalid_numbers = [
-            '123',  # Too short
-            '+0123456789',  # Starts with 0
-            'abc123456789',  # Contains letters
-            '',  # Empty
+            "123",  # Too short
+            "+0123456789",  # Starts with 0
+            "abc123456789",  # Contains letters
+            "",  # Empty
         ]
         for number in invalid_numbers:
             with pytest.raises(ValidationError):
@@ -57,11 +60,11 @@ class TestSlugValidator:
     def test_valid_slugs(self):
         """Test valid slug formats."""
         valid_slugs = [
-            'myrestaurant',
-            'my-restaurant',
-            'restaurant123',
-            'a',
-            'my-cool-restaurant-2024',
+            "myrestaurant",
+            "my-restaurant",
+            "restaurant123",
+            "a",
+            "my-cool-restaurant-2024",
         ]
         for slug in valid_slugs:
             try:
@@ -72,12 +75,12 @@ class TestSlugValidator:
     def test_invalid_slugs(self):
         """Test invalid slug formats."""
         invalid_slugs = [
-            'MyRestaurant',  # Uppercase
-            '-restaurant',  # Starts with hyphen
-            'restaurant-',  # Ends with hyphen
-            'my_restaurant',  # Contains underscore
-            'my restaurant',  # Contains space
-            '',  # Empty
+            "MyRestaurant",  # Uppercase
+            "-restaurant",  # Starts with hyphen
+            "restaurant-",  # Ends with hyphen
+            "my_restaurant",  # Contains underscore
+            "my restaurant",  # Contains space
+            "",  # Empty
         ]
         for slug in invalid_slugs:
             with pytest.raises(ValidationError):
@@ -90,8 +93,8 @@ class TestGeorgianPhoneValidator:
     def test_valid_georgian_phones(self):
         """Test valid Georgian phone numbers."""
         valid_numbers = [
-            '+995599123456',
-            '599123456',
+            "+995599123456",
+            "599123456",
         ]
         for number in valid_numbers:
             try:
@@ -102,9 +105,9 @@ class TestGeorgianPhoneValidator:
     def test_invalid_georgian_phones(self):
         """Test invalid Georgian phone numbers."""
         invalid_numbers = [
-            '+99599123456',  # Wrong country code
-            '12345678',  # Only 8 digits
-            '+995599123456789',  # Too long
+            "+99599123456",  # Wrong country code
+            "12345678",  # Only 8 digits
+            "+995599123456789",  # Too long
         ]
         for number in invalid_numbers:
             with pytest.raises(ValidationError):
@@ -116,7 +119,7 @@ class TestValidateHexColor:
 
     def test_valid_hex_colors(self):
         """Test valid hex color codes."""
-        valid_colors = ['#FF0000', '#00ff00', '#0000FF', '#123ABC', '#abcdef']
+        valid_colors = ["#FF0000", "#00ff00", "#0000FF", "#123ABC", "#abcdef"]
         for color in valid_colors:
             try:
                 validate_hex_color(color)
@@ -126,11 +129,11 @@ class TestValidateHexColor:
     def test_invalid_hex_colors(self):
         """Test invalid hex color codes."""
         invalid_colors = [
-            'FF0000',  # Missing #
-            '#FFF',  # Too short
-            '#GGGGGG',  # Invalid characters
-            '#FF00000',  # Too long
-            '',  # Empty
+            "FF0000",  # Missing #
+            "#FFF",  # Too short
+            "#GGGGGG",  # Invalid characters
+            "#FF00000",  # Too long
+            "",  # Empty
         ]
         for color in invalid_colors:
             with pytest.raises(ValidationError):
@@ -210,30 +213,30 @@ class TestSanitizeHtml:
 
     def test_allowed_tags_preserved(self):
         """Test allowed HTML tags are preserved."""
-        html = '<b>bold</b> <i>italic</i> <p>paragraph</p>'
+        html = "<b>bold</b> <i>italic</i> <p>paragraph</p>"
         result = sanitize_html(html)
-        assert '<b>bold</b>' in result
-        assert '<i>italic</i>' in result
-        assert '<p>paragraph</p>' in result
+        assert "<b>bold</b>" in result
+        assert "<i>italic</i>" in result
+        assert "<p>paragraph</p>" in result
 
     def test_dangerous_tags_removed(self):
         """Test dangerous HTML tags are stripped."""
         html = '<script>alert("xss")</script><b>safe</b>'
         result = sanitize_html(html)
-        assert '<script>' not in result
+        assert "<script>" not in result
         # Note: bleach with strip=True may keep text content of removed tags
-        assert '<b>safe</b>' in result
+        assert "<b>safe</b>" in result
 
     def test_dangerous_attributes_removed(self):
         """Test dangerous attributes are removed."""
         html = '<b onclick="alert()">text</b>'
         result = sanitize_html(html)
-        assert 'onclick' not in result
-        assert '<b>text</b>' in result
+        assert "onclick" not in result
+        assert "<b>text</b>" in result
 
     def test_empty_value_returned_as_is(self):
         """Test empty/None values are returned as-is."""
-        assert sanitize_html('') == ''
+        assert sanitize_html("") == ""
         assert sanitize_html(None) is None
 
 
@@ -293,7 +296,7 @@ class TestValidateAllergens:
 
     def test_valid_allergens(self):
         """Test valid allergen list."""
-        valid_allergens = ['nuts', 'dairy', 'gluten']
+        valid_allergens = ["nuts", "dairy", "gluten"]
         try:
             validate_allergens(valid_allergens)
         except ValidationError:
@@ -309,7 +312,7 @@ class TestValidateAllergens:
     def test_invalid_allergen(self):
         """Test invalid allergen raises error."""
         with pytest.raises(ValidationError):
-            validate_allergens(['nuts', 'invalid_allergen'])
+            validate_allergens(["nuts", "invalid_allergen"])
 
     def test_not_list_raises_error(self):
         """Test non-list value raises error."""
@@ -319,6 +322,6 @@ class TestValidateAllergens:
     def test_case_insensitive(self):
         """Test allergen validation is case insensitive."""
         try:
-            validate_allergens(['NUTS', 'Dairy', 'GLUTEN'])
+            validate_allergens(["NUTS", "Dairy", "GLUTEN"])
         except ValidationError:
             pytest.fail("Case insensitive allergens should be valid")

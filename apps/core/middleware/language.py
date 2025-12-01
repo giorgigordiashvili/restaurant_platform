@@ -1,6 +1,7 @@
 """
 Language middleware for API multi-language support.
 """
+
 from django.conf import settings
 from django.utils import translation
 
@@ -20,11 +21,11 @@ class APILanguageMiddleware:
 
     def __call__(self, request):
         # Priority 1: Query parameter
-        lang = request.GET.get('lang')
+        lang = request.GET.get("lang")
 
         # Priority 2: User preference (if authenticated)
-        if not lang and hasattr(request, 'user') and request.user.is_authenticated:
-            lang = getattr(request.user, 'preferred_language', None)
+        if not lang and hasattr(request, "user") and request.user.is_authenticated:
+            lang = getattr(request.user, "preferred_language", None)
 
         # Priority 3: Accept-Language header
         if not lang:
@@ -41,7 +42,7 @@ class APILanguageMiddleware:
         response = self.get_response(request)
 
         # Add Content-Language header to response
-        response['Content-Language'] = request.LANGUAGE_CODE
+        response["Content-Language"] = request.LANGUAGE_CODE
 
         return response
 
@@ -51,22 +52,22 @@ class APILanguageMiddleware:
 
         Example header: "ka,en-US;q=0.9,en;q=0.8,ru;q=0.7"
         """
-        accept_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
+        accept_language = request.META.get("HTTP_ACCEPT_LANGUAGE", "")
 
         if not accept_language:
             return None
 
         # Parse and sort by quality value
         languages = []
-        for lang_entry in accept_language.split(','):
-            parts = lang_entry.strip().split(';')
-            lang_code = parts[0].split('-')[0].lower()  # Get base language code
+        for lang_entry in accept_language.split(","):
+            parts = lang_entry.strip().split(";")
+            lang_code = parts[0].split("-")[0].lower()  # Get base language code
 
             # Get quality value (default is 1.0)
             q = 1.0
             if len(parts) > 1:
                 try:
-                    q = float(parts[1].split('=')[1])
+                    q = float(parts[1].split("=")[1])
                 except (ValueError, IndexError):
                     pass
 
