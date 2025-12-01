@@ -1,0 +1,22 @@
+# Include base requirements
+-r base.txt
+
+# Development tools
+ipython>=8.0
+django-debug-toolbar>=4.3
+
+# Testing
+pytest>=8.0
+pytest-django>=4.8
+pytest-cov>=4.1
+factory-boy>=3.3
+
+# Code quality
+black>=24.0
+isort>=5.13
+flake8>=7.0
+
+# Type checking
+mypy>=1.8
+django-stubs>=4.2
+djangorestframework-stubs>=3.14
