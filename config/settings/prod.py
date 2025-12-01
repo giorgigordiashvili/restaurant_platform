@@ -25,14 +25,21 @@ else:
         }
     }
 
-# Allow multiple hosts - APP_DOMAIN is set by DigitalOcean, plus custom domains
+# Allow multiple hosts
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="", cast=Csv())
-# Always allow the DigitalOcean app domain
-APP_DOMAIN = config("APP_DOMAIN", default="")
-if APP_DOMAIN:
-    ALLOWED_HOSTS.append(APP_DOMAIN)
-# Filter empty strings
 ALLOWED_HOSTS = [h for h in ALLOWED_HOSTS if h]
+
+# Always allow these domains
+ALLOWED_HOSTS.extend([
+    "groot.ge",
+    ".groot.ge",  # All subdomains
+    ".ondigitalocean.app",  # All DigitalOcean app domains
+])
+
+# Also add APP_DOMAIN if set by DigitalOcean
+APP_DOMAIN = config("APP_DOMAIN", default="")
+if APP_DOMAIN and APP_DOMAIN not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(APP_DOMAIN)
 
 # Support for DigitalOcean App Platform DATABASE_URL
 DATABASE_URL = config("DATABASE_URL", default=None)
