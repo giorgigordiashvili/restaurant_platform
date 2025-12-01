@@ -10,8 +10,13 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
     SpectacularRedocView,
 )
+from apps.core.views import health_check, readiness_check
 
 urlpatterns = [
+    # Health checks (for load balancers and monitoring)
+    path('api/v1/health/', health_check, name='health_check'),
+    path('api/v1/ready/', readiness_check, name='readiness_check'),
+
     # Admin
     path('admin/', admin.site.urls),
 

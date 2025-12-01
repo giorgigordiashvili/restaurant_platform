@@ -1,0 +1,187 @@
+name: restaurant-platform
+
+region: fra
+
+services:
+  # Django Web Application
+  - name: web
+    github:
+      repo: giorgigordiashvili/restaurant_platform
+      branch: main
+      deploy_on_push: true
+    dockerfile_path: docker/Dockerfile.prod
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    http_port: 8000
+    routes:
+      - path: /
+    health_check:
+      http_path: /api/v1/health/
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    envs:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ${APP_DOMAIN}
+      - key: SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        value: ${db.DATABASE_URL}
+      - key: REDIS_URL
+        scope: RUN_TIME
+        value: ${redis.DATABASE_URL}
+      - key: MINIO_ENDPOINT
+        scope: RUN_TIME
+        type: SECRET
+      - key: MINIO_ACCESS_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: MINIO_SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: MINIO_BUCKET_NAME
+        value: restaurant-media
+      - key: MINIO_USE_SSL
+        value: "True"
+
+  # Celery Worker
+  - name: celery-worker
+    github:
+      repo: giorgigordiashvili/restaurant_platform
+      branch: main
+      deploy_on_push: true
+    dockerfile_path: docker/Dockerfile.prod
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    run_command: celery -A config worker -l INFO -Q default,high_priority,low_priority
+    envs:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        value: ${db.DATABASE_URL}
+      - key: REDIS_URL
+        scope: RUN_TIME
+        value: ${redis.DATABASE_URL}
+      - key: MINIO_ENDPOINT
+        scope: RUN_TIME
+        type: SECRET
+      - key: MINIO_ACCESS_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: MINIO_SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+
+  # Celery Beat (Scheduler)
+  - name: celery-beat
+    github:
+      repo: giorgigordiashvili/restaurant_platform
+      branch: main
+      deploy_on_push: true
+    dockerfile_path: docker/Dockerfile.prod
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    run_command: celery -A config beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    envs:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        value: ${db.DATABASE_URL}
+      - key: REDIS_URL
+        scope: RUN_TIME
+        value: ${redis.DATABASE_URL}
+
+databases:
+  # PostgreSQL Database
+  - name: db
+    engine: PG
+    version: "15"
+    size: db-s-dev-database
+    num_nodes: 1
+
+  # Redis Cache
+  - name: redis
+    engine: REDIS
+    version: "7"
+    size: db-s-dev-database
+    num_nodes: 1
+
+jobs:
+  # Database Migration Job
+  - name: migrate
+    github:
+      repo: giorgigordiashvili/restaurant_platform
+      branch: main
+    dockerfile_path: docker/Dockerfile.prod
+    kind: PRE_DEPLOY
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    run_command: python manage.py migrate --noinput
+    envs:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        value: ${db.DATABASE_URL}
+      - key: REDIS_URL
+        scope: RUN_TIME
+        value: ${redis.DATABASE_URL}
+
+  # Collect Static Files Job
+  - name: collectstatic
+    github:
+      repo: giorgigordiashvili/restaurant_platform
+      branch: main
+    dockerfile_path: docker/Dockerfile.prod
+    kind: PRE_DEPLOY
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    run_command: python manage.py collectstatic --noinput
+    envs:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        value: ${db.DATABASE_URL}
+      - key: REDIS_URL
+        scope: RUN_TIME
+        value: ${redis.DATABASE_URL}
+      - key: MINIO_ENDPOINT
+        scope: RUN_TIME
+        type: SECRET
+      - key: MINIO_ACCESS_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: MINIO_SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
