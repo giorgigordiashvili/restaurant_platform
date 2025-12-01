@@ -30,11 +30,13 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="", cast=Csv())
 ALLOWED_HOSTS = [h for h in ALLOWED_HOSTS if h]
 
 # Always allow these domains
-ALLOWED_HOSTS.extend([
-    "groot.ge",
-    ".groot.ge",  # All subdomains
-    ".ondigitalocean.app",  # All DigitalOcean app domains
-])
+ALLOWED_HOSTS.extend(
+    [
+        "groot.ge",
+        ".groot.ge",  # All subdomains
+        ".ondigitalocean.app",  # All DigitalOcean app domains
+    ]
+)
 
 # Also add APP_DOMAIN if set by DigitalOcean
 APP_DOMAIN = config("APP_DOMAIN", default="")
