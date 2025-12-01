@@ -72,6 +72,57 @@ class PublicMenuItemDetailView(generics.RetrieveAPIView):
         ).select_related("category", "restaurant")
 
 
+@extend_schema(tags=["Menu"])
+class PublicMenuCategoryListView(generics.ListAPIView):
+    """List menu categories for a restaurant (public)."""
+
+    serializer_class = MenuCategorySerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        slug = self.kwargs.get("slug")
+        return MenuCategory.objects.filter(
+            restaurant__slug=slug,
+            restaurant__is_active=True,
+            is_active=True,
+        ).order_by("display_order")
+
+
+@extend_schema(tags=["Menu"])
+class PublicMenuItemListView(generics.ListAPIView):
+    """List menu items for a restaurant (public)."""
+
+    serializer_class = MenuItemSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        slug = self.kwargs.get("slug")
+        queryset = (
+            MenuItem.objects.filter(
+                restaurant__slug=slug,
+                restaurant__is_active=True,
+                is_available=True,
+            )
+            .select_related("category")
+            .order_by("display_order")
+        )
+
+        # Filter by category
+        category_id = self.request.query_params.get("category")
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+
+        # Filter by dietary options
+        if self.request.query_params.get("is_vegetarian") == "true":
+            queryset = queryset.filter(is_vegetarian=True)
+        if self.request.query_params.get("is_vegan") == "true":
+            queryset = queryset.filter(is_vegan=True)
+        if self.request.query_params.get("is_gluten_free") == "true":
+            queryset = queryset.filter(is_gluten_free=True)
+
+        return queryset
+
+
 # ============== Dashboard Views ==============
 
 
