@@ -1,0 +1,3 @@
+# Production requirements
+# This file references the main requirements for easier auto-detection
+-r requirements/base.txt

@@ -9,7 +9,7 @@ services:
       repo: giorgigordiashvili/restaurant_platform
       branch: main
       deploy_on_push: true
-    dockerfile_path: docker/Dockerfile.prod
+    dockerfile_path: Dockerfile
     instance_count: 1
     instance_size_slug: basic-xxs
     http_port: 8000
@@ -58,7 +58,7 @@ services:
       repo: giorgigordiashvili/restaurant_platform
       branch: main
       deploy_on_push: true
-    dockerfile_path: docker/Dockerfile.prod
+    dockerfile_path: Dockerfile
     instance_count: 1
     instance_size_slug: basic-xxs
     run_command: celery -A config worker -l INFO -Q default,high_priority,low_priority
@@ -92,7 +92,7 @@ services:
       repo: giorgigordiashvili/restaurant_platform
       branch: main
       deploy_on_push: true
-    dockerfile_path: docker/Dockerfile.prod
+    dockerfile_path: Dockerfile
     instance_count: 1
     instance_size_slug: basic-xxs
     run_command: celery -A config beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
@@ -132,7 +132,7 @@ jobs:
     github:
       repo: giorgigordiashvili/restaurant_platform
       branch: main
-    dockerfile_path: docker/Dockerfile.prod
+    dockerfile_path: Dockerfile
     kind: PRE_DEPLOY
     instance_count: 1
     instance_size_slug: basic-xxs
@@ -157,7 +157,7 @@ jobs:
     github:
       repo: giorgigordiashvili/restaurant_platform
       branch: main
-    dockerfile_path: docker/Dockerfile.prod
+    dockerfile_path: Dockerfile
     kind: PRE_DEPLOY
     instance_count: 1
     instance_size_slug: basic-xxs
