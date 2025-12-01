@@ -2,12 +2,13 @@
 Menu views for public access and dashboard management.
 """
 
-from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from drf_spectacular.utils import extend_schema
 
 from apps.core.middleware.tenant import require_restaurant
 from apps.core.permissions import IsTenantManager
@@ -24,7 +25,6 @@ from .serializers import (
     ModifierGroupCreateSerializer,
     ModifierGroupSerializer,
 )
-
 
 # ============== Public Views ==============
 

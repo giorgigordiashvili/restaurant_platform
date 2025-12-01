@@ -2,8 +2,9 @@
 Menu serializers with translation support.
 """
 
-from parler_rest.serializers import TranslatableModelSerializer, TranslatedFieldsField
 from rest_framework import serializers
+
+from parler_rest.serializers import TranslatableModelSerializer, TranslatedFieldsField
 
 from .models import MenuCategory, MenuItem, MenuItemModifierGroup, Modifier, ModifierGroup
 

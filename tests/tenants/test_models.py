@@ -2,9 +2,10 @@
 Tests for tenant (restaurant) models.
 """
 
-import pytest
 from datetime import time
 from decimal import Decimal
+
+import pytest
 
 from apps.tenants.models import Restaurant, RestaurantHours
 

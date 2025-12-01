@@ -2,8 +2,9 @@
 Tests for menu models.
 """
 
-import pytest
 from decimal import Decimal
+
+import pytest
 
 from apps.menu.models import MenuCategory, MenuItem, MenuItemModifierGroup, Modifier, ModifierGroup
 

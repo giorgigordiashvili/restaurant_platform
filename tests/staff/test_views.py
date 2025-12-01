@@ -2,8 +2,9 @@
 Tests for staff views.
 """
 
-import pytest
 from rest_framework import status
+
+import pytest
 
 
 @pytest.mark.django_db
@@ -88,9 +89,11 @@ class TestAcceptInvitationView:
 
     def test_accept_invitation(self, authenticated_client, restaurant, staff_roles, user, another_user):
         """Test accepting a valid invitation."""
-        from apps.staff.models import StaffInvitation
-        from rest_framework_simplejwt.tokens import RefreshToken
         from rest_framework.test import APIClient
+
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        from apps.staff.models import StaffInvitation
 
         waiter_role = next(r for r in staff_roles if r.name == "waiter")
         invitation = StaffInvitation.create_invitation(

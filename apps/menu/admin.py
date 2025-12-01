@@ -3,6 +3,7 @@ Menu admin configuration with translation support.
 """
 
 from django.contrib import admin
+
 from parler.admin import TranslatableAdmin, TranslatableTabularInline
 
 from .models import MenuCategory, MenuItem, MenuItemModifierGroup, Modifier, ModifierGroup

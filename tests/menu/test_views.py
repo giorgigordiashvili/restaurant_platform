@@ -2,8 +2,9 @@
 Tests for menu views.
 """
 
-import pytest
 from rest_framework import status
+
+import pytest
 
 
 @pytest.mark.django_db

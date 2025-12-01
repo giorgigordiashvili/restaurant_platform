@@ -4,6 +4,7 @@ Menu models with multi-language support via django-parler.
 
 from django.core.validators import MinValueValidator
 from django.db import models
+
 from parler.models import TranslatableModel, TranslatedFields
 
 from apps.core.models import TimeStampedModel

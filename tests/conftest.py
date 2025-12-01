@@ -250,8 +250,9 @@ def menu_category(create_menu_category, restaurant):
 @pytest.fixture
 def create_menu_item(db):
     """Factory fixture to create menu items."""
-    from apps.menu.models import MenuItem
     from decimal import Decimal
+
+    from apps.menu.models import MenuItem
 
     def _create_item(restaurant, category=None, name="Test Item", price=Decimal("10.00"), **kwargs):
         item = MenuItem.objects.create(restaurant=restaurant, category=category, price=price, **kwargs)

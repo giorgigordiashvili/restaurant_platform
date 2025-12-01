@@ -2,8 +2,9 @@
 Tests for staff models.
 """
 
-import pytest
 from django.utils import timezone
+
+import pytest
 
 from apps.staff.models import StaffInvitation, StaffMember, StaffRole
 
