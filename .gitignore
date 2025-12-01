@@ -62,3 +62,4 @@ celerybeat.pid
 # Secrets
 *.pem
 *.key
+app-spec.yaml

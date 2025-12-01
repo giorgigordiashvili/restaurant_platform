@@ -35,8 +35,12 @@ urlpatterns = [
     path("api/v1/reservations/", include("apps.reservations.urls")),
     path("api/v1/payments/", include("apps.payments.urls")),
     path("api/v1/favorites/", include("apps.favorites.urls")),
+    # Staff (public)
+    path("api/v1/staff/", include("apps.staff.urls")),
     # Dashboard API (tenant-scoped)
-    path("api/v1/dashboard/", include("apps.tenants.urls_dashboard")),
+    path("api/v1/dashboard/settings/", include("apps.tenants.urls_dashboard")),
+    path("api/v1/dashboard/staff/", include("apps.staff.urls_dashboard")),
+    path("api/v1/dashboard/menu/", include("apps.menu.urls_dashboard")),
 ]
 
 # Serve media files in development

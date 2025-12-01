@@ -1,9 +1,21 @@
 """
-URL patterns for restaurant dashboard endpoints.
+Restaurant dashboard settings URLs (tenant-scoped).
 """
 
-app_name = "dashboard"
+from django.urls import path
+
+from .views_dashboard import (
+    RestaurantCoverUploadView,
+    RestaurantHoursUpdateView,
+    RestaurantLogoUploadView,
+    RestaurantSettingsView,
+)
+
+app_name = "dashboard_settings"
 
 urlpatterns = [
-    # To be implemented in Phase 2
+    path("", RestaurantSettingsView.as_view(), name="settings"),
+    path("hours/", RestaurantHoursUpdateView.as_view(), name="hours"),
+    path("logo/", RestaurantLogoUploadView.as_view(), name="logo"),
+    path("cover/", RestaurantCoverUploadView.as_view(), name="cover"),
 ]
