@@ -2,8 +2,6 @@
 Pytest configuration and fixtures for the restaurant platform tests.
 """
 
-from django.test import Client
-
 from rest_framework.test import APIClient
 
 import pytest

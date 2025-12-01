@@ -2,8 +2,6 @@
 Tests for accounts app views (API endpoints).
 """
 
-from django.urls import reverse
-
 from rest_framework import status
 
 import pytest
@@ -38,7 +36,7 @@ class TestRegisterView:
 
     def test_register_creates_profile(self, api_client, user_data):
         """Test registration creates user profile."""
-        response = api_client.post(self.url, user_data, format="json")
+        api_client.post(self.url, user_data, format="json")
 
         user = User.objects.get(email=user_data["email"].lower())
         assert hasattr(user, "profile")

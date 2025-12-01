@@ -2,9 +2,7 @@
 Serializers for the accounts app.
 """
 
-from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-from django.utils import timezone
 
 from rest_framework import serializers
 
@@ -222,7 +220,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
             return data
 
-        except Exception as e:
+        except Exception:
             # Increment failed login attempts
             try:
                 user = User.objects.get(email__iexact=email)

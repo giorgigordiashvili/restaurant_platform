@@ -2,7 +2,7 @@
 Development settings for restaurant_platform project.
 """
 
-from .base import *
+from .base import *  # noqa: F401, F403
 
 DEBUG = True
 
@@ -23,10 +23,10 @@ AWS_S3_USE_SSL = False
 
 # Debug toolbar (optional)
 if DEBUG:
-    INSTALLED_APPS += ["django_extensions"]
+    INSTALLED_APPS += ["django_extensions"]  # noqa: F405
 
     # Slower throttle rates for development testing
-    REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {
+    REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {  # noqa: F405
         "anon": "1000/hour",
         "user": "10000/hour",
         "burst": "600/minute",

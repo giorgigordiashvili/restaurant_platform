@@ -8,7 +8,6 @@ from rest_framework.request import Request
 
 import pytest
 
-from apps.accounts.models import User
 from apps.accounts.serializers import (
     ChangePasswordSerializer,
     CustomTokenObtainPairSerializer,

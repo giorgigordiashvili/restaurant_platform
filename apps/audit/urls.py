@@ -1,5 +1,3 @@
-from django.urls import path
-
 app_name = "audit"
 
-urlpatterns = []
+urlpatterns = []  # type: ignore

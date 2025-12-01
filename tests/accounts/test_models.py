@@ -4,7 +4,6 @@ Tests for accounts app models.
 
 from datetime import timedelta
 
-from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 import pytest

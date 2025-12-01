@@ -176,8 +176,6 @@ class TestTenantMiddleware:
     @override_settings(MAIN_DOMAIN="example.com", ALLOWED_HOSTS=["*"])
     def test_nonexistent_restaurant_sets_null(self):
         """Test nonexistent restaurant slug sets null."""
-        from apps.tenants.models import Restaurant
-
         # Just use the real model with a non-existent slug
         request = self.factory.get("/", SERVER_NAME="nonexistent.example.com")
         self.middleware(request)
