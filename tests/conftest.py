@@ -98,13 +98,7 @@ def create_restaurant(db):
     from apps.tenants.models import Restaurant
 
     def _create_restaurant(owner, name="Test Restaurant", slug="test-restaurant", **kwargs):
-        restaurant = Restaurant.objects.create(
-            owner=owner,
-            name=name,
-            slug=slug,
-            is_active=True,
-            **kwargs
-        )
+        restaurant = Restaurant.objects.create(owner=owner, name=name, slug=slug, is_active=True, **kwargs)
         return restaurant
 
     return _create_restaurant
@@ -144,11 +138,7 @@ def create_staff_role(db):
     from apps.staff.models import StaffRole
 
     def _create_staff_role(restaurant, name="waiter", **kwargs):
-        role = StaffRole.objects.create(
-            restaurant=restaurant,
-            name=name,
-            **kwargs
-        )
+        role = StaffRole.objects.create(restaurant=restaurant, name=name, **kwargs)
         return role
 
     return _create_staff_role
@@ -168,12 +158,7 @@ def create_staff_member(db):
     from apps.staff.models import StaffMember
 
     def _create_staff_member(user, restaurant, role, **kwargs):
-        member = StaffMember.objects.create(
-            user=user,
-            restaurant=restaurant,
-            role=role,
-            **kwargs
-        )
+        member = StaffMember.objects.create(user=user, restaurant=restaurant, role=role, **kwargs)
         return member
 
     return _create_staff_member
@@ -246,10 +231,7 @@ def create_menu_category(db):
     from apps.menu.models import MenuCategory
 
     def _create_category(restaurant, name="Test Category", **kwargs):
-        category = MenuCategory.objects.create(
-            restaurant=restaurant,
-            **kwargs
-        )
+        category = MenuCategory.objects.create(restaurant=restaurant, **kwargs)
         # Set translation
         category.set_current_language("en")
         category.name = name
@@ -272,12 +254,7 @@ def create_menu_item(db):
     from decimal import Decimal
 
     def _create_item(restaurant, category=None, name="Test Item", price=Decimal("10.00"), **kwargs):
-        item = MenuItem.objects.create(
-            restaurant=restaurant,
-            category=category,
-            price=price,
-            **kwargs
-        )
+        item = MenuItem.objects.create(restaurant=restaurant, category=category, price=price, **kwargs)
         # Set translation
         item.set_current_language("en")
         item.name = name
@@ -303,10 +280,7 @@ def create_modifier_group(db):
     from apps.menu.models import ModifierGroup
 
     def _create_group(restaurant, name="Test Modifiers", **kwargs):
-        group = ModifierGroup.objects.create(
-            restaurant=restaurant,
-            **kwargs
-        )
+        group = ModifierGroup.objects.create(restaurant=restaurant, **kwargs)
         # Set translation
         group.set_current_language("en")
         group.name = name

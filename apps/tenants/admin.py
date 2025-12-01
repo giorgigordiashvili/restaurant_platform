@@ -25,41 +25,45 @@ class RestaurantAdmin(admin.ModelAdmin):
     inlines = [RestaurantHoursInline]
 
     fieldsets = (
-        (None, {
-            "fields": ("name", "slug", "description", "is_active", "owner")
-        }),
-        ("Contact", {
-            "fields": ("email", "phone", "website")
-        }),
-        ("Address", {
-            "fields": ("address", "city", "postal_code", "country", "latitude", "longitude")
-        }),
-        ("Branding", {
-            "fields": ("logo", "cover_image", "primary_color", "secondary_color"),
-            "classes": ("collapse",),
-        }),
-        ("Settings", {
-            "fields": (
-                "default_currency",
-                "timezone",
-                "default_language",
-                "tax_rate",
-                "service_charge",
-                "minimum_order_amount",
-                "average_preparation_time",
-            )
-        }),
-        ("Features", {
-            "fields": ("accepts_remote_orders", "accepts_reservations", "accepts_takeaway")
-        }),
-        ("Statistics", {
-            "fields": ("average_rating", "total_reviews", "total_orders"),
-            "classes": ("collapse",),
-        }),
-        ("Timestamps", {
-            "fields": ("created_at", "updated_at"),
-            "classes": ("collapse",),
-        }),
+        (None, {"fields": ("name", "slug", "description", "is_active", "owner")}),
+        ("Contact", {"fields": ("email", "phone", "website")}),
+        ("Address", {"fields": ("address", "city", "postal_code", "country", "latitude", "longitude")}),
+        (
+            "Branding",
+            {
+                "fields": ("logo", "cover_image", "primary_color", "secondary_color"),
+                "classes": ("collapse",),
+            },
+        ),
+        (
+            "Settings",
+            {
+                "fields": (
+                    "default_currency",
+                    "timezone",
+                    "default_language",
+                    "tax_rate",
+                    "service_charge",
+                    "minimum_order_amount",
+                    "average_preparation_time",
+                )
+            },
+        ),
+        ("Features", {"fields": ("accepts_remote_orders", "accepts_reservations", "accepts_takeaway")}),
+        (
+            "Statistics",
+            {
+                "fields": ("average_rating", "total_reviews", "total_orders"),
+                "classes": ("collapse",),
+            },
+        ),
+        (
+            "Timestamps",
+            {
+                "fields": ("created_at", "updated_at"),
+                "classes": ("collapse",),
+            },
+        ),
     )
 
 

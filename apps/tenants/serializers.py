@@ -164,6 +164,7 @@ class RestaurantCreateSerializer(serializers.ModelSerializer):
 
         # Create default staff roles
         from apps.staff.models import StaffRole
+
         StaffRole.create_default_roles(restaurant)
 
         return restaurant

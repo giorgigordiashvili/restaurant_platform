@@ -10,9 +10,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.core.middleware.tenant import require_restaurant
-from apps.core.permissions import IsTenantManager, IsTenantOwner
+from apps.core.permissions import IsTenantManager
 
-from .models import Restaurant
 from .serializers import (
     RestaurantDetailSerializer,
     RestaurantHoursSerializer,

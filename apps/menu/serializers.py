@@ -316,18 +316,24 @@ class FullMenuSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
 
     def get_categories(self, obj):
-        categories = MenuCategory.objects.filter(
-            restaurant=self.restaurant,
-            is_active=True,
-        ).prefetch_related("items").order_by("display_order")
+        categories = (
+            MenuCategory.objects.filter(
+                restaurant=self.restaurant,
+                is_active=True,
+            )
+            .prefetch_related("items")
+            .order_by("display_order")
+        )
 
         result = []
         for category in categories:
             items = category.items.filter(is_available=True).order_by("display_order")
-            result.append({
-                "category": MenuCategorySerializer(category).data,
-                "items": MenuItemListSerializer(items, many=True).data,
-            })
+            result.append(
+                {
+                    "category": MenuCategorySerializer(category).data,
+                    "items": MenuItemListSerializer(items, many=True).data,
+                }
+            )
         return result
 
     def get_uncategorized_items(self, obj):

@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.core.middleware.tenant import require_restaurant
-from apps.core.permissions import HasStaffPermission, IsTenantManager
+from apps.core.permissions import IsTenantManager
 
 from .models import StaffInvitation, StaffMember, StaffRole
 from .serializers import (
@@ -37,9 +37,7 @@ class StaffListView(generics.ListAPIView):
 
     @require_restaurant
     def get_queryset(self):
-        return StaffMember.objects.filter(
-            restaurant=self.request.restaurant
-        ).select_related("user", "role")
+        return StaffMember.objects.filter(restaurant=self.request.restaurant).select_related("user", "role")
 
 
 @extend_schema(tags=["Dashboard - Staff"])
@@ -57,9 +55,9 @@ class StaffDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     @require_restaurant
     def get_queryset(self):
-        return StaffMember.objects.filter(
-            restaurant=self.request.restaurant
-        ).select_related("user", "role", "invited_by")
+        return StaffMember.objects.filter(restaurant=self.request.restaurant).select_related(
+            "user", "role", "invited_by"
+        )
 
     def perform_destroy(self, instance):
         """Deactivate instead of delete."""
@@ -254,9 +252,7 @@ class InvitationDetailsView(APIView):
 
     def get(self, request, token):
         try:
-            invitation = StaffInvitation.objects.select_related(
-                "restaurant", "role"
-            ).get(token=token)
+            invitation = StaffInvitation.objects.select_related("restaurant", "role").get(token=token)
 
             return Response(
                 {

@@ -55,9 +55,7 @@ class RestaurantHoursView(APIView):
 
     def get(self, request, slug):
         try:
-            restaurant = Restaurant.objects.prefetch_related("operating_hours").get(
-                slug=slug, is_active=True
-            )
+            restaurant = Restaurant.objects.prefetch_related("operating_hours").get(slug=slug, is_active=True)
             hours = restaurant.operating_hours.all()
             serializer = RestaurantHoursSerializer(hours, many=True)
             return Response(

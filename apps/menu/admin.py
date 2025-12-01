@@ -61,31 +61,31 @@ class MenuItemAdmin(TranslatableAdmin):
     inlines = [MenuItemModifierGroupInline]
 
     fieldsets = (
-        (None, {
-            "fields": ("restaurant", "category", "price", "image")
-        }),
-        ("Availability", {
-            "fields": ("is_available", "is_featured", "display_order")
-        }),
-        ("Preparation", {
-            "fields": ("preparation_time_minutes", "preparation_station")
-        }),
-        ("Dietary Information", {
-            "fields": (
-                "calories",
-                "allergens",
-                "is_vegetarian",
-                "is_vegan",
-                "is_gluten_free",
-                "is_spicy",
-                "spicy_level",
-            ),
-            "classes": ("collapse",),
-        }),
-        ("Inventory", {
-            "fields": ("track_inventory", "stock_quantity"),
-            "classes": ("collapse",),
-        }),
+        (None, {"fields": ("restaurant", "category", "price", "image")}),
+        ("Availability", {"fields": ("is_available", "is_featured", "display_order")}),
+        ("Preparation", {"fields": ("preparation_time_minutes", "preparation_station")}),
+        (
+            "Dietary Information",
+            {
+                "fields": (
+                    "calories",
+                    "allergens",
+                    "is_vegetarian",
+                    "is_vegan",
+                    "is_gluten_free",
+                    "is_spicy",
+                    "spicy_level",
+                ),
+                "classes": ("collapse",),
+            },
+        ),
+        (
+            "Inventory",
+            {
+                "fields": ("track_inventory", "stock_quantity"),
+                "classes": ("collapse",),
+            },
+        ),
     )
 
 

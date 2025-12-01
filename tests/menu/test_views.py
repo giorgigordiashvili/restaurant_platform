@@ -3,7 +3,6 @@ Tests for menu views.
 """
 
 import pytest
-from decimal import Decimal
 from rest_framework import status
 
 
@@ -85,6 +84,7 @@ class TestPublicMenuItemDetailView:
     def test_item_not_found(self, api_client, restaurant):
         """Test 404 for non-existent item."""
         import uuid
+
         url = f"/api/v1/restaurants/{restaurant.slug}/menu/items/{uuid.uuid4()}/"
         response = api_client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -117,11 +117,7 @@ class TestDashboardCategoryCreateView:
 
     def test_unauthenticated_cannot_create(self, api_client):
         """Test that unauthenticated users cannot create categories."""
-        data = {
-            "translations": {
-                "en": {"name": "New Category", "description": "Description"}
-            }
-        }
+        data = {"translations": {"en": {"name": "New Category", "description": "Description"}}}
         response = api_client.post(self.url, data, format="json")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -146,12 +142,7 @@ class TestDashboardItemCreateView:
 
     def test_unauthenticated_cannot_create(self, api_client):
         """Test that unauthenticated users cannot create items."""
-        data = {
-            "translations": {
-                "en": {"name": "New Item", "description": "Description"}
-            },
-            "price": "15.00"
-        }
+        data = {"translations": {"en": {"name": "New Item", "description": "Description"}}, "price": "15.00"}
         response = api_client.post(self.url, data, format="json")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -176,12 +167,6 @@ class TestDashboardModifierGroupCreateView:
 
     def test_unauthenticated_cannot_create(self, api_client):
         """Test that unauthenticated users cannot create modifier groups."""
-        data = {
-            "translations": {
-                "en": {"name": "Size"}
-            },
-            "selection_type": "single",
-            "is_required": True
-        }
+        data = {"translations": {"en": {"name": "Size"}}, "selection_type": "single", "is_required": True}
         response = api_client.post(self.url, data, format="json")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED

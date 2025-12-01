@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.core.middleware.tenant import require_restaurant
-from apps.core.permissions import HasStaffPermission, IsTenantManager
+from apps.core.permissions import IsTenantManager
 from apps.tenants.models import Restaurant
 
 from .models import MenuCategory, MenuItem, ModifierGroup
@@ -85,9 +85,7 @@ class MenuCategoryListCreateView(generics.ListCreateAPIView):
 
     @require_restaurant
     def get_queryset(self):
-        return MenuCategory.objects.filter(
-            restaurant=self.request.restaurant
-        ).order_by("display_order")
+        return MenuCategory.objects.filter(restaurant=self.request.restaurant).order_by("display_order")
 
     @require_restaurant
     def perform_create(self, serializer):
@@ -121,9 +119,7 @@ class MenuCategoryReorderView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save(restaurant=request.restaurant)
 
-        return Response(
-            {"success": True, "message": "Categories reordered."}
-        )
+        return Response({"success": True, "message": "Categories reordered."})
 
 
 @extend_schema(tags=["Dashboard - Menu"])
@@ -145,11 +141,12 @@ class MenuItemListCreateView(generics.ListCreateAPIView):
 
     @require_restaurant
     def get_queryset(self):
-        queryset = MenuItem.objects.filter(
-            restaurant=self.request.restaurant
-        ).select_related("category").prefetch_related(
-            "modifier_groups_link__modifier_group"
-        ).order_by("display_order")
+        queryset = (
+            MenuItem.objects.filter(restaurant=self.request.restaurant)
+            .select_related("category")
+            .prefetch_related("modifier_groups_link__modifier_group")
+            .order_by("display_order")
+        )
 
         # Filter by category
         category_id = self.request.query_params.get("category")
@@ -193,10 +190,10 @@ class MenuItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     @require_restaurant
     def get_queryset(self):
-        return MenuItem.objects.filter(
-            restaurant=self.request.restaurant
-        ).select_related("category").prefetch_related(
-            "modifier_groups_link__modifier_group__modifiers"
+        return (
+            MenuItem.objects.filter(restaurant=self.request.restaurant)
+            .select_related("category")
+            .prefetch_related("modifier_groups_link__modifier_group__modifiers")
         )
 
 
@@ -259,9 +256,11 @@ class ModifierGroupListCreateView(generics.ListCreateAPIView):
 
     @require_restaurant
     def get_queryset(self):
-        return ModifierGroup.objects.filter(
-            restaurant=self.request.restaurant
-        ).prefetch_related("modifiers").order_by("display_order")
+        return (
+            ModifierGroup.objects.filter(restaurant=self.request.restaurant)
+            .prefetch_related("modifiers")
+            .order_by("display_order")
+        )
 
     @require_restaurant
     def perform_create(self, serializer):
@@ -279,6 +278,4 @@ class ModifierGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     @require_restaurant
     def get_queryset(self):
-        return ModifierGroup.objects.filter(
-            restaurant=self.request.restaurant
-        ).prefetch_related("modifiers")
+        return ModifierGroup.objects.filter(restaurant=self.request.restaurant).prefetch_related("modifiers")
