@@ -13,8 +13,6 @@ services:
     instance_count: 1
     instance_size_slug: basic-xxs
     http_port: 8000
-    routes:
-      - path: /
     health_check:
       http_path: /api/v1/health/
       initial_delay_seconds: 30
@@ -35,9 +33,6 @@ services:
       - key: DATABASE_URL
         scope: RUN_TIME
         value: ${db.DATABASE_URL}
-      - key: REDIS_URL
-        scope: RUN_TIME
-        value: ${redis.DATABASE_URL}
       - key: MINIO_ENDPOINT
         scope: RUN_TIME
         type: SECRET
@@ -52,77 +47,11 @@ services:
       - key: MINIO_USE_SSL
         value: "True"
 
-  # Celery Worker
-  - name: celery-worker
-    github:
-      repo: giorgigordiashvili/restaurant_platform
-      branch: main
-      deploy_on_push: true
-    dockerfile_path: Dockerfile
-    instance_count: 1
-    instance_size_slug: basic-xxs
-    run_command: celery -A config worker -l INFO -Q default,high_priority,low_priority
-    envs:
-      - key: DJANGO_SETTINGS_MODULE
-        value: config.settings.prod
-      - key: DEBUG
-        value: "False"
-      - key: SECRET_KEY
-        scope: RUN_TIME
-        type: SECRET
-      - key: DATABASE_URL
-        scope: RUN_TIME
-        value: ${db.DATABASE_URL}
-      - key: REDIS_URL
-        scope: RUN_TIME
-        value: ${redis.DATABASE_URL}
-      - key: MINIO_ENDPOINT
-        scope: RUN_TIME
-        type: SECRET
-      - key: MINIO_ACCESS_KEY
-        scope: RUN_TIME
-        type: SECRET
-      - key: MINIO_SECRET_KEY
-        scope: RUN_TIME
-        type: SECRET
-
-  # Celery Beat (Scheduler)
-  - name: celery-beat
-    github:
-      repo: giorgigordiashvili/restaurant_platform
-      branch: main
-      deploy_on_push: true
-    dockerfile_path: Dockerfile
-    instance_count: 1
-    instance_size_slug: basic-xxs
-    run_command: celery -A config beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    envs:
-      - key: DJANGO_SETTINGS_MODULE
-        value: config.settings.prod
-      - key: DEBUG
-        value: "False"
-      - key: SECRET_KEY
-        scope: RUN_TIME
-        type: SECRET
-      - key: DATABASE_URL
-        scope: RUN_TIME
-        value: ${db.DATABASE_URL}
-      - key: REDIS_URL
-        scope: RUN_TIME
-        value: ${redis.DATABASE_URL}
-
 databases:
   # PostgreSQL Database
   - name: db
     engine: PG
-    version: "15"
-    size: db-s-dev-database
-    num_nodes: 1
-
-  # Redis Cache
-  - name: redis
-    engine: REDIS
-    version: "7"
+    version: "16"
     size: db-s-dev-database
     num_nodes: 1
 
@@ -148,40 +77,3 @@ jobs:
       - key: DATABASE_URL
         scope: RUN_TIME
         value: ${db.DATABASE_URL}
-      - key: REDIS_URL
-        scope: RUN_TIME
-        value: ${redis.DATABASE_URL}
-
-  # Collect Static Files Job
-  - name: collectstatic
-    github:
-      repo: giorgigordiashvili/restaurant_platform
-      branch: main
-    dockerfile_path: Dockerfile
-    kind: PRE_DEPLOY
-    instance_count: 1
-    instance_size_slug: basic-xxs
-    run_command: python manage.py collectstatic --noinput
-    envs:
-      - key: DJANGO_SETTINGS_MODULE
-        value: config.settings.prod
-      - key: DEBUG
-        value: "False"
-      - key: SECRET_KEY
-        scope: RUN_TIME
-        type: SECRET
-      - key: DATABASE_URL
-        scope: RUN_TIME
-        value: ${db.DATABASE_URL}
-      - key: REDIS_URL
-        scope: RUN_TIME
-        value: ${redis.DATABASE_URL}
-      - key: MINIO_ENDPOINT
-        scope: RUN_TIME
-        type: SECRET
-      - key: MINIO_ACCESS_KEY
-        scope: RUN_TIME
-        type: SECRET
-      - key: MINIO_SECRET_KEY
-        scope: RUN_TIME
-        type: SECRET

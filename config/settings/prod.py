@@ -9,6 +9,22 @@ from .base import *  # noqa: F401, F403
 
 DEBUG = False
 
+# Redis is optional - use local memory cache if not available
+REDIS_URL = config("REDIS_URL", default=None)
+if REDIS_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_URL,
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
+
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
 
 # Support for DigitalOcean App Platform DATABASE_URL

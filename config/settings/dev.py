@@ -2,9 +2,20 @@
 Development settings for restaurant_platform project.
 """
 
+import dj_database_url
+from decouple import config
+
 from .base import *  # noqa: F401, F403
 
 DEBUG = True
+
+# Support DATABASE_URL for CI and flexible dev environments
+DATABASE_URL = config("DATABASE_URL", default=None)
+if DATABASE_URL:
+    DATABASES["default"] = dj_database_url.config(  # noqa: F405
+        default=DATABASE_URL,
+        conn_max_age=600,
+    )
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".localhost"]
 
