@@ -473,11 +473,11 @@ def create_refund(db):
 
     from apps.payments.models import Refund
 
-    def _create_refund(payment, amount=Decimal("10.00"), **kwargs):
+    def _create_refund(payment, amount=Decimal("10.00"), reason="customer_request", **kwargs):
         refund = Refund.objects.create(
             payment=payment,
             amount=amount,
-            reason="customer_request",
+            reason=reason,
             **kwargs,
         )
         return refund
@@ -496,15 +496,24 @@ def create_payment_method(db):
     """Factory fixture to create payment methods."""
     from apps.payments.models import PaymentMethod
 
-    def _create_method(customer, **kwargs):
+    def _create_method(
+        customer,
+        external_method_id="pm_test123",
+        method_type="card",
+        card_brand="visa",
+        card_last4="4242",
+        card_exp_month=12,
+        card_exp_year=2025,
+        **kwargs,
+    ):
         method = PaymentMethod.objects.create(
             customer=customer,
-            external_method_id="pm_test123",
-            method_type="card",
-            card_brand="visa",
-            card_last4="4242",
-            card_exp_month=12,
-            card_exp_year=2025,
+            external_method_id=external_method_id,
+            method_type=method_type,
+            card_brand=card_brand,
+            card_last4=card_last4,
+            card_exp_month=card_exp_month,
+            card_exp_year=card_exp_year,
             **kwargs,
         )
         return method
