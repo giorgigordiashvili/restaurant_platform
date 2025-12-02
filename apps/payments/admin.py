@@ -1,14 +1,20 @@
 """
-Admin configuration for payments app.
+Admin configuration for payments app with multi-tenant support.
 """
 
 from django.contrib import admin
+
+from apps.core.admin import TenantAwareModelAdmin
 
 from .models import Payment, PaymentMethod, Refund
 
 
 @admin.register(Payment)
-class PaymentAdmin(admin.ModelAdmin):
+class PaymentAdmin(TenantAwareModelAdmin):
+    """Admin for payments with tenant filtering."""
+
+    tenant_field = "order__restaurant"
+
     list_display = [
         "id",
         "order",
@@ -41,7 +47,11 @@ class PaymentAdmin(admin.ModelAdmin):
 
 
 @admin.register(Refund)
-class RefundAdmin(admin.ModelAdmin):
+class RefundAdmin(TenantAwareModelAdmin):
+    """Admin for refunds with tenant filtering."""
+
+    tenant_field = "payment__order__restaurant"
+
     list_display = [
         "id",
         "payment",
@@ -58,6 +68,11 @@ class RefundAdmin(admin.ModelAdmin):
 
 @admin.register(PaymentMethod)
 class PaymentMethodAdmin(admin.ModelAdmin):
+    """
+    Admin for payment methods.
+    No tenant filtering - payment methods belong to users, not restaurants.
+    """
+
     list_display = [
         "id",
         "customer",

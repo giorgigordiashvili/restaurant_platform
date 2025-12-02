@@ -1,0 +1,40 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content %}
+{% if user.is_superuser and available_restaurants %}
+<div id="tenant-simulator" style="background: {% if simulated_restaurant %}#fff3cd{% else %}#e8f4fd{% endif %}; padding: 10px 15px; margin-bottom: 20px; border-radius: 4px; border: 1px solid {% if simulated_restaurant %}#ffc107{% else %}#b8daff{% endif %};">
+    <form method="post" action="{% url 'admin-simulate-restaurant' %}" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        {% csrf_token %}
+        <label for="restaurant-select" style="font-weight: bold; margin: 0;">
+            {% if simulated_restaurant %}
+                <span style="color: #856404;">&#128065; Simulating:</span>
+            {% else %}
+                &#127758; Tenant Filter:
+            {% endif %}
+        </label>
+        <select name="restaurant_id" id="restaurant-select" style="padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc; min-width: 200px;">
+            <option value="">-- All Restaurants (Superadmin View) --</option>
+            {% for restaurant in available_restaurants %}
+                <option value="{{ restaurant.id }}" {% if simulated_restaurant.id == restaurant.id %}selected{% endif %}>
+                    {{ restaurant.name }}{% if not restaurant.is_active %} (Inactive){% endif %}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit" style="padding: 5px 15px; background: {% if simulated_restaurant %}#ffc107{% else %}#417690{% endif %}; color: {% if simulated_restaurant %}#000{% else %}#fff{% endif %}; border: none; border-radius: 4px; cursor: pointer;">
+            {% if simulated_restaurant %}
+                Update / Clear
+            {% else %}
+                Apply Filter
+            {% endif %}
+        </button>
+        {% if simulated_restaurant %}
+            <span style="color: #856404; font-size: 0.9em;">
+                Viewing data as: <strong>{{ simulated_restaurant.name }}</strong>
+            </span>
+        {% endif %}
+    </form>
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}

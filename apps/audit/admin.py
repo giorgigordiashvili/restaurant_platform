@@ -1,16 +1,30 @@
+"""
+Admin configuration for audit app - read-only, superadmin only.
+"""
+
 from django.contrib import admin
+
+from apps.core.admin import SuperadminOnlyMixin, TenantAwareModelAdmin
 
 from .models import AuditLog
 
 
 @admin.register(AuditLog)
-class AuditLogAdmin(admin.ModelAdmin):
-    """Admin for audit logs."""
+class AuditLogAdmin(SuperadminOnlyMixin, TenantAwareModelAdmin):
+    """
+    Admin for audit logs.
+    - Read-only: No add, change, or delete allowed
+    - Superadmin only: Only superusers can view
+    - Tenant filtering: Can filter by restaurant
+    """
+
+    tenant_field = "restaurant"
 
     list_display = [
         "action",
         "user_email",
         "ip_address",
+        "restaurant",
         "target_model",
         "response_status",
         "created_at",
@@ -44,6 +58,7 @@ class AuditLogAdmin(admin.ModelAdmin):
         "created_at",
     ]
     ordering = ["-created_at"]
+    date_hierarchy = "created_at"
 
     def has_add_permission(self, request):
         return False

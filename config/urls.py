@@ -13,13 +13,15 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+from apps.core.admin_views import set_simulated_restaurant
 from apps.core.views import health_check, readiness_check
 
 urlpatterns = [
     # Health checks (for load balancers and monitoring)
     path("api/v1/health/", health_check, name="health_check"),
     path("api/v1/ready/", readiness_check, name="readiness_check"),
-    # Admin
+    # Admin - tenant simulation URL must come before admin.site.urls
+    path("admin/simulate-restaurant/", set_simulated_restaurant, name="admin-simulate-restaurant"),
     path("admin/", admin.site.urls),
     # API Documentation
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

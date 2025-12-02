@@ -1,8 +1,10 @@
 """
-Tenant (Restaurant) admin configuration.
+Tenant (Restaurant) admin configuration with superadmin features.
 """
 
 from django.contrib import admin
+
+from apps.core.admin import ExportMixin, SuperadminOnlyMixin, make_active, make_inactive
 
 from .models import Restaurant, RestaurantHours
 
@@ -15,14 +17,20 @@ class RestaurantHoursInline(admin.TabularInline):
 
 
 @admin.register(Restaurant)
-class RestaurantAdmin(admin.ModelAdmin):
-    list_display = ["name", "slug", "city", "is_active", "owner", "average_rating", "created_at"]
+class RestaurantAdmin(SuperadminOnlyMixin, ExportMixin, admin.ModelAdmin):
+    """
+    Admin for restaurants - superadmin only.
+    This is the root tenant model, so no tenant_field needed.
+    """
+
+    list_display = ["name", "slug", "city", "is_active", "owner", "average_rating", "total_orders", "created_at"]
     list_filter = ["is_active", "city", "country", "default_currency", "created_at"]
-    search_fields = ["name", "slug", "email", "phone", "city"]
+    search_fields = ["name", "slug", "email", "phone", "city", "owner__email"]
     prepopulated_fields = {"slug": ("name",)}
     readonly_fields = ["created_at", "updated_at", "average_rating", "total_reviews", "total_orders"]
     raw_id_fields = ["owner"]
     inlines = [RestaurantHoursInline]
+    actions = ["export_as_csv", "export_as_json", make_active, make_inactive]
 
     fieldsets = (
         (None, {"fields": ("name", "slug", "description", "is_active", "owner")}),
@@ -68,7 +76,10 @@ class RestaurantAdmin(admin.ModelAdmin):
 
 
 @admin.register(RestaurantHours)
-class RestaurantHoursAdmin(admin.ModelAdmin):
+class RestaurantHoursAdmin(SuperadminOnlyMixin, admin.ModelAdmin):
+    """Admin for restaurant hours - superadmin only."""
+
     list_display = ["restaurant", "day_of_week", "open_time", "close_time", "is_closed"]
     list_filter = ["restaurant", "day_of_week", "is_closed"]
+    search_fields = ["restaurant__name"]
     ordering = ["restaurant", "day_of_week"]
