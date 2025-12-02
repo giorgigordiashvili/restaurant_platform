@@ -9,6 +9,6 @@ from .views import CustomerOrderCreateView, CustomerOrderStatusView
 app_name = "orders"
 
 urlpatterns = [
-    path("", CustomerOrderCreateView.as_view(), name="create"),
-    path("<str:order_number>/status/", CustomerOrderStatusView.as_view(), name="status"),
+    path("create/", CustomerOrderCreateView.as_view(), name="create"),
+    path("<str:order_number>/", CustomerOrderStatusView.as_view(), name="status"),
 ]

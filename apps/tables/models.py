@@ -252,10 +252,14 @@ class TableSession(TimeStampedModel):
         return self.status == "active"
 
     @property
-    def duration_minutes(self) -> int:
-        """Get session duration in minutes."""
+    def duration(self):
+        """Get session duration as timedelta."""
         from django.utils import timezone
 
         end_time = self.closed_at or timezone.now()
-        delta = end_time - self.started_at
-        return int(delta.total_seconds() / 60)
+        return end_time - self.started_at
+
+    @property
+    def duration_minutes(self) -> int:
+        """Get session duration in minutes."""
+        return int(self.duration.total_seconds() / 60)

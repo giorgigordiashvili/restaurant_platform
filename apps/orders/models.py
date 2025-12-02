@@ -173,16 +173,18 @@ class Order(TimeStampedModel):
 
     def calculate_totals(self):
         """Recalculate order totals from items."""
+        from decimal import Decimal
+
         from django.db.models import Sum
 
         # Calculate subtotal from items
-        items_total = self.items.aggregate(total=Sum("total_price"))["total"] or 0
+        items_total = self.items.aggregate(total=Sum("total_price"))["total"] or Decimal("0")
         self.subtotal = items_total
 
         # Apply tax and service charge from restaurant settings
         if self.restaurant:
-            self.tax_amount = self.subtotal * (self.restaurant.tax_rate / 100)
-            self.service_charge = self.subtotal * (self.restaurant.service_charge / 100)
+            self.tax_amount = self.subtotal * (self.restaurant.tax_rate / Decimal("100"))
+            self.service_charge = self.subtotal * (self.restaurant.service_charge / Decimal("100"))
 
         # Calculate total
         self.total = self.subtotal + self.tax_amount + self.service_charge - self.discount_amount
