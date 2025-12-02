@@ -45,6 +45,9 @@ urlpatterns = [
     path("api/v1/dashboard/orders/", include("apps.orders.urls_dashboard")),
     path("api/v1/dashboard/payments/", include("apps.payments.urls_dashboard")),
     path("api/v1/dashboard/reservations/", include("apps.reservations.urls_dashboard")),
+    path("api/v1/dashboard/audit/", include("apps.audit.urls_dashboard")),
+    # Admin API (platform-wide, staff only)
+    path("api/v1/admin/audit/", include("apps.audit.urls")),
 ]
 
 # Serve media files in development
