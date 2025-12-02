@@ -25,24 +25,37 @@ class TenantMiddleware:
         request.restaurant = None
         request.is_dashboard = False
 
-        host = request.get_host().split(":")[0]  # Remove port if present
-        main_domain = getattr(settings, "MAIN_DOMAIN", "localhost")
+        # Lazy import to avoid circular imports
+        from apps.tenants.models import Restaurant
 
-        # Check if it's a subdomain
-        if host.endswith(f".{main_domain}"):
-            subdomain = host.replace(f".{main_domain}", "")
+        # First, check for X-Restaurant header (useful for API testing and direct API calls)
+        # In Django, HTTP headers are stored in META with HTTP_ prefix
+        restaurant_slug = request.META.get("HTTP_X_RESTAURANT")
+        if restaurant_slug:
+            try:
+                restaurant = Restaurant.objects.get(slug=restaurant_slug, is_active=True)
+                request.restaurant = restaurant
+                request.is_dashboard = True
+            except Restaurant.DoesNotExist:
+                # Restaurant not found via header
+                pass
+        else:
+            # Fall back to subdomain-based resolution
+            host = request.get_host().split(":")[0]  # Remove port if present
+            main_domain = getattr(settings, "MAIN_DOMAIN", "localhost")
 
-            if subdomain and subdomain not in self.EXCLUDED_SUBDOMAINS:
-                # Lazy import to avoid circular imports
-                from apps.tenants.models import Restaurant
+            # Check if it's a subdomain
+            if host.endswith(f".{main_domain}"):
+                subdomain = host.replace(f".{main_domain}", "")
 
-                try:
-                    restaurant = Restaurant.objects.get(slug=subdomain, is_active=True)
-                    request.restaurant = restaurant
-                    request.is_dashboard = True
-                except Restaurant.DoesNotExist:
-                    # Restaurant not found - will be handled by views
-                    pass
+                if subdomain and subdomain not in self.EXCLUDED_SUBDOMAINS:
+                    try:
+                        restaurant = Restaurant.objects.get(slug=subdomain, is_active=True)
+                        request.restaurant = restaurant
+                        request.is_dashboard = True
+                    except Restaurant.DoesNotExist:
+                        # Restaurant not found - will be handled by views
+                        pass
 
         response = self.get_response(request)
         return response
@@ -58,13 +71,50 @@ def get_current_restaurant(request):
 def require_restaurant(view_func):
     """
     Decorator that requires a restaurant to be set in the request.
+    Works with both function-based views and class-based view methods.
+    Also works with methods like get_queryset that don't receive request directly.
     """
     from functools import wraps
 
+    from django.http import HttpRequest
+
+    from rest_framework.request import Request
+
     @wraps(view_func)
-    def _wrapped_view(request, *args, **kwargs):
-        if not getattr(request, "restaurant", None):
+    def _wrapped_view(*args, **kwargs):
+        request = None
+
+        # First, check args for request object
+        for arg in args:
+            # Check if this argument is a request object (DRF Request or Django HttpRequest)
+            if isinstance(arg, (Request, HttpRequest)):
+                request = arg
+                break
+            # Check if this is a class-based view instance with a request attribute
+            # Only check for real request objects, not just any hasattr
+            view_request = getattr(arg, "request", None)
+            if view_request is not None and isinstance(view_request, (Request, HttpRequest)):
+                request = view_request
+                break
+
+        # Fallback for testing: if no real request found, check first arg for restaurant attr
+        if request is None and args:
+            first_arg = args[0]
+            # Check if the attribute is explicitly set (not auto-created by Mock)
+            if "restaurant" in getattr(first_arg, "__dict__", {}):
+                request = first_arg
+
+        if request is None:
             raise Http404("Restaurant not found")
-        return view_func(request, *args, **kwargs)
+
+        # For DRF Request objects, the restaurant is on the underlying _request
+        restaurant = getattr(request, "restaurant", None)
+        if restaurant is None and isinstance(request, Request):
+            # Only check _request for actual DRF Request objects, not Mock objects
+            restaurant = getattr(request._request, "restaurant", None)
+
+        if not restaurant:
+            raise Http404("Restaurant not found")
+        return view_func(*args, **kwargs)
 
     return _wrapped_view

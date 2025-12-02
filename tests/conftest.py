@@ -525,3 +525,106 @@ def create_payment_method(db):
 def payment_method(create_payment_method, user):
     """Create a test payment method."""
     return create_payment_method(customer=user, is_default=True)
+
+
+# ============== Reservation Fixtures ==============
+
+
+@pytest.fixture
+def create_reservation_settings(db):
+    """Factory fixture to create reservation settings."""
+    from apps.reservations.models import ReservationSettings
+
+    def _create_settings(restaurant, **kwargs):
+        settings = ReservationSettings.objects.create(restaurant=restaurant, **kwargs)
+        return settings
+
+    return _create_settings
+
+
+@pytest.fixture
+def reservation_settings(create_reservation_settings, restaurant):
+    """Create test reservation settings."""
+    return create_reservation_settings(restaurant=restaurant)
+
+
+@pytest.fixture
+def create_reservation(db):
+    """Factory fixture to create reservations."""
+    from datetime import time, timedelta
+
+    from django.utils import timezone
+
+    from apps.reservations.models import Reservation
+
+    def _create_reservation(
+        restaurant,
+        guest_name="Test Guest",
+        guest_phone="+1234567890",
+        reservation_date=None,
+        reservation_time=time(19, 0),
+        party_size=4,
+        status="confirmed",
+        customer=None,
+        **kwargs,
+    ):
+        if reservation_date is None:
+            reservation_date = timezone.now().date() + timedelta(days=1)
+        reservation = Reservation.objects.create(
+            restaurant=restaurant,
+            guest_name=guest_name,
+            guest_phone=guest_phone,
+            reservation_date=reservation_date,
+            reservation_time=reservation_time,
+            party_size=party_size,
+            status=status,
+            customer=customer,
+            **kwargs,
+        )
+        return reservation
+
+    return _create_reservation
+
+
+@pytest.fixture
+def reservation(create_reservation, restaurant):
+    """Create a test reservation."""
+    return create_reservation(restaurant=restaurant)
+
+
+@pytest.fixture
+def create_blocked_time(db):
+    """Factory fixture to create blocked times."""
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from apps.reservations.models import ReservationBlockedTime
+
+    def _create_blocked_time(
+        restaurant,
+        start_datetime=None,
+        end_datetime=None,
+        reason="other",
+        **kwargs,
+    ):
+        if start_datetime is None:
+            start_datetime = timezone.now() + timedelta(days=1)
+        if end_datetime is None:
+            end_datetime = start_datetime + timedelta(hours=4)
+        blocked = ReservationBlockedTime.objects.create(
+            restaurant=restaurant,
+            start_datetime=start_datetime,
+            end_datetime=end_datetime,
+            reason=reason,
+            **kwargs,
+        )
+        return blocked
+
+    return _create_blocked_time
+
+
+@pytest.fixture
+def blocked_time(create_blocked_time, restaurant):
+    """Create a test blocked time."""
+    return create_blocked_time(restaurant=restaurant, reason="holiday")
