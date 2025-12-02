@@ -295,3 +295,143 @@ def create_modifier_group(db):
 def modifier_group(create_modifier_group, restaurant):
     """Create a test modifier group."""
     return create_modifier_group(restaurant=restaurant, name="Size")
+
+
+# ============== Table Fixtures ==============
+
+
+@pytest.fixture
+def create_table_section(db):
+    """Factory fixture to create table sections."""
+    from apps.tables.models import TableSection
+
+    def _create_section(restaurant, name="Main Hall", **kwargs):
+        section = TableSection.objects.create(restaurant=restaurant, name=name, **kwargs)
+        return section
+
+    return _create_section
+
+
+@pytest.fixture
+def table_section(create_table_section, restaurant):
+    """Create a test table section."""
+    return create_table_section(restaurant=restaurant, name="Main Hall")
+
+
+@pytest.fixture
+def create_table(db):
+    """Factory fixture to create tables."""
+    from apps.tables.models import Table
+
+    def _create_table(restaurant, number="1", section=None, capacity=4, **kwargs):
+        table = Table.objects.create(
+            restaurant=restaurant,
+            number=number,
+            section=section,
+            capacity=capacity,
+            **kwargs,
+        )
+        return table
+
+    return _create_table
+
+
+@pytest.fixture
+def table(create_table, restaurant, table_section):
+    """Create a test table."""
+    return create_table(restaurant=restaurant, number="T1", section=table_section)
+
+
+@pytest.fixture
+def create_qr_code(db):
+    """Factory fixture to create QR codes."""
+    from apps.tables.models import TableQRCode
+
+    def _create_qr_code(table, code=None, **kwargs):
+        if code is None:
+            import uuid
+
+            code = str(uuid.uuid4())[:8]
+        qr = TableQRCode.objects.create(table=table, code=code, **kwargs)
+        return qr
+
+    return _create_qr_code
+
+
+@pytest.fixture
+def table_qr_code(create_qr_code, table):
+    """Create a test QR code."""
+    return create_qr_code(table=table, code="testqr123")
+
+
+@pytest.fixture
+def create_table_session(db):
+    """Factory fixture to create table sessions."""
+    from apps.tables.models import TableSession
+
+    def _create_session(table, **kwargs):
+        session = TableSession.objects.create(table=table, **kwargs)
+        return session
+
+    return _create_session
+
+
+@pytest.fixture
+def table_session(create_table_session, table):
+    """Create a test table session."""
+    return create_table_session(table=table, guest_count=2)
+
+
+# ============== Order Fixtures ==============
+
+
+@pytest.fixture
+def create_order(db):
+    """Factory fixture to create orders."""
+    from apps.orders.models import Order
+
+    def _create_order(restaurant, table=None, **kwargs):
+        order = Order.objects.create(
+            restaurant=restaurant,
+            table=table,
+            **kwargs,
+        )
+        return order
+
+    return _create_order
+
+
+@pytest.fixture
+def order(create_order, restaurant, table):
+    """Create a test order."""
+    return create_order(restaurant=restaurant, table=table, order_type="dine_in")
+
+
+@pytest.fixture
+def create_order_item(db):
+    """Factory fixture to create order items."""
+    from decimal import Decimal
+
+    from apps.orders.models import OrderItem
+
+    def _create_order_item(order, menu_item=None, item_name="Test Item", unit_price=None, quantity=1, **kwargs):
+        if unit_price is None:
+            unit_price = menu_item.price if menu_item else Decimal("10.00")
+        order_item = OrderItem.objects.create(
+            order=order,
+            menu_item=menu_item,
+            item_name=item_name,
+            unit_price=unit_price,
+            quantity=quantity,
+            total_price=unit_price * quantity,
+            **kwargs,
+        )
+        return order_item
+
+    return _create_order_item
+
+
+@pytest.fixture
+def order_item(create_order_item, order, menu_item):
+    """Create a test order item."""
+    return create_order_item(order=order, menu_item=menu_item, item_name=menu_item.name)

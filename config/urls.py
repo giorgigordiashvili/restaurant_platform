@@ -41,6 +41,8 @@ urlpatterns = [
     path("api/v1/dashboard/settings/", include("apps.tenants.urls_dashboard")),
     path("api/v1/dashboard/staff/", include("apps.staff.urls_dashboard")),
     path("api/v1/dashboard/menu/", include("apps.menu.urls_dashboard")),
+    path("api/v1/dashboard/tables/", include("apps.tables.urls_dashboard")),
+    path("api/v1/dashboard/orders/", include("apps.orders.urls_dashboard")),
 ]
 
 # Serve media files in development
