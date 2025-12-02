@@ -2,10 +2,11 @@
 Tests for reservation views.
 """
 
-from datetime import date, time, timedelta
 import uuid
+from datetime import date, time, timedelta
 
 from django.utils import timezone
+
 from rest_framework import status
 
 import pytest

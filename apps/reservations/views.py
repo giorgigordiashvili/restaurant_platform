@@ -6,6 +6,7 @@ from datetime import datetime, time, timedelta
 
 from django.db.models import Q
 from django.utils import timezone
+
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -34,7 +35,6 @@ from .serializers import (
     ReservationUpdateSerializer,
     TableAssignmentSerializer,
 )
-
 
 # ============== Public Views ==============
 
