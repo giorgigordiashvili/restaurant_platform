@@ -181,3 +181,178 @@ class TestDashboardTableSessionCloseView:
         url = f"/api/v1/dashboard/tables/sessions/{table_session.id}/close/"
         response = api_client.post(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+# ============== Public Session Tests (Multi-user Ordering) ==============
+
+
+@pytest.mark.django_db
+class TestTableSessionDetailPublicView:
+    """Tests for public table session detail endpoint."""
+
+    def test_can_get_active_session(self, api_client, table_session_with_host):
+        """Test that anyone can get active session details."""
+        url = f"/api/v1/tables/sessions/{table_session_with_host.id}/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert "invite_code" in response.data
+
+    def test_cannot_get_closed_session(self, api_client, table_session):
+        """Test that closed sessions are not accessible."""
+        table_session.status = "closed"
+        table_session.save()
+        url = f"/api/v1/tables/sessions/{table_session.id}/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.django_db
+class TestTableSessionInviteView:
+    """Tests for session invite code endpoint."""
+
+    def test_host_can_get_invite_code(self, authenticated_client, user, table_session_with_host):
+        """Test that host can get the invite code."""
+        url = f"/api/v1/tables/sessions/{table_session_with_host.id}/invite/"
+        response = authenticated_client.post(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["success"] is True
+        assert "invite_code" in response.data["data"]
+        assert len(response.data["data"]["invite_code"]) == 8
+
+    def test_non_host_cannot_get_invite_code(self, api_client, another_user, table_session_with_host):
+        """Test that non-host cannot get the invite code."""
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        refresh = RefreshToken.for_user(another_user)
+        api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+        url = f"/api/v1/tables/sessions/{table_session_with_host.id}/invite/"
+        response = api_client.post(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_unauthenticated_cannot_get_invite_code(self, api_client, table_session_with_host):
+        """Test that unauthenticated users cannot get the invite code."""
+        url = f"/api/v1/tables/sessions/{table_session_with_host.id}/invite/"
+        response = api_client.post(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.django_db
+class TestJoinTableSessionPreviewView:
+    """Tests for session join preview endpoint."""
+
+    def test_can_preview_session(self, api_client, table_session_with_host):
+        """Test that anyone can preview session info before joining."""
+        url = f"/api/v1/tables/sessions/join/{table_session_with_host.invite_code}/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["success"] is True
+        assert "restaurant_name" in response.data["data"]
+        assert "table_number" in response.data["data"]
+
+    def test_invalid_invite_code_returns_404(self, api_client):
+        """Test that invalid invite codes return 404."""
+        url = "/api/v1/tables/sessions/join/INVALIDX/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.django_db
+class TestJoinTableSessionView:
+    """Tests for session join endpoint."""
+
+    def test_authenticated_user_can_join(self, authenticated_client, user, table_session_with_host, another_user):
+        """Test that authenticated user can join a session."""
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        refresh = RefreshToken.for_user(another_user)
+        authenticated_client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+        url = f"/api/v1/tables/sessions/join/{table_session_with_host.invite_code}/confirm/"
+        response = authenticated_client.post(url)
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data["success"] is True
+        assert "guest" in response.data["data"]
+
+    def test_anonymous_user_needs_guest_name(self, api_client, table_session_with_host):
+        """Test that anonymous users need to provide guest name."""
+        url = f"/api/v1/tables/sessions/join/{table_session_with_host.invite_code}/confirm/"
+        response = api_client.post(url, {})
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_anonymous_user_can_join_with_name(self, api_client, table_session_with_host):
+        """Test that anonymous users can join with guest name."""
+        url = f"/api/v1/tables/sessions/join/{table_session_with_host.invite_code}/confirm/"
+        response = api_client.post(url, {"guest_name": "John"})
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data["success"] is True
+
+    def test_user_already_joined_returns_existing(self, authenticated_client, user, table_session_with_host):
+        """Test that rejoining returns existing guest record."""
+        url = f"/api/v1/tables/sessions/join/{table_session_with_host.invite_code}/confirm/"
+        # First join (host is already in)
+        response = authenticated_client.post(url)
+        # Already joined as host
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["message"] == "Already joined this session."
+
+
+@pytest.mark.django_db
+class TestTableSessionGuestsView:
+    """Tests for session guests list endpoint."""
+
+    def test_can_list_guests(self, api_client, table_session_with_host):
+        """Test that anyone can list session guests."""
+        url = f"/api/v1/tables/sessions/{table_session_with_host.id}/guests/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        # At least the host should be there
+        assert len(response.data["results"]) >= 1
+
+
+@pytest.mark.django_db
+class TestTableSessionOrdersView:
+    """Tests for session orders list endpoint."""
+
+    def test_can_list_orders(self, api_client, table_session_with_host):
+        """Test that anyone can list session orders."""
+        url = f"/api/v1/tables/sessions/{table_session_with_host.id}/orders/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["success"] is True
+        assert "orders" in response.data["data"]
+
+
+@pytest.mark.django_db
+class TestLeaveTableSessionView:
+    """Tests for leave session endpoint."""
+
+    def test_host_cannot_leave(self, authenticated_client, user, table_session_with_host):
+        """Test that host cannot leave the session."""
+        url = f"/api/v1/tables/sessions/{table_session_with_host.id}/leave/"
+        response = authenticated_client.post(url)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "Host cannot leave" in response.data["error"]["message"]
+
+    def test_guest_can_leave(self, api_client, another_user, table_session_with_host, create_session_guest):
+        """Test that non-host guest can leave the session."""
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        # Add another user as guest
+        create_session_guest(session=table_session_with_host, user=another_user, is_host=False)
+
+        refresh = RefreshToken.for_user(another_user)
+        api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+        url = f"/api/v1/tables/sessions/{table_session_with_host.id}/leave/"
+        response = api_client.post(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["success"] is True
+
+    def test_anonymous_guest_can_leave_with_guest_id(self, api_client, table_session_with_host, create_session_guest):
+        """Test that anonymous guest can leave with guest_id."""
+        guest = create_session_guest(
+            session=table_session_with_host,
+            guest_name="Anonymous Guest",
+            is_host=False,
+        )
+        url = f"/api/v1/tables/sessions/{table_session_with_host.id}/leave/"
+        response = api_client.post(url, {"guest_id": str(guest.id)})
+        assert response.status_code == status.HTTP_200_OK

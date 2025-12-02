@@ -382,6 +382,35 @@ def table_session(create_table_session, table):
     return create_table_session(table=table, guest_count=2)
 
 
+@pytest.fixture
+def table_session_with_host(table, user):
+    """Create a table session with a host user."""
+    from apps.tables.models import TableSession, TableSessionGuest
+
+    session = TableSession.objects.create(table=table, host=user, guest_count=1)
+    # Create host as guest
+    TableSessionGuest.objects.create(session=session, user=user, is_host=True)
+    return session
+
+
+@pytest.fixture
+def create_session_guest(db):
+    """Factory fixture to create session guests."""
+    from apps.tables.models import TableSessionGuest
+
+    def _create_guest(session, user=None, guest_name="", is_host=False, **kwargs):
+        guest = TableSessionGuest.objects.create(
+            session=session,
+            user=user,
+            guest_name=guest_name,
+            is_host=is_host,
+            **kwargs,
+        )
+        return guest
+
+    return _create_guest
+
+
 # ============== Order Fixtures ==============
 
 

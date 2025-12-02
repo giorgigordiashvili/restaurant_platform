@@ -4,7 +4,7 @@ Serializers for tables app.
 
 from rest_framework import serializers
 
-from .models import Table, TableQRCode, TableSection, TableSession
+from .models import Table, TableQRCode, TableSection, TableSession, TableSessionGuest
 
 
 class TableSectionSerializer(serializers.ModelSerializer):
@@ -163,3 +163,102 @@ class QRCodeScanResponseSerializer(serializers.Serializer):
     restaurant_slug = serializers.CharField()
     table_number = serializers.CharField()
     table_name = serializers.CharField()
+
+
+# ============== Session Guest Serializers ==============
+
+
+class TableSessionGuestSerializer(serializers.ModelSerializer):
+    """Serializer for session guests."""
+
+    user_email = serializers.EmailField(source="user.email", read_only=True, default=None)
+    display_name = serializers.CharField(read_only=True)
+    order_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TableSessionGuest
+        fields = [
+            "id",
+            "user",
+            "user_email",
+            "guest_name",
+            "display_name",
+            "is_host",
+            "status",
+            "joined_at",
+            "left_at",
+            "order_count",
+        ]
+        read_only_fields = ["id", "user", "user_email", "is_host", "joined_at", "left_at"]
+
+    def get_order_count(self, obj):
+        return obj.orders.count()
+
+
+class TableSessionDetailSerializer(serializers.ModelSerializer):
+    """Session details with guests and their orders."""
+
+    table = TableSerializer(read_only=True)
+    guests = TableSessionGuestSerializer(many=True, read_only=True)
+    host_email = serializers.EmailField(source="host.email", read_only=True, default=None)
+    invite_code = serializers.CharField(read_only=True)
+    duration_minutes = serializers.IntegerField(read_only=True)
+    restaurant_name = serializers.CharField(source="table.restaurant.name", read_only=True)
+    restaurant_slug = serializers.CharField(source="table.restaurant.slug", read_only=True)
+
+    class Meta:
+        model = TableSession
+        fields = [
+            "id",
+            "table",
+            "host",
+            "host_email",
+            "invite_code",
+            "guest_count",
+            "status",
+            "started_at",
+            "closed_at",
+            "duration_minutes",
+            "guests",
+            "restaurant_name",
+            "restaurant_slug",
+        ]
+        read_only_fields = fields
+
+
+class JoinSessionSerializer(serializers.Serializer):
+    """Serializer for joining a session."""
+
+    guest_name = serializers.CharField(required=False, max_length=100, allow_blank=True)
+
+    def validate(self, data):
+        request = self.context.get("request")
+        guest_name = data.get("guest_name", "")
+        # Guest name is required for unauthenticated users
+        if not request or not request.user.is_authenticated:
+            if not guest_name or not guest_name.strip():
+                raise serializers.ValidationError({"guest_name": "Guest name is required for unauthenticated users."})
+        return data
+
+
+class SessionInviteResponseSerializer(serializers.Serializer):
+    """Response serializer for session invite info."""
+
+    invite_code = serializers.CharField()
+    invite_url = serializers.CharField()
+    session_id = serializers.UUIDField()
+    table_number = serializers.CharField()
+    restaurant_name = serializers.CharField()
+
+
+class SessionJoinPreviewSerializer(serializers.Serializer):
+    """Preview info before joining a session."""
+
+    session_id = serializers.UUIDField()
+    restaurant_name = serializers.CharField()
+    restaurant_slug = serializers.CharField()
+    table_number = serializers.CharField()
+    table_name = serializers.CharField()
+    host_name = serializers.CharField(allow_null=True)
+    guest_count = serializers.IntegerField()
+    status = serializers.CharField()

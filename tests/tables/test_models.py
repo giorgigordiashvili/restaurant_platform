@@ -147,3 +147,85 @@ class TestTableSessionModel:
         assert table_session.is_active is True
         table_session.close()
         assert table_session.is_active is False
+
+    def test_invite_code_generated_on_create(self, table):
+        """Test that invite code is auto-generated on session creation."""
+        from apps.tables.models import TableSession
+
+        session = TableSession.objects.create(table=table, guest_count=2)
+        assert session.invite_code is not None
+        assert len(session.invite_code) == 8
+
+    def test_invite_code_unique(self, create_table, restaurant):
+        """Test that invite codes are unique."""
+        from apps.tables.models import TableSession
+
+        table1 = create_table(restaurant=restaurant, number="T100")
+        table2 = create_table(restaurant=restaurant, number="T101")
+        session1 = TableSession.objects.create(table=table1)
+        session2 = TableSession.objects.create(table=table2)
+        assert session1.invite_code != session2.invite_code
+
+    def test_get_or_create_guest_authenticated(self, table_session_with_host, another_user):
+        """Test getting or creating a guest for authenticated user."""
+        guest, created = table_session_with_host.get_or_create_guest(user=another_user)
+        assert created is True
+        assert guest.user == another_user
+        assert guest.is_host is False
+
+        # Second call should return existing
+        guest2, created2 = table_session_with_host.get_or_create_guest(user=another_user)
+        assert created2 is False
+        assert guest2.id == guest.id
+
+    def test_get_or_create_guest_anonymous(self, table_session_with_host):
+        """Test creating a guest for anonymous user."""
+        guest, created = table_session_with_host.get_or_create_guest(guest_name="John")
+        assert created is True
+        assert guest.user is None
+        assert guest.guest_name == "John"
+
+
+@pytest.mark.django_db
+class TestTableSessionGuestModel:
+    """Tests for TableSessionGuest model."""
+
+    def test_create_guest(self, create_session_guest, table_session, user):
+        """Test creating a session guest."""
+        guest = create_session_guest(session=table_session, user=user, is_host=True)
+        assert guest.user == user
+        assert guest.is_host is True
+        assert guest.status == "active"
+
+    def test_guest_display_name_authenticated(self, create_session_guest, table_session, user):
+        """Test display name for authenticated guest."""
+        guest = create_session_guest(session=table_session, user=user)
+        assert guest.display_name == user.email
+
+    def test_guest_display_name_anonymous(self, create_session_guest, table_session):
+        """Test display name for anonymous guest."""
+        guest = create_session_guest(session=table_session, guest_name="John Doe")
+        assert guest.display_name == "John Doe"
+
+    def test_guest_display_name_fallback(self, create_session_guest, table_session):
+        """Test display name fallback for anonymous guest without name."""
+        guest = create_session_guest(session=table_session, guest_name="")
+        assert guest.display_name == "Guest"
+
+    def test_guest_leave(self, create_session_guest, table_session):
+        """Test guest leaving session."""
+        guest = create_session_guest(session=table_session, guest_name="Leaving Guest")
+        guest.leave()
+        assert guest.status == "left"
+        assert guest.left_at is not None
+
+    def test_guest_str(self, create_session_guest, table_session, user):
+        """Test guest string representation."""
+        guest = create_session_guest(session=table_session, user=user)
+        assert user.email in str(guest)
+
+    def test_unique_user_per_session(self, create_session_guest, table_session, user):
+        """Test that a user can only be a guest once per session."""
+        create_session_guest(session=table_session, user=user)
+        with pytest.raises(Exception):  # IntegrityError
+            create_session_guest(session=table_session, user=user)

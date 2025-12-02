@@ -221,6 +221,21 @@ class TableSession(TimeStampedModel):
         related_name="sessions",
         help_text="QR code used to start this session",
     )
+    host = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="hosted_sessions",
+        help_text="User who started this session",
+    )
+    invite_code = models.CharField(
+        max_length=8,
+        unique=True,
+        blank=True,
+        null=True,
+        help_text="Shareable code to invite others to this session",
+    )
     guest_count = models.PositiveSmallIntegerField(default=1)
     status = models.CharField(
         max_length=20,
@@ -263,3 +278,97 @@ class TableSession(TimeStampedModel):
     def duration_minutes(self) -> int:
         """Get session duration in minutes."""
         return int(self.duration.total_seconds() / 60)
+
+    def save(self, *args, **kwargs):
+        if not self.invite_code:
+            self.invite_code = self._generate_invite_code()
+        super().save(*args, **kwargs)
+
+    @staticmethod
+    def _generate_invite_code():
+        """Generate 8-character alphanumeric invite code."""
+        import string
+
+        chars = string.ascii_uppercase + string.digits
+        while True:
+            code = "".join(secrets.choice(chars) for _ in range(8))
+            if not TableSession.objects.filter(invite_code=code).exists():
+                return code
+
+    def get_or_create_guest(self, user=None, guest_name=""):
+        """Get or create a guest record for this session."""
+        if user and user.is_authenticated:
+            guest, created = self.guests.get_or_create(
+                user=user,
+                defaults={"guest_name": guest_name or "", "is_host": self.host == user},
+            )
+        else:
+            # For anonymous guests, always create new
+            guest = self.guests.create(guest_name=guest_name or "Guest", is_host=False)
+            created = True
+        return guest, created
+
+
+class TableSessionGuest(TimeStampedModel):
+    """
+    Individual guest at a table session.
+    Tracks who joined and their orders.
+    """
+
+    STATUS_CHOICES = [
+        ("active", "Active"),
+        ("left", "Left"),
+    ]
+
+    session = models.ForeignKey(
+        TableSession,
+        on_delete=models.CASCADE,
+        related_name="guests",
+    )
+    user = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="table_session_guests",
+    )
+    guest_name = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Name for anonymous guests",
+    )
+    is_host = models.BooleanField(
+        default=False,
+        help_text="Whether this guest is the session host",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="active",
+    )
+    joined_at = models.DateTimeField(auto_now_add=True)
+    left_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "table_session_guests"
+        ordering = ["-is_host", "joined_at"]
+        unique_together = [["session", "user"]]
+
+    def __str__(self):
+        name = self.user.email if self.user else self.guest_name
+        return f"{name} at {self.session}"
+
+    @property
+    def display_name(self) -> str:
+        """Get display name for the guest."""
+        if self.user:
+            return self.user.email
+        return self.guest_name or "Guest"
+
+    def leave(self):
+        """Mark guest as left."""
+        from django.utils import timezone
+
+        self.status = "left"
+        self.left_at = timezone.now()
+        self.save(update_fields=["status", "left_at", "updated_at"])

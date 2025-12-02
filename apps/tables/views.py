@@ -12,14 +12,19 @@ from drf_spectacular.utils import extend_schema
 from apps.core.middleware.tenant import require_restaurant
 from apps.core.permissions import IsTenantManager
 
-from .models import Table, TableQRCode, TableSection, TableSession
+from .models import Table, TableQRCode, TableSection, TableSession, TableSessionGuest
 from .serializers import (
+    JoinSessionSerializer,
     QRCodeScanSerializer,
+    SessionInviteResponseSerializer,
+    SessionJoinPreviewSerializer,
     TableCreateSerializer,
     TableQRCodeSerializer,
     TableSectionSerializer,
     TableSerializer,
     TableSessionCreateSerializer,
+    TableSessionDetailSerializer,
+    TableSessionGuestSerializer,
     TableSessionSerializer,
 )
 
@@ -288,11 +293,19 @@ class TableSessionCreateView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Create session
+        # Create session with host
         session = TableSession.objects.create(
             table=table,
             qr_code=qr,
+            host=request.user,
             guest_count=data.get("guest_count", 1),
+        )
+
+        # Create host as first guest
+        TableSessionGuest.objects.create(
+            session=session,
+            user=request.user,
+            is_host=True,
         )
 
         # Mark table as occupied
@@ -302,7 +315,7 @@ class TableSessionCreateView(APIView):
             {
                 "success": True,
                 "message": "Session started.",
-                "data": TableSessionSerializer(session).data,
+                "data": TableSessionDetailSerializer(session).data,
             },
             status=status.HTTP_201_CREATED,
         )
@@ -340,5 +353,275 @@ class TableSessionCloseView(APIView):
                 "success": True,
                 "message": "Session closed.",
                 "data": TableSessionSerializer(session).data,
+            }
+        )
+
+
+# ============== Public Session Views (for multi-user ordering) ==============
+
+
+@extend_schema(tags=["Table Sessions"])
+class TableSessionDetailPublicView(generics.RetrieveAPIView):
+    """
+    Get table session details (for guests at the table).
+    Requires the user to be a guest of the session.
+    """
+
+    serializer_class = TableSessionDetailSerializer
+    permission_classes = [AllowAny]
+    lookup_field = "id"
+
+    def get_queryset(self):
+        return (
+            TableSession.objects.filter(status__in=["active", "payment_pending"])
+            .select_related("table", "table__restaurant", "host")
+            .prefetch_related("guests", "guests__user")
+        )
+
+
+@extend_schema(tags=["Table Sessions"])
+class TableSessionInviteView(APIView):
+    """
+    Generate or retrieve invite code for a session.
+    Only the session host can access this.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, session_id):
+        try:
+            session = TableSession.objects.select_related("table", "table__restaurant").get(
+                id=session_id,
+                status__in=["active", "payment_pending"],
+            )
+        except TableSession.DoesNotExist:
+            return Response(
+                {"success": False, "error": {"message": "Session not found or already closed."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Check if user is the host
+        if session.host != request.user:
+            # Check if user is a guest of this session
+            if not session.guests.filter(user=request.user, is_host=True).exists():
+                return Response(
+                    {"success": False, "error": {"message": "Only the session host can get the invite code."}},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
+        # Generate invite URL (frontend will construct the actual link)
+        invite_url = f"/join/{session.invite_code}"
+
+        data = {
+            "invite_code": session.invite_code,
+            "invite_url": invite_url,
+            "session_id": session.id,
+            "table_number": session.table.number,
+            "restaurant_name": session.table.restaurant.name,
+        }
+
+        return Response({"success": True, "data": SessionInviteResponseSerializer(data).data})
+
+
+@extend_schema(tags=["Table Sessions"])
+class JoinTableSessionPreviewView(APIView):
+    """
+    Get session info before joining (via invite code).
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request, invite_code):
+        try:
+            session = TableSession.objects.select_related("table", "table__restaurant", "host").get(
+                invite_code=invite_code,
+                status__in=["active", "payment_pending"],
+            )
+        except TableSession.DoesNotExist:
+            return Response(
+                {"success": False, "error": {"message": "Invalid invite code or session closed."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        data = {
+            "session_id": session.id,
+            "restaurant_name": session.table.restaurant.name,
+            "restaurant_slug": session.table.restaurant.slug,
+            "table_number": session.table.number,
+            "table_name": session.table.name or "",
+            "host_name": session.host.email if session.host else None,
+            "guest_count": session.guests.filter(status="active").count(),
+            "status": session.status,
+        }
+
+        return Response({"success": True, "data": SessionJoinPreviewSerializer(data).data})
+
+
+@extend_schema(tags=["Table Sessions"])
+class JoinTableSessionView(APIView):
+    """
+    Join a table session via invite code.
+    Can be authenticated or anonymous (with guest_name).
+    """
+
+    permission_classes = [AllowAny]
+
+    def post(self, request, invite_code):
+        try:
+            session = TableSession.objects.select_related("table", "table__restaurant").get(
+                invite_code=invite_code,
+                status__in=["active", "payment_pending"],
+            )
+        except TableSession.DoesNotExist:
+            return Response(
+                {"success": False, "error": {"message": "Invalid invite code or session closed."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = JoinSessionSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user if request.user.is_authenticated else None
+        guest_name = serializer.validated_data.get("guest_name", "")
+
+        # Check if user already in session
+        if user:
+            existing_guest = session.guests.filter(user=user, status="active").first()
+            if existing_guest:
+                return Response(
+                    {
+                        "success": True,
+                        "message": "Already joined this session.",
+                        "data": {
+                            "guest": TableSessionGuestSerializer(existing_guest).data,
+                            "session": TableSessionDetailSerializer(session).data,
+                        },
+                    }
+                )
+
+        # Create guest record
+        guest, created = session.get_or_create_guest(user=user, guest_name=guest_name)
+
+        return Response(
+            {
+                "success": True,
+                "message": "Joined session successfully." if created else "Rejoined session.",
+                "data": {
+                    "guest": TableSessionGuestSerializer(guest).data,
+                    "session": TableSessionDetailSerializer(session).data,
+                },
+            },
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+
+@extend_schema(tags=["Table Sessions"])
+class TableSessionGuestsView(generics.ListAPIView):
+    """List all guests at a table session."""
+
+    serializer_class = TableSessionGuestSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        session_id = self.kwargs.get("session_id")
+        return (
+            TableSessionGuest.objects.filter(
+                session_id=session_id,
+                session__status__in=["active", "payment_pending"],
+            )
+            .select_related("user")
+            .order_by("-is_host", "joined_at")
+        )
+
+
+@extend_schema(tags=["Table Sessions"])
+class TableSessionOrdersView(APIView):
+    """List all orders in a session."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request, session_id):
+        from apps.orders.models import Order
+        from apps.orders.serializers import OrderListSerializer
+
+        try:
+            session = TableSession.objects.get(id=session_id)
+        except TableSession.DoesNotExist:
+            return Response(
+                {"success": False, "error": {"message": "Session not found."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        orders = (
+            Order.objects.filter(table_session=session)
+            .select_related("customer", "session_guest")
+            .order_by("-created_at")
+        )
+
+        serializer = OrderListSerializer(orders, many=True)
+
+        return Response(
+            {
+                "success": True,
+                "data": {
+                    "session_id": str(session.id),
+                    "orders": serializer.data,
+                    "total_orders": orders.count(),
+                },
+            }
+        )
+
+
+@extend_schema(tags=["Table Sessions"])
+class LeaveTableSessionView(APIView):
+    """Leave a table session."""
+
+    permission_classes = [AllowAny]
+
+    def post(self, request, session_id):
+        try:
+            session = TableSession.objects.get(
+                id=session_id,
+                status__in=["active", "payment_pending"],
+            )
+        except TableSession.DoesNotExist:
+            return Response(
+                {"success": False, "error": {"message": "Session not found or already closed."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        user = request.user if request.user.is_authenticated else None
+
+        if user:
+            guest = session.guests.filter(user=user, status="active").first()
+        else:
+            # For anonymous users, they need to provide guest_id
+            guest_id = request.data.get("guest_id")
+            if not guest_id:
+                return Response(
+                    {"success": False, "error": {"message": "guest_id is required for anonymous users."}},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            guest = session.guests.filter(id=guest_id, user__isnull=True, status="active").first()
+
+        if not guest:
+            return Response(
+                {"success": False, "error": {"message": "You are not a guest of this session."}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Cannot leave if host
+        if guest.is_host:
+            return Response(
+                {"success": False, "error": {"message": "Host cannot leave the session. Close the session instead."}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        guest.leave()
+
+        return Response(
+            {
+                "success": True,
+                "message": "Left session successfully.",
             }
         )

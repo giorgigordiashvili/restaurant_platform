@@ -57,6 +57,14 @@ class Order(TimeStampedModel):
         blank=True,
         related_name="orders",
     )
+    session_guest = models.ForeignKey(
+        "tables.TableSessionGuest",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="orders",
+        help_text="The guest at the table who placed this order",
+    )
     customer = models.ForeignKey(
         "accounts.User",
         on_delete=models.SET_NULL,
