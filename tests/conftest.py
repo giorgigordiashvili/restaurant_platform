@@ -435,3 +435,84 @@ def create_order_item(db):
 def order_item(create_order_item, order, menu_item):
     """Create a test order item."""
     return create_order_item(order=order, menu_item=menu_item, item_name=menu_item.name)
+
+
+# ============== Payment Fixtures ==============
+
+
+@pytest.fixture
+def create_payment(db):
+    """Factory fixture to create payments."""
+    from decimal import Decimal
+
+    from apps.payments.models import Payment
+
+    def _create_payment(order, amount=Decimal("50.00"), tip_amount=Decimal("5.00"), **kwargs):
+        payment = Payment.objects.create(
+            order=order,
+            amount=amount,
+            tip_amount=tip_amount,
+            total_amount=amount + tip_amount,
+            **kwargs,
+        )
+        return payment
+
+    return _create_payment
+
+
+@pytest.fixture
+def payment(create_payment, order):
+    """Create a test payment."""
+    return create_payment(order=order, payment_method="card", status="completed")
+
+
+@pytest.fixture
+def create_refund(db):
+    """Factory fixture to create refunds."""
+    from decimal import Decimal
+
+    from apps.payments.models import Refund
+
+    def _create_refund(payment, amount=Decimal("10.00"), **kwargs):
+        refund = Refund.objects.create(
+            payment=payment,
+            amount=amount,
+            reason="customer_request",
+            **kwargs,
+        )
+        return refund
+
+    return _create_refund
+
+
+@pytest.fixture
+def refund(create_refund, payment):
+    """Create a test refund."""
+    return create_refund(payment=payment)
+
+
+@pytest.fixture
+def create_payment_method(db):
+    """Factory fixture to create payment methods."""
+    from apps.payments.models import PaymentMethod
+
+    def _create_method(customer, **kwargs):
+        method = PaymentMethod.objects.create(
+            customer=customer,
+            external_method_id="pm_test123",
+            method_type="card",
+            card_brand="visa",
+            card_last4="4242",
+            card_exp_month=12,
+            card_exp_year=2025,
+            **kwargs,
+        )
+        return method
+
+    return _create_method
+
+
+@pytest.fixture
+def payment_method(create_payment_method, user):
+    """Create a test payment method."""
+    return create_payment_method(customer=user, is_default=True)
