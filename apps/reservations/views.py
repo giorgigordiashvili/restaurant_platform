@@ -141,10 +141,7 @@ class PublicAvailabilityView(APIView):
             slot_datetime = timezone.make_aware(datetime.combine(date, current_time))
 
             # Check if slot is blocked
-            is_blocked = any(
-                bt.start_datetime <= slot_datetime < bt.end_datetime
-                for bt in blocked_times
-            )
+            is_blocked = any(bt.start_datetime <= slot_datetime < bt.end_datetime for bt in blocked_times)
 
             if not is_blocked:
                 # Count available tables
@@ -157,19 +154,19 @@ class PublicAvailabilityView(APIView):
                 for reservation in existing_reservations:
                     if reservation.table:
                         # Check for overlap
-                        res_start = timezone.make_aware(
-                            datetime.combine(date, reservation.reservation_time)
-                        )
+                        res_start = timezone.make_aware(datetime.combine(date, reservation.reservation_time))
                         res_end = res_start + reservation.duration
                         if res_start <= slot_datetime < res_end:
                             tables_count -= 1
 
                 if tables_count > 0:
-                    slots.append({
-                        "date": date,
-                        "time": current_time,
-                        "available_tables": tables_count,
-                    })
+                    slots.append(
+                        {
+                            "date": date,
+                            "time": current_time,
+                            "available_tables": tables_count,
+                        }
+                    )
 
             # Move to next slot
             current_minutes = current_time.hour * 60 + current_time.minute + slot_interval
@@ -301,9 +298,7 @@ class CustomerReservationListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Reservation.objects.filter(customer=self.request.user).order_by(
-            "-reservation_date", "-reservation_time"
-        )
+        return Reservation.objects.filter(customer=self.request.user).order_by("-reservation_date", "-reservation_time")
 
 
 class CustomerReservationDetailView(generics.RetrieveAPIView):
@@ -697,9 +692,7 @@ class DashboardReservationStatsView(APIView):
                 },
                 "this_week": {
                     "total": week_reservations.count(),
-                    "confirmed": week_reservations.filter(
-                        status__in=["confirmed", "completed", "seated"]
-                    ).count(),
+                    "confirmed": week_reservations.filter(status__in=["confirmed", "completed", "seated"]).count(),
                     "cancelled": week_reservations.filter(status="cancelled").count(),
                     "no_show": week_reservations.filter(status="no_show").count(),
                 },
@@ -707,9 +700,7 @@ class DashboardReservationStatsView(APIView):
                     "total": month_reservations.count(),
                     "completed": month_reservations.filter(status="completed").count(),
                     "no_show_rate": (
-                        month_reservations.filter(status="no_show").count()
-                        / month_reservations.count()
-                        * 100
+                        month_reservations.filter(status="no_show").count() / month_reservations.count() * 100
                         if month_reservations.count() > 0
                         else 0
                     ),

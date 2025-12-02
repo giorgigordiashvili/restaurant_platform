@@ -214,8 +214,7 @@ class ReservationAdmin(admin.ModelAdmin):
         }
         color = colors.get(obj.status, "#777")
         return format_html(
-            '<span style="background-color: {}; color: white; padding: 3px 10px; '
-            'border-radius: 3px;">{}</span>',
+            '<span style="background-color: {}; color: white; padding: 3px 10px; ' 'border-radius: 3px;">{}</span>',
             color,
             obj.get_status_display(),
         )

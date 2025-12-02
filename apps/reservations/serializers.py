@@ -197,13 +197,9 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
             try:
                 settings = restaurant.reservation_settings
                 if value < settings.min_party_size:
-                    raise serializers.ValidationError(
-                        f"Minimum party size is {settings.min_party_size}."
-                    )
+                    raise serializers.ValidationError(f"Minimum party size is {settings.min_party_size}.")
                 if value > settings.max_party_size:
-                    raise serializers.ValidationError(
-                        f"Maximum party size is {settings.max_party_size}."
-                    )
+                    raise serializers.ValidationError(f"Maximum party size is {settings.max_party_size}.")
             except ReservationSettings.DoesNotExist:
                 pass
         return value
@@ -218,9 +214,7 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
         try:
             settings = restaurant.reservation_settings
             if not settings.accepts_reservations:
-                raise serializers.ValidationError(
-                    "This restaurant does not accept online reservations."
-                )
+                raise serializers.ValidationError("This restaurant does not accept online reservations.")
 
             # Check advance booking window
             reservation_datetime = timezone.make_aware(
@@ -327,9 +321,7 @@ class ReservationUpdateSerializer(serializers.ModelSerializer):
         """Validate update is allowed."""
         instance = self.instance
         if instance and not instance.can_modify:
-            raise serializers.ValidationError(
-                "This reservation can no longer be modified."
-            )
+            raise serializers.ValidationError("This reservation can no longer be modified.")
         return attrs
 
 
@@ -355,14 +347,10 @@ class ReservationStatusUpdateSerializer(serializers.Serializer):
         allowed_from = invalid_transitions.get(value, [])
 
         if value == "seated" and current_status not in ["pending", "confirmed"]:
-            raise serializers.ValidationError(
-                "Can only seat pending or confirmed reservations."
-            )
+            raise serializers.ValidationError("Can only seat pending or confirmed reservations.")
 
         if value == "completed" and current_status != "seated":
-            raise serializers.ValidationError(
-                "Can only complete seated reservations."
-            )
+            raise serializers.ValidationError("Can only complete seated reservations.")
 
         return value
 
@@ -412,9 +400,7 @@ class ReservationCancelSerializer(serializers.Serializer):
         """Validate cancellation is allowed."""
         instance = self.instance
         if not instance.can_cancel:
-            raise serializers.ValidationError(
-                "This reservation cannot be cancelled. Please contact the restaurant."
-            )
+            raise serializers.ValidationError("This reservation cannot be cancelled. Please contact the restaurant.")
         return attrs
 
 
@@ -448,9 +434,7 @@ class ReservationBlockedTimeSerializer(serializers.ModelSerializer):
         start = attrs.get("start_datetime")
         end = attrs.get("end_datetime")
         if start and end and start >= end:
-            raise serializers.ValidationError(
-                {"end_datetime": "End time must be after start time."}
-            )
+            raise serializers.ValidationError({"end_datetime": "End time must be after start time."})
         return attrs
 
     def create(self, validated_data):

@@ -242,9 +242,7 @@ class Reservation(TimeStampedModel):
         """Get combined datetime of reservation."""
         from datetime import datetime
 
-        return timezone.make_aware(
-            datetime.combine(self.reservation_date, self.reservation_time)
-        )
+        return timezone.make_aware(datetime.combine(self.reservation_date, self.reservation_time))
 
     @property
     def end_datetime(self):
@@ -272,9 +270,7 @@ class Reservation(TimeStampedModel):
         # Check cancellation deadline
         try:
             settings = self.restaurant.reservation_settings
-            deadline = self.reservation_datetime - timedelta(
-                hours=settings.cancellation_deadline_hours
-            )
+            deadline = self.reservation_datetime - timedelta(hours=settings.cancellation_deadline_hours)
             return timezone.now() < deadline
         except ReservationSettings.DoesNotExist:
             return self.is_upcoming
