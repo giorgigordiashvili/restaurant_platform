@@ -338,14 +338,7 @@ class ReservationStatusUpdateSerializer(serializers.Serializer):
         if not instance:
             return value
 
-        invalid_transitions = {
-            "completed": ["pending", "confirmed", "waitlist", "seated"],
-            "cancelled": ["pending", "confirmed", "waitlist"],
-            "no_show": ["pending", "confirmed", "waitlist"],
-        }
-
         current_status = instance.status
-        allowed_from = invalid_transitions.get(value, [])
 
         if value == "seated" and current_status not in ["pending", "confirmed"]:
             raise serializers.ValidationError("Can only seat pending or confirmed reservations.")

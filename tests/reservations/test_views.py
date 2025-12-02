@@ -3,7 +3,7 @@ Tests for reservation views.
 """
 
 import uuid
-from datetime import date, time, timedelta
+from datetime import timedelta
 
 from django.utils import timezone
 
@@ -146,7 +146,7 @@ class TestCustomerReservationListView:
 
     def test_authenticated_can_list(self, authenticated_client, user, restaurant, create_reservation):
         """Test that authenticated users can list their reservations."""
-        reservation = create_reservation(restaurant=restaurant, customer=user)
+        create_reservation(restaurant=restaurant, customer=user)
         response = authenticated_client.get(self.url)
         assert response.status_code == status.HTTP_200_OK
 
