@@ -1,0 +1,277 @@
+# Georgian translations for Restaurant Platform Admin
+# Copyright (C) 2024
+# This file is distributed under the same license as the restaurant_platform package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: restaurant_platform 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-12-03 00:00+0000\n"
+"PO-Revision-Date: 2024-12-03 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# Admin site
+msgid "Django administration"
+msgstr "ადმინისტრირება"
+
+msgid "Site administration"
+msgstr "საიტის ადმინისტრირება"
+
+msgid "Log in"
+msgstr "შესვლა"
+
+msgid "Log out"
+msgstr "გასვლა"
+
+msgid "Welcome,"
+msgstr "გამარჯობა,"
+
+msgid "Change password"
+msgstr "პაროლის შეცვლა"
+
+msgid "View site"
+msgstr "საიტის ნახვა"
+
+# Common actions
+msgid "Add"
+msgstr "დამატება"
+
+msgid "Change"
+msgstr "შეცვლა"
+
+msgid "Delete"
+msgstr "წაშლა"
+
+msgid "Save"
+msgstr "შენახვა"
+
+msgid "Save and add another"
+msgstr "შენახვა და ახლის დამატება"
+
+msgid "Save and continue editing"
+msgstr "შენახვა და რედაქტირების გაგრძელება"
+
+msgid "Delete selected"
+msgstr "მონიშნულის წაშლა"
+
+msgid "Search"
+msgstr "ძებნა"
+
+msgid "Filter"
+msgstr "ფილტრი"
+
+msgid "Clear all filters"
+msgstr "ფილტრების გასუფთავება"
+
+# Dashboard
+msgid "Dashboard"
+msgstr "მთავარი პანელი"
+
+msgid "Recent actions"
+msgstr "ბოლო მოქმედებები"
+
+msgid "My actions"
+msgstr "ჩემი მოქმედებები"
+
+msgid "None available"
+msgstr "არ არის ხელმისაწვდომი"
+
+# Models - Menu
+msgid "Menu"
+msgstr "მენიუ"
+
+msgid "Menu Categories"
+msgstr "მენიუს კატეგორიები"
+
+msgid "Menu Category"
+msgstr "მენიუს კატეგორია"
+
+msgid "Menu Items"
+msgstr "მენიუს ერთეულები"
+
+msgid "Menu Item"
+msgstr "მენიუს ერთეული"
+
+msgid "Modifier Groups"
+msgstr "მოდიფიკატორების ჯგუფები"
+
+msgid "Modifier Group"
+msgstr "მოდიფიკატორის ჯგუფი"
+
+msgid "Modifiers"
+msgstr "მოდიფიკატორები"
+
+msgid "Modifier"
+msgstr "მოდიფიკატორი"
+
+# Models - Orders
+msgid "Orders"
+msgstr "შეკვეთები"
+
+msgid "Order"
+msgstr "შეკვეთა"
+
+msgid "Order Items"
+msgstr "შეკვეთის ერთეულები"
+
+msgid "Order Item"
+msgstr "შეკვეთის ერთეული"
+
+msgid "Order Status History"
+msgstr "შეკვეთის სტატუსის ისტორია"
+
+# Models - Tables
+msgid "Tables"
+msgstr "მაგიდები"
+
+msgid "Table"
+msgstr "მაგიდა"
+
+msgid "Table Sections"
+msgstr "მაგიდების სექციები"
+
+msgid "Table Section"
+msgstr "მაგიდის სექცია"
+
+msgid "Table QR Codes"
+msgstr "მაგიდის QR კოდები"
+
+msgid "Table QR Code"
+msgstr "მაგიდის QR კოდი"
+
+msgid "Table Sessions"
+msgstr "მაგიდის სესიები"
+
+msgid "Table Session"
+msgstr "მაგიდის სესია"
+
+# Models - Staff
+msgid "Staff"
+msgstr "პერსონალი"
+
+msgid "Staff Members"
+msgstr "პერსონალის წევრები"
+
+msgid "Staff Member"
+msgstr "პერსონალის წევრი"
+
+msgid "Staff Roles"
+msgstr "პერსონალის როლები"
+
+msgid "Staff Role"
+msgstr "პერსონალის როლი"
+
+msgid "Staff Invitations"
+msgstr "პერსონალის მოწვევები"
+
+msgid "Staff Invitation"
+msgstr "პერსონალის მოწვევა"
+
+# Models - Reservations
+msgid "Reservations"
+msgstr "დაჯავშნები"
+
+msgid "Reservation"
+msgstr "დაჯავშნა"
+
+msgid "Reservation Settings"
+msgstr "დაჯავშნის პარამეტრები"
+
+msgid "Blocked Times"
+msgstr "დაბლოკილი დრო"
+
+msgid "Blocked Time"
+msgstr "დაბლოკილი დრო"
+
+# Status choices
+msgid "Pending"
+msgstr "მოლოდინში"
+
+msgid "Confirmed"
+msgstr "დადასტურებული"
+
+msgid "Preparing"
+msgstr "მზადდება"
+
+msgid "Ready"
+msgstr "მზადაა"
+
+msgid "Served"
+msgstr "მიწოდებული"
+
+msgid "Completed"
+msgstr "დასრულებული"
+
+msgid "Cancelled"
+msgstr "გაუქმებული"
+
+# Table status
+msgid "Available"
+msgstr "თავისუფალი"
+
+msgid "Occupied"
+msgstr "დაკავებული"
+
+msgid "Reserved"
+msgstr "დაჯავშნილი"
+
+msgid "Unavailable"
+msgstr "მიუწვდომელი"
+
+# Common fields
+msgid "Name"
+msgstr "სახელი"
+
+msgid "Description"
+msgstr "აღწერა"
+
+msgid "Price"
+msgstr "ფასი"
+
+msgid "Status"
+msgstr "სტატუსი"
+
+msgid "Active"
+msgstr "აქტიური"
+
+msgid "Created at"
+msgstr "შექმნის თარიღი"
+
+msgid "Updated at"
+msgstr "განახლების თარიღი"
+
+msgid "Is active"
+msgstr "აქტიურია"
+
+msgid "Is available"
+msgstr "ხელმისაწვდომია"
+
+# Yes/No
+msgid "Yes"
+msgstr "დიახ"
+
+msgid "No"
+msgstr "არა"
+
+# Pagination
+msgid "Show all"
+msgstr "ყველას ჩვენება"
+
+msgid "items"
+msgstr "ერთეული"
+
+# Confirmation
+msgid "Are you sure?"
+msgstr "დარწმუნებული ხართ?"
+
+msgid "Successfully deleted"
+msgstr "წარმატებით წაიშალა"
+
+msgid "Successfully saved"
+msgstr "წარმატებით შეინახა"
