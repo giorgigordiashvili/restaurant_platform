@@ -17,6 +17,12 @@ SECRET_KEY = config("SECRET_KEY")
 MAIN_DOMAIN = config("MAIN_DOMAIN", default="localhost")
 
 # Application definition
+# Unfold must come BEFORE django.contrib.admin for its templates to load
+UNFOLD_APPS = [
+    "unfold",
+    "unfold.contrib.filters",
+]
+
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -27,8 +33,6 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    "unfold",  # Modern admin UI for tenant admin
-    "unfold.contrib.filters",
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
@@ -54,7 +58,7 @@ LOCAL_APPS = [
     "apps.audit",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = UNFOLD_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
