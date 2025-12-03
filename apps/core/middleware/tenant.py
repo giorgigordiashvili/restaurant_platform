@@ -24,6 +24,7 @@ class TenantMiddleware:
     def __call__(self, request):
         request.restaurant = None
         request.is_dashboard = False
+        request.is_tenant_admin = False  # For tenant-specific admin routing
 
         # Lazy import to avoid circular imports
         from apps.tenants.models import Restaurant
@@ -36,6 +37,9 @@ class TenantMiddleware:
                 restaurant = Restaurant.objects.get(slug=restaurant_slug, is_active=True)
                 request.restaurant = restaurant
                 request.is_dashboard = True
+                # Mark as tenant admin if accessing /admin/ with restaurant context
+                if request.path.startswith("/admin/"):
+                    request.is_tenant_admin = True
             except Restaurant.DoesNotExist:
                 # Restaurant not found via header
                 pass
@@ -53,6 +57,9 @@ class TenantMiddleware:
                         restaurant = Restaurant.objects.get(slug=subdomain, is_active=True)
                         request.restaurant = restaurant
                         request.is_dashboard = True
+                        # Mark as tenant admin if accessing /admin/ on restaurant subdomain
+                        if request.path.startswith("/admin/"):
+                            request.is_tenant_admin = True
                     except Restaurant.DoesNotExist:
                         # Restaurant not found - will be handled by views
                         pass

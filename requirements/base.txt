@@ -39,6 +39,9 @@ django-filter>=24.1
 django-extensions>=3.2
 dj-database-url>=2.1
 
+# Modern Admin UI (for tenant admin)
+django-unfold>=0.20
+
 # Production server
 gunicorn>=22.0
 whitenoise>=6.6

@@ -27,6 +27,8 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "unfold",  # Modern admin UI for tenant admin
+    "unfold.contrib.filters",
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
@@ -66,6 +68,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.core.middleware.tenant.TenantMiddleware",
+    "apps.core.middleware.admin_router.TenantAdminRouterMiddleware",  # Route tenant admin
     "apps.core.middleware.audit.AuditMiddleware",
 ]
 
@@ -310,6 +313,34 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@restaurant.ge")
+
+# Django Unfold Configuration (for tenant admin)
+UNFOLD = {
+    "SITE_TITLE": "Restaurant Dashboard",
+    "SITE_HEADER": "Restaurant Dashboard",
+    "SITE_SYMBOL": "restaurant",
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": False,
+    "COLORS": {
+        "primary": {
+            "50": "#eff6ff",
+            "100": "#dbeafe",
+            "200": "#bfdbfe",
+            "300": "#93c5fd",
+            "400": "#60a5fa",
+            "500": "#3b82f6",
+            "600": "#2563eb",
+            "700": "#1d4ed8",
+            "800": "#1e40af",
+            "900": "#1e3a8a",
+            "950": "#172554",
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": False,
+    },
+}
 
 # Logging Configuration
 LOGGING = {
