@@ -4,6 +4,7 @@ Order models for restaurant order management.
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
 
@@ -150,6 +151,8 @@ class Order(TimeStampedModel):
     class Meta:
         db_table = "orders"
         ordering = ["-created_at"]
+        verbose_name = _("Order")
+        verbose_name_plural = _("Orders")
         indexes = [
             models.Index(fields=["restaurant", "status"]),
             models.Index(fields=["restaurant", "created_at"]),

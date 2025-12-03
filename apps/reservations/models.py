@@ -7,6 +7,7 @@ import string
 from datetime import timedelta
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 from apps.core.models import TimeStampedModel
@@ -84,8 +85,8 @@ class ReservationSettings(TimeStampedModel):
 
     class Meta:
         db_table = "reservation_settings"
-        verbose_name = "Reservation Settings"
-        verbose_name_plural = "Reservation Settings"
+        verbose_name = _("Reservation Settings")
+        verbose_name_plural = _("Reservation Settings")
 
     def __str__(self):
         return f"Reservation settings for {self.restaurant.name}"
@@ -210,8 +211,8 @@ class Reservation(TimeStampedModel):
 
     class Meta:
         db_table = "reservations"
-        verbose_name = "Reservation"
-        verbose_name_plural = "Reservations"
+        verbose_name = _("Reservation")
+        verbose_name_plural = _("Reservations")
         ordering = ["reservation_date", "reservation_time"]
         indexes = [
             models.Index(fields=["restaurant", "reservation_date"]),
@@ -379,8 +380,8 @@ class ReservationBlockedTime(TimeStampedModel):
 
     class Meta:
         db_table = "reservation_blocked_times"
-        verbose_name = "Blocked Time"
-        verbose_name_plural = "Blocked Times"
+        verbose_name = _("Blocked Time")
+        verbose_name_plural = _("Blocked Times")
         ordering = ["start_datetime"]
 
     def __str__(self):
@@ -420,8 +421,8 @@ class ReservationHistory(TimeStampedModel):
 
     class Meta:
         db_table = "reservation_history"
-        verbose_name = "Reservation History"
-        verbose_name_plural = "Reservation Histories"
+        verbose_name = _("Reservation History")
+        verbose_name_plural = _("Reservation History")
         ordering = ["-created_at"]
 
     def __str__(self):

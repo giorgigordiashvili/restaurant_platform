@@ -10,24 +10,42 @@ class APILanguageMiddleware:
     """
     Middleware to activate language based on:
     1. Query parameter (?lang=en)
-    2. User's preferred_language setting
-    3. Accept-Language header
-    4. Default language (Georgian)
+    2. Session preference (set by Django's set_language view)
+    3. User's preferred_language setting
+    4. Accept-Language header
+    5. Default language (Georgian)
+
+    Note: For admin pages, we respect Django's session-based language preference
+    set by the language switcher.
     """
+
+    LANGUAGE_SESSION_KEY = "django_language"
 
     def __init__(self, get_response):
         self.get_response = get_response
         self.supported_languages = [lang[0] for lang in settings.LANGUAGES]
 
     def __call__(self, request):
+        # Skip for admin pages - let LocaleMiddleware handle it
+        if request.path.startswith(("/admin/", "/tenant-admin/")):
+            response = self.get_response(request)
+            response["Content-Language"] = getattr(
+                request, "LANGUAGE_CODE", settings.LANGUAGE_CODE
+            )
+            return response
+
         # Priority 1: Query parameter
         lang = request.GET.get("lang")
 
-        # Priority 2: User preference (if authenticated)
+        # Priority 2: Session preference (from Django's set_language)
+        if not lang and hasattr(request, "session"):
+            lang = request.session.get(self.LANGUAGE_SESSION_KEY)
+
+        # Priority 3: User preference (if authenticated)
         if not lang and hasattr(request, "user") and request.user.is_authenticated:
             lang = getattr(request.user, "preferred_language", None)
 
-        # Priority 3: Accept-Language header
+        # Priority 4: Accept-Language header
         if not lang:
             lang = self._get_language_from_header(request)
 

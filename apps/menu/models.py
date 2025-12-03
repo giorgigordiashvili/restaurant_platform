@@ -4,6 +4,7 @@ Menu models with multi-language support via django-parler.
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from parler.models import TranslatableModel, TranslatedFields
 
@@ -36,7 +37,8 @@ class MenuCategory(TranslatableModel, TimeStampedModel):
     class Meta:
         db_table = "menu_categories"
         ordering = ["display_order", "created_at"]
-        verbose_name_plural = "Menu Categories"
+        verbose_name = _("Menu Category")
+        verbose_name_plural = _("Menu Categories")
 
     def __str__(self):
         return self.safe_translation_getter("name", default=f"Category {self.pk}")
@@ -142,6 +144,8 @@ class MenuItem(TranslatableModel, TimeStampedModel):
     class Meta:
         db_table = "menu_items"
         ordering = ["display_order", "created_at"]
+        verbose_name = _("Menu Item")
+        verbose_name_plural = _("Menu Items")
         indexes = [
             models.Index(fields=["restaurant", "is_available"]),
             models.Index(fields=["category", "is_available"]),
@@ -213,6 +217,8 @@ class ModifierGroup(TranslatableModel, TimeStampedModel):
     class Meta:
         db_table = "modifier_groups"
         ordering = ["display_order", "created_at"]
+        verbose_name = _("Modifier Group")
+        verbose_name_plural = _("Modifier Groups")
 
     def __str__(self):
         return self.safe_translation_getter("name", default=f"Modifier Group {self.pk}")
@@ -247,6 +253,8 @@ class Modifier(TranslatableModel, TimeStampedModel):
     class Meta:
         db_table = "modifiers"
         ordering = ["display_order", "created_at"]
+        verbose_name = _("Modifier")
+        verbose_name_plural = _("Modifiers")
 
     def __str__(self):
         name = self.safe_translation_getter("name", default=f"Modifier {self.pk}")

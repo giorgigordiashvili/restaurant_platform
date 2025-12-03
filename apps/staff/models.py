@@ -5,6 +5,7 @@ Staff models for restaurant personnel management.
 import secrets
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 from apps.core.models import TimeStampedModel
@@ -82,6 +83,8 @@ class StaffRole(TimeStampedModel):
         db_table = "staff_roles"
         unique_together = ["restaurant", "name"]
         ordering = ["name"]
+        verbose_name = _("Staff Role")
+        verbose_name_plural = _("Staff Roles")
 
     def __str__(self):
         return f"{self.get_display_name()} @ {self.restaurant.name}"
@@ -163,6 +166,8 @@ class StaffMember(TimeStampedModel):
         db_table = "staff_members"
         unique_together = ["user", "restaurant"]
         ordering = ["-created_at"]
+        verbose_name = _("Staff Member")
+        verbose_name_plural = _("Staff Members")
 
     def __str__(self):
         return f"{self.user.email} - {self.role.get_display_name()} @ {self.restaurant.name}"
@@ -244,6 +249,8 @@ class StaffInvitation(TimeStampedModel):
     class Meta:
         db_table = "staff_invitations"
         ordering = ["-created_at"]
+        verbose_name = _("Staff Invitation")
+        verbose_name_plural = _("Staff Invitations")
 
     def __str__(self):
         return f"Invitation for {self.email} to {self.restaurant.name}"

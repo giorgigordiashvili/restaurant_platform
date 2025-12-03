@@ -5,6 +5,7 @@ Table models for restaurant table management and QR code ordering.
 import secrets
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
 
@@ -29,6 +30,8 @@ class TableSection(TimeStampedModel):
         db_table = "table_sections"
         ordering = ["display_order", "name"]
         unique_together = ["restaurant", "name"]
+        verbose_name = _("Table Section")
+        verbose_name_plural = _("Table Sections")
 
     def __str__(self):
         return f"{self.name} @ {self.restaurant.name}"
@@ -109,6 +112,8 @@ class Table(TimeStampedModel):
         db_table = "tables"
         ordering = ["section__display_order", "number"]
         unique_together = ["restaurant", "number"]
+        verbose_name = _("Table")
+        verbose_name_plural = _("Tables")
         indexes = [
             models.Index(fields=["restaurant", "status"]),
         ]
@@ -163,8 +168,8 @@ class TableQRCode(TimeStampedModel):
 
     class Meta:
         db_table = "table_qr_codes"
-        verbose_name = "Table QR Code"
-        verbose_name_plural = "Table QR Codes"
+        verbose_name = _("Table QR Code")
+        verbose_name_plural = _("Table QR Codes")
 
     def __str__(self):
         return f"QR for {self.table} ({self.code[:8]}...)"

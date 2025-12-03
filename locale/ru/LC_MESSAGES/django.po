@@ -1,0 +1,825 @@
+# Russian translations for Restaurant Platform Admin
+# Copyright (C) 2024
+# This file is distributed under the same license as the restaurant_platform package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: restaurant_platform 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-12-03 00:00+0000\n"
+"PO-Revision-Date: 2024-12-03 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+# Admin site
+msgid "Django administration"
+msgstr "Администрирование"
+
+msgid "Site administration"
+msgstr "Администрирование сайта"
+
+msgid "Log in"
+msgstr "Войти"
+
+msgid "Log out"
+msgstr "Выйти"
+
+msgid "Welcome,"
+msgstr "Добро пожаловать,"
+
+msgid "Change password"
+msgstr "Сменить пароль"
+
+msgid "View site"
+msgstr "Просмотр сайта"
+
+msgid "Home"
+msgstr "Главная"
+
+msgid "History"
+msgstr "История"
+
+msgid "View on site"
+msgstr "Смотреть на сайте"
+
+# Common actions
+msgid "Add"
+msgstr "Добавить"
+
+msgid "Change"
+msgstr "Изменить"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Save and add another"
+msgstr "Сохранить и добавить другой"
+
+msgid "Save and continue editing"
+msgstr "Сохранить и продолжить редактирование"
+
+msgid "Save and view"
+msgstr "Сохранить и просмотреть"
+
+msgid "Delete selected"
+msgstr "Удалить выбранные"
+
+msgid "Search"
+msgstr "Поиск"
+
+msgid "Filter"
+msgstr "Фильтр"
+
+msgid "Clear all filters"
+msgstr "Сбросить все фильтры"
+
+msgid "Remove from sorting"
+msgstr "Убрать из сортировки"
+
+msgid "Toggle sorting"
+msgstr "Переключить сортировку"
+
+msgid "Select all"
+msgstr "Выбрать все"
+
+msgid "Select"
+msgstr "Выбрать"
+
+msgid "Action"
+msgstr "Действие"
+
+msgid "Go"
+msgstr "Выполнить"
+
+msgid "Run the selected action"
+msgstr "Выполнить выбранное действие"
+
+msgid "Select all objects on this page for an action"
+msgstr "Выбрать все объекты на этой странице"
+
+msgid "Click here to select all objects across all pages"
+msgstr "Выбрать все объекты на всех страницах"
+
+# Dashboard
+msgid "Dashboard"
+msgstr "Панель управления"
+
+msgid "Recent actions"
+msgstr "Последние действия"
+
+msgid "My actions"
+msgstr "Мои действия"
+
+msgid "None available"
+msgstr "Недоступно"
+
+msgid "Unknown content"
+msgstr "Неизвестное содержимое"
+
+# Models - Accounts
+msgid "Accounts"
+msgstr "Аккаунты"
+
+msgid "Users"
+msgstr "Пользователи"
+
+msgid "User"
+msgstr "Пользователь"
+
+msgid "User Profiles"
+msgstr "Профили пользователей"
+
+msgid "User Profile"
+msgstr "Профиль пользователя"
+
+# Models - Tenants
+msgid "Tenants"
+msgstr "Арендаторы"
+
+msgid "Restaurants"
+msgstr "Рестораны"
+
+msgid "Restaurant"
+msgstr "Ресторан"
+
+msgid "Restaurant Hours"
+msgstr "Часы работы ресторана"
+
+# Models - Menu
+msgid "Menu"
+msgstr "Меню"
+
+msgid "Menu Categories"
+msgstr "Категории меню"
+
+msgid "Menu Category"
+msgstr "Категория меню"
+
+msgid "Menu Items"
+msgstr "Позиции меню"
+
+msgid "Menu Item"
+msgstr "Позиция меню"
+
+msgid "Modifier Groups"
+msgstr "Группы модификаторов"
+
+msgid "Modifier Group"
+msgstr "Группа модификаторов"
+
+msgid "Modifiers"
+msgstr "Модификаторы"
+
+msgid "Modifier"
+msgstr "Модификатор"
+
+# Models - Orders
+msgid "Orders"
+msgstr "Заказы"
+
+msgid "Order"
+msgstr "Заказ"
+
+msgid "Order Items"
+msgstr "Позиции заказа"
+
+msgid "Order Item"
+msgstr "Позиция заказа"
+
+msgid "Order Status History"
+msgstr "История статуса заказа"
+
+msgid "Group Orders"
+msgstr "Групповые заказы"
+
+msgid "Group Order"
+msgstr "Групповой заказ"
+
+# Models - Tables
+msgid "Tables"
+msgstr "Столики"
+
+msgid "Table"
+msgstr "Столик"
+
+msgid "Table Sections"
+msgstr "Секции столиков"
+
+msgid "Table Section"
+msgstr "Секция столиков"
+
+msgid "Table QR Codes"
+msgstr "QR-коды столиков"
+
+msgid "Table QR Code"
+msgstr "QR-код столика"
+
+msgid "Table Sessions"
+msgstr "Сессии столиков"
+
+msgid "Table Session"
+msgstr "Сессия столика"
+
+msgid "Table Session Guests"
+msgstr "Гости столика"
+
+msgid "Table Session Guest"
+msgstr "Гость столика"
+
+# Models - Staff
+msgid "Staff"
+msgstr "Персонал"
+
+msgid "Staff Members"
+msgstr "Сотрудники"
+
+msgid "Staff Member"
+msgstr "Сотрудник"
+
+msgid "Staff Roles"
+msgstr "Роли персонала"
+
+msgid "Staff Role"
+msgstr "Роль персонала"
+
+msgid "Staff Invitations"
+msgstr "Приглашения персонала"
+
+msgid "Staff Invitation"
+msgstr "Приглашение персонала"
+
+# Models - Reservations
+msgid "Reservations"
+msgstr "Бронирования"
+
+msgid "Reservation"
+msgstr "Бронирование"
+
+msgid "Reservation Settings"
+msgstr "Настройки бронирования"
+
+msgid "Blocked Times"
+msgstr "Заблокированное время"
+
+msgid "Blocked Time"
+msgstr "Заблокированное время"
+
+msgid "Reservation History"
+msgstr "История бронирований"
+
+# Models - Payments
+msgid "Payments"
+msgstr "Платежи"
+
+msgid "Payment"
+msgstr "Платёж"
+
+msgid "Refunds"
+msgstr "Возвраты"
+
+msgid "Refund"
+msgstr "Возврат"
+
+# Models - Favorites
+msgid "Favorites"
+msgstr "Избранное"
+
+msgid "Favorite"
+msgstr "Избранное"
+
+# Models - Audit
+msgid "Audit"
+msgstr "Аудит"
+
+msgid "Audit Logs"
+msgstr "Журнал аудита"
+
+msgid "Audit Log"
+msgstr "Запись аудита"
+
+# Status choices - Order
+msgid "Pending"
+msgstr "В ожидании"
+
+msgid "Confirmed"
+msgstr "Подтверждён"
+
+msgid "Preparing"
+msgstr "Готовится"
+
+msgid "Ready"
+msgstr "Готов"
+
+msgid "Served"
+msgstr "Подан"
+
+msgid "Completed"
+msgstr "Завершён"
+
+msgid "Cancelled"
+msgstr "Отменён"
+
+msgid "Paid"
+msgstr "Оплачено"
+
+msgid "Partially Paid"
+msgstr "Частично оплачено"
+
+msgid "Unpaid"
+msgstr "Не оплачено"
+
+# Table status
+msgid "Available"
+msgstr "Свободен"
+
+msgid "Occupied"
+msgstr "Занят"
+
+msgid "Reserved"
+msgstr "Забронирован"
+
+msgid "Unavailable"
+msgstr "Недоступен"
+
+# Days of week
+msgid "Monday"
+msgstr "Понедельник"
+
+msgid "Tuesday"
+msgstr "Вторник"
+
+msgid "Wednesday"
+msgstr "Среда"
+
+msgid "Thursday"
+msgstr "Четверг"
+
+msgid "Friday"
+msgstr "Пятница"
+
+msgid "Saturday"
+msgstr "Суббота"
+
+msgid "Sunday"
+msgstr "Воскресенье"
+
+# Common fields
+msgid "Name"
+msgstr "Название"
+
+msgid "Description"
+msgstr "Описание"
+
+msgid "Price"
+msgstr "Цена"
+
+msgid "Status"
+msgstr "Статус"
+
+msgid "Active"
+msgstr "Активен"
+
+msgid "Created at"
+msgstr "Дата создания"
+
+msgid "Updated at"
+msgstr "Дата обновления"
+
+msgid "Created"
+msgstr "Создано"
+
+msgid "Updated"
+msgstr "Обновлено"
+
+msgid "Is active"
+msgstr "Активен"
+
+msgid "Is available"
+msgstr "Доступен"
+
+msgid "Email"
+msgstr "Эл. почта"
+
+msgid "Phone"
+msgstr "Телефон"
+
+msgid "Phone number"
+msgstr "Номер телефона"
+
+msgid "Address"
+msgstr "Адрес"
+
+msgid "Image"
+msgstr "Изображение"
+
+msgid "Note"
+msgstr "Заметка"
+
+msgid "Notes"
+msgstr "Заметки"
+
+msgid "Date"
+msgstr "Дата"
+
+msgid "Time"
+msgstr "Время"
+
+msgid "Amount"
+msgstr "Сумма"
+
+msgid "Total"
+msgstr "Итого"
+
+msgid "Subtotal"
+msgstr "Промежуточный итог"
+
+msgid "Quantity"
+msgstr "Количество"
+
+msgid "Number"
+msgstr "Номер"
+
+msgid "Capacity"
+msgstr "Вместимость"
+
+msgid "Position"
+msgstr "Позиция"
+
+msgid "Sort order"
+msgstr "Порядок сортировки"
+
+msgid "Slug"
+msgstr "Слаг"
+
+# Yes/No
+msgid "Yes"
+msgstr "Да"
+
+msgid "No"
+msgstr "Нет"
+
+msgid "All"
+msgstr "Все"
+
+msgid "Any"
+msgstr "Любой"
+
+msgid "None"
+msgstr "Нет"
+
+# Pagination
+msgid "Show all"
+msgstr "Показать все"
+
+msgid "items"
+msgstr "элементов"
+
+msgid "of"
+msgstr "из"
+
+msgid "results"
+msgstr "результатов"
+
+# Confirmation
+msgid "Are you sure?"
+msgstr "Вы уверены?"
+
+msgid "Are you sure you want to delete"
+msgstr "Вы уверены, что хотите удалить"
+
+msgid "Successfully deleted"
+msgstr "Успешно удалено"
+
+msgid "Successfully saved"
+msgstr "Успешно сохранено"
+
+msgid "Successfully added"
+msgstr "Успешно добавлено"
+
+msgid "Successfully updated"
+msgstr "Успешно обновлено"
+
+msgid "Error"
+msgstr "Ошибка"
+
+msgid "Warning"
+msgstr "Предупреждение"
+
+msgid "Success"
+msgstr "Успех"
+
+msgid "Info"
+msgstr "Информация"
+
+# Profile Settings
+msgid "Profile Settings"
+msgstr "Настройки профиля"
+
+msgid "Account Information"
+msgstr "Информация об аккаунте"
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Save Language"
+msgstr "Сохранить язык"
+
+msgid "Security"
+msgstr "Безопасность"
+
+msgid "Change Password"
+msgstr "Сменить пароль"
+
+# Form validation
+msgid "This field is required."
+msgstr "Это поле обязательно."
+
+msgid "Enter a valid email address."
+msgstr "Введите корректный адрес эл. почты."
+
+msgid "Enter a valid value."
+msgstr "Введите корректное значение."
+
+msgid "Enter a valid number."
+msgstr "Введите корректное число."
+
+msgid "Enter a valid date."
+msgstr "Введите корректную дату."
+
+msgid "Enter a valid time."
+msgstr "Введите корректное время."
+
+msgid "This field cannot be blank."
+msgstr "Это поле не может быть пустым."
+
+msgid "Please correct the error below."
+msgstr "Пожалуйста, исправьте ошибку ниже."
+
+msgid "Please correct the errors below."
+msgstr "Пожалуйста, исправьте ошибки ниже."
+
+# Login
+msgid "Username"
+msgstr "Имя пользователя"
+
+msgid "Password"
+msgstr "Пароль"
+
+msgid "Forgot your password?"
+msgstr "Забыли пароль?"
+
+msgid "Remember me"
+msgstr "Запомнить меня"
+
+msgid "Sign in"
+msgstr "Войти"
+
+msgid "Sign up"
+msgstr "Регистрация"
+
+msgid "Sign out"
+msgstr "Выйти"
+
+# Password
+msgid "Old password"
+msgstr "Старый пароль"
+
+msgid "New password"
+msgstr "Новый пароль"
+
+msgid "Confirm password"
+msgstr "Подтверждение пароля"
+
+msgid "Password confirmation"
+msgstr "Подтверждение пароля"
+
+msgid "The two password fields didn't match."
+msgstr "Пароли не совпадают."
+
+msgid "Your password was changed."
+msgstr "Ваш пароль был изменён."
+
+# Dates and times
+msgid "Today"
+msgstr "Сегодня"
+
+msgid "Yesterday"
+msgstr "Вчера"
+
+msgid "Tomorrow"
+msgstr "Завтра"
+
+msgid "Now"
+msgstr "Сейчас"
+
+msgid "This month"
+msgstr "В этом месяце"
+
+msgid "This year"
+msgstr "В этом году"
+
+msgid "Past 7 days"
+msgstr "Последние 7 дней"
+
+# Boolean field display
+msgid "true"
+msgstr "да"
+
+msgid "false"
+msgstr "нет"
+
+# Permissions
+msgid "Permission"
+msgstr "Разрешение"
+
+msgid "Permissions"
+msgstr "Разрешения"
+
+msgid "Add permission"
+msgstr "Добавить разрешение"
+
+msgid "Change permission"
+msgstr "Изменить разрешение"
+
+msgid "Delete permission"
+msgstr "Удалить разрешение"
+
+msgid "View permission"
+msgstr "Просмотреть разрешение"
+
+msgid "Can add"
+msgstr "Может добавлять"
+
+msgid "Can change"
+msgstr "Может изменять"
+
+msgid "Can delete"
+msgstr "Может удалять"
+
+msgid "Can view"
+msgstr "Может просматривать"
+
+# Filter labels
+msgid "By"
+msgstr "По"
+
+msgid "Any date"
+msgstr "Любая дата"
+
+msgid "Has date"
+msgstr "Есть дата"
+
+msgid "No date"
+msgstr "Без даты"
+
+# Empty states
+msgid "No results found."
+msgstr "Результаты не найдены."
+
+msgid "No data available"
+msgstr "Данные недоступны"
+
+msgid "There are no items yet."
+msgstr "Пока нет элементов."
+
+# Misc
+msgid "Optional"
+msgstr "Необязательно"
+
+msgid "Required"
+msgstr "Обязательно"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Back"
+msgstr "Назад"
+
+msgid "Next"
+msgstr "Далее"
+
+msgid "Previous"
+msgstr "Назад"
+
+msgid "First"
+msgstr "Первый"
+
+msgid "Last"
+msgstr "Последний"
+
+msgid "Loading..."
+msgstr "Загрузка..."
+
+msgid "Please wait..."
+msgstr "Пожалуйста, подождите..."
+
+msgid "Refresh"
+msgstr "Обновить"
+
+msgid "Export"
+msgstr "Экспорт"
+
+msgid "Import"
+msgstr "Импорт"
+
+msgid "Download"
+msgstr "Скачать"
+
+msgid "Upload"
+msgstr "Загрузить"
+
+msgid "Print"
+msgstr "Печать"
+
+msgid "Copy"
+msgstr "Копировать"
+
+msgid "Edit"
+msgstr "Редактировать"
+
+msgid "View"
+msgstr "Просмотр"
+
+msgid "Details"
+msgstr "Подробности"
+
+msgid "More"
+msgstr "Больше"
+
+msgid "Less"
+msgstr "Меньше"
+
+msgid "Show"
+msgstr "Показать"
+
+msgid "Hide"
+msgstr "Скрыть"
+
+msgid "Expand"
+msgstr "Развернуть"
+
+msgid "Collapse"
+msgstr "Свернуть"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Help"
+msgstr "Помощь"
+
+msgid "About"
+msgstr "О программе"
+
+msgid "Contact"
+msgstr "Контакт"
+
+# Additional model names
+msgid "Order Item Modifiers"
+msgstr "Модификаторы позиций заказа"
+
+msgid "Order Item Modifier"
+msgstr "Модификатор позиции заказа"
+
+msgid "Order Status Histories"
+msgstr "История статуса заказа"
+
+msgid "Payment Methods"
+msgstr "Способы оплаты"
+
+msgid "Payment Method"
+msgstr "Способ оплаты"
+
+msgid "Favorite Menu Items"
+msgstr "Избранные позиции меню"
+
+msgid "Favorite Menu Item"
+msgstr "Избранная позиция меню"
+
+msgid "Favorite Restaurants"
+msgstr "Избранные рестораны"
+
+msgid "Favorite Restaurant"
+msgstr "Избранный ресторан"
+
+msgid "Menu Item Modifier Groups"
+msgstr "Группы модификаторов позиций меню"
+
+msgid "Authentication and Authorization"
+msgstr "Аутентификация и авторизация"
+
+msgid "Groups"
+msgstr "Группы"
+
+msgid "Group"
+msgstr "Группа"

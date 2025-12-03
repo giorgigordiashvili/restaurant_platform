@@ -38,6 +38,15 @@ msgstr "პაროლის შეცვლა"
 msgid "View site"
 msgstr "საიტის ნახვა"
 
+msgid "Home"
+msgstr "მთავარი"
+
+msgid "History"
+msgstr "ისტორია"
+
+msgid "View on site"
+msgstr "საიტზე ნახვა"
+
 # Common actions
 msgid "Add"
 msgstr "დამატება"
@@ -57,6 +66,9 @@ msgstr "შენახვა და ახლის დამატება"
 msgid "Save and continue editing"
 msgstr "შენახვა და რედაქტირების გაგრძელება"
 
+msgid "Save and view"
+msgstr "შენახვა და ნახვა"
+
 msgid "Delete selected"
 msgstr "მონიშნულის წაშლა"
 
@@ -68,6 +80,33 @@ msgstr "ფილტრი"
 
 msgid "Clear all filters"
 msgstr "ფილტრების გასუფთავება"
+
+msgid "Remove from sorting"
+msgstr "დალაგებიდან ამოღება"
+
+msgid "Toggle sorting"
+msgstr "დალაგების გადართვა"
+
+msgid "Select all"
+msgstr "ყველას მონიშვნა"
+
+msgid "Select"
+msgstr "მონიშვნა"
+
+msgid "Action"
+msgstr "მოქმედება"
+
+msgid "Go"
+msgstr "შესრულება"
+
+msgid "Run the selected action"
+msgstr "მონიშნული მოქმედების შესრულება"
+
+msgid "Select all objects on this page for an action"
+msgstr "ყველა ობიექტის მონიშვნა ამ გვერდზე"
+
+msgid "Click here to select all objects across all pages"
+msgstr "ყველა ობიექტის მონიშვნა ყველა გვერდზე"
 
 # Dashboard
 msgid "Dashboard"
@@ -81,6 +120,38 @@ msgstr "ჩემი მოქმედებები"
 
 msgid "None available"
 msgstr "არ არის ხელმისაწვდომი"
+
+msgid "Unknown content"
+msgstr "უცნობი კონტენტი"
+
+# Models - Accounts
+msgid "Accounts"
+msgstr "ანგარიშები"
+
+msgid "Users"
+msgstr "მომხმარებლები"
+
+msgid "User"
+msgstr "მომხმარებელი"
+
+msgid "User Profiles"
+msgstr "მომხმარებლის პროფილები"
+
+msgid "User Profile"
+msgstr "მომხმარებლის პროფილი"
+
+# Models - Tenants
+msgid "Tenants"
+msgstr "მოიჯარეები"
+
+msgid "Restaurants"
+msgstr "რესტორნები"
+
+msgid "Restaurant"
+msgstr "რესტორანი"
+
+msgid "Restaurant Hours"
+msgstr "რესტორნის სამუშაო საათები"
 
 # Models - Menu
 msgid "Menu"
@@ -126,6 +197,12 @@ msgstr "შეკვეთის ერთეული"
 msgid "Order Status History"
 msgstr "შეკვეთის სტატუსის ისტორია"
 
+msgid "Group Orders"
+msgstr "ჯგუფური შეკვეთები"
+
+msgid "Group Order"
+msgstr "ჯგუფური შეკვეთა"
+
 # Models - Tables
 msgid "Tables"
 msgstr "მაგიდები"
@@ -150,6 +227,12 @@ msgstr "მაგიდის სესიები"
 
 msgid "Table Session"
 msgstr "მაგიდის სესია"
+
+msgid "Table Session Guests"
+msgstr "მაგიდის სტუმრები"
+
+msgid "Table Session Guest"
+msgstr "მაგიდის სტუმარი"
 
 # Models - Staff
 msgid "Staff"
@@ -189,7 +272,40 @@ msgstr "დაბლოკილი დრო"
 msgid "Blocked Time"
 msgstr "დაბლოკილი დრო"
 
-# Status choices
+msgid "Reservation History"
+msgstr "დაჯავშნის ისტორია"
+
+# Models - Payments
+msgid "Payments"
+msgstr "გადახდები"
+
+msgid "Payment"
+msgstr "გადახდა"
+
+msgid "Refunds"
+msgstr "თანხის დაბრუნებები"
+
+msgid "Refund"
+msgstr "თანხის დაბრუნება"
+
+# Models - Favorites
+msgid "Favorites"
+msgstr "რჩეულები"
+
+msgid "Favorite"
+msgstr "რჩეული"
+
+# Models - Audit
+msgid "Audit"
+msgstr "აუდიტი"
+
+msgid "Audit Logs"
+msgstr "აუდიტის ჟურნალი"
+
+msgid "Audit Log"
+msgstr "აუდიტის ჩანაწერი"
+
+# Status choices - Order
 msgid "Pending"
 msgstr "მოლოდინში"
 
@@ -211,6 +327,15 @@ msgstr "დასრულებული"
 msgid "Cancelled"
 msgstr "გაუქმებული"
 
+msgid "Paid"
+msgstr "გადახდილი"
+
+msgid "Partially Paid"
+msgstr "ნაწილობრივ გადახდილი"
+
+msgid "Unpaid"
+msgstr "გადაუხდელი"
+
 # Table status
 msgid "Available"
 msgstr "თავისუფალი"
@@ -223,6 +348,28 @@ msgstr "დაჯავშნილი"
 
 msgid "Unavailable"
 msgstr "მიუწვდომელი"
+
+# Days of week
+msgid "Monday"
+msgstr "ორშაბათი"
+
+msgid "Tuesday"
+msgstr "სამშაბათი"
+
+msgid "Wednesday"
+msgstr "ოთხშაბათი"
+
+msgid "Thursday"
+msgstr "ხუთშაბათი"
+
+msgid "Friday"
+msgstr "პარასკევი"
+
+msgid "Saturday"
+msgstr "შაბათი"
+
+msgid "Sunday"
+msgstr "კვირა"
 
 # Common fields
 msgid "Name"
@@ -246,11 +393,71 @@ msgstr "შექმნის თარიღი"
 msgid "Updated at"
 msgstr "განახლების თარიღი"
 
+msgid "Created"
+msgstr "შექმნილი"
+
+msgid "Updated"
+msgstr "განახლებული"
+
 msgid "Is active"
 msgstr "აქტიურია"
 
 msgid "Is available"
 msgstr "ხელმისაწვდომია"
+
+msgid "Email"
+msgstr "ელ. ფოსტა"
+
+msgid "Phone"
+msgstr "ტელეფონი"
+
+msgid "Phone number"
+msgstr "ტელეფონის ნომერი"
+
+msgid "Address"
+msgstr "მისამართი"
+
+msgid "Image"
+msgstr "სურათი"
+
+msgid "Note"
+msgstr "შენიშვნა"
+
+msgid "Notes"
+msgstr "შენიშვნები"
+
+msgid "Date"
+msgstr "თარიღი"
+
+msgid "Time"
+msgstr "დრო"
+
+msgid "Amount"
+msgstr "თანხა"
+
+msgid "Total"
+msgstr "ჯამი"
+
+msgid "Subtotal"
+msgstr "ქვეჯამი"
+
+msgid "Quantity"
+msgstr "რაოდენობა"
+
+msgid "Number"
+msgstr "ნომერი"
+
+msgid "Capacity"
+msgstr "ტევადობა"
+
+msgid "Position"
+msgstr "პოზიცია"
+
+msgid "Sort order"
+msgstr "დალაგების რიგი"
+
+msgid "Slug"
+msgstr "სლაგი"
 
 # Yes/No
 msgid "Yes"
@@ -259,6 +466,15 @@ msgstr "დიახ"
 msgid "No"
 msgstr "არა"
 
+msgid "All"
+msgstr "ყველა"
+
+msgid "Any"
+msgstr "ნებისმიერი"
+
+msgid "None"
+msgstr "არცერთი"
+
 # Pagination
 msgid "Show all"
 msgstr "ყველას ჩვენება"
@@ -266,12 +482,344 @@ msgstr "ყველას ჩვენება"
 msgid "items"
 msgstr "ერთეული"
 
+msgid "of"
+msgstr "-დან"
+
+msgid "results"
+msgstr "შედეგი"
+
 # Confirmation
 msgid "Are you sure?"
 msgstr "დარწმუნებული ხართ?"
+
+msgid "Are you sure you want to delete"
+msgstr "დარწმუნებული ხართ, რომ გსურთ წაშლა"
 
 msgid "Successfully deleted"
 msgstr "წარმატებით წაიშალა"
 
 msgid "Successfully saved"
 msgstr "წარმატებით შეინახა"
+
+msgid "Successfully added"
+msgstr "წარმატებით დაემატა"
+
+msgid "Successfully updated"
+msgstr "წარმატებით განახლდა"
+
+msgid "Error"
+msgstr "შეცდომა"
+
+msgid "Warning"
+msgstr "გაფრთხილება"
+
+msgid "Success"
+msgstr "წარმატება"
+
+msgid "Info"
+msgstr "ინფორმაცია"
+
+# Profile Settings
+msgid "Profile Settings"
+msgstr "პროფილის პარამეტრები"
+
+msgid "Account Information"
+msgstr "ანგარიშის ინფორმაცია"
+
+msgid "Language"
+msgstr "ენა"
+
+msgid "Save Language"
+msgstr "ენის შენახვა"
+
+msgid "Security"
+msgstr "უსაფრთხოება"
+
+msgid "Change Password"
+msgstr "პაროლის შეცვლა"
+
+# Form validation
+msgid "This field is required."
+msgstr "ეს ველი სავალდებულოა."
+
+msgid "Enter a valid email address."
+msgstr "შეიყვანეთ სწორი ელ. ფოსტა."
+
+msgid "Enter a valid value."
+msgstr "შეიყვანეთ სწორი მნიშვნელობა."
+
+msgid "Enter a valid number."
+msgstr "შეიყვანეთ სწორი რიცხვი."
+
+msgid "Enter a valid date."
+msgstr "შეიყვანეთ სწორი თარიღი."
+
+msgid "Enter a valid time."
+msgstr "შეიყვანეთ სწორი დრო."
+
+msgid "This field cannot be blank."
+msgstr "ეს ველი არ შეიძლება იყოს ცარიელი."
+
+msgid "Please correct the error below."
+msgstr "გთხოვთ, გაასწოროთ ქვემოთ მოცემული შეცდომა."
+
+msgid "Please correct the errors below."
+msgstr "გთხოვთ, გაასწოროთ ქვემოთ მოცემული შეცდომები."
+
+# Login
+msgid "Username"
+msgstr "მომხმარებლის სახელი"
+
+msgid "Password"
+msgstr "პაროლი"
+
+msgid "Forgot your password?"
+msgstr "დაგავიწყდათ პაროლი?"
+
+msgid "Remember me"
+msgstr "დამიმახსოვრე"
+
+msgid "Sign in"
+msgstr "შესვლა"
+
+msgid "Sign up"
+msgstr "რეგისტრაცია"
+
+msgid "Sign out"
+msgstr "გასვლა"
+
+# Password
+msgid "Old password"
+msgstr "ძველი პაროლი"
+
+msgid "New password"
+msgstr "ახალი პაროლი"
+
+msgid "Confirm password"
+msgstr "პაროლის დადასტურება"
+
+msgid "Password confirmation"
+msgstr "პაროლის დადასტურება"
+
+msgid "The two password fields didn't match."
+msgstr "პაროლის ორი ველი არ ემთხვევა."
+
+msgid "Your password was changed."
+msgstr "თქვენი პაროლი შეიცვალა."
+
+# Dates and times
+msgid "Today"
+msgstr "დღეს"
+
+msgid "Yesterday"
+msgstr "გუშინ"
+
+msgid "Tomorrow"
+msgstr "ხვალ"
+
+msgid "Now"
+msgstr "ახლა"
+
+msgid "This month"
+msgstr "ამ თვეში"
+
+msgid "This year"
+msgstr "ამ წელს"
+
+msgid "Past 7 days"
+msgstr "ბოლო 7 დღე"
+
+# Boolean field display
+msgid "true"
+msgstr "კი"
+
+msgid "false"
+msgstr "არა"
+
+# Permissions
+msgid "Permission"
+msgstr "უფლება"
+
+msgid "Permissions"
+msgstr "უფლებები"
+
+msgid "Add permission"
+msgstr "უფლების დამატება"
+
+msgid "Change permission"
+msgstr "უფლების შეცვლა"
+
+msgid "Delete permission"
+msgstr "უფლების წაშლა"
+
+msgid "View permission"
+msgstr "უფლების ნახვა"
+
+msgid "Can add"
+msgstr "შეუძლია დამატება"
+
+msgid "Can change"
+msgstr "შეუძლია შეცვლა"
+
+msgid "Can delete"
+msgstr "შეუძლია წაშლა"
+
+msgid "Can view"
+msgstr "შეუძლია ნახვა"
+
+# Filter labels
+msgid "By"
+msgstr "-ით"
+
+msgid "Any date"
+msgstr "ნებისმიერი თარიღი"
+
+msgid "Has date"
+msgstr "აქვს თარიღი"
+
+msgid "No date"
+msgstr "თარიღის გარეშე"
+
+# Empty states
+msgid "No results found."
+msgstr "შედეგები ვერ მოიძებნა."
+
+msgid "No data available"
+msgstr "მონაცემები არ არის ხელმისაწვდომი"
+
+msgid "There are no items yet."
+msgstr "ჯერ არ არის ერთეულები."
+
+# Misc
+msgid "Optional"
+msgstr "არასავალდებულო"
+
+msgid "Required"
+msgstr "სავალდებულო"
+
+msgid "Cancel"
+msgstr "გაუქმება"
+
+msgid "Close"
+msgstr "დახურვა"
+
+msgid "Back"
+msgstr "უკან"
+
+msgid "Next"
+msgstr "შემდეგი"
+
+msgid "Previous"
+msgstr "წინა"
+
+msgid "First"
+msgstr "პირველი"
+
+msgid "Last"
+msgstr "ბოლო"
+
+msgid "Loading..."
+msgstr "იტვირთება..."
+
+msgid "Please wait..."
+msgstr "გთხოვთ მოიცადოთ..."
+
+msgid "Refresh"
+msgstr "განახლება"
+
+msgid "Export"
+msgstr "ექსპორტი"
+
+msgid "Import"
+msgstr "იმპორტი"
+
+msgid "Download"
+msgstr "ჩამოტვირთვა"
+
+msgid "Upload"
+msgstr "ატვირთვა"
+
+msgid "Print"
+msgstr "ბეჭდვა"
+
+msgid "Copy"
+msgstr "კოპირება"
+
+msgid "Edit"
+msgstr "რედაქტირება"
+
+msgid "View"
+msgstr "ნახვა"
+
+msgid "Details"
+msgstr "დეტალები"
+
+msgid "More"
+msgstr "მეტი"
+
+msgid "Less"
+msgstr "ნაკლები"
+
+msgid "Show"
+msgstr "ჩვენება"
+
+msgid "Hide"
+msgstr "დამალვა"
+
+msgid "Expand"
+msgstr "გაფართოება"
+
+msgid "Collapse"
+msgstr "ჩაკეცვა"
+
+msgid "Settings"
+msgstr "პარამეტრები"
+
+msgid "Help"
+msgstr "დახმარება"
+
+msgid "About"
+msgstr "შესახებ"
+
+msgid "Contact"
+msgstr "კონტაქტი"
+
+# Additional model names
+msgid "Order Item Modifiers"
+msgstr "შეკვეთის ერთეულის მოდიფიკატორები"
+
+msgid "Order Item Modifier"
+msgstr "შეკვეთის ერთეულის მოდიფიკატორი"
+
+msgid "Order Status Histories"
+msgstr "შეკვეთის სტატუსის ისტორია"
+
+msgid "Payment Methods"
+msgstr "გადახდის მეთოდები"
+
+msgid "Payment Method"
+msgstr "გადახდის მეთოდი"
+
+msgid "Favorite Menu Items"
+msgstr "რჩეული მენიუს ერთეულები"
+
+msgid "Favorite Menu Item"
+msgstr "რჩეული მენიუს ერთეული"
+
+msgid "Favorite Restaurants"
+msgstr "რჩეული რესტორნები"
+
+msgid "Favorite Restaurant"
+msgstr "რჩეული რესტორანი"
+
+msgid "Menu Item Modifier Groups"
+msgstr "მენიუს ერთეულის მოდიფიკატორების ჯგუფები"
+
+msgid "Authentication and Authorization"
+msgstr "იდენტიფიკაცია და ავტორიზაცია"
+
+msgid "Groups"
+msgstr "ჯგუფები"
+
+msgid "Group"
+msgstr "ჯგუფი"

@@ -4,6 +4,7 @@ Payment models for restaurant payment processing.
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
 
@@ -121,6 +122,8 @@ class Payment(TimeStampedModel):
     class Meta:
         db_table = "payments"
         ordering = ["-created_at"]
+        verbose_name = _("Payment")
+        verbose_name_plural = _("Payments")
         indexes = [
             models.Index(fields=["order", "status"]),
             models.Index(fields=["status", "created_at"]),
@@ -261,6 +264,8 @@ class Refund(TimeStampedModel):
     class Meta:
         db_table = "refunds"
         ordering = ["-created_at"]
+        verbose_name = _("Refund")
+        verbose_name_plural = _("Refunds")
 
     def __str__(self):
         return f"Refund {self.id} - {self.amount} for Payment {self.payment_id}"

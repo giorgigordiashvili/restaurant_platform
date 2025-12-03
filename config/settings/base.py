@@ -345,6 +345,7 @@ UNFOLD = {
         "show_search": True,
         "show_all_applications": False,
     },
+    "SHOW_LANGUAGES": True,
 }
 
 # Logging Configuration
