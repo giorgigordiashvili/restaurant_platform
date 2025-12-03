@@ -58,7 +58,8 @@ RUN mkdir -p /app/staticfiles /app/media && \
     chown -R appuser:appgroup /app/staticfiles /app/media
 
 # Collect static files (needs to run before switching to non-root user)
-RUN python manage.py collectstatic --noinput
+# Use a dummy SECRET_KEY for collectstatic only - the real one is set at runtime
+RUN SECRET_KEY=build-time-dummy-key DJANGO_SETTINGS_MODULE=config.settings.prod python manage.py collectstatic --noinput
 
 # Switch to non-root user
 USER appuser
