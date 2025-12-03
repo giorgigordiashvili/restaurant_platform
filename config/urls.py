@@ -3,6 +3,7 @@ URL configuration for restaurant_platform project.
 """
 
 from django.conf import settings
+from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
@@ -52,6 +53,8 @@ urlpatterns = [
     # Health checks (for load balancers and monitoring)
     path("api/v1/health/", health_check, name="health_check"),
     path("api/v1/ready/", readiness_check, name="readiness_check"),
+    # Language switching
+    path("i18n/", include("django.conf.urls.i18n")),
     # Admin - tenant simulation URL must come before admin.site.urls
     # (Only used by superadmin on main domain)
     path("admin/simulate-restaurant/", set_simulated_restaurant, name="admin-simulate-restaurant"),

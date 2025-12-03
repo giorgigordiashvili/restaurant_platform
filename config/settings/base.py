@@ -64,6 +64,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",  # Language switching support
     "corsheaders.middleware.CorsMiddleware",
     "apps.core.middleware.language.APILanguageMiddleware",
     "django.middleware.common.CommonMiddleware",
