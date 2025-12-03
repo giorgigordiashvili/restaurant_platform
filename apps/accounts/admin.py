@@ -12,6 +12,8 @@ class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
     verbose_name_plural = "Profile"
+    extra = 0
+    max_num = 1
 
 
 @admin.register(User)
@@ -19,6 +21,12 @@ class UserAdmin(BaseUserAdmin):
     """Custom admin for User model."""
 
     inlines = [UserProfileInline]
+
+    def get_inlines(self, request, obj):
+        """Only show profile inline when editing existing user (signal creates it)."""
+        if obj is None:
+            return []
+        return self.inlines
 
     list_display = [
         "email",
