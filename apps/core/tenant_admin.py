@@ -7,9 +7,11 @@ checked against the user's StaffRole.
 """
 
 from django import forms
+from django.contrib import admin
 from parler.admin import TranslatableAdmin
 from parler.forms import TranslatableModelForm
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
+from unfold.admin import TabularInline as UnfoldTabularInline
 
 from apps.core.admin_sites import tenant_admin_site
 
@@ -42,7 +44,7 @@ class UnfoldTranslatableModelForm(TranslatableModelForm):
                 field.widget.attrs["class"] += " " + UNFOLD_INPUT_CLASSES
 
 # Import models
-from apps.menu.models import MenuCategory, MenuItem, Modifier, ModifierGroup
+from apps.menu.models import MenuCategory, MenuItem, MenuItemModifierGroup, Modifier, ModifierGroup
 from apps.orders.models import Order, OrderItem, OrderStatusHistory
 from apps.reservations.models import (
     Reservation,
@@ -179,6 +181,17 @@ class MenuCategoryTenantAdmin(TenantTranslatableAdmin):
     ordering = ["display_order"]
 
 
+class MenuItemModifierGroupInline(UnfoldTabularInline):
+    """Inline for linking modifier groups to menu items."""
+
+    model = MenuItemModifierGroup
+    extra = 1
+    ordering = ["display_order"]
+    autocomplete_fields = ["modifier_group"]
+    verbose_name = "Modifier Group"
+    verbose_name_plural = "Modifier Groups"
+
+
 class MenuItemTenantAdmin(TenantTranslatableAdmin):
     """Admin for menu items."""
 
@@ -204,6 +217,7 @@ class MenuItemTenantAdmin(TenantTranslatableAdmin):
     search_fields = ["translations__name", "translations__description"]
     ordering = ["category__display_order", "display_order"]
     autocomplete_fields = ["category"]
+    inlines = [MenuItemModifierGroupInline]
 
     def get_queryset(self, request):
         """Ensure category is also filtered."""
