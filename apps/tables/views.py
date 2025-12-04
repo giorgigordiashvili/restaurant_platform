@@ -64,6 +64,72 @@ class QRCodeScanView(APIView):
         )
 
 
+@extend_schema(tags=["Tables"])
+class TableValidateView(APIView):
+    """
+    Validate a table code from QR scan.
+    GET /api/v1/tables/validate/{code}/
+
+    Used by frontend when user scans QR code.
+    Returns table and restaurant info, and active session if exists.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request, code):
+        try:
+            qr = TableQRCode.objects.select_related(
+                "table", "table__restaurant", "table__section"
+            ).get(
+                code=code,
+                is_active=True,
+                table__is_active=True,
+            )
+        except TableQRCode.DoesNotExist:
+            return Response(
+                {"success": False, "error": {"message": "Invalid or inactive table code."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Record the scan
+        qr.record_scan()
+
+        table = qr.table
+        restaurant = table.restaurant
+
+        # Check for active session
+        active_session = table.sessions.filter(status="active").first()
+
+        data = {
+            "table": {
+                "id": str(table.id),
+                "number": table.number,
+                "name": table.name,
+                "capacity": table.capacity,
+                "section": table.section.name if table.section else None,
+                "status": table.status,
+            },
+            "restaurant": {
+                "id": str(restaurant.id),
+                "name": restaurant.name,
+                "slug": restaurant.slug,
+                "logo": restaurant.logo.url if restaurant.logo else None,
+                "primary_color": restaurant.primary_color,
+            },
+            "session": None,
+        }
+
+        if active_session:
+            data["session"] = {
+                "id": str(active_session.id),
+                "invite_code": active_session.invite_code,
+                "guest_count": active_session.guests.filter(status="active").count(),
+                "started_at": active_session.started_at.isoformat(),
+            }
+
+        return Response({"success": True, "data": data})
+
+
 # ============== Dashboard Views ==============
 
 

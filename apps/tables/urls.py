@@ -13,6 +13,7 @@ from .views import (
     TableSessionGuestsView,
     TableSessionInviteView,
     TableSessionOrdersView,
+    TableValidateView,
 )
 
 app_name = "tables"
@@ -20,6 +21,8 @@ app_name = "tables"
 urlpatterns = [
     # QR Code scanning
     path("scan/", QRCodeScanView.as_view(), name="qr-scan"),
+    # Table validation (for QR code URL parameter)
+    path("validate/<str:code>/", TableValidateView.as_view(), name="table-validate"),
     # Session join flow
     path(
         "sessions/join/<str:invite_code>/",
