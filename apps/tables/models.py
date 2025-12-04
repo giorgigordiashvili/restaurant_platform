@@ -162,6 +162,12 @@ class TableQRCode(TimeStampedModel):
         blank=True,
         help_text="Optional name (e.g., 'Main QR', 'Tent Card')",
     )
+    qr_image = models.ImageField(
+        upload_to="qr_codes/",
+        blank=True,
+        null=True,
+        help_text="Generated QR code image",
+    )
     is_active = models.BooleanField(default=True)
     scans_count = models.PositiveIntegerField(default=0)
     last_scanned_at = models.DateTimeField(null=True, blank=True)
@@ -178,6 +184,45 @@ class TableQRCode(TimeStampedModel):
         if not self.code:
             self.code = secrets.token_urlsafe(32)
         super().save(*args, **kwargs)
+        # Generate QR code image after save if not exists
+        if not self.qr_image:
+            self.generate_qr_image()
+
+    def get_qr_url(self):
+        """Get the URL that the QR code should point to."""
+        restaurant = self.table.restaurant
+        # URL format: https://{restaurant-slug}.admin.aimenu.ge/table/{code}
+        from django.conf import settings
+        main_domain = getattr(settings, "MAIN_DOMAIN", "admin.aimenu.ge")
+        return f"https://{restaurant.slug}.{main_domain}/table/{self.code}"
+
+    def generate_qr_image(self):
+        """Generate and save QR code image."""
+        import io
+        import qrcode
+        from django.core.files.base import ContentFile
+
+        # Create QR code
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(self.get_qr_url())
+        qr.make(fit=True)
+
+        # Create image
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        # Save to buffer
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        buffer.seek(0)
+
+        # Save to model
+        filename = f"qr_{self.table.restaurant.slug}_{self.table.number}_{self.code[:8]}.png"
+        self.qr_image.save(filename, ContentFile(buffer.read()), save=True)
 
     def record_scan(self):
         """Record a QR code scan."""

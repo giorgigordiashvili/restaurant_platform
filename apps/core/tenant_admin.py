@@ -406,11 +406,23 @@ class TableQRCodeTenantAdmin(TenantModelAdmin):
     permission_resource = "tables"
     restaurant_field = None  # QR code links through table
 
-    list_display = ["table", "code", "name", "is_active", "scans_count", "last_scanned_at"]
+    list_display = ["table", "name", "is_active", "qr_preview", "download_link", "scans_count"]
     list_filter = ["is_active"]
     search_fields = ["code", "name", "table__number"]
-    readonly_fields = ["code", "scans_count", "last_scanned_at"]
+    readonly_fields = ["code", "scans_count", "last_scanned_at", "qr_code_display", "qr_url_display"]
     ordering = ["table__number"]
+    fieldsets = (
+        (None, {
+            "fields": ("table", "name", "is_active")
+        }),
+        ("QR Code", {
+            "fields": ("qr_code_display", "qr_url_display", "code"),
+            "description": "QR code is auto-generated when you save.",
+        }),
+        ("Statistics", {
+            "fields": ("scans_count", "last_scanned_at"),
+        }),
+    )
 
     def get_queryset(self, request):
         """Filter by restaurant via table."""
@@ -419,6 +431,48 @@ class TableQRCodeTenantAdmin(TenantModelAdmin):
         if restaurant:
             qs = qs.filter(table__restaurant=restaurant)
         return qs.select_related("table")
+
+    @admin.display(description="QR Code")
+    def qr_code_display(self, obj):
+        """Display QR code image in detail view."""
+        from django.utils.html import format_html
+        if obj.qr_image:
+            return format_html(
+                '<img src="{}" style="max-width: 200px; max-height: 200px; border: 1px solid #ccc; padding: 10px; background: white;" />'
+                '<br><a href="{}" download class="button" style="margin-top: 10px; display: inline-block;">Download QR Code</a>',
+                obj.qr_image.url,
+                obj.qr_image.url
+            )
+        return "QR code will be generated after save"
+
+    @admin.display(description="QR URL")
+    def qr_url_display(self, obj):
+        """Display the URL encoded in the QR code."""
+        from django.utils.html import format_html
+        url = obj.get_qr_url()
+        return format_html('<a href="{}" target="_blank">{}</a>', url, url)
+
+    @admin.display(description="Preview")
+    def qr_preview(self, obj):
+        """Small QR preview for list view."""
+        from django.utils.html import format_html
+        if obj.qr_image:
+            return format_html(
+                '<img src="{}" style="width: 50px; height: 50px;" />',
+                obj.qr_image.url
+            )
+        return "-"
+
+    @admin.display(description="Download")
+    def download_link(self, obj):
+        """Download link for list view."""
+        from django.utils.html import format_html
+        if obj.qr_image:
+            return format_html(
+                '<a href="{}" download>Download</a>',
+                obj.qr_image.url
+            )
+        return "-"
 
 
 class TableSessionTenantAdmin(TenantModelAdmin):
