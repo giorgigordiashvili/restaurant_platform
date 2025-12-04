@@ -6,10 +6,40 @@ Each model is filtered to the current restaurant and permissions are
 checked against the user's StaffRole.
 """
 
+from django import forms
 from parler.admin import TranslatableAdmin
+from parler.forms import TranslatableModelForm
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
 from apps.core.admin_sites import tenant_admin_site
+
+# Unfold input styling classes
+UNFOLD_INPUT_CLASSES = (
+    "border border-base-200 bg-white font-medium min-w-20 placeholder-base-400 "
+    "rounded-default shadow-xs text-font-default-light text-sm focus:outline-2 "
+    "focus:-outline-offset-2 focus:outline-primary-600 group-[.errors]:border-red-600 "
+    "focus:group-[.errors]:outline-red-600 dark:bg-base-900 dark:border-base-700 "
+    "dark:text-font-default-dark dark:group-[.errors]:border-red-500 "
+    "dark:focus:group-[.errors]:outline-red-500 dark:scheme-dark "
+    "group-[.primary]:border-transparent disabled:!bg-base-50 "
+    "dark:disabled:!bg-base-800 px-3 py-2 w-full max-w-2xl"
+)
+
+UNFOLD_TEXTAREA_CLASSES = UNFOLD_INPUT_CLASSES + " min-h-[120px]"
+
+
+class UnfoldTranslatableModelForm(TranslatableModelForm):
+    """Translatable form with Unfold styling applied to all fields."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            if isinstance(field.widget, forms.Textarea):
+                field.widget.attrs.setdefault("class", "")
+                field.widget.attrs["class"] += " " + UNFOLD_TEXTAREA_CLASSES
+            elif isinstance(field.widget, (forms.TextInput, forms.NumberInput, forms.EmailInput)):
+                field.widget.attrs.setdefault("class", "")
+                field.widget.attrs["class"] += " " + UNFOLD_INPUT_CLASSES
 
 # Import models
 from apps.menu.models import MenuCategory, MenuItem, Modifier, ModifierGroup
@@ -117,7 +147,20 @@ class TenantTranslatableAdmin(TranslatableAdmin, TenantModelAdmin):
     Use this for models that use django-parler for translations.
     """
 
-    pass
+    def get_form(self, request, obj=None, **kwargs):
+        """Apply Unfold styling to translatable form fields."""
+        form = super().get_form(request, obj, **kwargs)
+
+        # Apply Unfold classes to all form fields
+        for field_name, field in form.base_fields.items():
+            if isinstance(field.widget, forms.Textarea):
+                field.widget.attrs.setdefault("class", "")
+                field.widget.attrs["class"] += " " + UNFOLD_TEXTAREA_CLASSES
+            elif isinstance(field.widget, (forms.TextInput, forms.NumberInput, forms.EmailInput)):
+                field.widget.attrs.setdefault("class", "")
+                field.widget.attrs["class"] += " " + UNFOLD_INPUT_CLASSES
+
+        return form
 
 
 # =============================================================================
