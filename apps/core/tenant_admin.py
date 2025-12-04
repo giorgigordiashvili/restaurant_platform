@@ -8,7 +8,7 @@ checked against the user's StaffRole.
 
 from django import forms
 from django.contrib import admin
-from parler.admin import TranslatableAdmin
+from parler.admin import TranslatableAdmin, TranslatableTabularInline
 from parler.forms import TranslatableModelForm
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
 from unfold.admin import TabularInline as UnfoldTabularInline
@@ -230,26 +230,28 @@ class MenuItemTenantAdmin(TenantTranslatableAdmin):
         return super().get_queryset(request).select_related("category")
 
 
-class ModifierInline(UnfoldTabularInline):
+class ModifierInline(TranslatableTabularInline):
     """Inline for adding modifiers directly within a modifier group."""
 
     model = Modifier
     extra = 3  # Show 3 empty rows for quick adding
     ordering = ["display_order"]
-    fields = ["name", "price_adjustment", "is_default", "is_available", "display_order"]
+    # Don't specify 'fields' - let parler handle the translated fields (name)
+    # Only specify non-translated fields we want to show
     verbose_name = "Option"
     verbose_name_plural = "Options (e.g., Small, Medium, Large or Meat, Cheese, Potato)"
 
     def get_formset(self, request, obj=None, **kwargs):
         """Apply styling to inline form fields."""
         formset = super().get_formset(request, obj, **kwargs)
-        for field_name in formset.form.base_fields:
-            field = formset.form.base_fields[field_name]
-            if hasattr(field.widget, 'attrs'):
-                if isinstance(field.widget, forms.Textarea):
-                    field.widget.attrs['class'] = field.widget.attrs.get('class', '') + ' ' + UNFOLD_TEXTAREA_CLASSES
-                elif isinstance(field.widget, (forms.TextInput, forms.NumberInput)):
-                    field.widget.attrs['class'] = field.widget.attrs.get('class', '') + ' ' + UNFOLD_INPUT_CLASSES
+        if hasattr(formset, 'form') and hasattr(formset.form, 'base_fields'):
+            for field_name in formset.form.base_fields:
+                field = formset.form.base_fields[field_name]
+                if hasattr(field.widget, 'attrs'):
+                    if isinstance(field.widget, forms.Textarea):
+                        field.widget.attrs['class'] = field.widget.attrs.get('class', '') + ' ' + UNFOLD_TEXTAREA_CLASSES
+                    elif isinstance(field.widget, (forms.TextInput, forms.NumberInput)):
+                        field.widget.attrs['class'] = field.widget.attrs.get('class', '') + ' ' + UNFOLD_INPUT_CLASSES
         return formset
 
 
@@ -271,10 +273,9 @@ class ModifierGroupTenantAdmin(TenantTranslatableAdmin):
     ordering = ["display_order"]
     inlines = [ModifierInline]
 
+    # Note: name and description are translated fields handled by parler
+    # They will appear in the language tabs automatically
     fieldsets = (
-        (None, {
-            "fields": ("name", "description"),
-        }),
         ("Selection Rules", {
             "fields": ("selection_type", "is_required", "min_selections", "max_selections"),
             "description": "Single = radio buttons (pick one), Multiple = checkboxes (pick many)",

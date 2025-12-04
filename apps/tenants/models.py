@@ -5,20 +5,26 @@ Restaurant (tenant) models for multi-tenant restaurant platform.
 from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
+
+from parler.models import TranslatableModel, TranslatedFields
 
 from apps.core.models import TimeStampedModel
 from apps.core.utils.validators import phone_validator
 
 
-class RestaurantCategory(TimeStampedModel):
+class RestaurantCategory(TranslatableModel, TimeStampedModel):
     """
     Category for restaurants (e.g., Italian, Georgian, Fast Food, Cafe).
     Managed by superadmins, selected when creating a restaurant.
+    Supports translations for name and description.
     """
 
-    name = models.CharField(max_length=100, unique=True)
+    translations = TranslatedFields(
+        name=models.CharField(max_length=100),
+        description=models.TextField(blank=True),
+    )
     slug = models.SlugField(max_length=100, unique=True)
-    description = models.TextField(blank=True)
     icon = models.CharField(
         max_length=50,
         blank=True,
@@ -34,16 +40,19 @@ class RestaurantCategory(TimeStampedModel):
 
     class Meta:
         db_table = "restaurant_categories"
-        ordering = ["display_order", "name"]
-        verbose_name = "Restaurant Category"
-        verbose_name_plural = "Restaurant Categories"
+        ordering = ["display_order"]
+        verbose_name = _("Restaurant Category")
+        verbose_name_plural = _("Restaurant Categories")
 
     def __str__(self):
-        return self.name
+        return self.safe_translation_getter("name", default=f"Category {self.pk}")
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            # Try to get the name from the default language for slug
+            name = self.safe_translation_getter("name", default="")
+            if name:
+                self.slug = slugify(name)
         super().save(*args, **kwargs)
 
     @property
@@ -52,35 +61,40 @@ class RestaurantCategory(TimeStampedModel):
         return self.restaurants.filter(is_active=True).count()
 
 
-class Amenity(TimeStampedModel):
+class Amenity(TranslatableModel, TimeStampedModel):
     """
     Amenities/features that restaurants can have (e.g., Terrace, Live Music, WiFi).
     Managed by superadmins, selected by restaurant owners.
+    Supports translations for name and description.
     """
 
-    name = models.CharField(max_length=100, unique=True)
+    translations = TranslatedFields(
+        name=models.CharField(max_length=100),
+        description=models.TextField(blank=True),
+    )
     slug = models.SlugField(max_length=100, unique=True)
     icon = models.CharField(
         max_length=50,
         blank=True,
         help_text="Material icon name (e.g., 'deck', 'music_note', 'wifi')",
     )
-    description = models.TextField(blank=True)
     display_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = "amenities"
-        ordering = ["display_order", "name"]
-        verbose_name = "Amenity"
-        verbose_name_plural = "Amenities"
+        ordering = ["display_order"]
+        verbose_name = _("Amenity")
+        verbose_name_plural = _("Amenities")
 
     def __str__(self):
-        return self.name
+        return self.safe_translation_getter("name", default=f"Amenity {self.pk}")
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            name = self.safe_translation_getter("name", default="")
+            if name:
+                self.slug = slugify(name)
         super().save(*args, **kwargs)
 
 

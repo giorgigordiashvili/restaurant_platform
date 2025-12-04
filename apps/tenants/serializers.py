@@ -4,38 +4,42 @@ Restaurant (tenant) serializers.
 
 from rest_framework import serializers
 
+from parler_rest.serializers import TranslatableModelSerializer, TranslatedFieldsField
+
 from apps.accounts.serializers import UserSerializer
 
 from .models import Amenity, Restaurant, RestaurantCategory, RestaurantHours
 
 
-class RestaurantCategorySerializer(serializers.ModelSerializer):
-    """Serializer for restaurant categories."""
+class RestaurantCategorySerializer(TranslatableModelSerializer):
+    """Serializer for restaurant categories with translations."""
+
+    translations = TranslatedFieldsField(shared_model=RestaurantCategory)
 
     class Meta:
         model = RestaurantCategory
         fields = [
             "id",
-            "name",
+            "translations",
             "slug",
-            "description",
             "icon",
             "image",
         ]
         read_only_fields = ["id", "slug"]
 
 
-class AmenitySerializer(serializers.ModelSerializer):
-    """Serializer for amenities."""
+class AmenitySerializer(TranslatableModelSerializer):
+    """Serializer for amenities with translations."""
+
+    translations = TranslatedFieldsField(shared_model=Amenity)
 
     class Meta:
         model = Amenity
         fields = [
             "id",
-            "name",
+            "translations",
             "slug",
             "icon",
-            "description",
         ]
         read_only_fields = ["id", "slug"]
 

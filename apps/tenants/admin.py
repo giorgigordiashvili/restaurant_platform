@@ -4,21 +4,68 @@ Tenant (Restaurant) admin configuration with superadmin features.
 
 from django.contrib import admin
 
+from parler.admin import TranslatableAdmin
+
 from apps.core.admin import ExportMixin, SuperadminOnlyMixin, make_active, make_inactive
 
 from .models import Amenity, Restaurant, RestaurantCategory, RestaurantHours
 
 
+# Unfold input styling classes for superadmin
+UNFOLD_INPUT_CLASSES = (
+    "border border-base-200 bg-white font-medium min-w-20 placeholder-base-400 "
+    "rounded-default shadow-xs text-font-default-light text-sm focus:outline-2 "
+    "focus:-outline-offset-2 focus:outline-primary-600 dark:bg-base-900 "
+    "dark:border-base-700 dark:text-font-default-dark dark:focus:outline-primary-500 "
+    "px-3 py-2 w-full max-w-2xl"
+)
+
+UNFOLD_TEXTAREA_CLASSES = (
+    "border border-base-200 bg-white font-medium placeholder-base-400 "
+    "rounded-default shadow-xs text-font-default-light text-sm focus:outline-2 "
+    "focus:-outline-offset-2 focus:outline-primary-600 dark:bg-base-900 "
+    "dark:border-base-700 dark:text-font-default-dark dark:focus:outline-primary-500 "
+    "px-3 py-2 w-full max-w-2xl min-h-[120px]"
+)
+
+
+class StyledTranslatableAdmin(SuperadminOnlyMixin, TranslatableAdmin):
+    """
+    TranslatableAdmin with Unfold styling for superadmin.
+    Applies consistent input styling to parler translation fields.
+    """
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        # Apply Unfold styling to all form fields
+        for field_name, field in form.base_fields.items():
+            widget = field.widget
+            existing_classes = widget.attrs.get("class", "")
+            if "Textarea" in widget.__class__.__name__:
+                widget.attrs["class"] = f"{existing_classes} {UNFOLD_TEXTAREA_CLASSES}".strip()
+            else:
+                widget.attrs["class"] = f"{existing_classes} {UNFOLD_INPUT_CLASSES}".strip()
+        return form
+
+
 @admin.register(RestaurantCategory)
-class RestaurantCategoryAdmin(SuperadminOnlyMixin, admin.ModelAdmin):
-    """Admin for restaurant categories - superadmin only."""
+class RestaurantCategoryAdmin(StyledTranslatableAdmin):
+    """Admin for restaurant categories - superadmin only with translations."""
 
     list_display = ["name", "slug", "icon", "display_order", "is_active", "restaurants_count"]
     list_filter = ["is_active"]
-    search_fields = ["name", "description"]
-    prepopulated_fields = {"slug": ("name",)}
+    search_fields = ["translations__name", "translations__description"]
     list_editable = ["display_order", "is_active"]
-    ordering = ["display_order", "name"]
+    ordering = ["display_order"]
+
+    fieldsets = (
+        (None, {"fields": ("slug", "icon", "image")}),
+        ("Settings", {"fields": ("display_order", "is_active")}),
+    )
+
+    def name(self, obj):
+        return obj.safe_translation_getter("name", default="-")
+    name.short_description = "Name"
 
     @admin.display(description="Restaurants")
     def restaurants_count(self, obj):
@@ -26,15 +73,23 @@ class RestaurantCategoryAdmin(SuperadminOnlyMixin, admin.ModelAdmin):
 
 
 @admin.register(Amenity)
-class AmenityAdmin(SuperadminOnlyMixin, admin.ModelAdmin):
-    """Admin for amenities - superadmin only."""
+class AmenityAdmin(StyledTranslatableAdmin):
+    """Admin for amenities - superadmin only with translations."""
 
     list_display = ["name", "slug", "icon", "display_order", "is_active"]
     list_filter = ["is_active"]
-    search_fields = ["name", "description"]
-    prepopulated_fields = {"slug": ("name",)}
+    search_fields = ["translations__name", "translations__description"]
     list_editable = ["display_order", "is_active"]
-    ordering = ["display_order", "name"]
+    ordering = ["display_order"]
+
+    fieldsets = (
+        (None, {"fields": ("slug", "icon")}),
+        ("Settings", {"fields": ("display_order", "is_active")}),
+    )
+
+    def name(self, obj):
+        return obj.safe_translation_getter("name", default="-")
+    name.short_description = "Name"
 
 
 class RestaurantHoursInline(admin.TabularInline):
