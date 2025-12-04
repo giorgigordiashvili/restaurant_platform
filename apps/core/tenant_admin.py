@@ -53,7 +53,7 @@ from apps.reservations.models import (
 )
 from apps.staff.models import StaffInvitation, StaffMember, StaffRole
 from apps.tables.models import Table, TableQRCode, TableSection, TableSession
-from apps.tenants.models import Restaurant, RestaurantHours
+from apps.tenants.models import Restaurant, RestaurantCategory, RestaurantHours
 
 
 class TenantModelAdmin(UnfoldModelAdmin):
@@ -652,7 +652,7 @@ class RestaurantSettingsAdmin(UnfoldModelAdmin):
 
     fieldsets = (
         ("Basic Info", {
-            "fields": ("name", "slug", "description", "is_active"),
+            "fields": ("name", "slug", "description", "category", "is_active"),
         }),
         ("Contact", {
             "fields": ("email", "phone", "website"),

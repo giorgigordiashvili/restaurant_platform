@@ -10,6 +10,48 @@ from apps.core.models import TimeStampedModel
 from apps.core.utils.validators import phone_validator
 
 
+class RestaurantCategory(TimeStampedModel):
+    """
+    Category for restaurants (e.g., Italian, Georgian, Fast Food, Cafe).
+    Managed by superadmins, selected when creating a restaurant.
+    """
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Material icon name (e.g., 'restaurant', 'local_cafe', 'fastfood')",
+    )
+    image = models.ImageField(
+        upload_to="restaurant_categories/",
+        blank=True,
+        null=True,
+    )
+    display_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "restaurant_categories"
+        ordering = ["display_order", "name"]
+        verbose_name = "Restaurant Category"
+        verbose_name_plural = "Restaurant Categories"
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    @property
+    def restaurants_count(self) -> int:
+        """Return count of active restaurants in this category."""
+        return self.restaurants.filter(is_active=True).count()
+
+
 class Restaurant(TimeStampedModel):
     """
     Restaurant model representing a tenant in the multi-tenant system.
@@ -34,6 +76,16 @@ class Restaurant(TimeStampedModel):
     slug = models.SlugField(max_length=100, unique=True, db_index=True)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True, db_index=True)
+
+    # Category
+    category = models.ForeignKey(
+        RestaurantCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="restaurants",
+        help_text="Restaurant category (e.g., Italian, Fast Food)",
+    )
 
     # Owner
     owner = models.ForeignKey(

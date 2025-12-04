@@ -6,7 +6,23 @@ from rest_framework import serializers
 
 from apps.accounts.serializers import UserSerializer
 
-from .models import Restaurant, RestaurantHours
+from .models import Restaurant, RestaurantCategory, RestaurantHours
+
+
+class RestaurantCategorySerializer(serializers.ModelSerializer):
+    """Serializer for restaurant categories."""
+
+    class Meta:
+        model = RestaurantCategory
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "description",
+            "icon",
+            "image",
+        ]
+        read_only_fields = ["id", "slug"]
 
 
 class RestaurantHoursSerializer(serializers.ModelSerializer):
@@ -34,6 +50,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
     """Minimal serializer for restaurant lists."""
 
     is_open_now = serializers.SerializerMethodField()
+    category = RestaurantCategorySerializer(read_only=True)
 
     class Meta:
         model = Restaurant
@@ -44,6 +61,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
             "description",
             "logo",
             "city",
+            "category",
             "average_rating",
             "total_reviews",
             "is_open_now",
@@ -62,6 +80,7 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
     is_open_now = serializers.SerializerMethodField()
     full_address = serializers.SerializerMethodField()
     owner = UserSerializer(read_only=True)
+    category = RestaurantCategorySerializer(read_only=True)
 
     class Meta:
         model = Restaurant
@@ -70,6 +89,7 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "description",
+            "category",
             "is_active",
             "owner",
             # Contact
@@ -133,12 +153,20 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
 class RestaurantCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating a new restaurant."""
 
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=RestaurantCategory.objects.filter(is_active=True),
+        source="category",
+        required=False,
+        allow_null=True,
+    )
+
     class Meta:
         model = Restaurant
         fields = [
             "name",
             "slug",
             "description",
+            "category_id",
             "email",
             "phone",
             "website",

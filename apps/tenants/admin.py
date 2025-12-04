@@ -6,7 +6,23 @@ from django.contrib import admin
 
 from apps.core.admin import ExportMixin, SuperadminOnlyMixin, make_active, make_inactive
 
-from .models import Restaurant, RestaurantHours
+from .models import Restaurant, RestaurantCategory, RestaurantHours
+
+
+@admin.register(RestaurantCategory)
+class RestaurantCategoryAdmin(SuperadminOnlyMixin, admin.ModelAdmin):
+    """Admin for restaurant categories - superadmin only."""
+
+    list_display = ["name", "slug", "icon", "display_order", "is_active", "restaurants_count"]
+    list_filter = ["is_active"]
+    search_fields = ["name", "description"]
+    prepopulated_fields = {"slug": ("name",)}
+    list_editable = ["display_order", "is_active"]
+    ordering = ["display_order", "name"]
+
+    @admin.display(description="Restaurants")
+    def restaurants_count(self, obj):
+        return obj.restaurants_count
 
 
 class RestaurantHoursInline(admin.TabularInline):
@@ -23,8 +39,8 @@ class RestaurantAdmin(SuperadminOnlyMixin, ExportMixin, admin.ModelAdmin):
     This is the root tenant model, so no tenant_field needed.
     """
 
-    list_display = ["name", "slug", "city", "is_active", "owner", "average_rating", "total_orders", "created_at"]
-    list_filter = ["is_active", "city", "country", "default_currency", "created_at"]
+    list_display = ["name", "slug", "category", "city", "is_active", "owner", "average_rating", "total_orders", "created_at"]
+    list_filter = ["is_active", "category", "city", "country", "default_currency", "created_at"]
     search_fields = ["name", "slug", "email", "phone", "city", "owner__email"]
     prepopulated_fields = {"slug": ("name",)}
     readonly_fields = ["created_at", "updated_at", "average_rating", "total_reviews", "total_orders"]
@@ -33,7 +49,7 @@ class RestaurantAdmin(SuperadminOnlyMixin, ExportMixin, admin.ModelAdmin):
     actions = ["export_as_csv", "export_as_json", make_active, make_inactive]
 
     fieldsets = (
-        (None, {"fields": ("name", "slug", "description", "is_active", "owner")}),
+        (None, {"fields": ("name", "slug", "description", "category", "is_active", "owner")}),
         ("Contact", {"fields": ("email", "phone", "website")}),
         ("Address", {"fields": ("address", "city", "postal_code", "country", "latitude", "longitude")}),
         (
