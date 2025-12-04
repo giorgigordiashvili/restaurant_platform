@@ -789,10 +789,10 @@ tenant_admin_site.register(MenuItem, MenuItemTenantAdmin)
 tenant_admin_site.register(ModifierGroup, ModifierGroupTenantAdmin)
 tenant_admin_site.register(Modifier, ModifierTenantAdmin)
 
-# Orders
-tenant_admin_site.register(Order, OrderTenantAdmin)
-tenant_admin_site.register(OrderItem, OrderItemTenantAdmin)
-tenant_admin_site.register(OrderStatusHistory, OrderStatusHistoryTenantAdmin)
+# Orders (temporarily hidden)
+# tenant_admin_site.register(Order, OrderTenantAdmin)
+# tenant_admin_site.register(OrderItem, OrderItemTenantAdmin)
+# tenant_admin_site.register(OrderStatusHistory, OrderStatusHistoryTenantAdmin)
 
 # Tables
 tenant_admin_site.register(TableSection, TableSectionTenantAdmin)
@@ -805,7 +805,7 @@ tenant_admin_site.register(StaffRole, StaffRoleTenantAdmin)
 tenant_admin_site.register(StaffMember, StaffMemberTenantAdmin)
 tenant_admin_site.register(StaffInvitation, StaffInvitationTenantAdmin)
 
-# Reservations
-tenant_admin_site.register(Reservation, ReservationTenantAdmin)
-tenant_admin_site.register(ReservationSettings, ReservationSettingsTenantAdmin)
-tenant_admin_site.register(ReservationBlockedTime, ReservationBlockedTimeTenantAdmin)
+# Reservations (temporarily hidden)
+# tenant_admin_site.register(Reservation, ReservationTenantAdmin)
+# tenant_admin_site.register(ReservationSettings, ReservationSettingsTenantAdmin)
+# tenant_admin_site.register(ReservationBlockedTime, ReservationBlockedTimeTenantAdmin)
