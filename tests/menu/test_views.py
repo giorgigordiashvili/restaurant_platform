@@ -171,3 +171,110 @@ class TestDashboardModifierGroupCreateView:
         data = {"translations": {"en": {"name": "Size"}}, "selection_type": "single", "is_required": True}
         response = api_client.post(self.url, data, format="json")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.django_db
+class TestMenuTranslations:
+    """Tests for menu translations in API responses."""
+
+    def test_category_translations_in_response(self, api_client, restaurant, menu_category):
+        """Test that category translations are included in response."""
+        url = f"/api/v1/restaurants/{restaurant.slug}/menu/categories/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        if len(response.data["results"]) > 0:
+            category = response.data["results"][0]
+            assert "translations" in category
+
+    def test_item_translations_in_response(self, api_client, restaurant, menu_item):
+        """Test that item translations are included in response."""
+        url = f"/api/v1/restaurants/{restaurant.slug}/menu/items/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        if len(response.data["results"]) > 0:
+            item = response.data["results"][0]
+            assert "translations" in item
+
+    def test_modifier_group_translations_in_item_response(
+        self, api_client, restaurant, menu_item, modifier_group, create_modifier
+    ):
+        """Test that modifier group translations are included in item response."""
+        from apps.menu.models import MenuItemModifierGroup
+
+        # Link modifier group to menu item
+        MenuItemModifierGroup.objects.create(
+            menu_item=menu_item,
+            modifier_group=modifier_group,
+        )
+
+        # Add a modifier
+        create_modifier(group=modifier_group, name="Small")
+
+        url = f"/api/v1/restaurants/{restaurant.slug}/menu/items/{menu_item.id}/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        if "modifier_groups" in response.data:
+            assert len(response.data["modifier_groups"]) >= 1
+            group = response.data["modifier_groups"][0]
+            assert "translations" in group
+
+    def test_modifier_translations_in_item_response(
+        self, api_client, restaurant, menu_item, modifier_group, modifier_with_translations
+    ):
+        """Test that modifier translations are included in item response."""
+        from apps.menu.models import MenuItemModifierGroup
+
+        # Link modifier group to menu item
+        MenuItemModifierGroup.objects.create(
+            menu_item=menu_item,
+            modifier_group=modifier_group,
+        )
+
+        url = f"/api/v1/restaurants/{restaurant.slug}/menu/items/{menu_item.id}/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        if "modifier_groups" in response.data and len(response.data["modifier_groups"]) > 0:
+            group = response.data["modifier_groups"][0]
+            if "modifiers" in group and len(group["modifiers"]) > 0:
+                modifier = group["modifiers"][0]
+                assert "translations" in modifier
+
+    def test_full_menu_includes_translations(self, api_client, restaurant, menu_category, menu_item):
+        """Test that full menu response includes all translations."""
+        url = f"/api/v1/restaurants/{restaurant.slug}/menu/full/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        if "categories" in response.data and len(response.data["categories"]) > 0:
+            category_data = response.data["categories"][0]
+            assert "translations" in category_data["category"]
+
+            if len(category_data["items"]) > 0:
+                item = category_data["items"][0]
+                assert "translations" in item
+
+    def test_menu_with_language_parameter(self, api_client, restaurant, menu_item):
+        """Test menu endpoint with language parameter."""
+        url = f"/api/v1/restaurants/{restaurant.slug}/menu/items/"
+
+        # Request with English
+        response = api_client.get(url, {"lang": "en"})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers.get("Content-Language") == "en"
+
+        # Request with Georgian
+        response = api_client.get(url, {"lang": "ka"})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers.get("Content-Language") == "ka"
+
+    def test_menu_with_accept_language_header(self, api_client, restaurant, menu_item):
+        """Test menu endpoint with Accept-Language header."""
+        url = f"/api/v1/restaurants/{restaurant.slug}/menu/items/"
+
+        response = api_client.get(url, HTTP_ACCEPT_LANGUAGE="ru,en;q=0.9")
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers.get("Content-Language") == "ru"

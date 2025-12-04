@@ -8,6 +8,100 @@ import pytest
 
 
 @pytest.mark.django_db
+class TestRestaurantListViewWithTranslations:
+    """Tests for restaurant list endpoint with translated category and amenities."""
+
+    url = "/api/v1/restaurants/"
+
+    def test_list_includes_category_translations(
+        self, api_client, restaurant_with_category_and_amenities
+    ):
+        """Test that restaurant list includes category with translations."""
+        response = api_client.get(self.url)
+        assert response.status_code == status.HTTP_200_OK
+
+        restaurant_data = response.data["results"][0]
+        assert "category" in restaurant_data
+        assert restaurant_data["category"] is not None
+        assert "translations" in restaurant_data["category"]
+
+    def test_list_includes_amenities_translations(
+        self, api_client, restaurant_with_category_and_amenities
+    ):
+        """Test that restaurant list includes amenities with translations."""
+        response = api_client.get(self.url)
+        assert response.status_code == status.HTTP_200_OK
+
+        restaurant_data = response.data["results"][0]
+        assert "amenities" in restaurant_data
+        assert len(restaurant_data["amenities"]) >= 1
+        assert "translations" in restaurant_data["amenities"][0]
+
+    def test_list_with_language_parameter(
+        self, api_client, restaurant_with_category_and_amenities
+    ):
+        """Test restaurant list with ?lang= parameter."""
+        # Request with English
+        response = api_client.get(self.url, {"lang": "en"})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers.get("Content-Language") == "en"
+
+        # Request with Georgian
+        response = api_client.get(self.url, {"lang": "ka"})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers.get("Content-Language") == "ka"
+
+    def test_list_with_accept_language_header(
+        self, api_client, restaurant_with_category_and_amenities
+    ):
+        """Test restaurant list with Accept-Language header."""
+        response = api_client.get(
+            self.url, HTTP_ACCEPT_LANGUAGE="en,ka;q=0.9"
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers.get("Content-Language") == "en"
+
+
+@pytest.mark.django_db
+class TestRestaurantDetailViewWithTranslations:
+    """Tests for restaurant detail endpoint with translated category and amenities."""
+
+    def test_detail_includes_category_translations(
+        self, api_client, restaurant_with_category_and_amenities
+    ):
+        """Test that restaurant detail includes category with translations."""
+        url = f"/api/v1/restaurants/{restaurant_with_category_and_amenities.slug}/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        assert "category" in response.data
+        assert response.data["category"] is not None
+        assert "translations" in response.data["category"]
+
+    def test_detail_includes_amenities_translations(
+        self, api_client, restaurant_with_category_and_amenities
+    ):
+        """Test that restaurant detail includes amenities with translations."""
+        url = f"/api/v1/restaurants/{restaurant_with_category_and_amenities.slug}/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        assert "amenities" in response.data
+        assert len(response.data["amenities"]) >= 1
+        assert "translations" in response.data["amenities"][0]
+
+    def test_detail_with_language_parameter(
+        self, api_client, restaurant_with_category_and_amenities
+    ):
+        """Test restaurant detail with ?lang= parameter."""
+        url = f"/api/v1/restaurants/{restaurant_with_category_and_amenities.slug}/"
+
+        response = api_client.get(url, {"lang": "ru"})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers.get("Content-Language") == "ru"
+
+
+@pytest.mark.django_db
 class TestRestaurantListView:
     """Tests for restaurant list endpoint."""
 

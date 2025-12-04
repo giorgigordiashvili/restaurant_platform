@@ -657,3 +657,164 @@ def create_blocked_time(db):
 def blocked_time(create_blocked_time, restaurant):
     """Create a test blocked time."""
     return create_blocked_time(restaurant=restaurant, reason="holiday")
+
+
+# ============== Restaurant Category Fixtures ==============
+
+
+@pytest.fixture
+def create_restaurant_category(db):
+    """Factory fixture to create restaurant categories."""
+    from apps.tenants.models import RestaurantCategory
+
+    def _create_category(name="Test Category", slug=None, **kwargs):
+        category = RestaurantCategory.objects.create(slug=slug or name.lower().replace(" ", "-"), **kwargs)
+        # Set translation for Georgian (default)
+        category.set_current_language("ka")
+        category.name = name
+        category.description = kwargs.get("description_ka", "")
+        category.save()
+        return category
+
+    return _create_category
+
+
+@pytest.fixture
+def restaurant_category(create_restaurant_category):
+    """Create a test restaurant category."""
+    return create_restaurant_category(name="რესტორანი", slug="restaurant")
+
+
+@pytest.fixture
+def restaurant_category_with_translations(db):
+    """Create a restaurant category with multiple language translations."""
+    from apps.tenants.models import RestaurantCategory
+
+    category = RestaurantCategory.objects.create(slug="georgian-cuisine", icon="restaurant")
+
+    # Georgian translation
+    category.set_current_language("ka")
+    category.name = "ქართული სამზარეულო"
+    category.description = "ტრადიციული ქართული კერძები"
+    category.save()
+
+    # English translation
+    category.set_current_language("en")
+    category.name = "Georgian Cuisine"
+    category.description = "Traditional Georgian dishes"
+    category.save()
+
+    # Russian translation
+    category.set_current_language("ru")
+    category.name = "Грузинская кухня"
+    category.description = "Традиционные грузинские блюда"
+    category.save()
+
+    return category
+
+
+# ============== Amenity Fixtures ==============
+
+
+@pytest.fixture
+def create_amenity(db):
+    """Factory fixture to create amenities."""
+    from apps.tenants.models import Amenity
+
+    def _create_amenity(name="Test Amenity", slug=None, **kwargs):
+        amenity = Amenity.objects.create(slug=slug or name.lower().replace(" ", "-"), **kwargs)
+        # Set translation for Georgian (default)
+        amenity.set_current_language("ka")
+        amenity.name = name
+        amenity.description = kwargs.get("description_ka", "")
+        amenity.save()
+        return amenity
+
+    return _create_amenity
+
+
+@pytest.fixture
+def amenity(create_amenity):
+    """Create a test amenity."""
+    return create_amenity(name="ტერასა", slug="terrace", icon="deck")
+
+
+@pytest.fixture
+def amenity_with_translations(db):
+    """Create an amenity with multiple language translations."""
+    from apps.tenants.models import Amenity
+
+    amenity = Amenity.objects.create(slug="live-music", icon="music_note")
+
+    # Georgian translation
+    amenity.set_current_language("ka")
+    amenity.name = "ცოცხალი მუსიკა"
+    amenity.description = "ცოცხალი მუსიკალური გამოსვლები"
+    amenity.save()
+
+    # English translation
+    amenity.set_current_language("en")
+    amenity.name = "Live Music"
+    amenity.description = "Live musical performances"
+    amenity.save()
+
+    # Russian translation
+    amenity.set_current_language("ru")
+    amenity.name = "Живая музыка"
+    amenity.description = "Живые музыкальные выступления"
+    amenity.save()
+
+    return amenity
+
+
+@pytest.fixture
+def restaurant_with_category_and_amenities(restaurant, restaurant_category, amenity):
+    """Create a restaurant with category and amenities assigned."""
+    restaurant.category = restaurant_category
+    restaurant.save()
+    restaurant.amenities.add(amenity)
+    return restaurant
+
+
+# ============== Modifier with Translations Fixture ==============
+
+
+@pytest.fixture
+def create_modifier(db):
+    """Factory fixture to create modifiers with translations."""
+    from decimal import Decimal
+
+    from apps.menu.models import Modifier
+
+    def _create_modifier(group, name="Test Modifier", price_adjustment=Decimal("0"), **kwargs):
+        modifier = Modifier.objects.create(group=group, price_adjustment=price_adjustment, **kwargs)
+        modifier.set_current_language("en")
+        modifier.name = name
+        modifier.save()
+        return modifier
+
+    return _create_modifier
+
+
+@pytest.fixture
+def modifier_with_translations(modifier_group):
+    """Create a modifier with multiple translations."""
+    from decimal import Decimal
+
+    from apps.menu.models import Modifier
+
+    modifier = Modifier.objects.create(group=modifier_group, price_adjustment=Decimal("2.00"))
+
+    modifier.set_current_language("ka")
+    modifier.name = "დიდი"
+    modifier.save()
+
+    modifier.set_current_language("en")
+    modifier.name = "Large"
+    modifier.save()
+
+    modifier.set_current_language("ru")
+    modifier.name = "Большой"
+    modifier.save()
+
+    return modifier

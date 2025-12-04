@@ -45,6 +45,90 @@ class TestQRCodeScanView:
 
 
 @pytest.mark.django_db
+class TestTableValidateView:
+    """Tests for table validation endpoint (for QR URL parameter validation)."""
+
+    def test_validate_valid_code(self, api_client, table_qr_code):
+        """Test validating a valid QR code."""
+        url = f"/api/v1/tables/validate/{table_qr_code.code}/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["success"] is True
+        assert "table" in response.data["data"]
+        assert "restaurant" in response.data["data"]
+
+    def test_validate_returns_table_info(self, api_client, table_qr_code):
+        """Test that validation returns correct table info."""
+        url = f"/api/v1/tables/validate/{table_qr_code.code}/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        table_data = response.data["data"]["table"]
+        assert "id" in table_data
+        assert "number" in table_data
+        assert "capacity" in table_data
+
+    def test_validate_returns_restaurant_info(self, api_client, table_qr_code):
+        """Test that validation returns restaurant info."""
+        url = f"/api/v1/tables/validate/{table_qr_code.code}/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        restaurant_data = response.data["data"]["restaurant"]
+        assert "name" in restaurant_data
+        assert "slug" in restaurant_data
+
+    def test_validate_includes_active_session(self, api_client, table_qr_code, table_session):
+        """Test that validation includes active session info if exists."""
+        url = f"/api/v1/tables/validate/{table_qr_code.code}/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        # Active session should be included
+        assert "active_session" in response.data["data"]
+        if response.data["data"]["active_session"]:
+            session = response.data["data"]["active_session"]
+            assert "id" in session
+            assert "invite_code" in session
+
+    def test_validate_invalid_code(self, api_client):
+        """Test validating an invalid QR code."""
+        url = "/api/v1/tables/validate/invalidcode123/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_validate_inactive_code(self, api_client, table_qr_code):
+        """Test validating an inactive QR code."""
+        table_qr_code.is_active = False
+        table_qr_code.save()
+
+        url = f"/api/v1/tables/validate/{table_qr_code.code}/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_validate_inactive_table(self, api_client, table_qr_code, table):
+        """Test validating QR code for inactive table."""
+        table.is_active = False
+        table.save()
+
+        url = f"/api/v1/tables/validate/{table_qr_code.code}/"
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_validate_with_language_parameter(self, api_client, table_qr_code):
+        """Test table validation with language parameter."""
+        url = f"/api/v1/tables/validate/{table_qr_code.code}/"
+
+        response = api_client.get(url, {"lang": "en"})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers.get("Content-Language") == "en"
+
+        response = api_client.get(url, {"lang": "ka"})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers.get("Content-Language") == "ka"
+
+
+@pytest.mark.django_db
 class TestDashboardTableSectionListView:
     """Tests for dashboard table section list endpoint."""
 
