@@ -6,7 +6,7 @@ from django.contrib import admin
 
 from apps.core.admin import ExportMixin, SuperadminOnlyMixin, make_active, make_inactive
 
-from .models import Restaurant, RestaurantCategory, RestaurantHours
+from .models import Amenity, Restaurant, RestaurantCategory, RestaurantHours
 
 
 @admin.register(RestaurantCategory)
@@ -23,6 +23,18 @@ class RestaurantCategoryAdmin(SuperadminOnlyMixin, admin.ModelAdmin):
     @admin.display(description="Restaurants")
     def restaurants_count(self, obj):
         return obj.restaurants_count
+
+
+@admin.register(Amenity)
+class AmenityAdmin(SuperadminOnlyMixin, admin.ModelAdmin):
+    """Admin for amenities - superadmin only."""
+
+    list_display = ["name", "slug", "icon", "display_order", "is_active"]
+    list_filter = ["is_active"]
+    search_fields = ["name", "description"]
+    prepopulated_fields = {"slug": ("name",)}
+    list_editable = ["display_order", "is_active"]
+    ordering = ["display_order", "name"]
 
 
 class RestaurantHoursInline(admin.TabularInline):
@@ -48,8 +60,11 @@ class RestaurantAdmin(SuperadminOnlyMixin, ExportMixin, admin.ModelAdmin):
     inlines = [RestaurantHoursInline]
     actions = ["export_as_csv", "export_as_json", make_active, make_inactive]
 
+    filter_horizontal = ["amenities"]
+
     fieldsets = (
         (None, {"fields": ("name", "slug", "description", "category", "is_active", "owner")}),
+        ("Amenities", {"fields": ("amenities",)}),
         ("Contact", {"fields": ("email", "phone", "website")}),
         ("Address", {"fields": ("address", "city", "postal_code", "country", "latitude", "longitude")}),
         (

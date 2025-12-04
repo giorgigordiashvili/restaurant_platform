@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from apps.accounts.serializers import UserSerializer
 
-from .models import Restaurant, RestaurantCategory, RestaurantHours
+from .models import Amenity, Restaurant, RestaurantCategory, RestaurantHours
 
 
 class RestaurantCategorySerializer(serializers.ModelSerializer):
@@ -21,6 +21,21 @@ class RestaurantCategorySerializer(serializers.ModelSerializer):
             "description",
             "icon",
             "image",
+        ]
+        read_only_fields = ["id", "slug"]
+
+
+class AmenitySerializer(serializers.ModelSerializer):
+    """Serializer for amenities."""
+
+    class Meta:
+        model = Amenity
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "icon",
+            "description",
         ]
         read_only_fields = ["id", "slug"]
 
@@ -51,6 +66,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
 
     is_open_now = serializers.SerializerMethodField()
     category = RestaurantCategorySerializer(read_only=True)
+    amenities = AmenitySerializer(many=True, read_only=True)
 
     class Meta:
         model = Restaurant
@@ -62,6 +78,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
             "logo",
             "city",
             "category",
+            "amenities",
             "average_rating",
             "total_reviews",
             "is_open_now",
@@ -81,6 +98,7 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
     full_address = serializers.SerializerMethodField()
     owner = UserSerializer(read_only=True)
     category = RestaurantCategorySerializer(read_only=True)
+    amenities = AmenitySerializer(many=True, read_only=True)
 
     class Meta:
         model = Restaurant
@@ -90,6 +108,7 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
             "slug",
             "description",
             "category",
+            "amenities",
             "is_active",
             "owner",
             # Contact

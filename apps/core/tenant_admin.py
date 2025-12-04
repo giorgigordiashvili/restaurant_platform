@@ -53,7 +53,7 @@ from apps.reservations.models import (
 )
 from apps.staff.models import StaffInvitation, StaffMember, StaffRole
 from apps.tables.models import Table, TableQRCode, TableSection, TableSession
-from apps.tenants.models import Restaurant, RestaurantCategory, RestaurantHours
+from apps.tenants.models import Amenity, Restaurant, RestaurantCategory, RestaurantHours
 
 
 class TenantModelAdmin(UnfoldModelAdmin):
@@ -649,10 +649,14 @@ class RestaurantSettingsAdmin(UnfoldModelAdmin):
     list_display = ["name", "is_active", "default_currency", "timezone"]
     readonly_fields = ["slug", "owner", "average_rating", "total_reviews", "total_orders", "created_at", "updated_at"]
     inlines = [RestaurantHoursInline]
+    filter_horizontal = ["amenities"]
 
     fieldsets = (
         ("Basic Info", {
             "fields": ("name", "slug", "description", "category", "is_active"),
+        }),
+        ("Amenities", {
+            "fields": ("amenities",),
         }),
         ("Contact", {
             "fields": ("email", "phone", "website"),

@@ -52,6 +52,38 @@ class RestaurantCategory(TimeStampedModel):
         return self.restaurants.filter(is_active=True).count()
 
 
+class Amenity(TimeStampedModel):
+    """
+    Amenities/features that restaurants can have (e.g., Terrace, Live Music, WiFi).
+    Managed by superadmins, selected by restaurant owners.
+    """
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Material icon name (e.g., 'deck', 'music_note', 'wifi')",
+    )
+    description = models.TextField(blank=True)
+    display_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "amenities"
+        ordering = ["display_order", "name"]
+        verbose_name = "Amenity"
+        verbose_name_plural = "Amenities"
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
 class Restaurant(TimeStampedModel):
     """
     Restaurant model representing a tenant in the multi-tenant system.
@@ -85,6 +117,14 @@ class Restaurant(TimeStampedModel):
         blank=True,
         related_name="restaurants",
         help_text="Restaurant category (e.g., Italian, Fast Food)",
+    )
+
+    # Amenities
+    amenities = models.ManyToManyField(
+        Amenity,
+        blank=True,
+        related_name="restaurants",
+        help_text="Amenities available at the restaurant",
     )
 
     # Owner
