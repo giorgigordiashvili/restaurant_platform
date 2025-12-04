@@ -14,9 +14,9 @@ class TenantAdminRouterMiddleware:
     This middleware must come after TenantMiddleware which sets is_tenant_admin.
 
     URL Structure:
-    - aimenu.ge/admin/ -> Default Django admin (superadmins)
-    - pizza-palace.aimenu.ge/admin/ -> Redirects to /tenant-admin/ (restaurant staff)
-    - pizza-palace.aimenu.ge/tenant-admin/ -> Tenant admin with unfold UI
+    - admin.aimenu.ge/admin/ -> Default Django admin (superadmins)
+    - pizza-palace.admin.aimenu.ge/admin/ -> Redirects to /tenant-admin/ (restaurant staff)
+    - pizza-palace.admin.aimenu.ge/tenant-admin/ -> Tenant admin with unfold UI
     """
 
     def __init__(self, get_response):

@@ -32,8 +32,8 @@ ALLOWED_HOSTS = [h for h in ALLOWED_HOSTS if h]
 # Always allow these domains
 ALLOWED_HOSTS.extend(
     [
-        "aimenu.ge",
-        ".aimenu.ge",  # All subdomains
+        "admin.aimenu.ge",
+        ".admin.aimenu.ge",  # All subdomains
         ".ondigitalocean.app",  # All DigitalOcean app domains
     ]
 )

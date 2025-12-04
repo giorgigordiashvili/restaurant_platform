@@ -2,7 +2,7 @@
 Custom AdminSite for tenant (restaurant) admin.
 
 Uses django-unfold for modern Tailwind-based UI.
-Restaurant staff access their admin at {restaurant-slug}.aimenu.ge/admin/
+Restaurant staff access their admin at {restaurant-slug}.admin.aimenu.ge/admin/
 """
 
 from django.contrib.admin.apps import AdminConfig
@@ -13,7 +13,7 @@ class TenantAdminSite(UnfoldAdminSite):
     """
     Restaurant-specific admin site with modern unfold UI.
 
-    Accessible at {restaurant-slug}.aimenu.ge/admin/
+    Accessible at {restaurant-slug}.admin.aimenu.ge/admin/
     Only staff members of the restaurant can access.
     """
 

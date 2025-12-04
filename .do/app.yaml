@@ -46,6 +46,9 @@ services:
         value: restaurant-media
       - key: MINIO_USE_SSL
         value: "True"
+      - key: MINIO_EXTERNAL_ENDPOINT
+        scope: RUN_TIME
+        type: SECRET
 
 databases:
   # PostgreSQL Database
