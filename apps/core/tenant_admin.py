@@ -190,7 +190,12 @@ class MenuItemModifierGroupInline(UnfoldTabularInline):
     ordering = ["display_order"]
     autocomplete_fields = ["modifier_group"]
     verbose_name = "Modifier Group"
-    verbose_name_plural = "Modifier Groups"
+    verbose_name_plural = "Modifier Groups (select existing or create new in Modifier Groups menu)"
+    fields = ["modifier_group", "display_order"]
+
+    def get_queryset(self, request):
+        """Prefetch modifiers for display."""
+        return super().get_queryset(request).select_related("modifier_group")
 
 
 class MenuItemTenantAdmin(TenantTranslatableAdmin):
@@ -225,8 +230,31 @@ class MenuItemTenantAdmin(TenantTranslatableAdmin):
         return super().get_queryset(request).select_related("category")
 
 
+class ModifierInline(UnfoldTabularInline):
+    """Inline for adding modifiers directly within a modifier group."""
+
+    model = Modifier
+    extra = 3  # Show 3 empty rows for quick adding
+    ordering = ["display_order"]
+    fields = ["name", "price_adjustment", "is_default", "is_available", "display_order"]
+    verbose_name = "Option"
+    verbose_name_plural = "Options (e.g., Small, Medium, Large or Meat, Cheese, Potato)"
+
+    def get_formset(self, request, obj=None, **kwargs):
+        """Apply styling to inline form fields."""
+        formset = super().get_formset(request, obj, **kwargs)
+        for field_name in formset.form.base_fields:
+            field = formset.form.base_fields[field_name]
+            if hasattr(field.widget, 'attrs'):
+                if isinstance(field.widget, forms.Textarea):
+                    field.widget.attrs['class'] = field.widget.attrs.get('class', '') + ' ' + UNFOLD_TEXTAREA_CLASSES
+                elif isinstance(field.widget, (forms.TextInput, forms.NumberInput)):
+                    field.widget.attrs['class'] = field.widget.attrs.get('class', '') + ' ' + UNFOLD_INPUT_CLASSES
+        return formset
+
+
 class ModifierGroupTenantAdmin(TenantTranslatableAdmin):
-    """Admin for modifier groups."""
+    """Admin for modifier groups with inline modifiers."""
 
     permission_resource = "menu"
     list_display = [
@@ -236,14 +264,33 @@ class ModifierGroupTenantAdmin(TenantTranslatableAdmin):
         "max_selections",
         "is_required",
         "is_active",
+        "modifiers_count",
     ]
     list_filter = ["selection_type", "is_required", "is_active"]
     search_fields = ["translations__name"]
     ordering = ["display_order"]
+    inlines = [ModifierInline]
+
+    fieldsets = (
+        (None, {
+            "fields": ("name", "description"),
+        }),
+        ("Selection Rules", {
+            "fields": ("selection_type", "is_required", "min_selections", "max_selections"),
+            "description": "Single = radio buttons (pick one), Multiple = checkboxes (pick many)",
+        }),
+        ("Display", {
+            "fields": ("display_order", "is_active"),
+        }),
+    )
+
+    @admin.display(description="Options")
+    def modifiers_count(self, obj):
+        return obj.modifiers.count()
 
 
 class ModifierTenantAdmin(TenantTranslatableAdmin):
-    """Admin for modifiers."""
+    """Admin for modifiers (can also be edited individually)."""
 
     permission_resource = "menu"
     restaurant_field = None  # Modifier doesn't have direct restaurant FK
