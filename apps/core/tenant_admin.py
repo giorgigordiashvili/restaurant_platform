@@ -53,6 +53,7 @@ from apps.reservations.models import (
 )
 from apps.staff.models import StaffInvitation, StaffMember, StaffRole
 from apps.tables.models import Table, TableQRCode, TableSection, TableSession
+from apps.tenants.models import Restaurant, RestaurantHours
 
 
 class TenantModelAdmin(UnfoldModelAdmin):
@@ -625,8 +626,111 @@ class ReservationBlockedTimeTenantAdmin(TenantModelAdmin):
 
 
 # =============================================================================
+# Restaurant Settings Admin
+# =============================================================================
+
+
+class RestaurantHoursInline(UnfoldTabularInline):
+    """Inline for restaurant operating hours."""
+
+    model = RestaurantHours
+    extra = 0
+    max_num = 7
+    ordering = ["day_of_week"]
+
+
+class RestaurantSettingsAdmin(UnfoldModelAdmin):
+    """
+    Admin for editing the current restaurant's settings.
+
+    Only shows the current restaurant - no list view needed.
+    """
+
+    list_display = ["name", "is_active", "default_currency", "timezone"]
+    readonly_fields = ["slug", "owner", "average_rating", "total_reviews", "total_orders", "created_at", "updated_at"]
+    inlines = [RestaurantHoursInline]
+
+    fieldsets = (
+        ("Basic Info", {
+            "fields": ("name", "slug", "description", "is_active"),
+        }),
+        ("Contact", {
+            "fields": ("email", "phone", "website"),
+        }),
+        ("Address", {
+            "fields": ("address", "city", "postal_code", "country", "latitude", "longitude"),
+        }),
+        ("Branding", {
+            "fields": ("logo", "cover_image", "primary_color", "secondary_color"),
+        }),
+        ("Settings", {
+            "fields": ("default_currency", "timezone", "default_language"),
+        }),
+        ("Features", {
+            "fields": ("accepts_remote_orders", "accepts_reservations", "accepts_takeaway"),
+        }),
+        ("Orders & Pricing", {
+            "fields": ("tax_rate", "service_charge", "minimum_order_amount", "average_preparation_time"),
+        }),
+        ("Statistics (read-only)", {
+            "fields": ("average_rating", "total_reviews", "total_orders"),
+            "classes": ("collapse",),
+        }),
+        ("System", {
+            "fields": ("owner", "created_at", "updated_at"),
+            "classes": ("collapse",),
+        }),
+    )
+
+    def get_queryset(self, request):
+        """Only show the current restaurant."""
+        qs = super().get_queryset(request)
+        restaurant = getattr(request, "restaurant", None)
+        if restaurant:
+            return qs.filter(pk=restaurant.pk)
+        return qs.none()
+
+    def has_add_permission(self, request):
+        """Don't allow adding new restaurants from tenant admin."""
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """Don't allow deleting the restaurant from tenant admin."""
+        return False
+
+    def has_view_permission(self, request, obj=None):
+        """Allow viewing if user has staff access."""
+        restaurant = getattr(request, "restaurant", None)
+        if not restaurant:
+            return False
+        if request.user.is_superuser:
+            return True
+        # Check if user is staff of this restaurant
+        return request.user.staff_memberships.filter(restaurant=restaurant, is_active=True).exists()
+
+    def has_change_permission(self, request, obj=None):
+        """Only owner or manager can change settings."""
+        restaurant = getattr(request, "restaurant", None)
+        if not restaurant:
+            return False
+        if request.user.is_superuser:
+            return True
+        if restaurant.owner == request.user:
+            return True
+        # Check for manager role
+        try:
+            staff = request.user.staff_memberships.get(restaurant=restaurant, is_active=True)
+            return staff.role and staff.role.name == "manager"
+        except Exception:
+            return False
+
+
+# =============================================================================
 # Register all models with tenant_admin_site
 # =============================================================================
+
+# Restaurant Settings
+tenant_admin_site.register(Restaurant, RestaurantSettingsAdmin)
 
 # Menu
 tenant_admin_site.register(MenuCategory, MenuCategoryTenantAdmin)
