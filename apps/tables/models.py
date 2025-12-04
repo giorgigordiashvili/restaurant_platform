@@ -191,10 +191,8 @@ class TableQRCode(TimeStampedModel):
     def get_qr_url(self):
         """Get the URL that the QR code should point to."""
         restaurant = self.table.restaurant
-        # URL format: https://{restaurant-slug}.admin.aimenu.ge/table/{code}
-        from django.conf import settings
-        main_domain = getattr(settings, "MAIN_DOMAIN", "admin.aimenu.ge")
-        return f"https://{restaurant.slug}.{main_domain}/table/{self.code}"
+        # URL format: https://aimenu.ge/restaurant/{slug}?table={code}
+        return f"https://aimenu.ge/restaurant/{restaurant.slug}?table={self.code}"
 
     def generate_qr_image(self):
         """Generate and save QR code image."""
