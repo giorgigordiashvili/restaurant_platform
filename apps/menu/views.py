@@ -104,6 +104,7 @@ class PublicMenuItemListView(generics.ListAPIView):
                 is_available=True,
             )
             .select_related("category")
+            .prefetch_related("modifier_groups_link__modifier_group__modifiers")
             .order_by("display_order")
         )
 

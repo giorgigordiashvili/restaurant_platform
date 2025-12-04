@@ -154,6 +154,7 @@ class MenuItemListSerializer(TranslatableModelSerializer):
 
     translations = TranslatedFieldsField(shared_model=MenuItem)
     dietary_tags = serializers.SerializerMethodField()
+    modifier_groups = serializers.SerializerMethodField()
 
     class Meta:
         model = MenuItem
@@ -166,10 +167,16 @@ class MenuItemListSerializer(TranslatableModelSerializer):
             "is_featured",
             "dietary_tags",
             "preparation_time_minutes",
+            "modifier_groups",
         ]
 
     def get_dietary_tags(self, obj):
         return obj.get_dietary_tags()
+
+    def get_modifier_groups(self, obj):
+        links = obj.modifier_groups_link.select_related("modifier_group").all()
+        groups = [link.modifier_group for link in links]
+        return ModifierGroupSerializer(groups, many=True).data
 
 
 class MenuItemCreateSerializer(TranslatableModelSerializer):
@@ -317,32 +324,46 @@ class FullMenuSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
 
     def get_categories(self, obj):
+        from django.db.models import Prefetch
+
         categories = (
             MenuCategory.objects.filter(
                 restaurant=self.restaurant,
                 is_active=True,
             )
-            .prefetch_related("items")
+            .prefetch_related(
+                Prefetch(
+                    "items",
+                    queryset=MenuItem.objects.filter(is_available=True)
+                    .prefetch_related(
+                        "modifier_groups_link__modifier_group__modifiers"
+                    )
+                    .order_by("display_order"),
+                )
+            )
             .order_by("display_order")
         )
 
         result = []
         for category in categories:
-            items = category.items.filter(is_available=True).order_by("display_order")
             result.append(
                 {
                     "category": MenuCategorySerializer(category).data,
-                    "items": MenuItemListSerializer(items, many=True).data,
+                    "items": MenuItemListSerializer(category.items.all(), many=True).data,
                 }
             )
         return result
 
     def get_uncategorized_items(self, obj):
-        items = MenuItem.objects.filter(
-            restaurant=self.restaurant,
-            category__isnull=True,
-            is_available=True,
-        ).order_by("display_order")
+        items = (
+            MenuItem.objects.filter(
+                restaurant=self.restaurant,
+                category__isnull=True,
+                is_available=True,
+            )
+            .prefetch_related("modifier_groups_link__modifier_group__modifiers")
+            .order_by("display_order")
+        )
         return MenuItemListSerializer(items, many=True).data
 
 
