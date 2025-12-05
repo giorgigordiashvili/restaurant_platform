@@ -23,6 +23,8 @@ class TenantAdminSite(UnfoldAdminSite):
 
     # Model name to permission resource mapping
     MODEL_TO_RESOURCE = {
+        # Restaurant Settings
+        "restaurant": "settings",
         # Menu
         "menuitem": "menu",
         "menucategory": "menu",
