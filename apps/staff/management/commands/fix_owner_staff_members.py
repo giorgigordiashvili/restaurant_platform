@@ -27,8 +27,8 @@ class Command(BaseCommand):
                 # Get or create owner role
                 owner_role, _ = StaffRole.objects.get_or_create(
                     restaurant=restaurant,
-                    role_type="owner",
-                    defaults={"name": "Owner", "is_system_role": True},
+                    name="owner",
+                    defaults={"display_name": "Owner", "is_system_role": True},
                 )
 
                 StaffMember.objects.create(

@@ -219,7 +219,7 @@ class RestaurantCreateSerializer(serializers.ModelSerializer):
         StaffRole.create_default_roles(restaurant)
 
         # Create StaffMember for owner with "owner" role
-        owner_role = StaffRole.objects.get(restaurant=restaurant, role_type="owner")
+        owner_role = StaffRole.objects.get(restaurant=restaurant, name="owner")
         StaffMember.objects.create(
             user=user,
             restaurant=restaurant,
