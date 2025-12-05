@@ -214,9 +214,23 @@ class RestaurantCreateSerializer(serializers.ModelSerializer):
         RestaurantHours.create_default_hours(restaurant)
 
         # Create default staff roles
-        from apps.staff.models import StaffRole
+        from apps.staff.models import StaffRole, StaffMember
 
         StaffRole.create_default_roles(restaurant)
+
+        # Create StaffMember for owner with "owner" role
+        owner_role = StaffRole.objects.get(restaurant=restaurant, role_type="owner")
+        StaffMember.objects.create(
+            user=user,
+            restaurant=restaurant,
+            role=owner_role,
+            is_active=True,
+        )
+
+        # Make user a Django staff member for admin access
+        if not user.is_staff:
+            user.is_staff = True
+            user.save(update_fields=["is_staff"])
 
         return restaurant
 
