@@ -750,6 +750,20 @@ class RestaurantSettingsAdmin(UnfoldModelAdmin):
         """Don't allow deleting the restaurant from tenant admin."""
         return False
 
+    def has_module_permission(self, request):
+        """Check if user can see this model in admin sidebar."""
+        restaurant = getattr(request, "restaurant", None)
+        if not restaurant:
+            return False
+        if request.user.is_superuser:
+            return True
+        # Check if user is staff of this restaurant with settings read permission
+        try:
+            staff = request.user.staff_memberships.get(restaurant=restaurant, is_active=True)
+            return "read" in staff.get_effective_permissions().get("settings", [])
+        except Exception:
+            return False
+
     def has_view_permission(self, request, obj=None):
         """Allow viewing if user has staff access."""
         restaurant = getattr(request, "restaurant", None)
