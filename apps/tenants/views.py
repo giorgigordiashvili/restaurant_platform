@@ -112,15 +112,31 @@ class RestaurantCitiesView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        cities = City.objects.filter(is_active=True).order_by("display_order", "slug")
-        serializer = CitySerializer(cities, many=True)
+        cities = City.objects.filter(is_active=True).prefetch_related("translations").order_by(
+            "display_order", "slug"
+        )
+
+        # Build simple response with translations
+        cities_data = []
+        for city in cities:
+            city_data = {
+                "id": city.id,
+                "slug": city.slug,
+                "country": city.country,
+                "translations": {},
+            }
+            for translation in city.translations.all():
+                city_data["translations"][translation.language_code] = {
+                    "name": translation.name,
+                }
+            cities_data.append(city_data)
 
         # Also include legacy distinct city strings for backward compat
-        legacy_cities = (
+        legacy_cities = list(
             Restaurant.objects.filter(is_active=True)
             .exclude(city__isnull=True)
             .exclude(city__exact="")
-            .exclude(city_obj__isnull=False)  # Skip those already using city_obj
+            .exclude(city_obj__isnull=False)
             .values_list("city", flat=True)
             .distinct()
             .order_by("city")
@@ -130,9 +146,9 @@ class RestaurantCitiesView(APIView):
             {
                 "success": True,
                 "data": {
-                    "count": len(serializer.data),
-                    "cities": serializer.data,
-                    "legacy_cities": list(legacy_cities),
+                    "count": len(cities_data),
+                    "cities": cities_data,
+                    "legacy_cities": legacy_cities,
                 },
             }
         )
