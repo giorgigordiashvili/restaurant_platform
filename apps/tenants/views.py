@@ -103,6 +103,32 @@ class RestaurantCreateView(generics.CreateAPIView):
         )
 
 
+@extend_schema(tags=["Restaurants"])
+class RestaurantCitiesView(APIView):
+    """List all distinct cities that have active restaurants."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        cities = (
+            Restaurant.objects.filter(is_active=True)
+            .exclude(city__isnull=True)
+            .exclude(city__exact="")
+            .values_list("city", flat=True)
+            .distinct()
+            .order_by("city")
+        )
+        return Response(
+            {
+                "success": True,
+                "data": {
+                    "count": len(cities),
+                    "cities": list(cities),
+                },
+            }
+        )
+
+
 class RestaurantSearchSerializer(serializers.Serializer):
     """Validates search parameters for homepage restaurant search."""
 
