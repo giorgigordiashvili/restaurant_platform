@@ -11,26 +11,22 @@ from apps.accounts.serializers import UserSerializer
 from .models import Amenity, City, Restaurant, RestaurantCategory, RestaurantHours
 
 
-class CitySerializer(serializers.ModelSerializer):
-    """Serializer for cities with translations."""
+class CitySerializer(serializers.Serializer):
+    """Simple serializer for cities — avoids parler model issues."""
 
+    id = serializers.IntegerField()
+    slug = serializers.CharField()
+    country = serializers.CharField()
     translations = serializers.SerializerMethodField()
 
-    class Meta:
-        model = City
-        fields = [
-            "id",
-            "translations",
-            "slug",
-            "country",
-        ]
-        read_only_fields = ["id", "slug"]
-
     def get_translations(self, obj):
-        result = {}
-        for translation in obj.translations.all():
-            result[translation.language_code] = {"name": translation.name}
-        return result
+        try:
+            result = {}
+            for translation in obj.translations.all():
+                result[translation.language_code] = {"name": translation.name}
+            return result
+        except Exception:
+            return {}
 
 
 class RestaurantCategorySerializer(TranslatableModelSerializer):
@@ -93,7 +89,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
     is_open_now = serializers.SerializerMethodField()
     category = RestaurantCategorySerializer(read_only=True)
     amenities = AmenitySerializer(many=True, read_only=True)
-    city_obj = CitySerializer(read_only=True)
+    city_obj = serializers.SerializerMethodField()
 
     class Meta:
         model = Restaurant
@@ -116,6 +112,23 @@ class RestaurantListSerializer(serializers.ModelSerializer):
 
     def get_is_open_now(self, obj):
         return obj.is_open_now
+
+    def get_city_obj(self, obj):
+        if not obj.city_obj_id:
+            return None
+        try:
+            city = obj.city_obj
+            translations = {}
+            for t in city.translations.all():
+                translations[t.language_code] = {"name": t.name}
+            return {
+                "id": city.id,
+                "slug": city.slug,
+                "country": city.country,
+                "translations": translations,
+            }
+        except Exception:
+            return None
 
 
 class RestaurantDetailSerializer(serializers.ModelSerializer):
