@@ -16,8 +16,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 
 from .filters import RestaurantFilter
-from .models import Restaurant
-from .models import City
+from .models import City, Restaurant
 from .serializers import (
     CitySerializer,
     RestaurantCreateSerializer,
@@ -112,46 +111,52 @@ class RestaurantCitiesView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        cities = City.objects.filter(is_active=True).prefetch_related("translations").order_by(
-            "display_order", "slug"
-        )
+        try:
+            cities = list(
+                City.objects.filter(is_active=True)
+                .order_by("display_order", "slug")
+                .values("id", "slug", "country")
+            )
 
-        # Build simple response with translations
-        cities_data = []
-        for city in cities:
-            city_data = {
-                "id": city.id,
-                "slug": city.slug,
-                "country": city.country,
-                "translations": {},
-            }
-            for translation in city.translations.all():
-                city_data["translations"][translation.language_code] = {
-                    "name": translation.name,
+            # Fetch translations separately
+            from django.db import connection
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT master_id, language_code, name FROM cities_translation"
+                )
+                translations = cursor.fetchall()
+
+            # Build translation map
+            trans_map = {}
+            for master_id, lang, name in translations:
+                if master_id not in trans_map:
+                    trans_map[master_id] = {}
+                trans_map[master_id][lang] = {"name": name}
+
+            # Merge
+            for city in cities:
+                city["translations"] = trans_map.get(city["id"], {})
+
+            return Response(
+                {
+                    "success": True,
+                    "data": {
+                        "count": len(cities),
+                        "cities": cities,
+                    },
                 }
-            cities_data.append(city_data)
-
-        # Also include legacy distinct city strings for backward compat
-        legacy_cities = list(
-            Restaurant.objects.filter(is_active=True)
-            .exclude(city__isnull=True)
-            .exclude(city__exact="")
-            .exclude(city_obj__isnull=False)
-            .values_list("city", flat=True)
-            .distinct()
-            .order_by("city")
-        )
-
-        return Response(
-            {
-                "success": True,
-                "data": {
-                    "count": len(cities_data),
-                    "cities": cities_data,
-                    "legacy_cities": legacy_cities,
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "success": False,
+                    "error": {
+                        "code": "cities_error",
+                        "message": str(e),
+                    },
                 },
-            }
-        )
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class RestaurantSearchSerializer(serializers.Serializer):
