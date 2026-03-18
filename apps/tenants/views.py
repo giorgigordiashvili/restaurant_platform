@@ -17,7 +17,9 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema
 
 from .filters import RestaurantFilter
 from .models import Restaurant
+from .models import City
 from .serializers import (
+    CitySerializer,
     RestaurantCreateSerializer,
     RestaurantDetailSerializer,
     RestaurantHoursSerializer,
@@ -105,25 +107,32 @@ class RestaurantCreateView(generics.CreateAPIView):
 
 @extend_schema(tags=["Restaurants"])
 class RestaurantCitiesView(APIView):
-    """List all distinct cities that have active restaurants."""
+    """List all cities available for restaurant selection."""
 
     permission_classes = [AllowAny]
 
     def get(self, request):
-        cities = (
+        cities = City.objects.filter(is_active=True).order_by("display_order", "slug")
+        serializer = CitySerializer(cities, many=True)
+
+        # Also include legacy distinct city strings for backward compat
+        legacy_cities = (
             Restaurant.objects.filter(is_active=True)
             .exclude(city__isnull=True)
             .exclude(city__exact="")
+            .exclude(city_obj__isnull=False)  # Skip those already using city_obj
             .values_list("city", flat=True)
             .distinct()
             .order_by("city")
         )
+
         return Response(
             {
                 "success": True,
                 "data": {
-                    "count": len(cities),
-                    "cities": list(cities),
+                    "count": len(serializer.data),
+                    "cities": serializer.data,
+                    "legacy_cities": list(legacy_cities),
                 },
             }
         )

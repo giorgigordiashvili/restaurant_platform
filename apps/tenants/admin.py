@@ -8,7 +8,7 @@ from parler.admin import TranslatableAdmin
 
 from apps.core.admin import ExportMixin, SuperadminOnlyMixin, make_active, make_inactive
 
-from .models import Amenity, Restaurant, RestaurantCategory, RestaurantHours
+from .models import Amenity, City, Restaurant, RestaurantCategory, RestaurantHours
 
 
 # Unfold input styling classes for superadmin
@@ -46,6 +46,30 @@ class StyledTranslatableAdmin(SuperadminOnlyMixin, TranslatableAdmin):
             else:
                 widget.attrs["class"] = f"{existing_classes} {UNFOLD_INPUT_CLASSES}".strip()
         return form
+
+
+@admin.register(City)
+class CityAdmin(StyledTranslatableAdmin):
+    """Admin for cities - superadmin only with translations."""
+
+    list_display = ["name", "slug", "country", "display_order", "is_active", "restaurants_count"]
+    list_filter = ["is_active", "country"]
+    search_fields = ["translations__name", "slug"]
+    list_editable = ["display_order", "is_active"]
+    ordering = ["display_order"]
+
+    fieldsets = (
+        (None, {"fields": ("slug", "country")}),
+        ("Settings", {"fields": ("display_order", "is_active")}),
+    )
+
+    def name(self, obj):
+        return obj.safe_translation_getter("name", default="-")
+    name.short_description = "Name"
+
+    @admin.display(description="Restaurants")
+    def restaurants_count(self, obj):
+        return obj.restaurants.filter(is_active=True).count()
 
 
 @admin.register(RestaurantCategory)
@@ -121,7 +145,7 @@ class RestaurantAdmin(SuperadminOnlyMixin, ExportMixin, admin.ModelAdmin):
         (None, {"fields": ("name", "slug", "description", "category", "is_active", "owner")}),
         ("Amenities", {"fields": ("amenities",)}),
         ("Contact", {"fields": ("email", "phone", "website")}),
-        ("Address", {"fields": ("address", "city", "postal_code", "country", "latitude", "longitude")}),
+        ("Address", {"fields": ("address", "city_obj", "city", "postal_code", "country", "latitude", "longitude")}),
         (
             "Branding",
             {

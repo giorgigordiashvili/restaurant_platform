@@ -8,7 +8,23 @@ from parler_rest.serializers import TranslatableModelSerializer, TranslatedField
 
 from apps.accounts.serializers import UserSerializer
 
-from .models import Amenity, Restaurant, RestaurantCategory, RestaurantHours
+from .models import Amenity, City, Restaurant, RestaurantCategory, RestaurantHours
+
+
+class CitySerializer(TranslatableModelSerializer):
+    """Serializer for cities with translations."""
+
+    translations = TranslatedFieldsField(shared_model=City)
+
+    class Meta:
+        model = City
+        fields = [
+            "id",
+            "translations",
+            "slug",
+            "country",
+        ]
+        read_only_fields = ["id", "slug"]
 
 
 class RestaurantCategorySerializer(TranslatableModelSerializer):
@@ -71,6 +87,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
     is_open_now = serializers.SerializerMethodField()
     category = RestaurantCategorySerializer(read_only=True)
     amenities = AmenitySerializer(many=True, read_only=True)
+    city_obj = CitySerializer(read_only=True)
 
     class Meta:
         model = Restaurant
@@ -81,6 +98,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
             "description",
             "logo",
             "city",
+            "city_obj",
             "category",
             "amenities",
             "average_rating",

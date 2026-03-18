@@ -13,6 +13,37 @@ from apps.core.models import TimeStampedModel
 from apps.core.utils.validators import phone_validator
 
 
+class City(TranslatableModel, TimeStampedModel):
+    """
+    City model for restaurant location selection.
+    Supports translations for city names (e.g., Tbilisi / თბილისი).
+    """
+
+    translations = TranslatedFields(
+        name=models.CharField(max_length=100),
+    )
+    slug = models.SlugField(max_length=100, unique=True)
+    country = models.CharField(max_length=100, default="Georgia")
+    display_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "cities"
+        ordering = ["display_order", "slug"]
+        verbose_name = _("City")
+        verbose_name_plural = _("Cities")
+
+    def __str__(self):
+        return self.safe_translation_getter("name", default=f"City {self.pk}")
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            name = self.safe_translation_getter("name", default="")
+            if name:
+                self.slug = slugify(name)
+        super().save(*args, **kwargs)
+
+
 class RestaurantCategory(TranslatableModel, TimeStampedModel):
     """
     Category for restaurants (e.g., Italian, Georgian, Fast Food, Cafe).
@@ -159,7 +190,15 @@ class Restaurant(TimeStampedModel):
 
     # Address
     address = models.CharField(max_length=255, blank=True)
-    city = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100, blank=True)  # Legacy — kept for backward compat
+    city_obj = models.ForeignKey(
+        City,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="restaurants",
+        verbose_name=_("City"),
+    )
     postal_code = models.CharField(max_length=20, blank=True)
     country = models.CharField(max_length=100, default="Georgia")
 
