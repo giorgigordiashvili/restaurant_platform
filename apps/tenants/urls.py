@@ -16,12 +16,14 @@ from .views import (
     RestaurantDetailView,
     RestaurantHoursView,
     RestaurantListView,
+    RestaurantSearchView,
 )
 
 app_name = "restaurants"
 
 urlpatterns = [
     path("", RestaurantListView.as_view(), name="list"),
+    path("search/", RestaurantSearchView.as_view(), name="search"),
     path("create/", RestaurantCreateView.as_view(), name="create"),
     path("<slug:slug>/", RestaurantDetailView.as_view(), name="detail"),
     path("<slug:slug>/hours/", RestaurantHoursView.as_view(), name="hours"),
