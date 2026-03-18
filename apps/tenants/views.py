@@ -39,7 +39,9 @@ class RestaurantListView(generics.ListAPIView):
     ordering = ["-average_rating"]
 
     def get_queryset(self):
-        return Restaurant.objects.filter(is_active=True).prefetch_related("operating_hours")
+        return Restaurant.objects.filter(is_active=True).prefetch_related(
+            "operating_hours", "city_obj__translations"
+        )
 
 
 @extend_schema(tags=["Restaurants"])
@@ -210,7 +212,7 @@ class RestaurantSearchView(APIView):
         search = data.get("search")
 
         qs = Restaurant.objects.filter(is_active=True).prefetch_related(
-            "operating_hours", "amenities", "category"
+            "operating_hours", "amenities", "category", "city_obj__translations"
         )
 
         # Filter by city

@@ -11,10 +11,10 @@ from apps.accounts.serializers import UserSerializer
 from .models import Amenity, City, Restaurant, RestaurantCategory, RestaurantHours
 
 
-class CitySerializer(TranslatableModelSerializer):
+class CitySerializer(serializers.ModelSerializer):
     """Serializer for cities with translations."""
 
-    translations = TranslatedFieldsField(shared_model=City)
+    translations = serializers.SerializerMethodField()
 
     class Meta:
         model = City
@@ -25,6 +25,12 @@ class CitySerializer(TranslatableModelSerializer):
             "country",
         ]
         read_only_fields = ["id", "slug"]
+
+    def get_translations(self, obj):
+        result = {}
+        for translation in obj.translations.all():
+            result[translation.language_code] = {"name": translation.name}
+        return result
 
 
 class RestaurantCategorySerializer(TranslatableModelSerializer):
