@@ -31,29 +31,10 @@ UNFOLD_TEXTAREA_CLASSES = (
 
 class StyledTranslatableAdmin(SuperadminOnlyMixin, TranslatableAdmin):
     """
-    TranslatableAdmin with Unfold styling for superadmin.
-    Applies consistent input styling to parler translation fields.
+    TranslatableAdmin for superadmin with parler translation support.
     """
 
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        # Apply Unfold styling to all form fields
-        try:
-            for field_name, field in form.base_fields.items():
-                widget = field.widget
-                attrs = widget.attrs
-                if not isinstance(attrs, dict):
-                    continue
-                existing_classes = attrs.get("class", "")
-                if not isinstance(existing_classes, str):
-                    existing_classes = ""
-                if "Textarea" in widget.__class__.__name__:
-                    attrs["class"] = f"{existing_classes} {UNFOLD_TEXTAREA_CLASSES}".strip()
-                else:
-                    attrs["class"] = f"{existing_classes} {UNFOLD_INPUT_CLASSES}".strip()
-        except (ValueError, TypeError, AttributeError):
-            pass  # Skip styling if form structure is unexpected
-        return form
+    pass
 
 
 @admin.register(City)
