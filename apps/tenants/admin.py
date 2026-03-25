@@ -38,13 +38,21 @@ class StyledTranslatableAdmin(SuperadminOnlyMixin, TranslatableAdmin):
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         # Apply Unfold styling to all form fields
-        for field_name, field in form.base_fields.items():
-            widget = field.widget
-            existing_classes = widget.attrs.get("class", "")
-            if "Textarea" in widget.__class__.__name__:
-                widget.attrs["class"] = f"{existing_classes} {UNFOLD_TEXTAREA_CLASSES}".strip()
-            else:
-                widget.attrs["class"] = f"{existing_classes} {UNFOLD_INPUT_CLASSES}".strip()
+        try:
+            for field_name, field in form.base_fields.items():
+                widget = field.widget
+                attrs = widget.attrs
+                if not isinstance(attrs, dict):
+                    continue
+                existing_classes = attrs.get("class", "")
+                if not isinstance(existing_classes, str):
+                    existing_classes = ""
+                if "Textarea" in widget.__class__.__name__:
+                    attrs["class"] = f"{existing_classes} {UNFOLD_TEXTAREA_CLASSES}".strip()
+                else:
+                    attrs["class"] = f"{existing_classes} {UNFOLD_INPUT_CLASSES}".strip()
+        except (ValueError, TypeError, AttributeError):
+            pass  # Skip styling if form structure is unexpected
         return form
 
 
