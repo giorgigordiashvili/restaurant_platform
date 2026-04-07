@@ -5,6 +5,7 @@ Tenant (Restaurant) admin configuration with superadmin features.
 from django.contrib import admin
 
 from parler.admin import TranslatableAdmin
+from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
 from apps.core.admin import ExportMixin, SuperadminOnlyMixin, make_active, make_inactive
 
@@ -29,7 +30,7 @@ UNFOLD_TEXTAREA_CLASSES = (
 )
 
 
-class StyledTranslatableAdmin(SuperadminOnlyMixin, TranslatableAdmin):
+class StyledTranslatableAdmin(SuperadminOnlyMixin, UnfoldModelAdmin, TranslatableAdmin):
     """
     TranslatableAdmin for superadmin with parler translation support.
     """
@@ -113,7 +114,7 @@ class RestaurantHoursInline(admin.TabularInline):
 
 
 @admin.register(Restaurant)
-class RestaurantAdmin(SuperadminOnlyMixin, ExportMixin, admin.ModelAdmin):
+class RestaurantAdmin(SuperadminOnlyMixin, ExportMixin, UnfoldModelAdmin):
     """
     Admin for restaurants - superadmin only.
     This is the root tenant model, so no tenant_field needed.
@@ -175,7 +176,7 @@ class RestaurantAdmin(SuperadminOnlyMixin, ExportMixin, admin.ModelAdmin):
 
 
 @admin.register(RestaurantHours)
-class RestaurantHoursAdmin(SuperadminOnlyMixin, admin.ModelAdmin):
+class RestaurantHoursAdmin(SuperadminOnlyMixin, UnfoldModelAdmin):
     """Admin for restaurant hours - superadmin only."""
 
     list_display = ["restaurant", "day_of_week", "open_time", "close_time", "is_closed"]

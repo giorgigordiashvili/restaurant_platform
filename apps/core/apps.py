@@ -1,6 +1,31 @@
 from django.apps import AppConfig
 
 
+def _patch_unfold_flatten_context():
+    """
+    Patch Django's Context.flatten() to handle nested Context objects
+    in context.dicts, which causes ValueError with Unfold on Django 5.0+.
+
+    Unfold's template tags call context.flatten() which fails when the
+    context stack contains non-dict entries (nested Context/RequestContext
+    objects). This patch makes flatten() safely recurse into nested contexts.
+    """
+    from django.template.context import BaseContext
+
+    _original_flatten = BaseContext.flatten
+
+    def _safe_flatten(self):
+        flat = {}
+        for d in self.dicts:
+            if isinstance(d, dict):
+                flat.update(d)
+            elif hasattr(d, "flatten"):
+                flat.update(d.flatten())
+        return flat
+
+    BaseContext.flatten = _safe_flatten
+
+
 class CoreConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "apps.core"
@@ -8,6 +33,7 @@ class CoreConfig(AppConfig):
 
     def ready(self):
         """Configure admin sites and register models."""
+        _patch_unfold_flatten_context()
         from django.contrib import admin
         from django.contrib.auth.admin import UserAdmin
 

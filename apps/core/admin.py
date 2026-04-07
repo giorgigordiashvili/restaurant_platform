@@ -14,6 +14,7 @@ import json
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils import timezone
+from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
 from apps.staff.models import StaffMember
 from apps.tenants.models import Restaurant
@@ -181,7 +182,7 @@ class ExportMixin:
     export_as_json.short_description = "Export selected as JSON"
 
 
-class TenantAwareModelAdmin(TenantSimulatorMixin, ExportMixin, admin.ModelAdmin):
+class TenantAwareModelAdmin(TenantSimulatorMixin, ExportMixin, UnfoldModelAdmin):
     """
     Base admin class for multi-tenant models.
 
@@ -308,7 +309,7 @@ make_inactive.short_description = "Deactivate selected items"
 try:
     from parler.admin import TranslatableAdmin
 
-    class TenantAwareTranslatableAdmin(TenantSimulatorMixin, ExportMixin, TranslatableAdmin):
+    class TenantAwareTranslatableAdmin(TenantSimulatorMixin, ExportMixin, UnfoldModelAdmin, TranslatableAdmin):
         """
         Base admin class for multi-tenant translatable models.
         Combines TenantAwareModelAdmin features with parler's TranslatableAdmin.

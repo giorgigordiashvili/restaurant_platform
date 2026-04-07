@@ -4,6 +4,7 @@ Admin configuration for the accounts app.
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
 from .models import User, UserProfile
 
@@ -17,7 +18,7 @@ class UserProfileInline(admin.StackedInline):
 
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(UnfoldModelAdmin, BaseUserAdmin):
     """Custom admin for User model."""
 
     inlines = [UserProfileInline]
@@ -120,7 +121,7 @@ class UserAdmin(BaseUserAdmin):
 
 
 @admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
+class UserProfileAdmin(UnfoldModelAdmin):
     """Admin for UserProfile model."""
 
     list_display = [
