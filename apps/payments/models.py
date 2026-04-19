@@ -366,3 +366,157 @@ class PaymentMethod(TimeStampedModel):
         """Deactivate this payment method."""
         self.is_active = False
         self.save(update_fields=["is_active", "updated_at"])
+
+
+class BogTransaction(TimeStampedModel):
+    """
+    Authoritative record of a Bank of Georgia Payment Manager order.
+
+    One row per BOG ``order_id``. Links back to an Order, Reservation, or
+    PaymentMethod depending on what the flow was initiating. The webhook handler
+    mutates ``status`` and fans out to update the linked record.
+    """
+
+    FLOW_ORDER = "order"
+    FLOW_RESERVATION = "reservation"
+    FLOW_ADD_CARD = "add_card"
+    FLOW_CHOICES = [
+        (FLOW_ORDER, "Order"),
+        (FLOW_RESERVATION, "Reservation"),
+        (FLOW_ADD_CARD, "Add Card"),
+    ]
+
+    # BOG's own order_status.key values — stored verbatim so downstream code
+    # can branch without a translation layer.
+    STATUS_CREATED = "created"
+    STATUS_PROCESSING = "processing"
+    STATUS_COMPLETED = "completed"
+    STATUS_REJECTED = "rejected"
+    STATUS_AUTH_REQUESTED = "auth_requested"
+    STATUS_BLOCKED = "blocked"
+    STATUS_PARTIAL_COMPLETED = "partial_completed"
+    STATUS_REFUND_REQUESTED = "refund_requested"
+    STATUS_REFUNDED = "refunded"
+    STATUS_REFUNDED_PARTIALLY = "refunded_partially"
+    STATUS_CHOICES = [
+        (STATUS_CREATED, "Created"),
+        (STATUS_PROCESSING, "Processing"),
+        (STATUS_COMPLETED, "Completed"),
+        (STATUS_REJECTED, "Rejected"),
+        (STATUS_AUTH_REQUESTED, "Pre-auth Requested"),
+        (STATUS_BLOCKED, "Pre-auth Blocked"),
+        (STATUS_PARTIAL_COMPLETED, "Partially Completed"),
+        (STATUS_REFUND_REQUESTED, "Refund Requested"),
+        (STATUS_REFUNDED, "Refunded"),
+        (STATUS_REFUNDED_PARTIALLY, "Refunded Partially"),
+    ]
+
+    bog_order_id = models.CharField(
+        max_length=64,
+        unique=True,
+        db_index=True,
+        help_text="UUID returned by BOG when the order was created.",
+    )
+    external_order_id = models.CharField(
+        max_length=64,
+        db_index=True,
+        blank=True,
+        help_text="Our reference (Order.order_number, Reservation.confirmation_code, or method_intent_id).",
+    )
+
+    flow_type = models.CharField(
+        max_length=20,
+        choices=FLOW_CHOICES,
+        default=FLOW_ORDER,
+        db_index=True,
+    )
+
+    order = models.ForeignKey(
+        "orders.Order",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="bog_transactions",
+    )
+    reservation = models.ForeignKey(
+        "reservations.Reservation",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="bog_transactions",
+    )
+    payment_method = models.ForeignKey(
+        "payments.PaymentMethod",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="bog_transactions",
+        help_text="Populated when this transaction tokenised a card (add_card flow).",
+    )
+    initiated_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="bog_transactions",
+    )
+
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+    )
+    currency = models.CharField(max_length=3, default="GEL")
+
+    status = models.CharField(
+        max_length=32,
+        choices=STATUS_CHOICES,
+        default=STATUS_CREATED,
+        db_index=True,
+    )
+    code = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="BOG payment_detail.code (e.g. 100 = success, 107 = insufficient funds).",
+    )
+    code_description = models.TextField(blank=True)
+    reject_reason = models.TextField(blank=True)
+
+    redirect_url = models.URLField(max_length=1024, blank=True)
+    return_url = models.URLField(max_length=1024, blank=True)
+    callback_url = models.URLField(max_length=1024, blank=True)
+
+    # Full JSON snapshots from BOG — handy for debugging and for deferring parts of
+    # the shape that we don't consume yet (e.g. basket, payment_detail.card_type).
+    request_payload = models.JSONField(default=dict, blank=True)
+    response_payload = models.JSONField(default=dict, blank=True)
+    last_webhook_payload = models.JSONField(default=dict, blank=True)
+
+    last_webhook_at = models.DateTimeField(null=True, blank=True)
+    last_reconciled_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "bog_transactions"
+        ordering = ["-created_at"]
+        verbose_name = "BOG Transaction"
+        verbose_name_plural = "BOG Transactions"
+        indexes = [
+            models.Index(fields=["flow_type", "status"]),
+            models.Index(fields=["status", "created_at"]),
+        ]
+
+    def __str__(self) -> str:  # pragma: no cover - admin str
+        return f"BOG {self.flow_type} {self.bog_order_id} ({self.status})"
+
+    @property
+    def is_terminal(self) -> bool:
+        return self.status in {
+            self.STATUS_COMPLETED,
+            self.STATUS_REJECTED,
+            self.STATUS_REFUNDED,
+            self.STATUS_REFUNDED_PARTIALLY,
+        }
+
+    @property
+    def is_successful(self) -> bool:
+        return self.status in {self.STATUS_COMPLETED, self.STATUS_PARTIAL_COMPLETED}

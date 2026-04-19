@@ -284,6 +284,36 @@ X_FRAME_OPTIONS = "DENY"
 # Field encryption key
 FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY", default="dev-encryption-key-32bytes-long!")
 
+# Bank of Georgia (BOG) Payment Manager — sandbox + production share the same host;
+# sandbox is gated by the merchant credentials BOG issues you. Leave the secret fields
+# blank in the example env so the app boots without BOG configured; the initiate
+# endpoints raise ImproperlyConfigured at request time if credentials are missing.
+BOG_CLIENT_ID = config("BOG_CLIENT_ID", default="")
+BOG_CLIENT_SECRET = config("BOG_CLIENT_SECRET", default="")
+BOG_OAUTH_URL = config(
+    "BOG_OAUTH_URL",
+    default="https://oauth2.bog.ge/auth/realms/bog/protocol/openid-connect/token",
+)
+BOG_API_URL = config("BOG_API_URL", default="https://api.bog.ge/payments/v1")
+# Webhook signature verification public key (PEM). Store with newlines escaped as
+# \n or as a single base64 blob and decode at load time — either works here because
+# python-decouple preserves `\n` when the value is quoted. Docs embed the current
+# production key under https://api.bog.ge/docs/en/payments/standard-process/callback.
+BOG_WEBHOOK_PUBLIC_KEY = config("BOG_WEBHOOK_PUBLIC_KEY", default="")
+# When true, surface a "sandbox" banner on the frontend + log everything verbosely.
+BOG_SANDBOX = config("BOG_SANDBOX", default=True, cast=bool)
+# Amount (GEL) charged for the tokenisation pre-auth during "add card". Must be > 0.
+# BOG returns the card metadata on the receipt for this pre-auth; we persist it
+# and void the hold in the webhook handler (TODO: wire void endpoint).
+BOG_ADD_CARD_AMOUNT = config("BOG_ADD_CARD_AMOUNT", default="1.00")
+# Fallback deposit amount (GEL) if a restaurant's reservation_settings doesn't
+# specify one. Sandbox only — production deployments should require a real value.
+BOG_RESERVATION_DEPOSIT_AMOUNT = config("BOG_RESERVATION_DEPOSIT_AMOUNT", default="10.00")
+# Absolute URL BOG will POST webhooks to. Leave blank to derive from the incoming
+# request host; set to a public tunnel (e.g. ngrok) when running locally so
+# BOG's sandbox can reach the callback.
+BOG_WEBHOOK_URL = config("BOG_WEBHOOK_URL", default="")
+
 # Celery Configuration
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://redis:6379/1")
 CELERY_RESULT_BACKEND = config("REDIS_URL", default="redis://redis:6379/0")

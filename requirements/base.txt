@@ -38,6 +38,7 @@ python-decouple>=3.8
 django-filter>=24.1
 django-extensions>=3.2
 dj-database-url>=2.1
+requests>=2.31
 
 # Modern Admin UI (for tenant admin)
 django-unfold>=0.20

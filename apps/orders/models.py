@@ -15,6 +15,8 @@ class Order(TimeStampedModel):
     """
 
     STATUS_CHOICES = [
+        # Created but awaiting a successful payment callback before going to the kitchen.
+        ("pending_payment", "Pending Payment"),
         ("pending", "Pending"),
         ("confirmed", "Confirmed"),
         ("preparing", "Preparing"),

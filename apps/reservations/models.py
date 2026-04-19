@@ -98,6 +98,8 @@ class Reservation(TimeStampedModel):
     """
 
     STATUS_CHOICES = [
+        # Reservation created but deposit payment not yet confirmed via BOG callback.
+        ("pending_payment", "Pending Payment"),
         ("pending", "Pending Confirmation"),
         ("confirmed", "Confirmed"),
         ("waitlist", "Waitlisted"),

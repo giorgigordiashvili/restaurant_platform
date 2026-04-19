@@ -7,7 +7,7 @@ from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
 from apps.core.admin import TenantAwareModelAdmin
 
-from .models import Payment, PaymentMethod, Refund
+from .models import BogTransaction, Payment, PaymentMethod, Refund
 
 
 @admin.register(Payment)
@@ -65,6 +65,63 @@ class RefundAdmin(TenantAwareModelAdmin):
     search_fields = ["external_refund_id", "payment__receipt_number"]
     readonly_fields = ["id", "created_at", "updated_at", "completed_at", "failed_at"]
     raw_id_fields = ["payment", "processed_by"]
+
+
+@admin.register(BogTransaction)
+class BogTransactionAdmin(UnfoldModelAdmin):
+    """Read-only view of BOG Payment Manager transactions for debugging."""
+
+    list_display = [
+        "bog_order_id",
+        "flow_type",
+        "status",
+        "amount",
+        "currency",
+        "code",
+        "external_order_id",
+        "created_at",
+    ]
+    list_filter = ["flow_type", "status", "currency", "created_at"]
+    search_fields = [
+        "bog_order_id",
+        "external_order_id",
+        "order__order_number",
+        "reservation__confirmation_code",
+    ]
+    readonly_fields = [
+        "id",
+        "bog_order_id",
+        "external_order_id",
+        "flow_type",
+        "order",
+        "reservation",
+        "payment_method",
+        "initiated_by",
+        "amount",
+        "currency",
+        "status",
+        "code",
+        "code_description",
+        "reject_reason",
+        "redirect_url",
+        "return_url",
+        "callback_url",
+        "request_payload",
+        "response_payload",
+        "last_webhook_payload",
+        "last_webhook_at",
+        "last_reconciled_at",
+        "created_at",
+        "updated_at",
+    ]
+    raw_id_fields = ["order", "reservation", "payment_method", "initiated_by"]
+    date_hierarchy = "created_at"
+
+    def has_add_permission(self, request):  # noqa: ARG002
+        return False
+
+    def has_delete_permission(self, request, obj=None):  # noqa: ARG002
+        return False
 
 
 @admin.register(PaymentMethod)
