@@ -39,7 +39,7 @@ from apps.reservations.serializers import ReservationDetailSerializer
 from apps.tables.models import Table
 from apps.tenants.models import Restaurant
 
-from ..models import BogTransaction, PaymentMethod
+from ..models import BogTransaction, Payment, PaymentMethod
 from .client import BogClientError, get_client
 from .serializers import (
     BogStatusResponseSerializer,
@@ -225,6 +225,7 @@ class InitiatePaymentView(APIView):
         order = Order.objects.create(
             restaurant=restaurant,
             table=table,
+            table_session_id=payload.get("table_session"),
             customer=request.user if request.user.is_authenticated else None,
             order_type=payload.get("order_type", "dine_in"),
             status="pending_payment",
@@ -277,6 +278,7 @@ class InitiatePaymentView(APIView):
         bog_payload = {
             "callback_url": _callback_url(request),
             "external_order_id": order.order_number,
+            "payment_method": ["card"],
             "purchase_units": {
                 "currency": "GEL",
                 "total_amount": float(amount),
@@ -352,6 +354,7 @@ class InitiatePaymentView(APIView):
         bog_payload = {
             "callback_url": _callback_url(request),
             "external_order_id": reservation.confirmation_code,
+            "payment_method": ["card"],
             "purchase_units": {
                 "currency": "GEL",
                 "total_amount": float(amount),
@@ -436,6 +439,7 @@ class InitiateAddCardView(APIView):
             "callback_url": _callback_url(request),
             "external_order_id": external_order_id,
             "capture": "manual",  # Pre-auth — we'll void in the webhook later.
+            "payment_method": ["card"],
             "purchase_units": {
                 "currency": "GEL",
                 "total_amount": float(amount),
@@ -667,6 +671,22 @@ def _apply_order_status(txn: BogTransaction) -> None:
             to_status="pending",
             notes="Payment confirmed via BOG.",
         )
+        # Mirror the successful charge into a Payment row so the standard admin /
+        # reporting surfaces work for BOG-paid orders (receipt numbers, refund
+        # accounting, customer payment history). Idempotent: skip if we already
+        # created one for this BOG transaction.
+        if not Payment.objects.filter(external_payment_id=txn.bog_order_id).exists():
+            payment = Payment.objects.create(
+                order=order,
+                customer=order.customer,
+                amount=txn.amount,
+                total_amount=txn.amount,
+                payment_method="card",
+                status="pending",
+                currency=txn.currency,
+                external_payment_id=txn.bog_order_id,
+            )
+            payment.complete()  # flips to 'completed' + generates receipt_number
     elif txn.status == BogTransaction.STATUS_REJECTED and order.status == "pending_payment":
         order.cancel(reason=f"BOG payment rejected ({txn.code or 'unknown'}): {txn.code_description}")
         OrderStatusHistory.objects.create(

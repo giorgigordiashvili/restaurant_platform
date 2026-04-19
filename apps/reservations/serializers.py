@@ -87,6 +87,21 @@ class ReservationListSerializer(serializers.ModelSerializer):
     table_number = serializers.CharField(source="table.number", read_only=True)
     can_cancel = serializers.BooleanField(read_only=True)
     can_modify = serializers.BooleanField(read_only=True)
+    # Surface restaurant metadata + deposit info so /profile/reservations cards
+    # can render without secondary lookups.
+    restaurant_name = serializers.CharField(source="restaurant.name", read_only=True)
+    restaurant_slug = serializers.CharField(source="restaurant.slug", read_only=True)
+    restaurant_logo = serializers.ImageField(source="restaurant.logo", read_only=True)
+    restaurant_cover_image = serializers.ImageField(source="restaurant.cover_image", read_only=True)
+    restaurant_city = serializers.CharField(source="restaurant.city", read_only=True)
+    restaurant_average_rating = serializers.DecimalField(
+        source="restaurant.average_rating",
+        max_digits=3,
+        decimal_places=2,
+        read_only=True,
+    )
+    deposit_amount = serializers.SerializerMethodField()
+    payment_status = serializers.SerializerMethodField()
 
     class Meta:
         model = Reservation
@@ -104,11 +119,35 @@ class ReservationListSerializer(serializers.ModelSerializer):
             "source_display",
             "table",
             "table_number",
+            "restaurant_name",
+            "restaurant_slug",
+            "restaurant_logo",
+            "restaurant_cover_image",
+            "restaurant_city",
+            "restaurant_average_rating",
+            "deposit_amount",
+            "payment_status",
             "can_cancel",
             "can_modify",
             "created_at",
         ]
         read_only_fields = fields
+
+    def get_deposit_amount(self, obj) -> str | None:
+        txn = _latest_bog_txn(obj)
+        return str(txn.amount) if txn else None
+
+    def get_payment_status(self, obj) -> str | None:
+        txn = _latest_bog_txn(obj)
+        return txn.status if txn else None
+
+
+def _latest_bog_txn(reservation):
+    """Return the most recent BogTransaction for a reservation, if any."""
+    try:
+        return reservation.bog_transactions.order_by("-created_at").first()
+    except Exception:
+        return None
 
 
 class ReservationDetailSerializer(serializers.ModelSerializer):
@@ -122,6 +161,22 @@ class ReservationDetailSerializer(serializers.ModelSerializer):
     can_modify = serializers.BooleanField(read_only=True)
     is_upcoming = serializers.BooleanField(read_only=True)
     history = ReservationHistorySerializer(many=True, read_only=True)
+    restaurant_name = serializers.CharField(source="restaurant.name", read_only=True)
+    restaurant_slug = serializers.CharField(source="restaurant.slug", read_only=True)
+    restaurant_logo = serializers.ImageField(source="restaurant.logo", read_only=True)
+    restaurant_cover_image = serializers.ImageField(source="restaurant.cover_image", read_only=True)
+    restaurant_city = serializers.CharField(source="restaurant.city", read_only=True)
+    restaurant_phone = serializers.CharField(source="restaurant.phone", read_only=True)
+    restaurant_average_rating = serializers.DecimalField(
+        source="restaurant.average_rating",
+        max_digits=3,
+        decimal_places=2,
+        read_only=True,
+    )
+    deposit_amount = serializers.SerializerMethodField()
+    deposit_currency = serializers.SerializerMethodField()
+    payment_status = serializers.SerializerMethodField()
+    payment_code_description = serializers.SerializerMethodField()
 
     class Meta:
         model = Reservation
@@ -129,6 +184,13 @@ class ReservationDetailSerializer(serializers.ModelSerializer):
             "id",
             "confirmation_code",
             "restaurant",
+            "restaurant_name",
+            "restaurant_slug",
+            "restaurant_logo",
+            "restaurant_cover_image",
+            "restaurant_city",
+            "restaurant_phone",
+            "restaurant_average_rating",
             "customer",
             "customer_email",
             "guest_name",
@@ -151,6 +213,10 @@ class ReservationDetailSerializer(serializers.ModelSerializer):
             "cancellation_reason",
             "seated_at",
             "completed_at",
+            "deposit_amount",
+            "deposit_currency",
+            "payment_status",
+            "payment_code_description",
             "can_cancel",
             "can_modify",
             "is_upcoming",
@@ -168,6 +234,22 @@ class ReservationDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def get_deposit_amount(self, obj) -> str | None:
+        txn = _latest_bog_txn(obj)
+        return str(txn.amount) if txn else None
+
+    def get_deposit_currency(self, obj) -> str | None:
+        txn = _latest_bog_txn(obj)
+        return txn.currency if txn else None
+
+    def get_payment_status(self, obj) -> str | None:
+        txn = _latest_bog_txn(obj)
+        return txn.status if txn else None
+
+    def get_payment_code_description(self, obj) -> str:
+        txn = _latest_bog_txn(obj)
+        return txn.code_description if txn else ""
 
 
 class ReservationCreateSerializer(serializers.ModelSerializer):
