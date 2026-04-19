@@ -117,6 +117,27 @@ def _resolve_restaurant(slug: str) -> Restaurant:
         raise ValueError(f"Restaurant '{slug}' not found") from exc
 
 
+def _redirect_urls(return_url: str, external_order_id: str) -> dict[str, str]:
+    """
+    BOG redirects the browser back to whatever ``redirect_urls.success`` / ``fail``
+    we pass, verbatim. We inject our ``external_order_id`` + ``status`` so the
+    frontend's return landing page can poll status without needing to remember
+    which order it just kicked off. We use the external id (not BOG's order_id)
+    because BOG generates their id only after we send this body — the external
+    id we know up-front.
+    """
+    from urllib.parse import urlencode, urlparse, urlunparse
+
+    parsed = urlparse(return_url)
+
+    def _with(status_value: str) -> str:
+        extra = urlencode({"ref": external_order_id, "status": status_value})
+        joined = f"{parsed.query}&{extra}" if parsed.query else extra
+        return urlunparse(parsed._replace(query=joined))
+
+    return {"success": _with("ok"), "fail": _with("fail")}
+
+
 def _callback_url(request: Request) -> str:
     """
     Absolute URL BOG will POST the webhook to.
@@ -261,7 +282,7 @@ class InitiatePaymentView(APIView):
                 "total_amount": float(amount),
                 "basket": _build_basket(order),
             },
-            "redirect_urls": {"success": return_url, "fail": return_url},
+            "redirect_urls": _redirect_urls(return_url, order.order_number),
         }
         response = get_client().create_order(
             bog_payload,
@@ -336,7 +357,7 @@ class InitiatePaymentView(APIView):
                 "total_amount": float(amount),
                 "basket": _reservation_basket(reservation, amount),
             },
-            "redirect_urls": {"success": return_url, "fail": return_url},
+            "redirect_urls": _redirect_urls(return_url, reservation.confirmation_code),
         }
         response = get_client().create_order(
             bog_payload,
@@ -410,16 +431,17 @@ class InitiateAddCardView(APIView):
             )
 
         method_intent_id = uuid.uuid4().hex
+        external_order_id = f"addcard-{method_intent_id}"
         bog_payload = {
             "callback_url": _callback_url(request),
-            "external_order_id": f"addcard-{method_intent_id}",
+            "external_order_id": external_order_id,
             "capture": "manual",  # Pre-auth — we'll void in the webhook later.
             "purchase_units": {
                 "currency": "GEL",
                 "total_amount": float(amount),
                 "basket": _add_card_basket(amount),
             },
-            "redirect_urls": {"success": return_url, "fail": return_url},
+            "redirect_urls": _redirect_urls(return_url, external_order_id),
         }
 
         try:
@@ -493,10 +515,17 @@ class BogStatusView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, bog_order_id: str):
+        # Accept either BOG's order_id or our external reference (order_number,
+        # confirmation_code, or method_intent_id) so the return-landing page can
+        # look up without needing BOG's id — BOG doesn't echo it in the redirect.
+        from django.db.models import Q
+
         try:
-            txn = BogTransaction.objects.select_related(
-                "order", "reservation", "payment_method"
-            ).get(bog_order_id=bog_order_id)
+            txn = (
+                BogTransaction.objects.select_related("order", "reservation", "payment_method")
+                .filter(Q(bog_order_id=bog_order_id) | Q(external_order_id=bog_order_id))
+                .latest("created_at")
+            )
         except BogTransaction.DoesNotExist:
             return Response(
                 {"success": False, "error": {"message": "Transaction not found."}},
