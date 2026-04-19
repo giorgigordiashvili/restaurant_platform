@@ -9,7 +9,43 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
-from apps.orders.serializers import OrderItemCreateSerializer
+from apps.menu.models import MenuItem, Modifier
+
+
+class BogOrderItemSerializer(serializers.Serializer):
+    """
+    Validates a cart item inside an initiate-payment body.
+
+    Mirrors ``apps.orders.serializers.BogOrderItemSerializer`` but doesn't
+    require a ``restaurant`` context — the enclosing view verifies that each
+    resolved ``MenuItem`` belongs to the target restaurant before creating
+    anything. Keeping this lookup context-free lets us reuse the same
+    serializer for both the order and reservation initiate flows (the
+    restaurant is only known after we've parsed ``restaurant_slug``).
+    """
+
+    menu_item_id = serializers.UUIDField()
+    quantity = serializers.IntegerField(min_value=1, default=1)
+    modifier_ids = serializers.ListField(
+        child=serializers.UUIDField(),
+        required=False,
+        default=list,
+    )
+    special_instructions = serializers.CharField(required=False, allow_blank=True, default="")
+
+    def validate_menu_item_id(self, value):
+        try:
+            return MenuItem.objects.get(id=value, is_available=True)
+        except MenuItem.DoesNotExist as exc:
+            raise serializers.ValidationError("Menu item not found or unavailable.") from exc
+
+    def validate_modifier_ids(self, value):
+        if not value:
+            return []
+        modifiers = list(Modifier.objects.filter(id__in=value, is_available=True))
+        if len(modifiers) != len(value):
+            raise serializers.ValidationError("One or more modifiers not found or unavailable.")
+        return modifiers
 
 ALLOWED_RETURN_SCHEMES = {"http", "https"}
 
@@ -58,7 +94,7 @@ class OrderPayloadSerializer(serializers.Serializer):
     customer_email = serializers.EmailField(required=False, allow_blank=True, default="")
     customer_notes = serializers.CharField(required=False, allow_blank=True, default="")
     delivery_address = serializers.CharField(required=False, allow_blank=True, default="")
-    items = OrderItemCreateSerializer(many=True)
+    items = BogOrderItemSerializer(many=True)
 
     def validate_items(self, value):
         if not value:
@@ -87,7 +123,7 @@ class ReservationPayloadSerializer(serializers.Serializer):
     # Optional pre-order bundle: menu items the guest wants prepared for arrival.
     # When present we create an Order(status=pending_payment, reservation=...) and
     # charge deposit + order total in a single BOG transaction.
-    items = OrderItemCreateSerializer(many=True, required=False, default=list)
+    items = BogOrderItemSerializer(many=True, required=False, default=list)
 
 
 class InitiatePaymentSerializer(ReturnURLMixin, serializers.Serializer):
