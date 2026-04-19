@@ -505,28 +505,64 @@ class CustomerOrderCreateView(APIView):
 
 @extend_schema(tags=["Orders"])
 class CustomerOrderStatusView(APIView):
-    """Check order status (for customer)."""
+    """
+    Customer-facing order detail.
+
+    Open to anonymous traffic — the order_number is the lookup key, and BOG
+    guarantees it's a wide-enough namespace that guessing isn't practical at
+    our scale. For a richer, auth-gated variant see ``CustomerMyOrdersListView``
+    below.
+    """
 
     permission_classes = [AllowAny]
 
     def get(self, request, order_number):
         try:
-            order = Order.objects.get(order_number=order_number)
+            order = (
+                Order.objects.select_related("restaurant", "table")
+                .prefetch_related("items__modifiers")
+                .get(order_number=order_number)
+            )
         except Order.DoesNotExist:
             return Response(
                 {"success": False, "error": {"message": "Order not found."}},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        return Response(
-            {
-                "success": True,
-                "data": {
-                    "order_number": order.order_number,
-                    "status": order.status,
-                    "status_display": order.get_status_display(),
-                    "estimated_ready_at": order.estimated_ready_at,
-                    "total": str(order.total),
-                },
-            }
+        return Response(OrderSerializer(order).data)
+
+
+@extend_schema(tags=["Orders"])
+class CustomerMyOrdersListView(generics.ListAPIView):
+    """List orders belonging to the authenticated user, newest first."""
+
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = (
+            Order.objects.filter(customer=self.request.user)
+            .select_related("restaurant", "table")
+            .prefetch_related("items__modifiers")
+            .order_by("-created_at")
+        )
+        status_param = self.request.query_params.get("status")
+        if status_param:
+            qs = qs.filter(status=status_param)
+        return qs
+
+
+@extend_schema(tags=["Orders"])
+class CustomerMyOrderDetailView(generics.RetrieveAPIView):
+    """Retrieve one of the authenticated user's orders by order_number."""
+
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = "order_number"
+
+    def get_queryset(self):
+        return (
+            Order.objects.filter(customer=self.request.user)
+            .select_related("restaurant", "table")
+            .prefetch_related("items__modifiers")
         )
