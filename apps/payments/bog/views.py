@@ -343,13 +343,72 @@ class InitiatePaymentView(APIView):
             source="website",
         )
 
+        # If the guest added food to their cart before clicking "book with order",
+        # create a sibling Order(status=pending_payment) tied to this reservation.
+        # Charged together in one BOG transaction below.
+        pre_order: Order | None = None
+        pre_order_total = Decimal("0")
+        items_payload = payload.get("items") or []
+        if items_payload:
+            pre_order = Order.objects.create(
+                restaurant=restaurant,
+                reservation=reservation,
+                customer=request.user if request.user.is_authenticated else None,
+                order_type="dine_in",
+                status="pending_payment",
+                customer_name=payload["guest_name"],
+                customer_phone=payload["guest_phone"],
+                customer_email=payload.get("guest_email", ""),
+                customer_notes=payload.get("special_requests", ""),
+            )
+            for item_payload in items_payload:
+                menu_item: MenuItem = item_payload["menu_item_id"]
+                if menu_item.restaurant_id != restaurant.id:
+                    raise ValueError("One or more pre-order items don't belong to this restaurant.")
+                order_item = OrderItem.objects.create(
+                    order=pre_order,
+                    menu_item=menu_item,
+                    item_name=menu_item.safe_translation_getter(
+                        "name", default=f"Item {menu_item.pk}"
+                    ),
+                    item_description=menu_item.safe_translation_getter("description", default=""),
+                    unit_price=menu_item.price,
+                    quantity=item_payload.get("quantity", 1),
+                    total_price=menu_item.price * item_payload.get("quantity", 1),
+                    preparation_station=menu_item.preparation_station,
+                    special_instructions=item_payload.get("special_instructions", ""),
+                )
+                for modifier in item_payload.get("modifier_ids", []):
+                    OrderItemModifier.objects.create(
+                        order_item=order_item,
+                        modifier=modifier,
+                        modifier_name=modifier.safe_translation_getter(
+                            "name", default=f"Modifier {modifier.pk}"
+                        ),
+                        price_adjustment=modifier.price_adjustment,
+                    )
+                order_item.recalculate_total()
+            pre_order.calculate_totals()
+            OrderStatusHistory.objects.create(
+                order=pre_order,
+                from_status="",
+                to_status="pending_payment",
+                notes=f"Pre-order for reservation {reservation.confirmation_code}; awaiting BOG payment.",
+            )
+            pre_order_total = pre_order.total
+
         override = payload.get("deposit_amount_override")
         if override is not None:
-            amount = override
+            deposit = Decimal(str(override))
         else:
-            amount = Decimal(settings.BOG_RESERVATION_DEPOSIT_AMOUNT)
-        if amount <= 0:
+            deposit = Decimal(settings.BOG_RESERVATION_DEPOSIT_AMOUNT)
+        if deposit <= 0 and pre_order_total <= 0:
             raise ValueError("Reservation deposit must be greater than zero.")
+
+        amount = deposit + pre_order_total
+        basket = _reservation_basket(reservation, deposit)
+        if pre_order is not None:
+            basket.extend(_build_basket(pre_order))
 
         bog_payload = {
             "callback_url": _callback_url(request),
@@ -358,7 +417,7 @@ class InitiatePaymentView(APIView):
             "purchase_units": {
                 "currency": "GEL",
                 "total_amount": float(amount),
-                "basket": _reservation_basket(reservation, amount),
+                "basket": basket,
             },
             "redirect_urls": _redirect_urls(return_url, reservation.confirmation_code),
         }
@@ -376,6 +435,7 @@ class InitiatePaymentView(APIView):
             external_order_id=reservation.confirmation_code,
             flow_type=BogTransaction.FLOW_RESERVATION,
             reservation=reservation,
+            order=pre_order,
             initiated_by=request.user if request.user.is_authenticated else None,
             amount=amount,
             currency="GEL",
@@ -394,6 +454,7 @@ class InitiatePaymentView(APIView):
                     "bog_order_id": bog_order_id,
                     "reservation_id": str(reservation.id),
                     "confirmation_code": reservation.confirmation_code,
+                    "order_number": pre_order.order_number if pre_order else None,
                     "redirect_url": redirect_url,
                     "reservation": ReservationDetailSerializer(reservation).data,
                 },
@@ -652,6 +713,10 @@ def _apply_receipt(txn: BogTransaction, receipt: dict[str, Any], *, source: str)
         _apply_order_status(txn)
     elif txn.flow_type == BogTransaction.FLOW_RESERVATION and txn.reservation_id:
         _apply_reservation_status(txn)
+        # A reservation may have a sibling pre-order — flip its status too so
+        # the kitchen sees it as soon as deposit + food are paid.
+        if txn.order_id:
+            _apply_order_status(txn)
     elif txn.flow_type == BogTransaction.FLOW_ADD_CARD and not txn.payment_method_id:
         _apply_add_card_status(txn, payment_detail)
 

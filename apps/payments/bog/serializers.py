@@ -84,6 +84,10 @@ class ReservationPayloadSerializer(serializers.Serializer):
         required=False,
         min_value=0,
     )
+    # Optional pre-order bundle: menu items the guest wants prepared for arrival.
+    # When present we create an Order(status=pending_payment, reservation=...) and
+    # charge deposit + order total in a single BOG transaction.
+    items = OrderItemCreateSerializer(many=True, required=False, default=list)
 
 
 class InitiatePaymentSerializer(ReturnURLMixin, serializers.Serializer):

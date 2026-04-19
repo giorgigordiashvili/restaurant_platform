@@ -68,6 +68,14 @@ class Order(TimeStampedModel):
         related_name="orders",
         help_text="The guest at the table who placed this order",
     )
+    reservation = models.ForeignKey(
+        "reservations.Reservation",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="orders",
+        help_text="Optional — set when this order was placed as part of a reservation.",
+    )
     customer = models.ForeignKey(
         "accounts.User",
         on_delete=models.SET_NULL,
