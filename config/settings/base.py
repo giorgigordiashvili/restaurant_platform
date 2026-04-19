@@ -284,24 +284,48 @@ X_FRAME_OPTIONS = "DENY"
 # Field encryption key
 FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY", default="dev-encryption-key-32bytes-long!")
 
-# Bank of Georgia (BOG) Payment Manager — sandbox + production share the same host;
-# sandbox is gated by the merchant credentials BOG issues you. Leave the secret fields
-# blank in the example env so the app boots without BOG configured; the initiate
-# endpoints raise ImproperlyConfigured at request time if credentials are missing.
+# Bank of Georgia (BOG) Payment Manager.
+#
+# Sandbox and production live on separate hosts — sandbox inserts ``-sandbox``
+# before ``.bog.ge`` on all three BOG hosts (oauth2, api, payment). We derive
+# defaults from ``BOG_SANDBOX`` so a tester only needs to set the credentials +
+# webhook key; production switches in a single env flag.
+BOG_SANDBOX = config("BOG_SANDBOX", default=True, cast=bool)
 BOG_CLIENT_ID = config("BOG_CLIENT_ID", default="")
 BOG_CLIENT_SECRET = config("BOG_CLIENT_SECRET", default="")
-BOG_OAUTH_URL = config(
-    "BOG_OAUTH_URL",
-    default="https://oauth2.bog.ge/auth/realms/bog/protocol/openid-connect/token",
+
+_bog_oauth_default = (
+    "https://oauth2-sandbox.bog.ge/auth/realms/bog/protocol/openid-connect/token"
+    if BOG_SANDBOX
+    else "https://oauth2.bog.ge/auth/realms/bog/protocol/openid-connect/token"
 )
-BOG_API_URL = config("BOG_API_URL", default="https://api.bog.ge/payments/v1")
-# Webhook signature verification public key (PEM). Store with newlines escaped as
-# \n or as a single base64 blob and decode at load time — either works here because
-# python-decouple preserves `\n` when the value is quoted. Docs embed the current
-# production key under https://api.bog.ge/docs/en/payments/standard-process/callback.
-BOG_WEBHOOK_PUBLIC_KEY = config("BOG_WEBHOOK_PUBLIC_KEY", default="")
-# When true, surface a "sandbox" banner on the frontend + log everything verbosely.
-BOG_SANDBOX = config("BOG_SANDBOX", default=True, cast=bool)
+_bog_api_default = (
+    "https://api-sandbox.bog.ge/payments/v1" if BOG_SANDBOX else "https://api.bog.ge/payments/v1"
+)
+BOG_OAUTH_URL = config("BOG_OAUTH_URL", default=_bog_oauth_default)
+BOG_API_URL = config("BOG_API_URL", default=_bog_api_default)
+
+# Webhook signature verification public key (PEM). Sandbox and production use
+# DIFFERENT keys — both are published in the public docs:
+#   https://api.bog.ge/docs/sandbox/payments/standard-process/callback
+#   https://api.bog.ge/docs/en/payments/standard-process/callback
+# We bake the sandbox key in as a default so a tester only has to set this env
+# var when going live. Store PEM literally (newlines preserved inside quotes) or
+# paste a base64 blob — both are accepted by apps.payments.bog.signatures.
+_BOG_SANDBOX_PUBLIC_KEY = """-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqczfAuhtxw2iF68kS0Hy
+bGSv0ZlDAjsXh6VC8avDl3Vxa9qCn6Pzl37Tl2Z21WodiISLeXdhCtOMTeLNUBeb
+CYD31y2/MwnhLYqlCk2bOh29fyPc1iT5Eu/k/1IaNRrK9/UVZaTkhOMeEm+aL4y8
+5XsE4UjqftEmwrAdbO2G4cCpuoMC9ZXG9gAdr2BFN6i2Vt9eCen5Poj7E1ik7s8T
+GyzploVV0NflhwBGeWnvQANUQGr87gsP5k2JG1z5EwnMybJQ7i3XT726rJMaV6QW
+sY5hP72Mtv1I1zL2d9FXm9FWOzbpcXCyxuEBXvqqOHzogri8C7KRRYKyk97Ri7D6
+8wIDAQAB
+-----END PUBLIC KEY-----"""
+BOG_WEBHOOK_PUBLIC_KEY = config(
+    "BOG_WEBHOOK_PUBLIC_KEY",
+    default=_BOG_SANDBOX_PUBLIC_KEY if BOG_SANDBOX else "",
+)
+
 # Amount (GEL) charged for the tokenisation pre-auth during "add card". Must be > 0.
 # BOG returns the card metadata on the receipt for this pre-auth; we persist it
 # and void the hold in the webhook handler (TODO: wire void endpoint).
