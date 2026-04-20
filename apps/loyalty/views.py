@@ -36,21 +36,49 @@ def _err(code: str, message: str, status_code: int = status.HTTP_400_BAD_REQUEST
 
 
 @extend_schema(tags=["Loyalty"])
-class CustomerLoyaltyListView(generics.ListAPIView):
-    """My counters across all restaurants."""
+class CustomerLoyaltyListView(APIView):
+    """
+    Return one row per active loyalty program on the platform, with the
+    current user's punch count joined in. Programs the user has never
+    earned a punch on still appear (punches=0, can_redeem=False) so
+    customers can discover available promotions.
+    """
 
-    serializer_class = LoyaltyCounterSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
-        # Direct user-bound counters
-        qs = (
-            LoyaltyCounter.objects.filter(user=user, program__is_active=True)
-            .select_related("program__trigger_item", "program__reward_item", "program__restaurant")
-            .order_by("-updated_at")
+    def get(self, request):
+        user = request.user
+        programs = (
+            LoyaltyProgram.objects.filter(is_active=True)
+            .select_related("trigger_item", "reward_item", "restaurant")
+            .order_by("-created_at")
         )
-        return qs
+        counters_by_program = {
+            c.program_id: c
+            for c in LoyaltyCounter.objects.filter(user=user, program__in=programs)
+        }
+
+        results = []
+        for program in programs:
+            if not program.is_live():
+                continue
+            counter = counters_by_program.get(program.id)
+            results.append(
+                {
+                    "id": counter.id if counter else f"synthetic-{program.id}",
+                    "punches": counter.punches if counter else 0,
+                    "can_redeem": bool(counter and counter.can_redeem),
+                    "last_earned_at": counter.last_earned_at if counter else None,
+                    "created_at": counter.created_at if counter else program.created_at,
+                    "restaurant_name": program.restaurant.name,
+                    "restaurant_slug": program.restaurant.slug,
+                    "restaurant_logo": program.restaurant.logo.url
+                    if program.restaurant.logo
+                    else None,
+                    "program": LoyaltyProgramSerializer(program).data,
+                }
+            )
+        return Response({"count": len(results), "results": results})
 
 
 @extend_schema(tags=["Loyalty"])

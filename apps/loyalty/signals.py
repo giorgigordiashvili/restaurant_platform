@@ -1,7 +1,14 @@
 """
 Post-save signal on Order → award loyalty punches for the restaurant's
-active programs. Runs only on the completed-transition so cancellations
-and in-flight status changes don't double-count.
+active programs.
+
+Fires on the pending → confirmed transition (restaurant accepts the
+order). Crediting at accept (not completion) gives customers visible
+progress straight away and matches the mental model: "you ordered a
+wrap, you got a punch". Later status transitions (preparing → ready →
+served → completed) do not re-credit; cancellation after acceptance
+does not rewind either (out of scope for MVP — revisit if abuse shows
+up).
 
 Customer resolution order:
     1. Authenticated order (`order.customer`) → use that User.
@@ -48,7 +55,7 @@ def _resolve_target(order: Order):
 
 @receiver(post_save, sender=Order)
 def award_punches(sender, instance: Order, created, update_fields=None, **kwargs):
-    if instance.status != "completed":
+    if instance.status != "confirmed":
         return
     # Avoid running on unrelated saves (e.g. customer_notes tweak)
     if update_fields and "status" not in update_fields:
