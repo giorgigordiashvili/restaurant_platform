@@ -39,8 +39,30 @@ class Command(BaseCommand):
             "--target",
             help="Limit to one model (e.g. 'menu.MenuItem').",
         )
+        parser.add_argument(
+            "--async",
+            dest="run_async",
+            action="store_true",
+            help="Enqueue on Celery and return immediately — use this on DO "
+            "when the exec session keeps timing out mid-backfill.",
+        )
 
     def handle(self, *args, **opts):
+        if opts.get("run_async"):
+            from apps.core.tasks import backfill_blurhash_task
+
+            result = backfill_blurhash_task.delay(
+                force=opts["force"],
+                target=opts.get("target"),
+            )
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"Enqueued on Celery as task {result.id}. "
+                    "Watch 'celery worker' logs (or flower) for progress."
+                )
+            )
+            return
+
         from django.apps import apps
 
         force = opts["force"]
