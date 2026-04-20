@@ -12,7 +12,9 @@ from .views import (
     OrderHistoryView,
     OrderItemStatusUpdateView,
     OrderListView,
+    OrderServerAssignView,
     OrderStatusUpdateView,
+    TipReportView,
 )
 
 app_name = "orders_dashboard"
@@ -28,4 +30,7 @@ urlpatterns = [
     path("<uuid:order_id>/history/", OrderHistoryView.as_view(), name="history"),
     # Kitchen display
     path("kitchen/", KitchenOrdersView.as_view(), name="kitchen"),
+    # Tips
+    path("<uuid:id>/server/", OrderServerAssignView.as_view(), name="server-assign"),
+    path("tips/report/", TipReportView.as_view(), name="tips-report"),
 ]

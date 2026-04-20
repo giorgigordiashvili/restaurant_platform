@@ -3,6 +3,7 @@ Views for orders app.
 """
 
 from django.db.models import Q
+from django.utils import timezone
 
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -160,6 +161,7 @@ class OrderCreateView(APIView):
             customer_email=data.get("customer_email", ""),
             customer_notes=data.get("customer_notes", ""),
             delivery_address=data.get("delivery_address", ""),
+            tip_amount=data.get("tip_amount", 0),
             handled_by=request.user,
         )
 
@@ -405,6 +407,130 @@ class OrderHistoryView(generics.ListAPIView):
         ).order_by("-created_at")
 
 
+# ============== Tip distribution (Phase-3) =====================
+
+
+@extend_schema(tags=["Dashboard - Orders"])
+class OrderServerAssignView(APIView):
+    """
+    Assign a staff member as the server for an order, so the tip
+    amount gets credited to them in the tip-distribution report.
+
+    PATCH body: {"server_id": "<user-uuid>" | null}
+    """
+
+    permission_classes = [IsAuthenticated, IsTenantManager]
+
+    @require_restaurant
+    def patch(self, request, id):
+        try:
+            order = Order.objects.get(id=id, restaurant=request.restaurant)
+        except Order.DoesNotExist:
+            return Response(
+                {"success": False, "error": {"message": "Order not found."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        server_id = request.data.get("server_id")
+        if server_id is None:
+            order.server = None
+        else:
+            from apps.accounts.models import User
+            from apps.staff.models import StaffMember
+
+            try:
+                user = User.objects.get(id=server_id)
+            except User.DoesNotExist:
+                return Response(
+                    {"success": False, "error": {"message": "User not found."}},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+            # Guard: user must be an active staff member of this restaurant.
+            if not StaffMember.objects.filter(
+                user=user, restaurant=request.restaurant, is_active=True
+            ).exists():
+                return Response(
+                    {
+                        "success": False,
+                        "error": {
+                            "message": "User isn't a staff member of this restaurant.",
+                        },
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            order.server = user
+
+        # Default full-credit tip allocation to the assigned server.
+        if order.server and order.tip_amount:
+            order.tip_distribution = {str(order.server.id): str(order.tip_amount)}
+        order.save(update_fields=["server", "tip_distribution", "updated_at"])
+
+        return Response({"success": True, "data": OrderSerializer(order).data})
+
+
+@extend_schema(tags=["Dashboard - Orders"])
+class TipReportView(APIView):
+    """
+    GET /dashboard/orders/tips/?from=YYYY-MM-DD&to=YYYY-MM-DD
+
+    Per-server tip totals for a date range. Aggregates Order.tip_amount
+    across orders whose status is anything but cancelled; tips with no
+    assigned server roll up under the "unassigned" bucket for the
+    restaurant to distribute manually.
+    """
+
+    permission_classes = [IsAuthenticated, IsTenantManager]
+
+    @require_restaurant
+    def get(self, request):
+        from datetime import date
+        from decimal import Decimal
+
+        today = timezone.localdate() if hasattr(timezone, "localdate") else date.today()
+        raw_from = request.query_params.get("from") or today.isoformat()
+        raw_to = request.query_params.get("to") or today.isoformat()
+
+        qs = (
+            Order.objects.filter(restaurant=request.restaurant, tip_amount__gt=0)
+            .exclude(status="cancelled")
+            .filter(created_at__date__gte=raw_from, created_at__date__lte=raw_to)
+            .select_related("server")
+        )
+        by_server: dict = {}
+        for o in qs:
+            key = str(o.server_id) if o.server_id else "unassigned"
+            bucket = by_server.setdefault(
+                key,
+                {
+                    "server_id": str(o.server_id) if o.server_id else None,
+                    "server_email": o.server.email if o.server_id else None,
+                    "server_name": o.server.get_full_name() if o.server_id else None,
+                    "total_tips": Decimal("0"),
+                    "order_count": 0,
+                },
+            )
+            bucket["total_tips"] += o.tip_amount or Decimal("0")
+            bucket["order_count"] += 1
+
+        # stringify decimals for JSON
+        for b in by_server.values():
+            b["total_tips"] = str(b["total_tips"])
+
+        grand = sum((o.tip_amount or Decimal("0")) for o in qs)
+        return Response(
+            {
+                "success": True,
+                "data": {
+                    "from": raw_from,
+                    "to": raw_to,
+                    "grand_total": str(grand),
+                    "order_count": qs.count(),
+                    "by_server": list(by_server.values()),
+                },
+            }
+        )
+
+
 # ============== Public Views (for customer ordering) ==============
 
 
@@ -496,6 +622,7 @@ class CustomerOrderCreateView(APIView):
             customer_email=data.get("customer_email", ""),
             customer_notes=data.get("customer_notes", ""),
             delivery_address=data.get("delivery_address", ""),
+            tip_amount=data.get("tip_amount", 0),
         )
 
         # Add items

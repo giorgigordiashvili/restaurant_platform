@@ -243,6 +243,7 @@ class InitiatePaymentView(APIView):
             table_session_id=session_id,
             customer=request.user if request.user.is_authenticated else None,
             order_type=payload.get("order_type", "dine_in"),
+            tip_amount=payload.get("tip_amount", 0),
             status="pending_payment",
             customer_name=payload.get("customer_name", ""),
             customer_phone=payload.get("customer_phone", ""),

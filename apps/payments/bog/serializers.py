@@ -94,6 +94,9 @@ class OrderPayloadSerializer(serializers.Serializer):
     customer_email = serializers.EmailField(required=False, allow_blank=True, default="")
     customer_notes = serializers.CharField(required=False, allow_blank=True, default="")
     delivery_address = serializers.CharField(required=False, allow_blank=True, default="")
+    tip_amount = serializers.DecimalField(
+        max_digits=10, decimal_places=2, min_value=0, required=False, default=0
+    )
     items = BogOrderItemSerializer(many=True)
 
     def validate_items(self, value):

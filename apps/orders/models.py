@@ -121,6 +121,29 @@ class Order(TimeStampedModel):
         default=0,
         validators=[MinValueValidator(0)],
     )
+    tip_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        validators=[MinValueValidator(0)],
+        help_text="Optional gratuity paid on top of subtotal/tax/service.",
+    )
+    tip_distribution = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text=(
+            "Phase-3 tip allocation map. {user_id_or_pool: decimal_amount}. "
+            "Unassigned tips accrue to the server FK or the restaurant pool."
+        ),
+    )
+    server = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="served_orders",
+        help_text="Staff member credited with serving this order (for tip distribution).",
+    )
     total = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -225,8 +248,14 @@ class Order(TimeStampedModel):
             self.tax_amount = self.subtotal * (self.restaurant.tax_rate / Decimal("100"))
             self.service_charge = self.subtotal * (self.restaurant.service_charge / Decimal("100"))
 
-        # Calculate total
-        self.total = self.subtotal + self.tax_amount + self.service_charge - self.discount_amount
+        # Calculate total (tip is customer-set; not recalculated)
+        self.total = (
+            self.subtotal
+            + self.tax_amount
+            + self.service_charge
+            + (self.tip_amount or Decimal("0"))
+            - self.discount_amount
+        )
 
         self.save(
             update_fields=[
