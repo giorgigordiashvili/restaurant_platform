@@ -861,6 +861,18 @@ class LoyaltyProgramTenantAdmin(TenantModelAdmin):
             kwargs["queryset"] = db_field.related_model.objects.filter(restaurant=restaurant)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+    def save_model(self, request, obj, form, change):
+        # Explicit auto-assign so failures are visible; the base class does
+        # the same but is defensive about missing fields.
+        if obj.restaurant_id is None:
+            restaurant = getattr(request, "restaurant", None)
+            if restaurant is None:
+                raise ValueError(
+                    "Tenant admin has no restaurant context — middleware didn't resolve a subdomain."
+                )
+            obj.restaurant = restaurant
+        super().save_model(request, obj, form, change)
+
 
 class LoyaltyCounterTenantAdmin(TenantModelAdmin):
     permission_resource = "menu"
