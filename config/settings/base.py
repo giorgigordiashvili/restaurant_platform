@@ -274,6 +274,7 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
     "accept-language",
+    "x-restaurant",
 ]
 
 # Security Settings
