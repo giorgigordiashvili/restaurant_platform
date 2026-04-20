@@ -174,22 +174,40 @@ class Order(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         if not self.order_number:
-            self.order_number = self._generate_order_number()
+            # Retry a handful of times in case the daily counter raced against
+            # another order.save() across workers — rare but real under parallel
+            # gunicorn writes.
+            from django.db import IntegrityError, transaction
+
+            attempts = 0
+            while True:
+                attempts += 1
+                self.order_number = self._generate_order_number()
+                try:
+                    with transaction.atomic():
+                        return super().save(*args, **kwargs)
+                except IntegrityError:
+                    if attempts >= 5:
+                        raise
+                    # Let the counter reread and retry.
         super().save(*args, **kwargs)
 
     def _generate_order_number(self) -> str:
-        """Generate a unique order number."""
+        """
+        Generate a globally-unique ``ORD-YYMMDD-NNNN`` number for today.
+
+        The uniqueness constraint on ``order_number`` is global (not per-tenant),
+        so the daily counter must be too. Prior versions scoped the count by
+        ``restaurant`` which produced collisions like
+        ``UniqueViolation: Key (order_number)=(ORD-260420-0001) already exists``
+        whenever two different restaurants created their first order of the
+        day in the same second.
+        """
         from django.utils import timezone
 
         today = timezone.localdate()
         prefix = today.strftime("%y%m%d")
-
-        # Get count of orders today for this restaurant
-        count = Order.objects.filter(
-            restaurant=self.restaurant,
-            created_at__date=today,
-        ).count()
-
+        count = Order.objects.filter(created_at__date=today).count()
         return f"ORD-{prefix}-{count + 1:04d}"
 
     def calculate_totals(self):
