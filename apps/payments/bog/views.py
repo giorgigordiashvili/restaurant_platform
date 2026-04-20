@@ -599,11 +599,14 @@ class BogStatusView(APIView):
 
         if not txn.is_terminal:
             # Refresh on demand — cheap and avoids relying on webhook timing.
+            # BUG FIX: always use txn.bog_order_id (BOG's UUID) here, not the
+            # URL parameter — the URL param may be our external reference
+            # (confirmation_code / order_number), which BOG doesn't know.
             try:
-                receipt = get_client().get_receipt(bog_order_id)
+                receipt = get_client().get_receipt(txn.bog_order_id)
                 _apply_receipt(txn, receipt, source="poll")
             except BogClientError:
-                logger.warning("BOG receipt fetch failed for %s", bog_order_id)
+                logger.warning("BOG receipt fetch failed for %s", txn.bog_order_id)
 
         data = {
             "status": txn.status,
