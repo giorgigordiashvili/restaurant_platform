@@ -12,9 +12,9 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("menu", "0003_alter_menucategory_options_and_more"),
+        ("menu", "0002_alter_menucategorytranslation_options_and_more"),
         ("orders", "0004_order_reservation"),
-        ("tenants", "0010_alter_citytranslation_options_and_more"),
+        ("tenants", "0009_update_restaurant_data"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
