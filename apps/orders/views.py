@@ -2,6 +2,8 @@
 Views for orders app.
 """
 
+from django.db.models import Q
+
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -39,10 +41,22 @@ class OrderListView(generics.ListAPIView):
     def get_queryset(self):
         queryset = (
             Order.objects.filter(restaurant=self.request.restaurant)
-            .select_related("table")
+            .select_related("table", "reservation")
             .prefetch_related("items")
             .order_by("-created_at")
         )
+
+        # Kitchen should only see orders whose linked reservation has been
+        # confirmed. Walk-in / QR-dine-in / takeaway orders have no
+        # reservation and are always visible. Dashboard consumers can
+        # opt-out with ?include_pending_reservations=true if they truly
+        # want everything.
+        include_pending = self.request.query_params.get("include_pending_reservations")
+        if not (include_pending and include_pending.lower() == "true"):
+            queryset = queryset.filter(
+                Q(reservation__isnull=True)
+                | Q(reservation__status__in=["confirmed", "seated", "completed"])
+            )
 
         # Filter by status
         order_status = self.request.query_params.get("status")
