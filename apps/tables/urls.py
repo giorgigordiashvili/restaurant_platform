@@ -9,9 +9,11 @@ from .views import (
     JoinTableSessionView,
     LeaveTableSessionView,
     QRCodeScanView,
+    TableSessionBillView,
     TableSessionDetailPublicView,
     TableSessionGuestsView,
     TableSessionInviteView,
+    TableSessionModeView,
     TableSessionOrdersView,
     TableValidateView,
 )
@@ -59,5 +61,15 @@ urlpatterns = [
         "sessions/<uuid:session_id>/leave/",
         LeaveTableSessionView.as_view(),
         name="session-leave",
+    ),
+    path(
+        "sessions/<uuid:session_id>/mode/",
+        TableSessionModeView.as_view(),
+        name="session-mode",
+    ),
+    path(
+        "sessions/<uuid:session_id>/bill/",
+        TableSessionBillView.as_view(),
+        name="session-bill",
     ),
 ]

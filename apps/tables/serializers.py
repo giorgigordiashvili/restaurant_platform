@@ -123,12 +123,14 @@ class TableSessionSerializer(serializers.ModelSerializer):
             "table_number",
             "guest_count",
             "status",
+            "payment_mode",
+            "host",
             "started_at",
             "closed_at",
             "notes",
             "duration_minutes",
         ]
-        read_only_fields = ["id", "started_at", "closed_at", "duration_minutes"]
+        read_only_fields = ["id", "host", "started_at", "closed_at", "duration_minutes"]
 
 
 class TableSessionCreateSerializer(serializers.Serializer):
@@ -217,6 +219,7 @@ class TableSessionDetailSerializer(serializers.ModelSerializer):
             "invite_code",
             "guest_count",
             "status",
+            "payment_mode",
             "started_at",
             "closed_at",
             "duration_minutes",

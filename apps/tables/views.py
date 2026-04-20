@@ -460,6 +460,118 @@ class TableSessionDetailPublicView(generics.RetrieveAPIView):
 
 
 @extend_schema(tags=["Table Sessions"])
+class TableSessionModeView(APIView):
+    """
+    Set the payment_mode on a session. Only the session host (registered or
+    anonymous via session_id UUID proof) may change it. The guest client
+    reads this before submitting to decide whether to hit BOG initiate or
+    go straight to /orders/create as a shared-tab order.
+    """
+
+    permission_classes = [AllowAny]
+
+    def patch(self, request, session_id):
+        try:
+            session = TableSession.objects.select_related("table").get(
+                id=session_id,
+                status__in=["active", "payment_pending"],
+            )
+        except TableSession.DoesNotExist:
+            return Response(
+                {"success": False, "error": {"message": "Session not found or closed."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        mode = request.data.get("payment_mode")
+        if mode not in dict(TableSession.PAYMENT_MODE_CHOICES):
+            return Response(
+                {"success": False, "error": {"message": "Invalid payment_mode."}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Authz: anonymous sessions (no host) are writable by anyone with the
+        # session_id; once a host registers, only they can flip the mode.
+        if session.host_id is not None:
+            if not request.user.is_authenticated or request.user.id != session.host_id:
+                if not session.guests.filter(user=request.user, is_host=True).exists():
+                    return Response(
+                        {
+                            "success": False,
+                            "error": {"message": "Only the session host can change payment mode."},
+                        },
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+
+        # If host just became known via this call, remember them.
+        if session.host_id is None and request.user.is_authenticated:
+            session.host = request.user
+            session.payment_mode = mode
+            session.save(update_fields=["host", "payment_mode", "updated_at"])
+        else:
+            session.payment_mode = mode
+            session.save(update_fields=["payment_mode", "updated_at"])
+
+        return Response({"success": True, "data": TableSessionDetailSerializer(session).data})
+
+
+@extend_schema(tags=["Table Sessions"])
+class TableSessionBillView(APIView):
+    """
+    Return the running tab for a session in host-covers mode: a list of
+    orders tied to the session whose status is anything but cancelled,
+    plus the running grand total. Frontend uses this to render the
+    host's "pay the table" summary.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request, session_id):
+        from apps.orders.models import Order
+
+        try:
+            session = TableSession.objects.select_related("table").get(id=session_id)
+        except TableSession.DoesNotExist:
+            return Response(
+                {"success": False, "error": {"message": "Session not found."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        orders = (
+            Order.objects.filter(table_session=session)
+            .exclude(status="cancelled")
+            .order_by("created_at")
+        )
+        tab_items = []
+        grand_total = 0
+        for o in orders:
+            total = o.total or 0
+            grand_total += total
+            tab_items.append(
+                {
+                    "id": str(o.id),
+                    "order_number": o.order_number,
+                    "status": o.status,
+                    "customer_name": o.customer_name
+                    or (o.customer.get_full_name() if o.customer else "Guest"),
+                    "total": str(total),
+                    "created_at": o.created_at.isoformat(),
+                }
+            )
+
+        return Response(
+            {
+                "success": True,
+                "data": {
+                    "session_id": str(session.id),
+                    "payment_mode": session.payment_mode,
+                    "orders": tab_items,
+                    "grand_total": str(grand_total),
+                },
+            }
+        )
+
+
+@extend_schema(tags=["Table Sessions"])
 class TableSessionInviteView(APIView):
     """
     Generate or retrieve invite code for a session.

@@ -284,6 +284,20 @@ class TableSession(TimeStampedModel):
         null=True,
         help_text="Shareable code to invite others to this session",
     )
+    PAYMENT_MODE_CHOICES = [
+        ("split", "Everyone pays their own"),
+        ("host_covers", "Host covers the whole table"),
+    ]
+    payment_mode = models.CharField(
+        max_length=16,
+        choices=PAYMENT_MODE_CHOICES,
+        default="split",
+        help_text=(
+            "split = each guest pays for their own orders. "
+            "host_covers = the host settles the entire table at the end; "
+            "guest orders are created without an individual BOG charge."
+        ),
+    )
     guest_count = models.PositiveSmallIntegerField(default=1)
     status = models.CharField(
         max_length=20,
