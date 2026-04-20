@@ -33,6 +33,10 @@ cryptography>=42.0
 qrcode[pil]>=7.4
 Pillow>=10.2
 
+# Low-quality image placeholders (inline blurhash strings)
+blurhash>=1.1
+numpy>=1.26
+
 # Utilities
 python-decouple>=3.8
 django-filter>=24.1

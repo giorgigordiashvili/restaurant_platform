@@ -66,6 +66,12 @@ class RestaurantCategory(TranslatableModel, TimeStampedModel):
         blank=True,
         null=True,
     )
+    image_blurhash = models.CharField(
+        max_length=64,
+        blank=True,
+        default="",
+        help_text="BlurHash string for the image — used as an inline LQIP.",
+    )
     display_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
@@ -222,10 +228,22 @@ class Restaurant(TimeStampedModel):
         blank=True,
         null=True,
     )
+    logo_blurhash = models.CharField(
+        max_length=64,
+        blank=True,
+        default="",
+        help_text="BlurHash string for the logo — used as an inline LQIP.",
+    )
     cover_image = models.ImageField(
         upload_to="restaurants/covers/",
         blank=True,
         null=True,
+    )
+    cover_image_blurhash = models.CharField(
+        max_length=64,
+        blank=True,
+        default="",
+        help_text="BlurHash string for the cover image — used as an inline LQIP.",
     )
     primary_color = models.CharField(
         max_length=7,

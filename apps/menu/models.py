@@ -31,6 +31,12 @@ class MenuCategory(TranslatableModel, TimeStampedModel):
         blank=True,
         null=True,
     )
+    image_blurhash = models.CharField(
+        max_length=64,
+        blank=True,
+        default="",
+        help_text="BlurHash string for the image — used as an inline LQIP.",
+    )
     display_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
@@ -98,6 +104,12 @@ class MenuItem(TranslatableModel, TimeStampedModel):
         upload_to="menu/items/",
         blank=True,
         null=True,
+    )
+    image_blurhash = models.CharField(
+        max_length=64,
+        blank=True,
+        default="",
+        help_text="BlurHash string for the image — used as an inline LQIP.",
     )
     is_available = models.BooleanField(default=True)
     is_featured = models.BooleanField(
