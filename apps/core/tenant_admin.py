@@ -51,6 +51,7 @@ from apps.reservations.models import (
     ReservationBlockedTime,
     ReservationSettings,
 )
+from apps.loyalty.models import LoyaltyCounter, LoyaltyProgram, LoyaltyRedemption
 from apps.staff.models import StaffInvitation, StaffMember, StaffRole
 from apps.tables.models import Table, TableQRCode, TableSection, TableSession
 from apps.tenants.models import Amenity, Restaurant, RestaurantCategory, RestaurantHours
@@ -824,3 +825,77 @@ tenant_admin_site.register(StaffInvitation, StaffInvitationTenantAdmin)
 # tenant_admin_site.register(Reservation, ReservationTenantAdmin)
 # tenant_admin_site.register(ReservationSettings, ReservationSettingsTenantAdmin)
 # tenant_admin_site.register(ReservationBlockedTime, ReservationBlockedTimeTenantAdmin)
+
+
+# Loyalty
+class LoyaltyProgramTenantAdmin(TenantModelAdmin):
+    permission_resource = "menu"  # reuses the menu-manager role bucket
+    restaurant_field = "restaurant"
+    list_display = [
+        "name",
+        "trigger_item",
+        "threshold",
+        "reward_item",
+        "reward_quantity",
+        "is_active",
+    ]
+    list_filter = ["is_active"]
+    search_fields = ["name"]
+    autocomplete_fields = ["trigger_item", "reward_item"]
+    fields = [
+        "name",
+        "description",
+        "is_active",
+        "trigger_item",
+        "threshold",
+        "reward_item",
+        "reward_quantity",
+        "starts_at",
+        "ends_at",
+        "code_ttl_seconds",
+    ]
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        restaurant = getattr(request, "restaurant", None)
+        if restaurant and db_field.name in ("trigger_item", "reward_item"):
+            kwargs["queryset"] = db_field.related_model.objects.filter(restaurant=restaurant)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+class LoyaltyCounterTenantAdmin(TenantModelAdmin):
+    permission_resource = "menu"
+    restaurant_field = "program__restaurant"
+    list_display = ["program", "user", "phone_number", "punches", "last_earned_at"]
+    list_filter = ["program"]
+    search_fields = ["user__email", "phone_number"]
+    autocomplete_fields = ["program"]
+    readonly_fields = ["punches", "last_earned_at"]
+
+
+class LoyaltyRedemptionTenantAdmin(TenantModelAdmin):
+    permission_resource = "menu"
+    restaurant_field = "program__restaurant"
+    list_display = [
+        "code",
+        "program",
+        "user",
+        "status",
+        "issued_at",
+        "expires_at",
+        "redeemed_at",
+    ]
+    list_filter = ["status", "program"]
+    search_fields = ["code", "user__email", "phone_number"]
+    readonly_fields = [
+        "code",
+        "issued_at",
+        "expires_at",
+        "redeemed_at",
+        "redeemed_by",
+        "counter",
+    ]
+
+
+tenant_admin_site.register(LoyaltyProgram, LoyaltyProgramTenantAdmin)
+tenant_admin_site.register(LoyaltyCounter, LoyaltyCounterTenantAdmin)
+tenant_admin_site.register(LoyaltyRedemption, LoyaltyRedemptionTenantAdmin)
