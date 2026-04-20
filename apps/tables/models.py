@@ -385,6 +385,12 @@ class TableSessionGuest(TimeStampedModel):
         blank=True,
         help_text="Name for anonymous guests",
     )
+    guest_contact = models.CharField(
+        max_length=120,
+        blank=True,
+        default="",
+        help_text="Phone or email for anonymous guests so the host can reach them.",
+    )
     is_host = models.BooleanField(
         default=False,
         help_text="Whether this guest is the session host",

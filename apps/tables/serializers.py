@@ -182,6 +182,7 @@ class TableSessionGuestSerializer(serializers.ModelSerializer):
             "user",
             "user_email",
             "guest_name",
+            "guest_contact",
             "display_name",
             "is_host",
             "status",
@@ -229,16 +230,16 @@ class TableSessionDetailSerializer(serializers.ModelSerializer):
 class JoinSessionSerializer(serializers.Serializer):
     """Serializer for joining a session."""
 
-    guest_name = serializers.CharField(required=False, max_length=100, allow_blank=True)
+    guest_name = serializers.CharField(max_length=100, allow_blank=False, required=True)
+    guest_contact = serializers.CharField(max_length=120, required=False, allow_blank=True, default="")
 
-    def validate(self, data):
-        request = self.context.get("request")
-        guest_name = data.get("guest_name", "")
-        # Guest name is required for unauthenticated users
-        if not request or not request.user.is_authenticated:
-            if not guest_name or not guest_name.strip():
-                raise serializers.ValidationError({"guest_name": "Guest name is required for unauthenticated users."})
-        return data
+    def validate_guest_name(self, value):
+        if not value or not value.strip():
+            raise serializers.ValidationError("Guest name is required.")
+        return value.strip()
+
+    def validate_guest_contact(self, value):
+        return (value or "").strip()
 
 
 class SessionInviteResponseSerializer(serializers.Serializer):
@@ -262,3 +263,4 @@ class SessionJoinPreviewSerializer(serializers.Serializer):
     host_name = serializers.CharField(allow_null=True)
     guest_count = serializers.IntegerField()
     status = serializers.CharField()
+    started_at = serializers.CharField(required=False, allow_blank=True)

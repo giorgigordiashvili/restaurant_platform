@@ -498,17 +498,35 @@ class JoinTableSessionPreviewView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, invite_code):
-        try:
-            session = TableSession.objects.select_related("table", "table__restaurant", "host").get(
-                invite_code=invite_code,
-                status__in=["active", "payment_pending"],
-            )
-        except TableSession.DoesNotExist:
+        # Separate "unknown code" vs "session closed" so the UI can show a
+        # distinct message instead of the generic "invalid or expired".
+        any_session = (
+            TableSession.objects.select_related("table", "table__restaurant", "host")
+            .filter(invite_code=invite_code)
+            .first()
+        )
+        if any_session is None:
             return Response(
-                {"success": False, "error": {"message": "Invalid invite code or session closed."}},
+                {"success": False, "error": {"code": "not_found", "message": "Invalid invite code."}},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        if any_session.status not in ("active", "payment_pending"):
+            return Response(
+                {
+                    "success": False,
+                    "error": {
+                        "code": "session_closed",
+                        "message": "This table session has been closed.",
+                        "details": {
+                            "closed_at": any_session.closed_at.isoformat() if any_session.closed_at else None,
+                            "status": any_session.status,
+                        },
+                    },
+                },
+                status=status.HTTP_410_GONE,
+            )
 
+        session = any_session
         data = {
             "session_id": session.id,
             "restaurant_name": session.table.restaurant.name,
@@ -518,6 +536,7 @@ class JoinTableSessionPreviewView(APIView):
             "host_name": session.host.email if session.host else None,
             "guest_count": session.guests.filter(status="active").count(),
             "status": session.status,
+            "started_at": session.started_at.isoformat(),
         }
 
         return Response({"success": True, "data": SessionJoinPreviewSerializer(data).data})
@@ -549,11 +568,15 @@ class JoinTableSessionView(APIView):
 
         user = request.user if request.user.is_authenticated else None
         guest_name = serializer.validated_data.get("guest_name", "")
+        guest_contact = serializer.validated_data.get("guest_contact", "")
 
         # Check if user already in session
         if user:
             existing_guest = session.guests.filter(user=user, status="active").first()
             if existing_guest:
+                if guest_contact and not existing_guest.guest_contact:
+                    existing_guest.guest_contact = guest_contact
+                    existing_guest.save(update_fields=["guest_contact", "updated_at"])
                 return Response(
                     {
                         "success": True,
@@ -561,12 +584,17 @@ class JoinTableSessionView(APIView):
                         "data": {
                             "guest": TableSessionGuestSerializer(existing_guest).data,
                             "session": TableSessionDetailSerializer(session).data,
+                            "restaurant_slug": session.table.restaurant.slug if session.table else None,
                         },
                     }
                 )
 
         # Create guest record
         guest, created = session.get_or_create_guest(user=user, guest_name=guest_name)
+        # Persist guest contact for the host's visibility
+        if guest_contact and not guest.guest_contact:
+            guest.guest_contact = guest_contact
+            guest.save(update_fields=["guest_contact", "updated_at"])
 
         return Response(
             {
@@ -575,6 +603,7 @@ class JoinTableSessionView(APIView):
                 "data": {
                     "guest": TableSessionGuestSerializer(guest).data,
                     "session": TableSessionDetailSerializer(session).data,
+                    "restaurant_slug": session.table.restaurant.slug if session.table else None,
                 },
             },
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
