@@ -586,7 +586,7 @@ class DashboardUpcomingReservationsView(generics.ListAPIView):
             restaurant=restaurant,
             reservation_date__gte=timezone.now().date(),
             status__in=["pending", "confirmed", "waitlist"],
-        ).order_by("reservation_date", "reservation_time")[:20]
+        ).order_by("reservation_date", "reservation_time")
 
 
 class DashboardBlockedTimeListView(generics.ListCreateAPIView):
