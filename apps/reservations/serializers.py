@@ -102,6 +102,7 @@ class ReservationListSerializer(serializers.ModelSerializer):
     )
     deposit_amount = serializers.SerializerMethodField()
     payment_status = serializers.SerializerMethodField()
+    pre_order_summary = serializers.SerializerMethodField()
 
     class Meta:
         model = Reservation
@@ -127,6 +128,7 @@ class ReservationListSerializer(serializers.ModelSerializer):
             "restaurant_average_rating",
             "deposit_amount",
             "payment_status",
+            "pre_order_summary",
             "can_cancel",
             "can_modify",
             "created_at",
@@ -140,6 +142,24 @@ class ReservationListSerializer(serializers.ModelSerializer):
     def get_payment_status(self, obj) -> str | None:
         txn = _latest_bog_txn(obj)
         return txn.status if txn else None
+
+    def get_pre_order_summary(self, obj):
+        """
+        Slim pre-order info for list cards: total + subtotal + item count.
+
+        Avoids serialising full items[] on every list row so the POS
+        dashboard can show the "reservation + order" badge without pulling
+        detail payloads. Detail view still surfaces the full order.
+        """
+        order = obj.orders.order_by("-created_at").first()
+        if order is None:
+            return None
+        return {
+            "order_id": str(order.id),
+            "total": str(order.total) if order.total is not None else None,
+            "subtotal": str(order.subtotal) if order.subtotal is not None else None,
+            "items_count": order.items.count(),
+        }
 
 
 def _latest_bog_txn(reservation):
