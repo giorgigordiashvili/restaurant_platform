@@ -298,7 +298,7 @@ class CustomerReservationListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Reservation.objects.filter(customer=self.request.user).order_by("-reservation_date", "-reservation_time")
+        return Reservation.objects.filter(customer=self.request.user).order_by("-created_at")
 
 
 class CustomerReservationDetailView(generics.RetrieveAPIView):
