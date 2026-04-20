@@ -426,6 +426,38 @@ class TableSessionCloseView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        # Money-leak guard: refuse to close a session that has orders which
+        # were never paid for. An order is settled if it is cancelled OR has
+        # at least one BOG transaction with status='completed'. Staff must
+        # either cancel the stray order or have the customer pay before the
+        # table can be released.
+        force = str(request.data.get("force", "")).lower() in {"1", "true", "yes"}
+        unpaid = [
+            o for o in session.orders.prefetch_related("bog_transactions").all()
+            if o.status != "cancelled"
+            and not any(
+                t.status == "completed" for t in o.bog_transactions.all()
+            )
+        ]
+        if unpaid and not force:
+            return Response(
+                {
+                    "success": False,
+                    "error": {
+                        "code": "unpaid_orders",
+                        "message": (
+                            f"{len(unpaid)} order(s) on this table have not been paid. "
+                            "Collect payment or cancel them before closing."
+                        ),
+                        "unpaid_order_numbers": [o.order_number for o in unpaid],
+                        "unpaid_total": str(
+                            sum((o.total or 0) for o in unpaid)
+                        ),
+                    },
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         session.close()
 
         return Response(

@@ -140,7 +140,7 @@ class TableSessionSerializer(serializers.ModelSerializer):
         counts + the grand total + the `all_terminal` flag staff use to
         decide whether "Close table" is safe.
         """
-        orders = list(obj.orders.all())
+        orders = list(obj.orders.prefetch_related("bog_transactions").all())
         counts = {
             "pending_payment": 0,
             "pending": 0,
@@ -152,10 +152,18 @@ class TableSessionSerializer(serializers.ModelSerializer):
             "cancelled": 0,
         }
         grand_total = 0
+        unpaid_numbers: list[str] = []
+        unpaid_total = 0
         for o in orders:
             counts[o.status] = counts.get(o.status, 0) + 1
             if o.total is not None:
                 grand_total += o.total
+            if o.status != "cancelled" and not any(
+                t.status == "completed" for t in o.bog_transactions.all()
+            ):
+                unpaid_numbers.append(o.order_number)
+                if o.total is not None:
+                    unpaid_total += o.total
         non_terminal = sum(
             counts[s] for s in ("pending_payment", "pending", "confirmed", "preparing", "ready")
         )
@@ -165,6 +173,10 @@ class TableSessionSerializer(serializers.ModelSerializer):
             "non_terminal": non_terminal,
             "grand_total": str(grand_total),
             "all_terminal": non_terminal == 0 and len(orders) > 0,
+            "unpaid_count": len(unpaid_numbers),
+            "unpaid_order_numbers": unpaid_numbers,
+            "unpaid_total": str(unpaid_total),
+            "all_paid": len(unpaid_numbers) == 0,
         }
 
 
