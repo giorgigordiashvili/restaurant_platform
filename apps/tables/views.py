@@ -97,8 +97,18 @@ class TableValidateView(APIView):
         table = qr.table
         restaurant = table.restaurant
 
-        # Check for active session
+        # Join or start a session: if none is active, auto-create an anonymous
+        # session so guests can order + invite friends without needing a
+        # separate explicit "start session" endpoint.
         active_session = table.sessions.filter(status="active").first()
+        if active_session is None:
+            active_session = TableSession.objects.create(
+                table=table,
+                qr_code=qr,
+                host=request.user if request.user.is_authenticated else None,
+                guest_count=1,
+            )
+            table.set_occupied()
 
         data = {
             "table": {
@@ -116,16 +126,20 @@ class TableValidateView(APIView):
                 "logo": restaurant.logo.url if restaurant.logo else None,
                 "primary_color": restaurant.primary_color,
             },
-            "session": None,
-        }
-
-        if active_session:
-            data["session"] = {
+            "session": {
                 "id": str(active_session.id),
                 "invite_code": active_session.invite_code,
                 "guest_count": active_session.guests.filter(status="active").count(),
                 "started_at": active_session.started_at.isoformat(),
-            }
+            },
+            # Flat top-level helpers so single-shot clients don't have to dig
+            # into the nested shape. Matches what the frontend previously
+            # assumed (r.session_id / r.table_number / r.restaurant_slug).
+            "session_id": str(active_session.id),
+            "table_number": table.number,
+            "table_name": table.name or "",
+            "restaurant_slug": restaurant.slug,
+        }
 
         return Response({"success": True, "data": data})
 
@@ -449,10 +463,14 @@ class TableSessionDetailPublicView(generics.RetrieveAPIView):
 class TableSessionInviteView(APIView):
     """
     Generate or retrieve invite code for a session.
-    Only the session host can access this.
+
+    Knowing the session_id (a UUID) is taken as proof of access — QR-dine-in
+    sessions are often anonymous (no host account, no guest rows at scan
+    time) and still need to let the scanner share an invite link with
+    friends.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request, session_id):
         try:
@@ -466,14 +484,22 @@ class TableSessionInviteView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        # Check if user is the host
-        if session.host != request.user:
-            # Check if user is a guest of this session
-            if not session.guests.filter(user=request.user, is_host=True).exists():
+        # If session has an authenticated host, only they (or a guest-host
+        # row) can share the invite. Anonymous sessions (host=None) are open
+        # to anyone with the session_id.
+        if session.host_id is not None and request.user.is_authenticated:
+            if session.host_id != request.user.id and not session.guests.filter(
+                user=request.user, is_host=True
+            ).exists():
                 return Response(
                     {"success": False, "error": {"message": "Only the session host can get the invite code."}},
                     status=status.HTTP_403_FORBIDDEN,
                 )
+        elif session.host_id is not None and not request.user.is_authenticated:
+            return Response(
+                {"success": False, "error": {"message": "Only the session host can get the invite code."}},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         # Generate invite URL (frontend will construct the actual link)
         invite_url = f"/join/{session.invite_code}"
