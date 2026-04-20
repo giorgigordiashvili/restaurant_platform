@@ -129,16 +129,32 @@ class ReservationPayloadSerializer(serializers.Serializer):
     items = BogOrderItemSerializer(many=True, required=False, default=list)
 
 
+class SessionSettlePayloadSerializer(serializers.Serializer):
+    """Body for the host "pay for the whole table" flow."""
+
+    restaurant_slug = serializers.SlugField(max_length=100)
+    session_id = serializers.UUIDField()
+    tip_amount = serializers.DecimalField(
+        max_digits=10, decimal_places=2, min_value=0, required=False, default=0
+    )
+
+
 class InitiatePaymentSerializer(ReturnURLMixin, serializers.Serializer):
     """Top-level initiate body. ``target`` discriminates the payload."""
 
     TARGET_ORDER = "order"
     TARGET_RESERVATION = "reservation"
-    TARGET_CHOICES = [(TARGET_ORDER, "Order"), (TARGET_RESERVATION, "Reservation")]
+    TARGET_SESSION = "session"
+    TARGET_CHOICES = [
+        (TARGET_ORDER, "Order"),
+        (TARGET_RESERVATION, "Reservation"),
+        (TARGET_SESSION, "Session"),
+    ]
 
     target = serializers.ChoiceField(choices=TARGET_CHOICES)
     order_payload = OrderPayloadSerializer(required=False)
     reservation_payload = ReservationPayloadSerializer(required=False)
+    session_payload = SessionSettlePayloadSerializer(required=False)
 
     def validate(self, attrs):
         target = attrs["target"]
@@ -149,6 +165,10 @@ class InitiatePaymentSerializer(ReturnURLMixin, serializers.Serializer):
         if target == self.TARGET_RESERVATION and "reservation_payload" not in attrs:
             raise serializers.ValidationError(
                 {"reservation_payload": "reservation_payload is required when target='reservation'."}
+            )
+        if target == self.TARGET_SESSION and "session_payload" not in attrs:
+            raise serializers.ValidationError(
+                {"session_payload": "session_payload is required when target='session'."}
             )
         return attrs
 
@@ -166,3 +186,5 @@ class BogStatusResponseSerializer(serializers.Serializer):
     order_number = serializers.CharField(allow_null=True, required=False)
     reservation_id = serializers.CharField(allow_null=True, required=False)
     payment_method_id = serializers.CharField(allow_null=True, required=False)
+    session_id = serializers.CharField(allow_null=True, required=False)
+    flow_type = serializers.CharField(allow_blank=True, required=False)

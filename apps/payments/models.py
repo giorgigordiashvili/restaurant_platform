@@ -380,10 +380,12 @@ class BogTransaction(TimeStampedModel):
     FLOW_ORDER = "order"
     FLOW_RESERVATION = "reservation"
     FLOW_ADD_CARD = "add_card"
+    FLOW_SESSION_SETTLE = "session_settle"
     FLOW_CHOICES = [
         (FLOW_ORDER, "Order"),
         (FLOW_RESERVATION, "Reservation"),
         (FLOW_ADD_CARD, "Add Card"),
+        (FLOW_SESSION_SETTLE, "Session Settle"),
     ]
 
     # BOG's own order_status.key values — stored verbatim so downstream code
@@ -452,6 +454,24 @@ class BogTransaction(TimeStampedModel):
         blank=True,
         related_name="bog_transactions",
         help_text="Populated when this transaction tokenised a card (add_card flow).",
+    )
+    session = models.ForeignKey(
+        "tables.TableSession",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="bog_transactions",
+        help_text="Populated when this transaction settles a whole table (session_settle flow).",
+    )
+    covered_orders = models.ManyToManyField(
+        "orders.Order",
+        related_name="settle_transactions",
+        blank=True,
+        help_text=(
+            "Orders this transaction pays off in bulk (session_settle flow). "
+            "Snapshotted at initiate-time so orders placed after the settle "
+            "call still require their own payment."
+        ),
     )
     initiated_by = models.ForeignKey(
         "accounts.User",

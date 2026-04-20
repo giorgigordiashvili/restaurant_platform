@@ -181,6 +181,10 @@ class InitiatePaymentView(APIView):
         try:
             if target == InitiatePaymentSerializer.TARGET_ORDER:
                 return self._initiate_order(request, data["order_payload"], data["return_url"])
+            if target == InitiatePaymentSerializer.TARGET_SESSION:
+                return self._initiate_session_settle(
+                    request, data["session_payload"], data["return_url"]
+                )
             return self._initiate_reservation(
                 request, data["reservation_payload"], data["return_url"]
             )
@@ -333,6 +337,123 @@ class InitiatePaymentView(APIView):
                 "data": {
                     "bog_order_id": transaction_row.bog_order_id,
                     "order_number": order.order_number,
+                    "redirect_url": redirect_url,
+                },
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    @transaction.atomic
+    def _initiate_session_settle(
+        self, request: Request, payload: dict[str, Any], return_url: str
+    ) -> Response:
+        """
+        Host "pay for the whole table" flow. Charges a single BOG transaction
+        for every currently-unpaid non-cancelled order on the session, plus
+        an optional tip, and snapshots the covered orders via the M2M so
+        orders placed after this call still require their own payment.
+        """
+        from apps.tables.models import TableSession
+
+        restaurant = _resolve_restaurant(payload["restaurant_slug"])
+
+        try:
+            session_obj = TableSession.objects.get(
+                id=payload["session_id"], table__restaurant=restaurant
+            )
+        except TableSession.DoesNotExist as exc:
+            raise ValueError("Table session not found.") from exc
+        if session_obj.status != "active":
+            raise ValueError(
+                "This table session has ended. Scan a new QR to start over."
+            )
+
+        # Identify orders the settle will pay off: not cancelled AND not
+        # already paid by an individual BOG charge AND not already covered
+        # by a previous completed settle txn.
+        orders = list(
+            session_obj.orders.prefetch_related("bog_transactions", "settle_transactions").all()
+        )
+        unpaid_orders = [
+            o for o in orders
+            if o.status != "cancelled"
+            and not any(t.status == "completed" for t in o.bog_transactions.all())
+            and not any(t.status == "completed" for t in o.settle_transactions.all())
+        ]
+        if not unpaid_orders:
+            raise ValueError("All orders on this table are already paid.")
+
+        tip_amount = Decimal(payload.get("tip_amount") or 0)
+        orders_total = sum((o.total or Decimal("0")) for o in unpaid_orders)
+        amount = orders_total + tip_amount
+        if amount <= 0:
+            raise ValueError("Settle total must be greater than zero.")
+
+        external_id = f"settle-{session_obj.id.hex[:12]}-{uuid.uuid4().hex[:6]}"
+        basket = [
+            {
+                "quantity": 1,
+                "unit_price": float(o.total or 0),
+                "product_id": o.order_number,
+                "description": f"Order {o.order_number}",
+            }
+            for o in unpaid_orders
+        ]
+        if tip_amount > 0:
+            basket.append(
+                {
+                    "quantity": 1,
+                    "unit_price": float(tip_amount),
+                    "product_id": "tip",
+                    "description": "Tip",
+                }
+            )
+
+        bog_payload = {
+            "callback_url": _callback_url(request),
+            "external_order_id": external_id,
+            "payment_method": ["card"],
+            "purchase_units": {
+                "currency": "GEL",
+                "total_amount": float(amount),
+                "basket": basket,
+            },
+            "redirect_urls": _redirect_urls(return_url, external_id),
+        }
+        response = get_client().create_order(
+            bog_payload,
+            idempotency_key=external_id,
+        )
+        bog_order_id = response.get("id")
+        redirect_url = (response.get("_links") or {}).get("redirect", {}).get("href")
+        if not bog_order_id or not redirect_url:
+            raise BogClientError("BOG response missing id/redirect.href", payload=response)
+
+        txn = BogTransaction.objects.create(
+            bog_order_id=bog_order_id,
+            external_order_id=external_id,
+            flow_type=BogTransaction.FLOW_SESSION_SETTLE,
+            session=session_obj,
+            initiated_by=request.user if request.user.is_authenticated else None,
+            amount=amount,
+            currency="GEL",
+            status=BogTransaction.STATUS_CREATED,
+            redirect_url=redirect_url,
+            return_url=return_url,
+            callback_url=bog_payload["callback_url"],
+            request_payload=bog_payload,
+            response_payload=response,
+        )
+        txn.covered_orders.set(unpaid_orders)
+
+        return Response(
+            {
+                "success": True,
+                "data": {
+                    "bog_order_id": bog_order_id,
+                    "session_id": str(session_obj.id),
+                    "covered_order_numbers": [o.order_number for o in unpaid_orders],
+                    "amount": str(amount),
                     "redirect_url": redirect_url,
                 },
             },
@@ -631,6 +752,8 @@ class BogStatusView(APIView):
             "order_number": txn.order.order_number if txn.order else None,
             "reservation_id": str(txn.reservation_id) if txn.reservation_id else None,
             "payment_method_id": str(txn.payment_method_id) if txn.payment_method_id else None,
+            "session_id": str(txn.session_id) if txn.session_id else None,
+            "flow_type": txn.flow_type,
         }
         return Response(
             {"success": True, "data": BogStatusResponseSerializer(data).data},
@@ -738,6 +861,8 @@ def _apply_receipt(txn: BogTransaction, receipt: dict[str, Any], *, source: str)
             _apply_order_status(txn)
     elif txn.flow_type == BogTransaction.FLOW_ADD_CARD and not txn.payment_method_id:
         _apply_add_card_status(txn, payment_detail)
+    elif txn.flow_type == BogTransaction.FLOW_SESSION_SETTLE:
+        _apply_session_settle_status(txn)
 
     txn.save()
 
@@ -779,6 +904,37 @@ def _apply_order_status(txn: BogTransaction) -> None:
             to_status="cancelled",
             notes=f"Payment rejected: {txn.reject_reason or txn.code_description}",
         )
+
+
+def _apply_session_settle_status(txn: BogTransaction) -> None:
+    """
+    Record the aggregate settle in the Payment ledger. The covered orders'
+    kitchen status was never gated on this flow (guest orders go straight to
+    status=pending), so there's no order-level flip to do — the M2M link is
+    what the close-guard / orders_summary check for "is this paid?".
+    """
+    if not txn.is_successful:
+        return
+    if Payment.objects.filter(external_payment_id=txn.bog_order_id).exists():
+        return
+    # Attach the ledger row to the first covered order so it shows up in
+    # normal order-payment admin views. The bulk nature is captured by
+    # notes + the M2M.
+    anchor = txn.covered_orders.first()
+    if anchor is None:
+        return
+    payment = Payment.objects.create(
+        order=anchor,
+        customer=anchor.customer,
+        amount=txn.amount,
+        total_amount=txn.amount,
+        payment_method="card",
+        status="pending",
+        currency=txn.currency,
+        external_payment_id=txn.bog_order_id,
+        notes=f"Session settle — covers orders: {', '.join(o.order_number for o in txn.covered_orders.all())}",
+    )
+    payment.complete()
 
 
 def _apply_reservation_status(txn: BogTransaction) -> None:
