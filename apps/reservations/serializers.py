@@ -217,6 +217,7 @@ class ReservationDetailSerializer(serializers.ModelSerializer):
             "deposit_currency",
             "payment_status",
             "payment_code_description",
+            "pre_order",
             "can_cancel",
             "can_modify",
             "is_upcoming",
@@ -250,6 +251,25 @@ class ReservationDetailSerializer(serializers.ModelSerializer):
     def get_payment_code_description(self, obj) -> str:
         txn = _latest_bog_txn(obj)
         return txn.code_description if txn else ""
+
+    pre_order = serializers.SerializerMethodField()
+
+    def get_pre_order(self, obj):
+        """
+        Serialise the sibling Order linked to this reservation (if any).
+
+        A reservation can carry a pre-order when the guest paid for food at
+        booking time. The frontend renders these items inside the reservation
+        detail modal so users see what they ordered without visiting the
+        /orders/<number> page separately.
+        """
+        order = obj.orders.order_by("-created_at").first()
+        if order is None:
+            return None
+        # Lazy import to avoid circular import at module load.
+        from apps.orders.serializers import OrderSerializer
+
+        return OrderSerializer(order).data
 
 
 class ReservationCreateSerializer(serializers.ModelSerializer):
