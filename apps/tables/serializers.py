@@ -140,7 +140,9 @@ class TableSessionSerializer(serializers.ModelSerializer):
         counts + the grand total + the `all_terminal` flag staff use to
         decide whether "Close table" is safe.
         """
-        orders = list(obj.orders.prefetch_related("bog_transactions").all())
+        orders = list(
+            obj.orders.prefetch_related("bog_transactions", "settle_transactions").all()
+        )
         counts = {
             "pending_payment": 0,
             "pending": 0,
@@ -158,8 +160,10 @@ class TableSessionSerializer(serializers.ModelSerializer):
             counts[o.status] = counts.get(o.status, 0) + 1
             if o.total is not None:
                 grand_total += o.total
-            if o.status != "cancelled" and not any(
-                t.status == "completed" for t in o.bog_transactions.all()
+            if (
+                o.status != "cancelled"
+                and not any(t.status == "completed" for t in o.bog_transactions.all())
+                and not any(t.status == "completed" for t in o.settle_transactions.all())
             ):
                 unpaid_numbers.append(o.order_number)
                 if o.total is not None:
@@ -255,6 +259,7 @@ class TableSessionDetailSerializer(serializers.ModelSerializer):
     duration_minutes = serializers.IntegerField(read_only=True)
     restaurant_name = serializers.CharField(source="table.restaurant.name", read_only=True)
     restaurant_slug = serializers.CharField(source="table.restaurant.slug", read_only=True)
+    orders_summary = serializers.SerializerMethodField()
 
     class Meta:
         model = TableSession
@@ -273,8 +278,13 @@ class TableSessionDetailSerializer(serializers.ModelSerializer):
             "guests",
             "restaurant_name",
             "restaurant_slug",
+            "orders_summary",
         ]
         read_only_fields = fields
+
+    def get_orders_summary(self, obj):
+        # Reuse the dashboard serializer's method so the shape stays identical.
+        return TableSessionSerializer().get_orders_summary(obj)
 
 
 class JoinSessionSerializer(serializers.Serializer):

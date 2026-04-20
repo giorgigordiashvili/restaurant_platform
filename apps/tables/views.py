@@ -433,10 +433,15 @@ class TableSessionCloseView(APIView):
         # table can be released.
         force = str(request.data.get("force", "")).lower() in {"1", "true", "yes"}
         unpaid = [
-            o for o in session.orders.prefetch_related("bog_transactions").all()
+            o for o in session.orders.prefetch_related(
+                "bog_transactions", "settle_transactions"
+            ).all()
             if o.status != "cancelled"
             and not any(
                 t.status == "completed" for t in o.bog_transactions.all()
+            )
+            and not any(
+                t.status == "completed" for t in o.settle_transactions.all()
             )
         ]
         if unpaid and not force:
