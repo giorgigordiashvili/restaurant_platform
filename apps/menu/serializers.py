@@ -77,11 +77,12 @@ class MenuCategorySerializer(TranslatableModelSerializer):
             "id",
             "translations",
             "image",
+            "image_blurhash",
             "display_order",
             "is_active",
             "items_count",
         ]
-        read_only_fields = ["id", "items_count"]
+        read_only_fields = ["id", "items_count", "image_blurhash"]
 
     def get_items_count(self, obj):
         return obj.items_count
@@ -121,6 +122,7 @@ class MenuItemSerializer(TranslatableModelSerializer):
             "category_id",
             "price",
             "image",
+            "image_blurhash",
             "is_available",
             "is_featured",
             "display_order",
@@ -138,7 +140,7 @@ class MenuItemSerializer(TranslatableModelSerializer):
             "stock_quantity",
             "modifier_groups",
         ]
-        read_only_fields = ["id", "dietary_tags"]
+        read_only_fields = ["id", "dietary_tags", "image_blurhash"]
 
     def get_modifier_groups(self, obj):
         links = obj.modifier_groups_link.select_related("modifier_group").all()
@@ -163,6 +165,7 @@ class MenuItemListSerializer(TranslatableModelSerializer):
             "translations",
             "price",
             "image",
+            "image_blurhash",
             "is_available",
             "is_featured",
             "dietary_tags",

@@ -42,8 +42,9 @@ class RestaurantCategorySerializer(TranslatableModelSerializer):
             "slug",
             "icon",
             "image",
+            "image_blurhash",
         ]
-        read_only_fields = ["id", "slug"]
+        read_only_fields = ["id", "slug", "image_blurhash"]
 
 
 class AmenitySerializer(TranslatableModelSerializer):
@@ -99,6 +100,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
             "slug",
             "description",
             "logo",
+            "logo_blurhash",
             "city",
             "city_obj",
             "category",
@@ -166,7 +168,9 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
             "longitude",
             # Branding
             "logo",
+            "logo_blurhash",
             "cover_image",
+            "cover_image_blurhash",
             "primary_color",
             "secondary_color",
             # Settings
