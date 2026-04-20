@@ -445,7 +445,37 @@ class CustomerOrderCreateView(APIView):
         table = None
         session = None
 
-        if data.get("table_id"):
+        if data.get("session_id"):
+            try:
+                session = TableSession.objects.get(
+                    id=data["session_id"],
+                    table__restaurant=restaurant,
+                )
+            except TableSession.DoesNotExist:
+                return Response(
+                    {
+                        "success": False,
+                        "error": {
+                            "code": "session_not_found",
+                            "message": "Table session not found.",
+                        },
+                    },
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+            if session.status != "active":
+                return Response(
+                    {
+                        "success": False,
+                        "error": {
+                            "code": "session_closed",
+                            "message": "This table session has ended. Scan a new QR to start over.",
+                        },
+                    },
+                    status=status.HTTP_410_GONE,
+                )
+            table = session.table
+
+        if data.get("table_id") and table is None:
             try:
                 table = Table.objects.get(id=data["table_id"], restaurant=restaurant)
             except Table.DoesNotExist:

@@ -114,6 +114,7 @@ class TableSessionSerializer(serializers.ModelSerializer):
 
     table_number = serializers.CharField(source="table.number", read_only=True)
     duration_minutes = serializers.IntegerField(read_only=True)
+    orders_summary = serializers.SerializerMethodField()
 
     class Meta:
         model = TableSession
@@ -129,8 +130,42 @@ class TableSessionSerializer(serializers.ModelSerializer):
             "closed_at",
             "notes",
             "duration_minutes",
+            "orders_summary",
         ]
         read_only_fields = ["id", "host", "started_at", "closed_at", "duration_minutes"]
+
+    def get_orders_summary(self, obj):
+        """
+        Per-session orders roll-up for the POS "Tables" tab. Returns status
+        counts + the grand total + the `all_terminal` flag staff use to
+        decide whether "Close table" is safe.
+        """
+        orders = list(obj.orders.all())
+        counts = {
+            "pending_payment": 0,
+            "pending": 0,
+            "confirmed": 0,
+            "preparing": 0,
+            "ready": 0,
+            "served": 0,
+            "completed": 0,
+            "cancelled": 0,
+        }
+        grand_total = 0
+        for o in orders:
+            counts[o.status] = counts.get(o.status, 0) + 1
+            if o.total is not None:
+                grand_total += o.total
+        non_terminal = sum(
+            counts[s] for s in ("pending_payment", "pending", "confirmed", "preparing", "ready")
+        )
+        return {
+            "counts": counts,
+            "total_orders": len(orders),
+            "non_terminal": non_terminal,
+            "grand_total": str(grand_total),
+            "all_terminal": non_terminal == 0 and len(orders) > 0,
+        }
 
 
 class TableSessionCreateSerializer(serializers.Serializer):

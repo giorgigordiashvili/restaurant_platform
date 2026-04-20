@@ -222,10 +222,25 @@ class InitiatePaymentView(APIView):
             except Table.DoesNotExist as exc:
                 raise ValueError("Table not found") from exc
 
+        session_id = payload.get("table_session")
+        if session_id:
+            from apps.tables.models import TableSession
+
+            try:
+                session_obj = TableSession.objects.get(
+                    id=session_id, table__restaurant=restaurant
+                )
+            except TableSession.DoesNotExist as exc:
+                raise ValueError("Table session not found.") from exc
+            if session_obj.status != "active":
+                raise ValueError(
+                    "This table session has ended. Scan a new QR to start over."
+                )
+
         order = Order.objects.create(
             restaurant=restaurant,
             table=table,
-            table_session_id=payload.get("table_session"),
+            table_session_id=session_id,
             customer=request.user if request.user.is_authenticated else None,
             order_type=payload.get("order_type", "dine_in"),
             status="pending_payment",
