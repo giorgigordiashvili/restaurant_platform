@@ -52,6 +52,10 @@ class TenantAdminSite(UnfoldAdminSite):
         # Payments
         "payment": "payments",
         "refund": "payments",
+        # Loyalty — piggybacks on the menu-manager permission bucket.
+        "loyaltyprogram": "menu",
+        "loyaltycounter": "menu",
+        "loyaltyredemption": "menu",
     }
 
     def has_permission(self, request):
