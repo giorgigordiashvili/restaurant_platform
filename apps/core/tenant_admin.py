@@ -691,9 +691,32 @@ class RestaurantHoursInline(UnfoldTabularInline):
     """Inline for restaurant operating hours."""
 
     model = RestaurantHours
-    extra = 0
+    extra = 7  # preload a row per weekday so new restaurants aren't empty
     max_num = 7
     ordering = ["day_of_week"]
+
+    # Tenant staff authenticate via StaffMember, not Django auth perms,
+    # so the default InlineModelAdmin permission checks (which want
+    # `tenants.view_restauranthours` etc.) return False and the whole
+    # inline silently disappears from the Restaurant edit page.
+    # Anyone with permission to edit the parent Restaurant can edit its
+    # hours — gate on that, not on model-level Django perms.
+    def _parent_editable(self, request):
+        return request.user.is_authenticated and (
+            request.user.is_superuser or getattr(request, "restaurant", None) is not None
+        )
+
+    def has_view_permission(self, request, obj=None):
+        return self._parent_editable(request)
+
+    def has_change_permission(self, request, obj=None):
+        return self._parent_editable(request)
+
+    def has_add_permission(self, request, obj=None):
+        return self._parent_editable(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return self._parent_editable(request)
 
 
 class RestaurantSettingsAdmin(UnfoldModelAdmin):
