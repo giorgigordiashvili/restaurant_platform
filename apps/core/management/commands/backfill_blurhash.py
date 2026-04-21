@@ -15,7 +15,6 @@ from django.core.management.base import BaseCommand
 
 from apps.core.blurhash_utils import generate_blurhash
 
-
 TARGETS = [
     # (app_label, model_name, image_field, blurhash_field)
     ("menu", "MenuCategory", "image", "image_blurhash"),
@@ -57,8 +56,7 @@ class Command(BaseCommand):
             )
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"Enqueued on Celery as task {result.id}. "
-                    "Watch 'celery worker' logs (or flower) for progress."
+                    f"Enqueued on Celery as task {result.id}. " "Watch 'celery worker' logs (or flower) for progress."
                 )
             )
             return

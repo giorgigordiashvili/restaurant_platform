@@ -197,8 +197,10 @@ class TableQRCode(TimeStampedModel):
     def generate_qr_image(self):
         """Generate and save QR code image."""
         import io
-        import qrcode
+
         from django.core.files.base import ContentFile
+
+        import qrcode
 
         # Create QR code
         qr = qrcode.QRCode(

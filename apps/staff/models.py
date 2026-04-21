@@ -5,8 +5,8 @@ Staff models for restaurant personnel management.
 import secrets
 
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
 

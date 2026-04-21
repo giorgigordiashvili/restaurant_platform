@@ -47,6 +47,7 @@ class BogOrderItemSerializer(serializers.Serializer):
             raise serializers.ValidationError("One or more modifiers not found or unavailable.")
         return modifiers
 
+
 ALLOWED_RETURN_SCHEMES = {"http", "https"}
 
 
@@ -94,9 +95,7 @@ class OrderPayloadSerializer(serializers.Serializer):
     customer_email = serializers.EmailField(required=False, allow_blank=True, default="")
     customer_notes = serializers.CharField(required=False, allow_blank=True, default="")
     delivery_address = serializers.CharField(required=False, allow_blank=True, default="")
-    tip_amount = serializers.DecimalField(
-        max_digits=10, decimal_places=2, min_value=0, required=False, default=0
-    )
+    tip_amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0, required=False, default=0)
     items = BogOrderItemSerializer(many=True)
 
     def validate_items(self, value):
@@ -134,9 +133,7 @@ class SessionSettlePayloadSerializer(serializers.Serializer):
 
     restaurant_slug = serializers.SlugField(max_length=100)
     session_id = serializers.UUIDField()
-    tip_amount = serializers.DecimalField(
-        max_digits=10, decimal_places=2, min_value=0, required=False, default=0
-    )
+    tip_amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0, required=False, default=0)
 
 
 class InitiatePaymentSerializer(ReturnURLMixin, serializers.Serializer):
@@ -159,17 +156,13 @@ class InitiatePaymentSerializer(ReturnURLMixin, serializers.Serializer):
     def validate(self, attrs):
         target = attrs["target"]
         if target == self.TARGET_ORDER and "order_payload" not in attrs:
-            raise serializers.ValidationError(
-                {"order_payload": "order_payload is required when target='order'."}
-            )
+            raise serializers.ValidationError({"order_payload": "order_payload is required when target='order'."})
         if target == self.TARGET_RESERVATION and "reservation_payload" not in attrs:
             raise serializers.ValidationError(
                 {"reservation_payload": "reservation_payload is required when target='reservation'."}
             )
         if target == self.TARGET_SESSION and "session_payload" not in attrs:
-            raise serializers.ValidationError(
-                {"session_payload": "session_payload is required when target='session'."}
-            )
+            raise serializers.ValidationError({"session_payload": "session_payload is required when target='session'."})
         return attrs
 
 

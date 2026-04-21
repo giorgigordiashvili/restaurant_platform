@@ -2,7 +2,7 @@
 Public restaurant discovery views.
 """
 
-from datetime import datetime, time, timedelta
+from datetime import datetime
 
 from django.db.models import Q
 from django.utils import timezone
@@ -16,9 +16,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 
 from .filters import RestaurantFilter
-from .models import City, Restaurant
+from .models import Amenity, City, Restaurant, RestaurantCategory
 from .serializers import (
-    CitySerializer,
+    AmenitySerializer,
+    RestaurantCategorySerializer,
     RestaurantCreateSerializer,
     RestaurantDetailSerializer,
     RestaurantHoursSerializer,
@@ -39,9 +40,7 @@ class RestaurantListView(generics.ListAPIView):
     ordering = ["-average_rating"]
 
     def get_queryset(self):
-        return Restaurant.objects.filter(is_active=True).select_related(
-            "city_obj"
-        ).prefetch_related("operating_hours")
+        return Restaurant.objects.filter(is_active=True).select_related("city_obj").prefetch_related("operating_hours")
 
 
 @extend_schema(tags=["Restaurants"])
@@ -107,6 +106,30 @@ class RestaurantCreateView(generics.CreateAPIView):
 
 
 @extend_schema(tags=["Restaurants"])
+class RestaurantCategoryListView(generics.ListAPIView):
+    """Public list of active restaurant categories — used by the signup form."""
+
+    serializer_class = RestaurantCategorySerializer
+    permission_classes = [AllowAny]
+    pagination_class = None
+
+    def get_queryset(self):
+        return RestaurantCategory.objects.filter(is_active=True).order_by("display_order", "slug")
+
+
+@extend_schema(tags=["Restaurants"])
+class AmenityListView(generics.ListAPIView):
+    """Public list of active amenities."""
+
+    serializer_class = AmenitySerializer
+    permission_classes = [AllowAny]
+    pagination_class = None
+
+    def get_queryset(self):
+        return Amenity.objects.filter(is_active=True).order_by("display_order", "slug")
+
+
+@extend_schema(tags=["Restaurants"])
 class RestaurantCitiesView(APIView):
     """List all cities available for restaurant selection."""
 
@@ -115,17 +138,14 @@ class RestaurantCitiesView(APIView):
     def get(self, request):
         try:
             cities = list(
-                City.objects.filter(is_active=True)
-                .order_by("display_order", "slug")
-                .values("id", "slug", "country")
+                City.objects.filter(is_active=True).order_by("display_order", "slug").values("id", "slug", "country")
             )
 
             # Fetch translations separately
             from django.db import connection
+
             with connection.cursor() as cursor:
-                cursor.execute(
-                    "SELECT master_id, language_code, name FROM cities_translation"
-                )
+                cursor.execute("SELECT master_id, language_code, name FROM cities_translation")
                 translations = cursor.fetchall()
 
             # Build translation map
@@ -167,9 +187,7 @@ class RestaurantSearchSerializer(serializers.Serializer):
     city = serializers.CharField(required=False, help_text="City name (case-insensitive)")
     date = serializers.DateField(required=False, help_text="Reservation date (YYYY-MM-DD)")
     time = serializers.TimeField(required=False, help_text="Desired reservation time (HH:MM)")
-    party_size = serializers.IntegerField(
-        required=False, min_value=1, max_value=50, help_text="Number of guests"
-    )
+    party_size = serializers.IntegerField(required=False, min_value=1, max_value=50, help_text="Number of guests")
     search = serializers.CharField(required=False, help_text="Search by restaurant name")
 
 
@@ -179,9 +197,7 @@ class RestaurantSearchSerializer(serializers.Serializer):
         OpenApiParameter(name="city", type=str, required=False, description="City name"),
         OpenApiParameter(name="date", type=str, required=False, description="Date (YYYY-MM-DD)"),
         OpenApiParameter(name="time", type=str, required=False, description="Time (HH:MM)"),
-        OpenApiParameter(
-            name="party_size", type=int, required=False, description="Number of guests"
-        ),
+        OpenApiParameter(name="party_size", type=int, required=False, description="Number of guests"),
         OpenApiParameter(name="search", type=str, required=False, description="Search by name"),
     ],
 )
@@ -211,9 +227,11 @@ class RestaurantSearchView(APIView):
         party_size = data.get("party_size")
         search = data.get("search")
 
-        qs = Restaurant.objects.filter(is_active=True).select_related(
-            "city_obj"
-        ).prefetch_related("operating_hours", "amenities", "category")
+        qs = (
+            Restaurant.objects.filter(is_active=True)
+            .select_related("city_obj")
+            .prefetch_related("operating_hours", "amenities", "category")
+        )
 
         # Filter by city
         if city:

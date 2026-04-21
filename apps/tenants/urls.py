@@ -12,6 +12,8 @@ from apps.menu.views import (
 )
 
 from .views import (
+    AmenityListView,
+    RestaurantCategoryListView,
     RestaurantCitiesView,
     RestaurantCreateView,
     RestaurantDetailView,
@@ -24,6 +26,8 @@ app_name = "restaurants"
 
 urlpatterns = [
     path("", RestaurantListView.as_view(), name="list"),
+    path("categories/", RestaurantCategoryListView.as_view(), name="categories"),
+    path("amenities/", AmenityListView.as_view(), name="amenities"),
     path("cities/", RestaurantCitiesView.as_view(), name="cities"),
     path("search/", RestaurantSearchView.as_view(), name="search"),
     path("create/", RestaurantCreateView.as_view(), name="create"),

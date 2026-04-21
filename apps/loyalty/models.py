@@ -39,9 +39,7 @@ class LoyaltyProgram(TimeStampedModel):
         related_name="loyalty_trigger_programs",
         help_text="Buying this item earns punches.",
     )
-    threshold = models.PositiveIntegerField(
-        default=5, help_text="Punches required to unlock the reward."
-    )
+    threshold = models.PositiveIntegerField(default=5, help_text="Punches required to unlock the reward.")
     reward_item = models.ForeignKey(
         "menu.MenuItem",
         on_delete=models.PROTECT,
@@ -158,9 +156,7 @@ class LoyaltyRedemption(TimeStampedModel):
     phone_number = models.CharField(max_length=32, blank=True, default="")
 
     code = models.CharField(max_length=64, unique=True, db_index=True)
-    status = models.CharField(
-        max_length=16, choices=STATUS_CHOICES, default=STATUS_PENDING, db_index=True
-    )
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=STATUS_PENDING, db_index=True)
     issued_at = models.DateTimeField(default=timezone.now)
     expires_at = models.DateTimeField()
 

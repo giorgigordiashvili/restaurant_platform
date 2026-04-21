@@ -2,21 +2,18 @@
 Tests for multi-tenant admin functionality.
 """
 
-import pytest
 from django.contrib.admin.sites import AdminSite
 from django.test import RequestFactory
 
+import pytest
+
 from apps.core.admin import (
-    ExportMixin,
     ReadOnlyAdminMixin,
     SuperadminOnlyMixin,
     TenantAwareModelAdmin,
-    TenantSimulatorMixin,
     make_active,
     make_inactive,
 )
-from apps.orders.models import Order
-from apps.staff.models import StaffMember, StaffRole
 from apps.tables.models import Table
 
 
@@ -165,8 +162,8 @@ class TestExportMixin:
 
     def test_export_csv(self, superuser_request, restaurant, create_table):
         """Test CSV export action."""
-        t1 = create_table(restaurant=restaurant, number="T1")
-        t2 = create_table(restaurant=restaurant, number="T2")
+        create_table(restaurant=restaurant, number="T1")
+        create_table(restaurant=restaurant, number="T2")
 
         admin = TenantAwareModelAdmin(Table, AdminSite())
         queryset = Table.objects.filter(restaurant=restaurant)
@@ -180,7 +177,7 @@ class TestExportMixin:
 
     def test_export_json(self, superuser_request, restaurant, create_table):
         """Test JSON export action."""
-        t1 = create_table(restaurant=restaurant, number="T1")
+        create_table(restaurant=restaurant, number="T1")
 
         admin = TenantAwareModelAdmin(Table, AdminSite())
         queryset = Table.objects.filter(restaurant=restaurant)
@@ -263,8 +260,8 @@ class TestNestedTenantField:
         table2 = create_table(restaurant=restaurant, number="T2")
 
         # Create QR codes
-        qr1 = TableQRCode.objects.create(table=table1, code="qr1")
-        qr2 = TableQRCode.objects.create(table=table2, code="qr2")
+        TableQRCode.objects.create(table=table1, code="qr1")
+        TableQRCode.objects.create(table=table2, code="qr2")
 
         # Without simulation, superuser sees all
         admin = TableQRCodeAdmin(TableQRCode, AdminSite())

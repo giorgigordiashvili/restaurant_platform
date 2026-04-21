@@ -301,9 +301,7 @@ _bog_oauth_default = (
     if BOG_SANDBOX
     else "https://oauth2.bog.ge/auth/realms/bog/protocol/openid-connect/token"
 )
-_bog_api_default = (
-    "https://api-sandbox.bog.ge/payments/v1" if BOG_SANDBOX else "https://api.bog.ge/payments/v1"
-)
+_bog_api_default = "https://api-sandbox.bog.ge/payments/v1" if BOG_SANDBOX else "https://api.bog.ge/payments/v1"
 BOG_OAUTH_URL = config("BOG_OAUTH_URL", default=_bog_oauth_default)
 BOG_API_URL = config("BOG_API_URL", default=_bog_api_default)
 

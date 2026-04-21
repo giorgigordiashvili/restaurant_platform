@@ -57,9 +57,7 @@ class LoyaltyProgramWriteSerializer(LoyaltyProgramSerializer):
         restaurant = self.context.get("restaurant")
         for field_name, item in (("trigger_item", trigger), ("reward_item", reward)):
             if item and restaurant and item.restaurant_id != restaurant.id:
-                raise serializers.ValidationError(
-                    {field_name: "Item must belong to this restaurant."}
-                )
+                raise serializers.ValidationError({field_name: "Item must belong to this restaurant."})
         if attrs.get("threshold") is not None and attrs["threshold"] < 1:
             raise serializers.ValidationError({"threshold": "Must be at least 1."})
         return attrs

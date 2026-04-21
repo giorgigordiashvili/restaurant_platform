@@ -13,9 +13,7 @@ class TestRestaurantListViewWithTranslations:
 
     url = "/api/v1/restaurants/"
 
-    def test_list_includes_category_translations(
-        self, api_client, restaurant_with_category_and_amenities
-    ):
+    def test_list_includes_category_translations(self, api_client, restaurant_with_category_and_amenities):
         """Test that restaurant list includes category with translations."""
         response = api_client.get(self.url)
         assert response.status_code == status.HTTP_200_OK
@@ -25,9 +23,7 @@ class TestRestaurantListViewWithTranslations:
         assert restaurant_data["category"] is not None
         assert "translations" in restaurant_data["category"]
 
-    def test_list_includes_amenities_translations(
-        self, api_client, restaurant_with_category_and_amenities
-    ):
+    def test_list_includes_amenities_translations(self, api_client, restaurant_with_category_and_amenities):
         """Test that restaurant list includes amenities with translations."""
         response = api_client.get(self.url)
         assert response.status_code == status.HTTP_200_OK
@@ -37,9 +33,7 @@ class TestRestaurantListViewWithTranslations:
         assert len(restaurant_data["amenities"]) >= 1
         assert "translations" in restaurant_data["amenities"][0]
 
-    def test_list_with_language_parameter(
-        self, api_client, restaurant_with_category_and_amenities
-    ):
+    def test_list_with_language_parameter(self, api_client, restaurant_with_category_and_amenities):
         """Test restaurant list with ?lang= parameter."""
         # Request with English
         response = api_client.get(self.url, {"lang": "en"})
@@ -51,13 +45,9 @@ class TestRestaurantListViewWithTranslations:
         assert response.status_code == status.HTTP_200_OK
         assert response.headers.get("Content-Language") == "ka"
 
-    def test_list_with_accept_language_header(
-        self, api_client, restaurant_with_category_and_amenities
-    ):
+    def test_list_with_accept_language_header(self, api_client, restaurant_with_category_and_amenities):
         """Test restaurant list with Accept-Language header."""
-        response = api_client.get(
-            self.url, HTTP_ACCEPT_LANGUAGE="en,ka;q=0.9"
-        )
+        response = api_client.get(self.url, HTTP_ACCEPT_LANGUAGE="en,ka;q=0.9")
         assert response.status_code == status.HTTP_200_OK
         assert response.headers.get("Content-Language") == "en"
 
@@ -66,9 +56,7 @@ class TestRestaurantListViewWithTranslations:
 class TestRestaurantDetailViewWithTranslations:
     """Tests for restaurant detail endpoint with translated category and amenities."""
 
-    def test_detail_includes_category_translations(
-        self, api_client, restaurant_with_category_and_amenities
-    ):
+    def test_detail_includes_category_translations(self, api_client, restaurant_with_category_and_amenities):
         """Test that restaurant detail includes category with translations."""
         url = f"/api/v1/restaurants/{restaurant_with_category_and_amenities.slug}/"
         response = api_client.get(url)
@@ -78,9 +66,7 @@ class TestRestaurantDetailViewWithTranslations:
         assert response.data["category"] is not None
         assert "translations" in response.data["category"]
 
-    def test_detail_includes_amenities_translations(
-        self, api_client, restaurant_with_category_and_amenities
-    ):
+    def test_detail_includes_amenities_translations(self, api_client, restaurant_with_category_and_amenities):
         """Test that restaurant detail includes amenities with translations."""
         url = f"/api/v1/restaurants/{restaurant_with_category_and_amenities.slug}/"
         response = api_client.get(url)
@@ -90,9 +76,7 @@ class TestRestaurantDetailViewWithTranslations:
         assert len(response.data["amenities"]) >= 1
         assert "translations" in response.data["amenities"][0]
 
-    def test_detail_with_language_parameter(
-        self, api_client, restaurant_with_category_and_amenities
-    ):
+    def test_detail_with_language_parameter(self, api_client, restaurant_with_category_and_amenities):
         """Test restaurant detail with ?lang= parameter."""
         url = f"/api/v1/restaurants/{restaurant_with_category_and_amenities.slug}/"
 

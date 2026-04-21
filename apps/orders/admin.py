@@ -46,9 +46,7 @@ class OrderAdmin(TenantAwareModelAdmin):
 
     @admin.action(description="Mark selected orders as completed")
     def mark_completed(self, request, queryset):
-        updated = queryset.filter(status__in=["pending", "confirmed", "preparing", "ready"]).update(
-            status="completed"
-        )
+        updated = queryset.filter(status__in=["pending", "confirmed", "preparing", "ready"]).update(status="completed")
         self.message_user(request, f"{updated} order(s) marked as completed.")
 
 

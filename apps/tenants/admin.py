@@ -11,7 +11,6 @@ from apps.core.admin import ExportMixin, SuperadminOnlyMixin, make_active, make_
 
 from .models import Amenity, City, Restaurant, RestaurantCategory, RestaurantHours
 
-
 # Unfold input styling classes for superadmin
 UNFOLD_INPUT_CLASSES = (
     "border border-base-200 bg-white font-medium min-w-20 placeholder-base-400 "
@@ -35,8 +34,6 @@ class StyledTranslatableAdmin(SuperadminOnlyMixin, UnfoldModelAdmin, Translatabl
     TranslatableAdmin for superadmin with parler translation support.
     """
 
-    pass
-
 
 @admin.register(City)
 class CityAdmin(StyledTranslatableAdmin):
@@ -55,6 +52,7 @@ class CityAdmin(StyledTranslatableAdmin):
 
     def name(self, obj):
         return obj.safe_translation_getter("name", default="-")
+
     name.short_description = "Name"
 
     @admin.display(description="Restaurants")
@@ -79,6 +77,7 @@ class RestaurantCategoryAdmin(StyledTranslatableAdmin):
 
     def name(self, obj):
         return obj.safe_translation_getter("name", default="-")
+
     name.short_description = "Name"
 
     @admin.display(description="Restaurants")
@@ -103,6 +102,7 @@ class AmenityAdmin(StyledTranslatableAdmin):
 
     def name(self, obj):
         return obj.safe_translation_getter("name", default="-")
+
     name.short_description = "Name"
 
 
@@ -120,7 +120,17 @@ class RestaurantAdmin(SuperadminOnlyMixin, ExportMixin, UnfoldModelAdmin):
     This is the root tenant model, so no tenant_field needed.
     """
 
-    list_display = ["name", "slug", "category", "city", "is_active", "owner", "average_rating", "total_orders", "created_at"]
+    list_display = [
+        "name",
+        "slug",
+        "category",
+        "city",
+        "is_active",
+        "owner",
+        "average_rating",
+        "total_orders",
+        "created_at",
+    ]
     list_filter = ["is_active", "category", "city", "country", "default_currency", "created_at"]
     search_fields = ["name", "slug", "email", "phone", "city", "owner__email"]
     prepopulated_fields = {"slug": ("name",)}

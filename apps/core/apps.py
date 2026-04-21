@@ -12,7 +12,7 @@ def _patch_unfold_flatten_context():
     """
     from django.template.context import BaseContext
 
-    _original_flatten = BaseContext.flatten
+    BaseContext.flatten
 
     def _safe_flatten(self):
         flat = {}
@@ -35,21 +35,21 @@ class CoreConfig(AppConfig):
         """Configure admin sites and register models."""
         _patch_unfold_flatten_context()
         from django.contrib import admin
-        from django.contrib.auth.admin import UserAdmin
 
-        # Import tenant_admin to register models with tenant_admin_site
-        from apps.core import tenant_admin  # noqa: F401
+        # Import admin classes
+        from apps.accounts.admin import UserAdmin as CustomUserAdmin
+        from apps.accounts.admin import UserProfileAdmin
 
         # Manually register models with admin.site since unfold may have
         # replaced it after Django's autodiscovery ran
         from apps.accounts.models import User, UserProfile
-        from apps.tenants.models import Restaurant, RestaurantHours
+        from apps.audit.admin import AuditLogAdmin
         from apps.audit.models import AuditLog
 
-        # Import admin classes
-        from apps.accounts.admin import UserAdmin as CustomUserAdmin, UserProfileAdmin
+        # Import tenant_admin to register models with tenant_admin_site
+        from apps.core import tenant_admin  # noqa: F401
         from apps.tenants.admin import RestaurantAdmin, RestaurantHoursAdmin
-        from apps.audit.admin import AuditLogAdmin
+        from apps.tenants.models import Restaurant, RestaurantHours
 
         # Register if not already registered
         if User not in admin.site._registry:

@@ -14,11 +14,11 @@ import json
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils import timezone
+
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
 from apps.staff.models import StaffMember
 from apps.tenants.models import Restaurant
-
 
 # Customize the default admin site
 admin.site.site_header = "Restaurant Platform Admin"
@@ -281,8 +281,6 @@ class TenantAwareReadOnlyAdmin(SuperadminOnlyMixin, ReadOnlyAdminMixin, TenantAw
     Read-only admin for superusers only.
     Perfect for audit logs and sensitive data.
     """
-
-    pass
 
 
 # Bulk action helpers

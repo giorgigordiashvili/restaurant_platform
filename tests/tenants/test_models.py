@@ -185,9 +185,9 @@ class TestRestaurantCategoryModel:
 
     def test_category_ordering(self, create_restaurant_category):
         """Test categories are ordered by display_order."""
-        cat3 = create_restaurant_category(name="Third", slug="third", display_order=3)
-        cat1 = create_restaurant_category(name="First", slug="first", display_order=1)
-        cat2 = create_restaurant_category(name="Second", slug="second", display_order=2)
+        create_restaurant_category(name="Third", slug="third", display_order=3)
+        create_restaurant_category(name="First", slug="first", display_order=1)
+        create_restaurant_category(name="Second", slug="second", display_order=2)
 
         categories = list(RestaurantCategory.objects.all())
         assert categories[0].display_order == 1
@@ -265,9 +265,9 @@ class TestAmenityModel:
 
     def test_amenity_ordering(self, create_amenity):
         """Test amenities are ordered by display_order."""
-        am3 = create_amenity(name="Third", slug="third", display_order=3)
-        am1 = create_amenity(name="First", slug="first", display_order=1)
-        am2 = create_amenity(name="Second", slug="second", display_order=2)
+        create_amenity(name="Third", slug="third", display_order=3)
+        create_amenity(name="First", slug="first", display_order=1)
+        create_amenity(name="Second", slug="second", display_order=2)
 
         amenities = list(Amenity.objects.all())
         assert amenities[0].display_order == 1

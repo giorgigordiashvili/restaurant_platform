@@ -140,9 +140,7 @@ class OrderCreateSerializer(serializers.Serializer):
     customer_email = serializers.EmailField(required=False, allow_blank=True)
     customer_notes = serializers.CharField(required=False, allow_blank=True)
     delivery_address = serializers.CharField(required=False, allow_blank=True)
-    tip_amount = serializers.DecimalField(
-        max_digits=10, decimal_places=2, min_value=0, required=False, default=0
-    )
+    tip_amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0, required=False, default=0)
     items = OrderItemCreateSerializer(many=True, min_length=1)
 
     def validate(self, data):

@@ -8,6 +8,7 @@ checked against the user's StaffRole.
 
 from django import forms
 from django.contrib import admin
+
 from parler.admin import TranslatableAdmin, TranslatableTabularInline
 from parler.forms import TranslatableModelForm
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
@@ -43,18 +44,17 @@ class UnfoldTranslatableModelForm(TranslatableModelForm):
                 field.widget.attrs.setdefault("class", "")
                 field.widget.attrs["class"] += " " + UNFOLD_INPUT_CLASSES
 
+
+from apps.loyalty.models import LoyaltyCounter, LoyaltyProgram, LoyaltyRedemption
+
 # Import models
 from apps.menu.models import MenuCategory, MenuItem, MenuItemModifierGroup, Modifier, ModifierGroup
-from apps.orders.models import Order, OrderItem, OrderStatusHistory
 from apps.reservations.models import (
-    Reservation,
-    ReservationBlockedTime,
     ReservationSettings,
 )
-from apps.loyalty.models import LoyaltyCounter, LoyaltyProgram, LoyaltyRedemption
 from apps.staff.models import StaffInvitation, StaffMember, StaffRole
 from apps.tables.models import Table, TableQRCode, TableSection, TableSession
-from apps.tenants.models import Amenity, Restaurant, RestaurantCategory, RestaurantHours
+from apps.tenants.models import Restaurant, RestaurantHours
 
 
 class TenantModelAdmin(UnfoldModelAdmin):
@@ -102,9 +102,7 @@ class TenantModelAdmin(UnfoldModelAdmin):
             return {"*": ["create", "read", "update", "delete"]}
 
         try:
-            staff = request.user.staff_memberships.get(
-                restaurant=restaurant, is_active=True
-            )
+            staff = request.user.staff_memberships.get(restaurant=restaurant, is_active=True)
             return staff.get_effective_permissions()
         except Exception:
             return {}
@@ -245,14 +243,16 @@ class ModifierInline(TranslatableTabularInline):
     def get_formset(self, request, obj=None, **kwargs):
         """Apply styling to inline form fields."""
         formset = super().get_formset(request, obj, **kwargs)
-        if hasattr(formset, 'form') and hasattr(formset.form, 'base_fields'):
+        if hasattr(formset, "form") and hasattr(formset.form, "base_fields"):
             for field_name in formset.form.base_fields:
                 field = formset.form.base_fields[field_name]
-                if hasattr(field.widget, 'attrs'):
+                if hasattr(field.widget, "attrs"):
                     if isinstance(field.widget, forms.Textarea):
-                        field.widget.attrs['class'] = field.widget.attrs.get('class', '') + ' ' + UNFOLD_TEXTAREA_CLASSES
+                        field.widget.attrs["class"] = (
+                            field.widget.attrs.get("class", "") + " " + UNFOLD_TEXTAREA_CLASSES
+                        )
                     elif isinstance(field.widget, (forms.TextInput, forms.NumberInput)):
-                        field.widget.attrs['class'] = field.widget.attrs.get('class', '') + ' ' + UNFOLD_INPUT_CLASSES
+                        field.widget.attrs["class"] = field.widget.attrs.get("class", "") + " " + UNFOLD_INPUT_CLASSES
         return formset
 
 
@@ -277,13 +277,19 @@ class ModifierGroupTenantAdmin(TenantTranslatableAdmin):
     # Note: name and description are translated fields handled by parler
     # They will appear in the language tabs automatically
     fieldsets = (
-        ("Selection Rules", {
-            "fields": ("selection_type", "is_required", "min_selections", "max_selections"),
-            "description": "Single = radio buttons (pick one), Multiple = checkboxes (pick many)",
-        }),
-        ("Display", {
-            "fields": ("display_order", "is_active"),
-        }),
+        (
+            "Selection Rules",
+            {
+                "fields": ("selection_type", "is_required", "min_selections", "max_selections"),
+                "description": "Single = radio buttons (pick one), Multiple = checkboxes (pick many)",
+            },
+        ),
+        (
+            "Display",
+            {
+                "fields": ("display_order", "is_active"),
+            },
+        ),
     )
 
     @admin.display(description="Options")
@@ -462,16 +468,20 @@ class TableQRCodeTenantAdmin(TenantModelAdmin):
     readonly_fields = ["code", "scans_count", "last_scanned_at", "qr_code_display", "qr_url_display"]
     ordering = ["table__number"]
     fieldsets = (
-        (None, {
-            "fields": ("table", "name", "is_active")
-        }),
-        ("QR Code", {
-            "fields": ("qr_code_display", "qr_url_display", "code"),
-            "description": "QR code is auto-generated when you save.",
-        }),
-        ("Statistics", {
-            "fields": ("scans_count", "last_scanned_at"),
-        }),
+        (None, {"fields": ("table", "name", "is_active")}),
+        (
+            "QR Code",
+            {
+                "fields": ("qr_code_display", "qr_url_display", "code"),
+                "description": "QR code is auto-generated when you save.",
+            },
+        ),
+        (
+            "Statistics",
+            {
+                "fields": ("scans_count", "last_scanned_at"),
+            },
+        ),
     )
 
     def get_queryset(self, request):
@@ -486,12 +496,13 @@ class TableQRCodeTenantAdmin(TenantModelAdmin):
     def qr_code_display(self, obj):
         """Display QR code image in detail view."""
         from django.utils.html import format_html
+
         if obj.qr_image:
             return format_html(
                 '<img src="{}" style="max-width: 200px; max-height: 200px; border: 1px solid #ccc; padding: 10px; background: white;" />'
                 '<br><a href="{}" download class="button" style="margin-top: 10px; display: inline-block;">Download QR Code</a>',
                 obj.qr_image.url,
-                obj.qr_image.url
+                obj.qr_image.url,
             )
         return "QR code will be generated after save"
 
@@ -499,6 +510,7 @@ class TableQRCodeTenantAdmin(TenantModelAdmin):
     def qr_url_display(self, obj):
         """Display the URL encoded in the QR code."""
         from django.utils.html import format_html
+
         url = obj.get_qr_url()
         return format_html('<a href="{}" target="_blank">{}</a>', url, url)
 
@@ -506,22 +518,18 @@ class TableQRCodeTenantAdmin(TenantModelAdmin):
     def qr_preview(self, obj):
         """Small QR preview for list view."""
         from django.utils.html import format_html
+
         if obj.qr_image:
-            return format_html(
-                '<img src="{}" style="width: 50px; height: 50px;" />',
-                obj.qr_image.url
-            )
+            return format_html('<img src="{}" style="width: 50px; height: 50px;" />', obj.qr_image.url)
         return "-"
 
     @admin.display(description="Download")
     def download_link(self, obj):
         """Download link for list view."""
         from django.utils.html import format_html
+
         if obj.qr_image:
-            return format_html(
-                '<a href="{}" download>Download</a>',
-                obj.qr_image.url
-            )
+            return format_html('<a href="{}" download>Download</a>', obj.qr_image.url)
         return "-"
 
 
@@ -701,38 +709,68 @@ class RestaurantSettingsAdmin(UnfoldModelAdmin):
     filter_horizontal = ["amenities"]
 
     fieldsets = (
-        ("Basic Info", {
-            "fields": ("name", "slug", "description", "category", "is_active"),
-        }),
-        ("Amenities", {
-            "fields": ("amenities",),
-        }),
-        ("Contact", {
-            "fields": ("email", "phone", "website"),
-        }),
-        ("Address", {
-            "fields": ("address", "city", "postal_code", "country", "latitude", "longitude"),
-        }),
-        ("Branding", {
-            "fields": ("logo", "cover_image", "primary_color", "secondary_color"),
-        }),
-        ("Settings", {
-            "fields": ("default_currency", "timezone", "default_language"),
-        }),
-        ("Features", {
-            "fields": ("accepts_remote_orders", "accepts_reservations", "accepts_takeaway"),
-        }),
-        ("Orders & Pricing", {
-            "fields": ("tax_rate", "service_charge", "minimum_order_amount", "average_preparation_time"),
-        }),
-        ("Statistics (read-only)", {
-            "fields": ("average_rating", "total_reviews", "total_orders"),
-            "classes": ("collapse",),
-        }),
-        ("System", {
-            "fields": ("owner", "created_at", "updated_at"),
-            "classes": ("collapse",),
-        }),
+        (
+            "Basic Info",
+            {
+                "fields": ("name", "slug", "description", "category", "is_active"),
+            },
+        ),
+        (
+            "Amenities",
+            {
+                "fields": ("amenities",),
+            },
+        ),
+        (
+            "Contact",
+            {
+                "fields": ("email", "phone", "website"),
+            },
+        ),
+        (
+            "Address",
+            {
+                "fields": ("address", "city", "postal_code", "country", "latitude", "longitude"),
+            },
+        ),
+        (
+            "Branding",
+            {
+                "fields": ("logo", "cover_image", "primary_color", "secondary_color"),
+            },
+        ),
+        (
+            "Settings",
+            {
+                "fields": ("default_currency", "timezone", "default_language"),
+            },
+        ),
+        (
+            "Features",
+            {
+                "fields": ("accepts_remote_orders", "accepts_reservations", "accepts_takeaway"),
+            },
+        ),
+        (
+            "Orders & Pricing",
+            {
+                "fields": ("tax_rate", "service_charge", "minimum_order_amount", "average_preparation_time"),
+            },
+        ),
+        (
+            "Statistics (read-only)",
+            {
+                "fields": ("average_rating", "total_reviews", "total_orders"),
+                "classes": ("collapse",),
+            },
+        ),
+        (
+            "System",
+            {
+                "fields": ("owner", "created_at", "updated_at"),
+                "classes": ("collapse",),
+            },
+        ),
     )
 
     def get_queryset(self, request):
@@ -867,9 +905,7 @@ class LoyaltyProgramTenantAdmin(TenantModelAdmin):
         if obj.restaurant_id is None:
             restaurant = getattr(request, "restaurant", None)
             if restaurant is None:
-                raise ValueError(
-                    "Tenant admin has no restaurant context — middleware didn't resolve a subdomain."
-                )
+                raise ValueError("Tenant admin has no restaurant context — middleware didn't resolve a subdomain.")
             obj.restaurant = restaurant
         super().save_model(request, obj, form, change)
 

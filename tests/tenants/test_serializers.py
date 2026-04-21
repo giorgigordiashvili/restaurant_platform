@@ -3,7 +3,6 @@ Tests for tenant serializers with translation support.
 """
 
 import pytest
-from django.utils import translation
 
 from apps.tenants.serializers import (
     AmenitySerializer,

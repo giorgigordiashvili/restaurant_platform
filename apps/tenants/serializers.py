@@ -8,7 +8,7 @@ from parler_rest.serializers import TranslatableModelSerializer, TranslatedField
 
 from apps.accounts.serializers import UserSerializer
 
-from .models import Amenity, City, Restaurant, RestaurantCategory, RestaurantHours
+from .models import Amenity, Restaurant, RestaurantCategory, RestaurantHours
 
 
 class CitySerializer(serializers.Serializer):
@@ -255,7 +255,7 @@ class RestaurantCreateSerializer(serializers.ModelSerializer):
         RestaurantHours.create_default_hours(restaurant)
 
         # Create default staff roles
-        from apps.staff.models import StaffRole, StaffMember
+        from apps.staff.models import StaffMember, StaffRole
 
         StaffRole.create_default_roles(restaurant)
 

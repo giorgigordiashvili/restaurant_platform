@@ -65,9 +65,8 @@ def award_punches(sender, instance: Order, created, update_fields=None, **kwargs
     from .models import LoyaltyCounter, LoyaltyProgram
 
     now = timezone.now()
-    programs = (
-        LoyaltyProgram.objects.filter(restaurant_id=instance.restaurant_id, is_active=True)
-        .select_related("trigger_item")
+    programs = LoyaltyProgram.objects.filter(restaurant_id=instance.restaurant_id, is_active=True).select_related(
+        "trigger_item"
     )
     active_programs = [p for p in programs if p.is_live(now)]
     if not active_programs:

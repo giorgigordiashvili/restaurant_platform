@@ -5,7 +5,6 @@ Uses django-unfold for modern Tailwind-based UI.
 Restaurant staff access their admin at {restaurant-slug}.admin.aimenu.ge/admin/
 """
 
-from django.contrib.admin.apps import AdminConfig
 from unfold.sites import UnfoldAdminSite
 
 

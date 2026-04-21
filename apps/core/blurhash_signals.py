@@ -57,7 +57,9 @@ def register_blurhash(model, *, image_field: str, blurhash_field: str):
             new_hash = generate_blurhash(image)
         except Exception:
             logger.warning(
-                "blurhash: unexpected failure on %s.%s", sender.__name__, image_field,
+                "blurhash: unexpected failure on %s.%s",
+                sender.__name__,
+                image_field,
                 exc_info=True,
             )
             new_hash = ""
