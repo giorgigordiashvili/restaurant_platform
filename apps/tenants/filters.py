@@ -16,6 +16,7 @@ class RestaurantFilter(django_filters.FilterSet):
     accepts_remote_orders = django_filters.BooleanFilter()
     accepts_reservations = django_filters.BooleanFilter()
     accepts_takeaway = django_filters.BooleanFilter()
+    accepts_platform_loyalty = django_filters.BooleanFilter()
     min_rating = django_filters.NumberFilter(field_name="average_rating", lookup_expr="gte")
 
     class Meta:
@@ -27,5 +28,6 @@ class RestaurantFilter(django_filters.FilterSet):
             "accepts_remote_orders",
             "accepts_reservations",
             "accepts_takeaway",
+            "accepts_platform_loyalty",
             "min_rating",
         ]

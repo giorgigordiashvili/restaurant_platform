@@ -110,6 +110,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
             "is_open_now",
             "accepts_remote_orders",
             "accepts_reservations",
+            "accepts_platform_loyalty",
         ]
 
     def get_is_open_now(self, obj):
