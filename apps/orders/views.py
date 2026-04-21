@@ -559,6 +559,21 @@ class CustomerOrderCreateView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        # Menu-only mode — restaurant has flipped its master ordering switch
+        # off. The customer site should already hide every order surface, so
+        # this is mostly a belt-and-braces guard against direct API clients.
+        if not restaurant.accepts_remote_orders:
+            return Response(
+                {
+                    "success": False,
+                    "error": {
+                        "code": "ordering_disabled",
+                        "message": "Ordering is disabled at this restaurant.",
+                    },
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         serializer = OrderCreateSerializer(
             data=request.data,
             context={"restaurant": restaurant},

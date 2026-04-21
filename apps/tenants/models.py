@@ -276,7 +276,11 @@ class Restaurant(TimeStampedModel):
     # Features
     accepts_remote_orders = models.BooleanField(
         default=True,
-        help_text="Allow customers to place orders without being at the restaurant",
+        help_text=(
+            "Master ordering switch. When off, customers see the menu but can't "
+            "order (no cart, no checkout, no QR dine-in ordering). Reservations "
+            "are controlled separately by accepts_reservations."
+        ),
     )
     accepts_reservations = models.BooleanField(
         default=True,
