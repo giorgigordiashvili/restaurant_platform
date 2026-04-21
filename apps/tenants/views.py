@@ -301,18 +301,36 @@ class RestaurantSearchView(APIView):
         """Check if a restaurant has at least one available table for the given slot."""
         from apps.reservations.models import Reservation, ReservationBlockedTime
 
-        # Check blocked times
+        # A ReservationBlockedTime always wins — staff has marked the slot
+        # unavailable for a reason (private event, closure, etc.).
         slot_datetime = timezone.make_aware(datetime.combine(date, search_time))
         is_blocked = ReservationBlockedTime.objects.filter(
             restaurant=restaurant,
             start_datetime__lte=slot_datetime,
             end_datetime__gt=slot_datetime,
         ).exists()
-
         if is_blocked:
             return False
 
-        # Count existing reservations at this slot
+        # If the restaurant hasn't modelled any tables in the system yet
+        # (most venues don't — tables are a POS-level setup step), we
+        # can't do a strict capacity check. Returning False here caused
+        # restaurants to silently disappear from search the moment a
+        # `party_size` was supplied, even when they accept reservations.
+        # Fall through to including it; the real availability check
+        # happens when the reservation is actually booked.
+        all_active = restaurant.tables.filter(is_active=True)
+        if not all_active.exists():
+            return True
+
+        # Tables that can fit the party
+        fit_count = all_active.filter(capacity__gte=party_size).count()
+        if fit_count == 0:
+            # There are tables, but none big enough for this party.
+            return False
+
+        # Count existing reservations at this slot — if they already
+        # consume every fitting table we're full.
         existing = Reservation.objects.filter(
             restaurant=restaurant,
             reservation_date=date,
@@ -320,10 +338,4 @@ class RestaurantSearchView(APIView):
             status__in=["pending", "confirmed", "waitlist"],
         ).count()
 
-        # Check if there are tables that can fit the party
-        available_tables = restaurant.tables.filter(
-            is_active=True,
-            capacity__gte=party_size,
-        ).count()
-
-        return available_tables > existing
+        return fit_count > existing
