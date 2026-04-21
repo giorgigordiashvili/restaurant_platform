@@ -3,6 +3,7 @@ Admin configuration for payments app with multi-tenant support.
 """
 
 from django.contrib import admin
+
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
 from apps.core.admin import TenantAwareModelAdmin

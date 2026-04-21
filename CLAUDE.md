@@ -46,19 +46,30 @@ isort --check-only apps/ tests/ config/
 python manage.py check
 ```
 
-**Black version matters.** `requirements/dev.txt` pins `black>=24.0`, which
-pip resolves to the latest major (currently 26.x). If your local black is
-older (e.g. 24.10), it will accept files that CI's newer black then flags.
-When CI says "would reformat X.py" but your local `black --check X.py`
-passes, you're on an older black — upgrade:
+**Version matters for both black AND isort.** `requirements/dev.txt` pins
+`black>=24.0` / `isort>=5.0`, which pip resolves to the latest major
+(currently `black==26.x`, `isort==6.x`). Older locals accept files that
+newer CI flags. When CI says "would reformat X.py" but your local check
+passes, upgrade:
 
 ```bash
-pip install --upgrade black && black --version
+pip install --upgrade black isort && black --version && isort --version
 ```
 
-If black reformats files owned by other PRs (pre-existing drift under a
-stricter new major version), fix them in the same PR — there's no way to
-get CI green without touching them.
+If a linter reformats files owned by other PRs (pre-existing drift under a
+newer major), fix them in the same PR — there's no way to get CI green
+without touching them.
+
+## Known CI drift on `main`
+
+As of 2026-04-21 the **Test** job on `main` has been red for weeks due to
+a missing MinIO service container in GitHub Actions (boto3 fails with
+`NameResolutionError` against `minio:9000`). A handful of individual
+tests (`tests/core/test_admin.py::TestNestedTenantField`, etc.) are also
+pre-existing. Don't feel obligated to fix these in an unrelated PR — open
+a separate infra PR for the MinIO fixture or mock `DEFAULT_FILE_STORAGE`
+in tests. Merges are currently going in with the Test job red; the Lint
++ Security jobs are the real gates.
 
 ## CRITICAL: migration gotcha
 

@@ -8,6 +8,7 @@ checked against the user's StaffRole.
 
 from django import forms
 from django.contrib import admin
+
 from parler.admin import TranslatableAdmin, TranslatableTabularInline
 from parler.forms import TranslatableModelForm
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
@@ -44,6 +45,8 @@ class UnfoldTranslatableModelForm(TranslatableModelForm):
                 field.widget.attrs["class"] += " " + UNFOLD_INPUT_CLASSES
 
 
+from apps.loyalty.models import LoyaltyCounter, LoyaltyProgram, LoyaltyRedemption
+
 # Import models
 from apps.menu.models import MenuCategory, MenuItem, MenuItemModifierGroup, Modifier, ModifierGroup
 from apps.orders.models import Order, OrderItem, OrderStatusHistory
@@ -52,7 +55,6 @@ from apps.reservations.models import (
     ReservationBlockedTime,
     ReservationSettings,
 )
-from apps.loyalty.models import LoyaltyCounter, LoyaltyProgram, LoyaltyRedemption
 from apps.staff.models import StaffInvitation, StaffMember, StaffRole
 from apps.tables.models import Table, TableQRCode, TableSection, TableSession
 from apps.tenants.models import Amenity, Restaurant, RestaurantCategory, RestaurantHours

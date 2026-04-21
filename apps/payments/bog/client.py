@@ -26,9 +26,10 @@ import time
 from dataclasses import dataclass
 from typing import Any
 
-import requests
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+
+import requests
 
 logger = logging.getLogger(__name__)
 

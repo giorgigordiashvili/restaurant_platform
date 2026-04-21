@@ -2,9 +2,10 @@
 Tests for multi-tenant admin functionality.
 """
 
-import pytest
 from django.contrib.admin.sites import AdminSite
 from django.test import RequestFactory
+
+import pytest
 
 from apps.core.admin import (
     ExportMixin,
