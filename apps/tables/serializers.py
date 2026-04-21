@@ -140,9 +140,7 @@ class TableSessionSerializer(serializers.ModelSerializer):
         counts + the grand total + the `all_terminal` flag staff use to
         decide whether "Close table" is safe.
         """
-        orders = list(
-            obj.orders.prefetch_related("bog_transactions", "settle_transactions").all()
-        )
+        orders = list(obj.orders.prefetch_related("bog_transactions", "settle_transactions").all())
         counts = {
             "pending_payment": 0,
             "pending": 0,
@@ -168,9 +166,7 @@ class TableSessionSerializer(serializers.ModelSerializer):
                 unpaid_numbers.append(o.order_number)
                 if o.total is not None:
                     unpaid_total += o.total
-        non_terminal = sum(
-            counts[s] for s in ("pending_payment", "pending", "confirmed", "preparing", "ready")
-        )
+        non_terminal = sum(counts[s] for s in ("pending_payment", "pending", "confirmed", "preparing", "ready"))
         return {
             "counts": counts,
             "total_orders": len(orders),

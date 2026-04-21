@@ -55,8 +55,7 @@ class OrderListView(generics.ListAPIView):
         include_pending = self.request.query_params.get("include_pending_reservations")
         if not (include_pending and include_pending.lower() == "true"):
             queryset = queryset.filter(
-                Q(reservation__isnull=True)
-                | Q(reservation__status__in=["confirmed", "seated", "completed"])
+                Q(reservation__isnull=True) | Q(reservation__status__in=["confirmed", "seated", "completed"])
             )
 
         # Filter by status
@@ -446,9 +445,7 @@ class OrderServerAssignView(APIView):
                     status=status.HTTP_404_NOT_FOUND,
                 )
             # Guard: user must be an active staff member of this restaurant.
-            if not StaffMember.objects.filter(
-                user=user, restaurant=request.restaurant, is_active=True
-            ).exists():
+            if not StaffMember.objects.filter(user=user, restaurant=request.restaurant, is_active=True).exists():
                 return Response(
                     {
                         "success": False,

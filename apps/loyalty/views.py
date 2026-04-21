@@ -53,10 +53,7 @@ class CustomerLoyaltyListView(APIView):
             .select_related("trigger_item", "reward_item", "restaurant")
             .order_by("-created_at")
         )
-        counters_by_program = {
-            c.program_id: c
-            for c in LoyaltyCounter.objects.filter(user=user, program__in=programs)
-        }
+        counters_by_program = {c.program_id: c for c in LoyaltyCounter.objects.filter(user=user, program__in=programs)}
 
         results = []
         for program in programs:
@@ -72,9 +69,7 @@ class CustomerLoyaltyListView(APIView):
                     "created_at": counter.created_at if counter else program.created_at,
                     "restaurant_name": program.restaurant.name,
                     "restaurant_slug": program.restaurant.slug,
-                    "restaurant_logo": program.restaurant.logo.url
-                    if program.restaurant.logo
-                    else None,
+                    "restaurant_logo": program.restaurant.logo.url if program.restaurant.logo else None,
                     "program": LoyaltyProgramSerializer(program).data,
                 }
             )
@@ -122,9 +117,7 @@ class CustomerLoyaltyRedeemView(APIView):
             .first()
         )
         if existing:
-            return Response(
-                {"success": True, "data": LoyaltyRedemptionSerializer(existing).data}
-            )
+            return Response({"success": True, "data": LoyaltyRedemptionSerializer(existing).data})
 
         redemption = LoyaltyRedemption.objects.create(
             program=program,
@@ -160,10 +153,7 @@ class DashboardProgramListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         restaurant = get_current_restaurant(self.request)
-        return (
-            LoyaltyProgram.objects.filter(restaurant=restaurant)
-            .select_related("trigger_item", "reward_item")
-        )
+        return LoyaltyProgram.objects.filter(restaurant=restaurant).select_related("trigger_item", "reward_item")
 
     def get_serializer_context(self):
         ctx = super().get_serializer_context()
@@ -288,14 +278,14 @@ class DashboardConfirmView(APIView):
             redemption.redeemed_by = request.user
             if order_id:
                 redemption.redeemed_order_id = order_id
-            redemption.save(update_fields=[
-                "status",
-                "redeemed_at",
-                "redeemed_by",
-                "redeemed_order",
-                "updated_at",
-            ])
+            redemption.save(
+                update_fields=[
+                    "status",
+                    "redeemed_at",
+                    "redeemed_by",
+                    "redeemed_order",
+                    "updated_at",
+                ]
+            )
 
-        return Response(
-            {"success": True, "data": LoyaltyRedemptionSerializer(redemption).data}
-        )
+        return Response({"success": True, "data": LoyaltyRedemptionSerializer(redemption).data})

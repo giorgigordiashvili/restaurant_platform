@@ -182,12 +182,8 @@ class InitiatePaymentView(APIView):
             if target == InitiatePaymentSerializer.TARGET_ORDER:
                 return self._initiate_order(request, data["order_payload"], data["return_url"])
             if target == InitiatePaymentSerializer.TARGET_SESSION:
-                return self._initiate_session_settle(
-                    request, data["session_payload"], data["return_url"]
-                )
-            return self._initiate_reservation(
-                request, data["reservation_payload"], data["return_url"]
-            )
+                return self._initiate_session_settle(request, data["session_payload"], data["return_url"])
+            return self._initiate_reservation(request, data["reservation_payload"], data["return_url"])
         except ValueError as exc:
             return Response(
                 {"success": False, "error": {"message": str(exc)}},
@@ -237,15 +233,11 @@ class InitiatePaymentView(APIView):
             from apps.tables.models import TableSession
 
             try:
-                session_obj = TableSession.objects.get(
-                    id=session_id, table__restaurant=restaurant
-                )
+                session_obj = TableSession.objects.get(id=session_id, table__restaurant=restaurant)
             except TableSession.DoesNotExist as exc:
                 raise ValueError("Table session not found.") from exc
             if session_obj.status != "active":
-                raise ValueError(
-                    "This table session has ended. Scan a new QR to start over."
-                )
+                raise ValueError("This table session has ended. Scan a new QR to start over.")
 
         order = Order.objects.create(
             restaurant=restaurant,
@@ -350,9 +342,7 @@ class InitiatePaymentView(APIView):
         )
 
     @transaction.atomic
-    def _initiate_session_settle(
-        self, request: Request, payload: dict[str, Any], return_url: str
-    ) -> Response:
+    def _initiate_session_settle(self, request: Request, payload: dict[str, Any], return_url: str) -> Response:
         """
         Host "pay for the whole table" flow. Charges a single BOG transaction
         for every currently-unpaid non-cancelled order on the session, plus
@@ -364,24 +354,19 @@ class InitiatePaymentView(APIView):
         restaurant = _resolve_restaurant(payload["restaurant_slug"])
 
         try:
-            session_obj = TableSession.objects.get(
-                id=payload["session_id"], table__restaurant=restaurant
-            )
+            session_obj = TableSession.objects.get(id=payload["session_id"], table__restaurant=restaurant)
         except TableSession.DoesNotExist as exc:
             raise ValueError("Table session not found.") from exc
         if session_obj.status != "active":
-            raise ValueError(
-                "This table session has ended. Scan a new QR to start over."
-            )
+            raise ValueError("This table session has ended. Scan a new QR to start over.")
 
         # Identify orders the settle will pay off: not cancelled AND not
         # already paid by an individual BOG charge AND not already covered
         # by a previous completed settle txn.
-        orders = list(
-            session_obj.orders.prefetch_related("bog_transactions", "settle_transactions").all()
-        )
+        orders = list(session_obj.orders.prefetch_related("bog_transactions", "settle_transactions").all())
         unpaid_orders = [
-            o for o in orders
+            o
+            for o in orders
             if o.status != "cancelled"
             and not any(t.status == "completed" for t in o.bog_transactions.all())
             and not any(t.status == "completed" for t in o.settle_transactions.all())
@@ -467,9 +452,7 @@ class InitiatePaymentView(APIView):
         )
 
     @transaction.atomic
-    def _initiate_reservation(
-        self, request: Request, payload: dict[str, Any], return_url: str
-    ) -> Response:
+    def _initiate_reservation(self, request: Request, payload: dict[str, Any], return_url: str) -> Response:
         restaurant = _resolve_restaurant(payload["restaurant_slug"])
 
         reservation = Reservation.objects.create(
@@ -511,9 +494,7 @@ class InitiatePaymentView(APIView):
                 order_item = OrderItem.objects.create(
                     order=pre_order,
                     menu_item=menu_item,
-                    item_name=menu_item.safe_translation_getter(
-                        "name", default=f"Item {menu_item.pk}"
-                    ),
+                    item_name=menu_item.safe_translation_getter("name", default=f"Item {menu_item.pk}"),
                     item_description=menu_item.safe_translation_getter("description", default=""),
                     unit_price=menu_item.price,
                     quantity=item_payload.get("quantity", 1),
@@ -525,9 +506,7 @@ class InitiatePaymentView(APIView):
                     OrderItemModifier.objects.create(
                         order_item=order_item,
                         modifier=modifier,
-                        modifier_name=modifier.safe_translation_getter(
-                            "name", default=f"Modifier {modifier.pk}"
-                        ),
+                        modifier_name=modifier.safe_translation_getter("name", default=f"Modifier {modifier.pk}"),
                         price_adjustment=modifier.price_adjustment,
                     )
                 order_item.recalculate_total()
@@ -785,9 +764,7 @@ class BogWebhookView(APIView):
 
     def post(self, request):
         raw_body = request.body
-        signature = request.headers.get("Callback-Signature") or request.headers.get(
-            "callback-signature"
-        )
+        signature = request.headers.get("Callback-Signature") or request.headers.get("callback-signature")
 
         try:
             valid = verify_signature(raw_body, signature)
@@ -953,12 +930,8 @@ def _apply_reservation_status(txn: BogTransaction) -> None:
     elif txn.status == BogTransaction.STATUS_REJECTED and reservation.status == "pending_payment":
         reservation.status = "cancelled"
         reservation.cancelled_at = timezone.now()
-        reservation.cancellation_reason = (
-            f"BOG payment rejected ({txn.code or 'unknown'}): {txn.code_description}"
-        )
-        reservation.save(
-            update_fields=["status", "cancelled_at", "cancellation_reason", "updated_at"]
-        )
+        reservation.cancellation_reason = f"BOG payment rejected ({txn.code or 'unknown'}): {txn.code_description}"
+        reservation.save(update_fields=["status", "cancelled_at", "cancellation_reason", "updated_at"])
 
 
 def _apply_add_card_status(txn: BogTransaction, payment_detail: dict[str, Any]) -> None:

@@ -78,9 +78,7 @@ class TableValidateView(APIView):
 
     def get(self, request, code):
         try:
-            qr = TableQRCode.objects.select_related(
-                "table", "table__restaurant", "table__section"
-            ).get(
+            qr = TableQRCode.objects.select_related("table", "table__restaurant", "table__section").get(
                 code=code,
                 is_active=True,
                 table__is_active=True,
@@ -433,16 +431,11 @@ class TableSessionCloseView(APIView):
         # table can be released.
         force = str(request.data.get("force", "")).lower() in {"1", "true", "yes"}
         unpaid = [
-            o for o in session.orders.prefetch_related(
-                "bog_transactions", "settle_transactions"
-            ).all()
+            o
+            for o in session.orders.prefetch_related("bog_transactions", "settle_transactions").all()
             if o.status != "cancelled"
-            and not any(
-                t.status == "completed" for t in o.bog_transactions.all()
-            )
-            and not any(
-                t.status == "completed" for t in o.settle_transactions.all()
-            )
+            and not any(t.status == "completed" for t in o.bog_transactions.all())
+            and not any(t.status == "completed" for t in o.settle_transactions.all())
         ]
         if unpaid and not force:
             return Response(
@@ -455,9 +448,7 @@ class TableSessionCloseView(APIView):
                             "Collect payment or cancel them before closing."
                         ),
                         "unpaid_order_numbers": [o.order_number for o in unpaid],
-                        "unpaid_total": str(
-                            sum((o.total or 0) for o in unpaid)
-                        ),
+                        "unpaid_total": str(sum((o.total or 0) for o in unpaid)),
                     },
                 },
                 status=status.HTTP_400_BAD_REQUEST,
@@ -573,11 +564,7 @@ class TableSessionBillView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        orders = (
-            Order.objects.filter(table_session=session)
-            .exclude(status="cancelled")
-            .order_by("created_at")
-        )
+        orders = Order.objects.filter(table_session=session).exclude(status="cancelled").order_by("created_at")
         tab_items = []
         grand_total = 0
         for o in orders:
@@ -588,8 +575,7 @@ class TableSessionBillView(APIView):
                     "id": str(o.id),
                     "order_number": o.order_number,
                     "status": o.status,
-                    "customer_name": o.customer_name
-                    or (o.customer.get_full_name() if o.customer else "Guest"),
+                    "customer_name": o.customer_name or (o.customer.get_full_name() if o.customer else "Guest"),
                     "total": str(total),
                     "created_at": o.created_at.isoformat(),
                 }
@@ -637,9 +623,10 @@ class TableSessionInviteView(APIView):
         # row) can share the invite. Anonymous sessions (host=None) are open
         # to anyone with the session_id.
         if session.host_id is not None and request.user.is_authenticated:
-            if session.host_id != request.user.id and not session.guests.filter(
-                user=request.user, is_host=True
-            ).exists():
+            if (
+                session.host_id != request.user.id
+                and not session.guests.filter(user=request.user, is_host=True).exists()
+            ):
                 return Response(
                     {"success": False, "error": {"message": "Only the session host can get the invite code."}},
                     status=status.HTTP_403_FORBIDDEN,

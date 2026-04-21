@@ -29,9 +29,7 @@ class APILanguageMiddleware:
         # Skip for admin pages - let LocaleMiddleware handle it
         if request.path.startswith(("/admin/", "/tenant-admin/")):
             response = self.get_response(request)
-            response["Content-Language"] = getattr(
-                request, "LANGUAGE_CODE", settings.LANGUAGE_CODE
-            )
+            response["Content-Language"] = getattr(request, "LANGUAGE_CODE", settings.LANGUAGE_CODE)
             return response
 
         # Priority 1: Query parameter

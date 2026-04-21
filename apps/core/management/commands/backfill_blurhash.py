@@ -57,8 +57,7 @@ class Command(BaseCommand):
             )
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"Enqueued on Celery as task {result.id}. "
-                    "Watch 'celery worker' logs (or flower) for progress."
+                    f"Enqueued on Celery as task {result.id}. " "Watch 'celery worker' logs (or flower) for progress."
                 )
             )
             return

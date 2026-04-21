@@ -338,9 +338,7 @@ class FullMenuSerializer(serializers.Serializer):
                 Prefetch(
                     "items",
                     queryset=MenuItem.objects.filter(is_available=True)
-                    .prefetch_related(
-                        "modifier_groups_link__modifier_group__modifiers"
-                    )
+                    .prefetch_related("modifier_groups_link__modifier_group__modifiers")
                     .order_by("display_order"),
                 )
             )

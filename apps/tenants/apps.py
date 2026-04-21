@@ -12,9 +12,7 @@ class TenantsConfig(AppConfig):
 
         from .models import Restaurant, RestaurantCategory
 
-        register_blurhash(
-            RestaurantCategory, image_field="image", blurhash_field="image_blurhash"
-        )
+        register_blurhash(RestaurantCategory, image_field="image", blurhash_field="image_blurhash")
         register_many(
             Restaurant,
             [
