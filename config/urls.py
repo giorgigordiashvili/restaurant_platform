@@ -75,6 +75,7 @@ urlpatterns = [
     path("api/v1/reservations/", include("apps.reservations.urls")),
     path("api/v1/payments/", include("apps.payments.urls")),
     path("api/v1/favorites/", include("apps.favorites.urls")),
+    path("api/v1/reviews/", include("apps.reviews.urls")),
     # Public contact form (aimenu.ge /contact).
     path("api/v1/contact/", include("apps.contact.urls")),
     # Staff (public)

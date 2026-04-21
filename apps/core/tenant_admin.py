@@ -52,6 +52,7 @@ from apps.menu.models import MenuCategory, MenuItem, MenuItemModifierGroup, Modi
 from apps.reservations.models import (
     ReservationSettings,
 )
+from apps.reviews.models import Review, ReviewReport
 from apps.staff.models import StaffInvitation, StaffMember, StaffRole
 from apps.tables.models import Table, TableQRCode, TableSection, TableSession
 from apps.tenants.models import Restaurant, RestaurantHours
@@ -975,3 +976,83 @@ class LoyaltyRedemptionTenantAdmin(TenantModelAdmin):
 tenant_admin_site.register(LoyaltyProgram, LoyaltyProgramTenantAdmin)
 tenant_admin_site.register(LoyaltyCounter, LoyaltyCounterTenantAdmin)
 tenant_admin_site.register(LoyaltyRedemption, LoyaltyRedemptionTenantAdmin)
+
+
+# Reviews — owners / managers can browse reviews and flag ones they
+# want platform admins to look at. Everything is read-only; the Report
+# action files a ReviewReport row against the current user.
+class ReviewTenantAdmin(TenantModelAdmin):
+    permission_resource = "menu"  # managers who edit the menu can browse reviews
+    restaurant_field = "restaurant"
+
+    list_display = [
+        "rating",
+        "short_title",
+        "user",
+        "is_hidden",
+        "open_reports",
+        "created_at",
+    ]
+    list_filter = ["rating", "is_hidden"]
+    search_fields = ["title", "body", "user__email"]
+    readonly_fields = [
+        "order",
+        "restaurant",
+        "user",
+        "rating",
+        "title",
+        "body",
+        "is_hidden",
+        "edited_at",
+        "created_at",
+        "updated_at",
+    ]
+    date_hierarchy = "created_at"
+    actions = ["report_reviews"]
+
+    def short_title(self, obj):
+        return obj.title[:40] or obj.body[:40]
+
+    short_title.short_description = "Title"
+
+    def open_reports(self, obj):
+        return obj.reports.filter(resolution=ReviewReport.RESOLUTION_NONE).count()
+
+    open_reports.short_description = "Open reports"
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        # Everything on this admin is read-only; the Report action creates
+        # new ReviewReport rows without mutating the Review itself.
+        return self._has_resource_permission(request, "read")
+
+    @admin.action(description="Report selected reviews to platform moderators")
+    def report_reviews(self, request, queryset):
+        from django.contrib import messages
+
+        from apps.reviews.models import ReviewReport
+
+        made = 0
+        skipped = 0
+        for review in queryset:
+            _, created = ReviewReport.objects.get_or_create(
+                review=review,
+                reporter=request.user,
+                defaults={"reason": ReviewReport.REASON_OTHER, "notes": "Reported via tenant admin."},
+            )
+            if created:
+                made += 1
+            else:
+                skipped += 1
+        msg = f"Reported {made} review(s)."
+        if skipped:
+            msg += f" Skipped {skipped} already reported."
+        self.message_user(request, msg, level=messages.SUCCESS)
+
+
+tenant_admin_site.register(Review, ReviewTenantAdmin)
