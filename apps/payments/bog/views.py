@@ -292,6 +292,24 @@ class InitiatePaymentView(APIView):
             order_item.recalculate_total()
 
         order.calculate_totals()
+
+        # Apply a platform-loyalty tier discount when the customer is
+        # authenticated, carries a tier with non-zero discount, and the
+        # restaurant has opted into the program. The discount is written
+        # to `order.discount_amount`; calculate_totals reruns so
+        # `order.total` (and therefore the BOG charge below) reflects it.
+        try:
+            from apps.loyalty.services import current_user_tier
+
+            if request.user.is_authenticated and restaurant.accepts_platform_loyalty:
+                tier = current_user_tier(request.user)
+                if tier and tier.discount_percent > 0:
+                    pct = Decimal(tier.discount_percent) / Decimal(100)
+                    order.discount_amount = (order.subtotal * pct).quantize(Decimal("0.01"))
+                    order.calculate_totals()
+        except Exception:
+            logger.exception("Failed to apply platform loyalty discount")
+
         OrderStatusHistory.objects.create(
             order=order,
             from_status="",
@@ -383,6 +401,22 @@ class InitiatePaymentView(APIView):
         ]
         if not unpaid_orders:
             raise ValueError("All orders on this table are already paid.")
+
+        # Apply platform-loyalty tier discount to each unpaid order
+        # before totalling. Mirrors the _initiate_order path so the
+        # single-order and whole-table-settle flows behave identically.
+        try:
+            from apps.loyalty.services import current_user_tier
+
+            if request.user.is_authenticated and restaurant.accepts_platform_loyalty:
+                tier = current_user_tier(request.user)
+                if tier and tier.discount_percent > 0:
+                    pct = Decimal(tier.discount_percent) / Decimal(100)
+                    for o in unpaid_orders:
+                        o.discount_amount = (o.subtotal * pct).quantize(Decimal("0.01"))
+                        o.calculate_totals()
+        except Exception:
+            logger.exception("Failed to apply platform loyalty discount (session settle)")
 
         tip_amount = Decimal(payload.get("tip_amount") or 0)
         orders_total = sum((o.total or Decimal("0")) for o in unpaid_orders)
@@ -903,6 +937,16 @@ def _apply_order_status(txn: BogTransaction) -> None:
                 external_payment_id=txn.bog_order_id,
             )
             payment.complete()  # flips to 'completed' + generates receipt_number
+
+        # Credit platform-loyalty points. Helper is a no-op when the
+        # restaurant hasn't opted in or the order was anonymous; safe
+        # to call unconditionally here.
+        try:
+            from apps.loyalty.services import accrue_platform_points
+
+            accrue_platform_points(order, source="bog")
+        except Exception:  # pragma: no cover
+            logger.exception("accrue_platform_points failed for order %s", order.id)
     elif txn.status == BogTransaction.STATUS_REJECTED and order.status == "pending_payment":
         order.cancel(reason=f"BOG payment rejected ({txn.code or 'unknown'}): {txn.code_description}")
         OrderStatusHistory.objects.create(

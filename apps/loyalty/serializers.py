@@ -121,3 +121,29 @@ class LoyaltyValidateRequestSerializer(serializers.Serializer):
 class LoyaltyConfirmRequestSerializer(serializers.Serializer):
     code = serializers.CharField()
     order_id = serializers.UUIDField(required=False, allow_null=True)
+
+
+# ─── Platform-wide tiered loyalty ─────────────────────────────────────────────
+
+
+class PlatformLoyaltyTierSerializer(serializers.Serializer):
+    """Localised tier summary used in the status endpoint."""
+
+    slug = serializers.CharField()
+    name = serializers.SerializerMethodField()
+    min_points = serializers.IntegerField()
+    discount_percent = serializers.IntegerField()
+
+    def get_name(self, obj):
+        locale = (self.context or {}).get("locale") or "en"
+        return obj.localized_name(locale)
+
+
+class PlatformLoyaltyStatusSerializer(serializers.Serializer):
+    """Current user's platform loyalty snapshot."""
+
+    current_tier = PlatformLoyaltyTierSerializer(allow_null=True)
+    next_tier = PlatformLoyaltyTierSerializer(allow_null=True)
+    points = serializers.DecimalField(max_digits=10, decimal_places=2)
+    points_to_next = serializers.DecimalField(max_digits=10, decimal_places=2)
+    window_started = serializers.DateTimeField()

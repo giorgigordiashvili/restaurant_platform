@@ -297,6 +297,15 @@ class Restaurant(TimeStampedModel):
         default=True,
         help_text="Allow takeaway orders",
     )
+    accepts_platform_loyalty = models.BooleanField(
+        default=False,
+        help_text=(
+            "Opt into the platform-wide tier discount program. When on, "
+            "customer orders at this restaurant accrue platform loyalty "
+            "points and any existing tier discount the customer holds is "
+            "applied to their subtotal. Restaurant absorbs the discount."
+        ),
+    )
 
     # Tax settings
     tax_rate = models.DecimalField(

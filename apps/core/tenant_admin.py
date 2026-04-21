@@ -771,7 +771,12 @@ class RestaurantSettingsAdmin(UnfoldModelAdmin):
         (
             "Features",
             {
-                "fields": ("accepts_remote_orders", "accepts_reservations", "accepts_takeaway"),
+                "fields": (
+                    "accepts_remote_orders",
+                    "accepts_reservations",
+                    "accepts_takeaway",
+                    "accepts_platform_loyalty",
+                ),
             },
         ),
         (

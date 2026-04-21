@@ -22,7 +22,9 @@ from .serializers import (
     LoyaltyRedeemRequestSerializer,
     LoyaltyRedemptionSerializer,
     LoyaltyValidateRequestSerializer,
+    PlatformLoyaltyStatusSerializer,
 )
+from .services import user_status
 
 
 def _err(code: str, message: str, status_code: int = status.HTTP_400_BAD_REQUEST, details=None):
@@ -289,3 +291,29 @@ class DashboardConfirmView(APIView):
             )
 
         return Response({"success": True, "data": LoyaltyRedemptionSerializer(redemption).data})
+
+
+# ─── Platform-wide tiered loyalty ────────────────────────────────────────────
+
+
+@extend_schema(tags=["Loyalty"])
+class PlatformLoyaltyStatusView(APIView):
+    """Authenticated customer's platform-wide tier status snapshot."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        status_payload = user_status(request.user)
+        # Crude but effective locale detection — matches the patterns
+        # already used elsewhere (cities endpoint, category translations).
+        accept = (request.META.get("HTTP_ACCEPT_LANGUAGE") or "").lower()
+        locale = "en"
+        for candidate in ("ka", "ru", "en"):
+            if candidate in accept:
+                locale = candidate
+                break
+        serializer = PlatformLoyaltyStatusSerializer(
+            status_payload,
+            context={"locale": locale},
+        )
+        return Response({"success": True, "data": serializer.data})

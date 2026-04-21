@@ -13,6 +13,7 @@ over into the next card.
 from __future__ import annotations
 
 import secrets
+from decimal import Decimal
 
 from django.conf import settings
 from django.db import models
@@ -203,3 +204,100 @@ class LoyaltyRedemption(TimeStampedModel):
         if self.status != self.STATUS_PENDING:
             return False
         return timezone.now() <= self.expires_at
+
+
+# ─── Platform-wide tiered loyalty ─────────────────────────────────────────────
+#
+# Separate from the per-restaurant punch-card models above. This system
+# rewards customers for eating across the whole platform: every paid
+# order at an opted-in restaurant credits a PlatformLoyaltyLedger row;
+# summing rows from the last 365 days places the customer into one of
+# the configured PlatformLoyaltyTier rows, which carries a percentage
+# discount usable at any other opted-in restaurant.
+
+
+class PlatformLoyaltyTier(models.Model):
+    """
+    A rung on the platform-wide loyalty ladder. Seeded with Gourmand /
+    Silver / Gold / Platinum via data migration but editable at runtime
+    so thresholds can be tuned after launch without a deploy.
+    """
+
+    slug = models.SlugField(max_length=40, unique=True)
+    display_order = models.PositiveIntegerField(default=0)
+    name_ka = models.CharField(max_length=80)
+    name_en = models.CharField(max_length=80)
+    name_ru = models.CharField(max_length=80)
+    min_points = models.PositiveIntegerField(help_text="Inclusive lower bound of points-in-window for this tier.")
+    discount_percent = models.PositiveSmallIntegerField(
+        default=0,
+        help_text="Integer 0–100. Applied to subtotal at checkout.",
+    )
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "platform_loyalty_tiers"
+        ordering = ["min_points"]
+        verbose_name = "Platform loyalty tier"
+        verbose_name_plural = "Platform loyalty tiers"
+
+    def __str__(self) -> str:
+        return f"{self.name_en} (≥{self.min_points})"
+
+    def localized_name(self, locale: str) -> str:
+        return getattr(self, f"name_{locale}", None) or self.name_en
+
+
+class PlatformLoyaltyLedger(models.Model):
+    """
+    One row per point-earning event. Sum over a 365-day window gives
+    the user's current points balance; the highest PlatformLoyaltyTier
+    they clear is their current tier.
+    """
+
+    SOURCE_BOG = "bog"
+    SOURCE_CASH = "cash"
+    SOURCE_CHOICES = [
+        (SOURCE_BOG, "BOG"),
+        (SOURCE_CASH, "Cash settle"),
+    ]
+
+    user = models.ForeignKey(
+        "accounts.UserProfile",
+        on_delete=models.CASCADE,
+        related_name="platform_loyalty_events",
+    )
+    order = models.ForeignKey(
+        "orders.Order",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="platform_loyalty_events",
+    )
+    restaurant = models.ForeignKey(
+        "tenants.Restaurant",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="platform_loyalty_events",
+    )
+    points = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        default=Decimal("0"),
+    )
+    earned_at = models.DateTimeField(auto_now_add=True)
+    source = models.CharField(max_length=16, choices=SOURCE_CHOICES, default=SOURCE_BOG)
+
+    class Meta:
+        db_table = "platform_loyalty_ledger"
+        ordering = ["-earned_at"]
+        indexes = [
+            # Single-shot range scan for "last 365 days sum per user".
+            models.Index(fields=["user", "earned_at"]),
+        ]
+        verbose_name = "Platform loyalty ledger entry"
+        verbose_name_plural = "Platform loyalty ledger"
+
+    def __str__(self) -> str:
+        return f"{self.user_id} +{self.points} pts ({self.source})"

@@ -527,6 +527,19 @@ class TableSessionMarkCashPaidView(APIView):
         )
         txn.covered_orders.set(unpaid)
 
+        # Platform loyalty accrual — one ledger row per covered order.
+        # No-op when the restaurant hasn't opted in or the order was
+        # anonymous; safe to call in all cases.
+        try:
+            from apps.loyalty.services import accrue_platform_points
+
+            for o in unpaid:
+                accrue_platform_points(o, source="cash")
+        except Exception:  # pragma: no cover
+            import logging
+
+            logging.getLogger(__name__).exception("accrue_platform_points failed during cash settle")
+
         return Response(
             {
                 "success": True,
