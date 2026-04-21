@@ -2,8 +2,6 @@
 Tests for tenant serializers with translation support.
 """
 
-from django.utils import translation
-
 import pytest
 
 from apps.tenants.serializers import (

@@ -12,7 +12,7 @@ def _patch_unfold_flatten_context():
     """
     from django.template.context import BaseContext
 
-    _original_flatten = BaseContext.flatten
+    BaseContext.flatten
 
     def _safe_flatten(self):
         flat = {}
@@ -35,7 +35,6 @@ class CoreConfig(AppConfig):
         """Configure admin sites and register models."""
         _patch_unfold_flatten_context()
         from django.contrib import admin
-        from django.contrib.auth.admin import UserAdmin
 
         # Import admin classes
         from apps.accounts.admin import UserAdmin as CustomUserAdmin

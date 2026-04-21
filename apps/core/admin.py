@@ -282,8 +282,6 @@ class TenantAwareReadOnlyAdmin(SuperadminOnlyMixin, ReadOnlyAdminMixin, TenantAw
     Perfect for audit logs and sensitive data.
     """
 
-    pass
-
 
 # Bulk action helpers
 def make_active(modeladmin, request, queryset):

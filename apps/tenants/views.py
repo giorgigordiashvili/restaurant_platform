@@ -2,7 +2,7 @@
 Public restaurant discovery views.
 """
 
-from datetime import datetime, time, timedelta
+from datetime import datetime
 
 from django.db.models import Q
 from django.utils import timezone
@@ -19,7 +19,6 @@ from .filters import RestaurantFilter
 from .models import Amenity, City, Restaurant, RestaurantCategory
 from .serializers import (
     AmenitySerializer,
-    CitySerializer,
     RestaurantCategorySerializer,
     RestaurantCreateSerializer,
     RestaurantDetailSerializer,

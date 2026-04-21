@@ -17,7 +17,6 @@ from apps.core.permissions import IsTenantManager
 from .models import LoyaltyCounter, LoyaltyProgram, LoyaltyRedemption
 from .serializers import (
     LoyaltyConfirmRequestSerializer,
-    LoyaltyCounterSerializer,
     LoyaltyProgramSerializer,
     LoyaltyProgramWriteSerializer,
     LoyaltyRedeemRequestSerializer,

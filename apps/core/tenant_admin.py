@@ -49,15 +49,12 @@ from apps.loyalty.models import LoyaltyCounter, LoyaltyProgram, LoyaltyRedemptio
 
 # Import models
 from apps.menu.models import MenuCategory, MenuItem, MenuItemModifierGroup, Modifier, ModifierGroup
-from apps.orders.models import Order, OrderItem, OrderStatusHistory
 from apps.reservations.models import (
-    Reservation,
-    ReservationBlockedTime,
     ReservationSettings,
 )
 from apps.staff.models import StaffInvitation, StaffMember, StaffRole
 from apps.tables.models import Table, TableQRCode, TableSection, TableSession
-from apps.tenants.models import Amenity, Restaurant, RestaurantCategory, RestaurantHours
+from apps.tenants.models import Restaurant, RestaurantHours
 
 
 class TenantModelAdmin(UnfoldModelAdmin):

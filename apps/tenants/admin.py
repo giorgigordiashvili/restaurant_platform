@@ -34,8 +34,6 @@ class StyledTranslatableAdmin(SuperadminOnlyMixin, UnfoldModelAdmin, Translatabl
     TranslatableAdmin for superadmin with parler translation support.
     """
 
-    pass
-
 
 @admin.register(City)
 class CityAdmin(StyledTranslatableAdmin):
