@@ -429,9 +429,15 @@ class InitiatePaymentView(APIView):
             },
             "redirect_urls": _redirect_urls(return_url, external_id),
         }
+        # BOG requires the Idempotency-Key header to be a valid UUID v4.
+        # Our `external_id` is a human-readable string (`settle-…-…`), so
+        # we mint a fresh UUID for the header and keep external_id for
+        # our own ledger + BOG's `external_order_id` field (which has no
+        # format restriction).
+        idempotency_key = str(uuid.uuid4())
         response = get_client().create_order(
             bog_payload,
-            idempotency_key=external_id,
+            idempotency_key=idempotency_key,
         )
         bog_order_id = response.get("id")
         redirect_url = (response.get("_links") or {}).get("redirect", {}).get("href")
