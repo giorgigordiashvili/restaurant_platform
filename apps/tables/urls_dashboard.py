@@ -14,6 +14,7 @@ from .views import (
     TableSessionCloseView,
     TableSessionCreateView,
     TableSessionListView,
+    TableSessionMarkCashPaidView,
     TableStatusUpdateView,
 )
 
@@ -34,4 +35,9 @@ urlpatterns = [
     path("sessions/", TableSessionListView.as_view(), name="session-list"),
     path("sessions/start/", TableSessionCreateView.as_view(), name="session-start"),
     path("sessions/<uuid:id>/close/", TableSessionCloseView.as_view(), name="session-close"),
+    path(
+        "sessions/<uuid:id>/mark-cash-paid/",
+        TableSessionMarkCashPaidView.as_view(),
+        name="session-mark-cash-paid",
+    ),
 ]

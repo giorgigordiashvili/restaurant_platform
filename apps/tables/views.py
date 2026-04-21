@@ -465,6 +465,82 @@ class TableSessionCloseView(APIView):
         )
 
 
+@extend_schema(tags=["Dashboard - Tables"])
+class TableSessionMarkCashPaidView(APIView):
+    """
+    Record a cash payment for every unpaid order on a table session.
+
+    Creates a single `BogTransaction` with flow_type='cash_settle' and
+    status='completed' whose `covered_orders` includes the unpaid orders.
+    That satisfies the close-session money-leak guard while leaving an
+    auditable ledger entry (including `initiated_by` = the staff member
+    who recorded the cash). No BOG API call is made.
+    """
+
+    permission_classes = [IsAuthenticated, IsTenantManager]
+
+    @require_restaurant
+    def post(self, request, id):
+        import uuid as _uuid
+        from decimal import Decimal
+
+        from apps.payments.models import BogTransaction
+
+        try:
+            session = TableSession.objects.get(
+                id=id,
+                table__restaurant=request.restaurant,
+            )
+        except TableSession.DoesNotExist:
+            return Response(
+                {"success": False, "error": {"message": "Session not found."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        unpaid = [
+            o
+            for o in session.orders.prefetch_related("bog_transactions", "settle_transactions").all()
+            if o.status != "cancelled"
+            and not any(t.status == "completed" for t in o.bog_transactions.all())
+            and not any(t.status == "completed" for t in o.settle_transactions.all())
+        ]
+        if not unpaid:
+            return Response(
+                {
+                    "success": False,
+                    "error": {"message": "No unpaid orders on this session."},
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        total = sum((o.total or Decimal("0")) for o in unpaid)
+
+        txn = BogTransaction.objects.create(
+            bog_order_id=f"CASH-{_uuid.uuid4().hex[:24]}",
+            external_order_id=str(session.id)[:12],
+            flow_type=BogTransaction.FLOW_CASH_SETTLE,
+            session=session,
+            amount=total,
+            currency="GEL",
+            status=BogTransaction.STATUS_COMPLETED,
+            initiated_by=request.user,
+        )
+        txn.covered_orders.set(unpaid)
+
+        return Response(
+            {
+                "success": True,
+                "message": "Cash payment recorded.",
+                "data": {
+                    "transaction_id": str(txn.id),
+                    "amount": str(total),
+                    "covered_order_numbers": [o.order_number for o in unpaid],
+                },
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
 # ============== Public Session Views (for multi-user ordering) ==============
 
 

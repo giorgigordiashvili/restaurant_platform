@@ -381,11 +381,17 @@ class BogTransaction(TimeStampedModel):
     FLOW_RESERVATION = "reservation"
     FLOW_ADD_CARD = "add_card"
     FLOW_SESSION_SETTLE = "session_settle"
+    # Staff-recorded cash payment — no BOG round-trip, just a ledger entry
+    # so the unpaid-orders guard on session close is satisfied and the
+    # money is auditable. The `bog_order_id` is synthesised with a
+    # `CASH-` prefix to stay within the unique constraint.
+    FLOW_CASH_SETTLE = "cash_settle"
     FLOW_CHOICES = [
         (FLOW_ORDER, "Order"),
         (FLOW_RESERVATION, "Reservation"),
         (FLOW_ADD_CARD, "Add Card"),
         (FLOW_SESSION_SETTLE, "Session Settle"),
+        (FLOW_CASH_SETTLE, "Cash Settle"),
     ]
 
     # BOG's own order_status.key values — stored verbatim so downstream code
