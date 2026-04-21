@@ -16,9 +16,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 
 from .filters import RestaurantFilter
-from .models import City, Restaurant
+from .models import Amenity, City, Restaurant, RestaurantCategory
 from .serializers import (
+    AmenitySerializer,
     CitySerializer,
+    RestaurantCategorySerializer,
     RestaurantCreateSerializer,
     RestaurantDetailSerializer,
     RestaurantHoursSerializer,
@@ -104,6 +106,32 @@ class RestaurantCreateView(generics.CreateAPIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
+
+@extend_schema(tags=["Restaurants"])
+class RestaurantCategoryListView(generics.ListAPIView):
+    """Public list of active restaurant categories — used by the signup form."""
+
+    serializer_class = RestaurantCategorySerializer
+    permission_classes = [AllowAny]
+    pagination_class = None
+
+    def get_queryset(self):
+        return RestaurantCategory.objects.filter(is_active=True).order_by(
+            "display_order", "slug"
+        )
+
+
+@extend_schema(tags=["Restaurants"])
+class AmenityListView(generics.ListAPIView):
+    """Public list of active amenities."""
+
+    serializer_class = AmenitySerializer
+    permission_classes = [AllowAny]
+    pagination_class = None
+
+    def get_queryset(self):
+        return Amenity.objects.filter(is_active=True).order_by("display_order", "slug")
 
 
 @extend_schema(tags=["Restaurants"])
