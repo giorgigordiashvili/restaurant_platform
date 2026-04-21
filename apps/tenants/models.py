@@ -19,6 +19,13 @@ class City(TranslatableModel, TimeStampedModel):
     Supports translations for city names (e.g., Tbilisi / თბილისი).
     """
 
+    # The `cities` table was created with a bigint PK via migration
+    # 0007_add_city_model. TimeStampedModel's default `id = UUIDField`
+    # would otherwise override it in-memory, which breaks Restaurant.save
+    # ("column city_obj_id is of type bigint but expression is of type
+    # uuid"). Keep the Python pk in sync with the on-disk column.
+    id = models.BigAutoField(primary_key=True)
+
     translations = TranslatedFields(
         name=models.CharField(max_length=100),
     )
