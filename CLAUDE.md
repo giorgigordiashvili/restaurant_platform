@@ -114,6 +114,15 @@ drf-spectacular serves the spec at `/api/schema/`. Downstream clients
 (`restaurant-frontend`, `aimenu-pos`) regenerate via `@gordela/api-generator`
 (`npm run generate:api`) from `.env` vars.
 
+**Every backend change that touches the public API MUST be followed by
+`npm run generate:api` in both client repos** — frontend and POS — so
+the TypeScript client stays in sync. Commit the regenerated
+`src/api/generated/*` alongside the change (or in the next commit once
+DO has gone `ACTIVE`). Letting the generated client drift behind the
+server is the single biggest source of "why doesn't this endpoint
+exist in TypeScript" surprises; don't skip the regen step just
+because the feature works via hand-written axios.
+
 **Always add `@extend_schema(request=<YourSerializer>)`** on APIViews that
 read `request.data`. Without it, the generator emits a no-arg function
 (`Promise<any>`) which is useless — downstream clients have to hand-write a
