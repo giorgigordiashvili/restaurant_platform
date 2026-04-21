@@ -19,7 +19,6 @@ from unfold.admin import ModelAdmin as UnfoldModelAdmin
 from apps.staff.models import StaffMember
 from apps.tenants.models import Restaurant
 
-
 # Customize the default admin site
 admin.site.site_header = "Restaurant Platform Admin"
 admin.site.site_title = "Restaurant Platform"

@@ -33,6 +33,33 @@ and the Django admin at `admin.aimenu.ge`.
   user explicitly says "merge it". Create a branch, push it, wait for the
   go-ahead.
 
+## CI checks — run BEFORE pushing
+
+CI (`.github/workflows/ci.yml`) runs these gates. A push that trips any of
+them round-trips through a failed Actions run, so run them locally first:
+
+```bash
+source .venv/bin/activate
+pip install --upgrade 'black' 'isort'   # pick up the latest; CI pins `black>=24.0` so it resolves latest
+black --check apps/ tests/ config/
+isort --check-only apps/ tests/ config/
+python manage.py check
+```
+
+**Black version matters.** `requirements/dev.txt` pins `black>=24.0`, which
+pip resolves to the latest major (currently 26.x). If your local black is
+older (e.g. 24.10), it will accept files that CI's newer black then flags.
+When CI says "would reformat X.py" but your local `black --check X.py`
+passes, you're on an older black — upgrade:
+
+```bash
+pip install --upgrade black && black --version
+```
+
+If black reformats files owned by other PRs (pre-existing drift under a
+stricter new major version), fix them in the same PR — there's no way to
+get CI green without touching them.
+
 ## CRITICAL: migration gotcha
 
 `makemigrations <app>` scans ALL installed apps, and several of the

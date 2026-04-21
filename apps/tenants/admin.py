@@ -11,7 +11,6 @@ from apps.core.admin import ExportMixin, SuperadminOnlyMixin, make_active, make_
 
 from .models import Amenity, City, Restaurant, RestaurantCategory, RestaurantHours
 
-
 # Unfold input styling classes for superadmin
 UNFOLD_INPUT_CLASSES = (
     "border border-base-200 bg-white font-medium min-w-20 placeholder-base-400 "
