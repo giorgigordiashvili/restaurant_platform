@@ -57,6 +57,7 @@ LOCAL_APPS = [
     "apps.payments",
     "apps.favorites",
     "apps.audit",
+    "apps.contact",
 ]
 
 INSTALLED_APPS = UNFOLD_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -211,6 +212,9 @@ REST_FRAMEWORK = {
         "user": "1000/hour",
         "burst": "60/minute",
         "auth": "5/minute",
+        # /api/v1/contact/ — public, unauthenticated form. 10 genuine
+        # retries per IP per hour is plenty; bots hit the same ceiling.
+        "contact": "10/hour",
     },
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",

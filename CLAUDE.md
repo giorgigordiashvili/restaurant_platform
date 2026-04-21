@@ -32,6 +32,11 @@ and the Django admin at `admin.aimenu.ge`.
 - Direct push to `main` is blocked by the Claude Code sandbox unless the
   user explicitly says "merge it". Create a branch, push it, wait for the
   go-ahead.
+- **The user's preferred workflow is to push directly to `main`** once
+  they've approved a change. Don't silo every small edit in its own PR if
+  it's already been discussed and approved — commit directly to `main`
+  and push. Branch + PR is only the default when the user hasn't said
+  "merge it" yet, or for large/risky changes that deserve review.
 
 ## CI checks — run BEFORE pushing
 
