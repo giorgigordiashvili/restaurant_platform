@@ -382,10 +382,17 @@ class InitiatePaymentView(APIView):
             raise ValueError("Settle total must be greater than zero.")
 
         external_id = f"settle-{session_obj.id.hex[:12]}-{uuid.uuid4().hex[:6]}"
+        # BOG requires `total_price` on every basket entry in addition to
+        # `unit_price` × `quantity`. Every other basket builder in this
+        # module (_build_basket, _reservation_basket, _add_card_basket)
+        # emits both; this one was omitting total_price, which the BOG
+        # API rejects with a bare 400 and no descriptive payload — the
+        # 502 we saw on /table/settle was downstream of that failure.
         basket = [
             {
                 "quantity": 1,
                 "unit_price": float(o.total or 0),
+                "total_price": float(o.total or 0),
                 "product_id": o.order_number,
                 "description": f"Order {o.order_number}",
             }
@@ -396,6 +403,7 @@ class InitiatePaymentView(APIView):
                 {
                     "quantity": 1,
                     "unit_price": float(tip_amount),
+                    "total_price": float(tip_amount),
                     "product_id": "tip",
                     "description": "Tip",
                 }
