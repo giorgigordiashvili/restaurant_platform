@@ -219,6 +219,12 @@ class InitiatePaymentView(APIView):
     def _initiate_order(self, request: Request, payload: dict[str, Any], return_url: str) -> Response:
         restaurant = _resolve_restaurant(payload["restaurant_slug"])
 
+        # Belt-and-braces for the master ordering switch — the customer site
+        # already hides all order UI when this flag is off, but block here
+        # too so raw API clients can't bypass it.
+        if not restaurant.accepts_remote_orders:
+            raise ValueError("Ordering is disabled at this restaurant.")
+
         table = None
         if payload.get("table_id"):
             try:
