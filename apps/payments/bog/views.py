@@ -191,7 +191,16 @@ class InitiatePaymentView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except BogClientError as exc:
-            logger.exception("BOG upstream call failed during initiate (%s)", target)
+            # Log the BOG response body — without it "returned 400" is
+            # unhelpful. The payload contains BOG's field-level validation
+            # messages that tell us exactly which key was rejected.
+            logger.exception(
+                "BOG upstream call failed during initiate (%s) status=%s payload=%r request=%r",
+                target,
+                getattr(exc, "status_code", None),
+                getattr(exc, "payload", None),
+                data,
+            )
             return Response(
                 {
                     "success": False,
