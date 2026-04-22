@@ -243,6 +243,53 @@ class PublicReservationLookupView(APIView):
             )
 
 
+class PublicReservationInvitePreviewView(APIView):
+    """
+    Public preview of a reservation keyed by confirmation code, used by
+    the customer site's invite-share flow. Deliberately tenant-free — a
+    friend following the shared link has no `X-Restaurant` header, so
+    we look up by the globally unique confirmation_code and return the
+    restaurant's own identifying bits in the response instead.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request, code):
+        try:
+            reservation = Reservation.objects.select_related("restaurant", "customer").get(
+                confirmation_code=code.upper()
+            )
+        except Reservation.DoesNotExist:
+            return Response({"error": "Invite not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Don't hand out details of cancelled / no-show bookings — the
+        # invite URL effectively becomes stale the moment the host cancels.
+        is_expired = reservation.status in ("cancelled", "no_show", "completed")
+
+        host_name = ""
+        if reservation.customer and reservation.customer.full_name:
+            host_name = reservation.customer.full_name
+        elif reservation.guest_name:
+            host_name = reservation.guest_name
+
+        return Response(
+            {
+                "kind": "reservation",
+                "confirmation_code": reservation.confirmation_code,
+                "restaurant_name": reservation.restaurant.name,
+                "restaurant_slug": reservation.restaurant.slug,
+                "restaurant_city": reservation.restaurant.city,
+                "restaurant_logo": (reservation.restaurant.logo.url if reservation.restaurant.logo else ""),
+                "reservation_date": reservation.reservation_date.isoformat(),
+                "reservation_time": reservation.reservation_time.strftime("%H:%M"),
+                "party_size": reservation.party_size,
+                "host_name": host_name,
+                "status": reservation.status,
+                "is_expired": is_expired,
+            }
+        )
+
+
 class PublicReservationCancelView(APIView):
     """Cancel a reservation by confirmation code."""
 
