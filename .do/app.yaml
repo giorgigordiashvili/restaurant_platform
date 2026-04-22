@@ -1,10 +1,12 @@
-name: restaurant-platform
+name: aimenu-backend
 
 region: fra
 
 services:
-  # Django Web Application
-  - name: web
+  # Django Web Application — name must match what's already live on DO
+  # (see the Settings → Components panel) or `doctl apps update` will
+  # treat this block as a new service and tear down the existing one.
+  - name: restaurant-platform
     github:
       repo: giorgigordiashvili/restaurant_platform
       branch: main
