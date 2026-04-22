@@ -59,6 +59,7 @@ LOCAL_APPS = [
     "apps.audit",
     "apps.contact",
     "apps.reviews",
+    "apps.referrals",
 ]
 
 INSTALLED_APPS = UNFOLD_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -389,6 +390,12 @@ FLITT_ALLOWED_WEBHOOK_IPS = [
 # (superuser-editable only). Keep this as a string; apps.payments.splits
 # casts it to Decimal on use to avoid floating-point drift.
 PLATFORM_COMMISSION_PERCENT = config("PLATFORM_COMMISSION_PERCENT", default="5")
+
+# Default referral payout percent — credited to the referrer's wallet for every
+# paid order their referee places. Overridable per-user via
+# UserProfile.referral_percent_override (superuser-editable). Decimal-cast in
+# apps.referrals.services to avoid float drift.
+REFERRAL_DEFAULT_PERCENT = config("REFERRAL_DEFAULT_PERCENT", default="0.5")
 
 # Celery Configuration
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://redis:6379/1")

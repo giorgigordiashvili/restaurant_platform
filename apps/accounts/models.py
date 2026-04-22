@@ -2,9 +2,13 @@
 User models for the restaurant platform.
 """
 
+import secrets
+import string
 import uuid
+from decimal import Decimal
 
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from apps.core.models import TimeStampedModel
@@ -12,6 +16,9 @@ from apps.core.utils.storage import user_avatar_path
 from apps.core.utils.validators import phone_validator
 
 from .managers import UserManager
+
+REFERRAL_CODE_LENGTH = 8
+REFERRAL_CODE_ALPHABET = string.ascii_uppercase + string.digits
 
 
 class User(AbstractUser):
@@ -150,6 +157,42 @@ class UserProfile(TimeStampedModel):
     sms_notifications = models.BooleanField(default=False)
     push_notifications = models.BooleanField(default=True)
 
+    # Referral + wallet
+    referral_code = models.CharField(
+        max_length=REFERRAL_CODE_LENGTH,
+        unique=True,
+        blank=True,
+        default="",
+        db_index=True,
+        help_text="Auto-generated code the user shares to refer others.",
+    )
+    referred_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="referrals_made",
+        help_text="The user whose referral_code was claimed at signup. Set once.",
+    )
+    wallet_balance = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal("0"),
+        validators=[MinValueValidator(Decimal("0"))],
+        help_text="Spendable balance in GEL. Source-of-truth is the WalletTransaction ledger.",
+    )
+    referral_percent_override = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal("0")), MaxValueValidator(Decimal("100"))],
+        help_text=(
+            "Superuser-only. When set, overrides settings.REFERRAL_DEFAULT_PERCENT for "
+            "orders placed by users this profile has referred."
+        ),
+    )
+
     class Meta:
         db_table = "user_profiles"
         verbose_name = "User Profile"
@@ -157,6 +200,22 @@ class UserProfile(TimeStampedModel):
 
     def __str__(self):
         return f"Profile of {self.user.email}"
+
+    def save(self, *args, **kwargs):
+        if not self.referral_code:
+            self.referral_code = self._mint_referral_code()
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def _mint_referral_code(cls) -> str:
+        """Generate a unique 8-char alphanumeric code, retrying on collision."""
+        for _ in range(10):
+            candidate = "".join(secrets.choice(REFERRAL_CODE_ALPHABET) for _ in range(REFERRAL_CODE_LENGTH))
+            if not cls.objects.filter(referral_code=candidate).exists():
+                return candidate
+        # Astronomically unlikely; fall through and let the unique constraint
+        # raise IntegrityError so the caller knows we ran out of luck.
+        return "".join(secrets.choice(REFERRAL_CODE_ALPHABET) for _ in range(REFERRAL_CODE_LENGTH))
 
     def add_loyalty_points(self, points):
         """Add loyalty points to user."""

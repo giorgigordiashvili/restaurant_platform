@@ -12,8 +12,9 @@ from __future__ import annotations
 
 import logging
 
-from celery import shared_task
 from django.db import transaction
+
+from celery import shared_task
 
 from apps.payments.models import FlittTransaction
 

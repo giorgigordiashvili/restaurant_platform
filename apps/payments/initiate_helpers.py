@@ -190,6 +190,11 @@ def create_pending_order(request, payload: dict[str, Any]) -> OrderInitiateResul
     except Exception:
         logger.exception("Failed to apply platform loyalty discount")
 
+    # Apply customer-requested wallet credit. We clamp to the actually-spendable
+    # amount so over-asking on the frontend (stale balance, race) silently
+    # downsizes rather than throwing — the user just pays the rest by card.
+    _apply_wallet_to_order(request, order, payload.get("wallet_amount"))
+
     OrderStatusHistory.objects.create(
         order=order,
         from_status="",
@@ -207,6 +212,39 @@ def create_pending_order(request, payload: dict[str, Any]) -> OrderInitiateResul
         amount=amount,
         basket=build_order_basket(order),
     )
+
+
+def _apply_wallet_to_order(request, order: Order, requested_amount) -> None:
+    """
+    Set ``order.wallet_applied`` to the spendable portion of the user's wallet,
+    capped at ``order.subtotal − order.discount_amount`` so we never debit more
+    than the pre-tax/tip/service line. Anonymous carts get ignored.
+
+    The actual wallet debit is deferred until payment success — apps.payments
+    success hooks call ``apps.referrals.services.spend_wallet`` once the funds
+    are confirmed received.
+    """
+    if requested_amount in (None, "", 0, Decimal("0")):
+        return
+    if not getattr(request, "user", None) or not request.user.is_authenticated:
+        return
+    profile = getattr(request.user, "profile", None)
+    if profile is None:
+        return
+
+    requested = Decimal(str(requested_amount))
+    if requested <= 0:
+        return
+
+    balance = Decimal(profile.wallet_balance or 0)
+    spendable_cap = Decimal(order.subtotal or 0) - Decimal(order.discount_amount or 0)
+    spendable = min(requested, balance, spendable_cap)
+    if spendable <= 0:
+        return
+
+    order.wallet_applied = spendable.quantize(Decimal("0.01"))
+    order.save(update_fields=["wallet_applied", "updated_at"])
+    order.calculate_totals()
 
 
 # ── Reservation flow ──────────────────────────────────────────────────
@@ -238,6 +276,7 @@ def create_pending_reservation(request, payload: dict[str, Any]) -> ReservationI
     pre_order: Order | None = None
     pre_order_total = Decimal("0")
     items = payload.get("items") or []
+    wallet_amount_request = payload.get("wallet_amount")
     if items:
         pre_order = Order.objects.create(
             restaurant=restaurant,
@@ -273,6 +312,8 @@ def create_pending_reservation(request, payload: dict[str, Any]) -> ReservationI
                 )
             order_item.recalculate_total()
         pre_order.calculate_totals()
+        # Wallet credit applies only to the pre-order portion, not the deposit.
+        _apply_wallet_to_order(request, pre_order, wallet_amount_request)
         OrderStatusHistory.objects.create(
             order=pre_order,
             from_status="",

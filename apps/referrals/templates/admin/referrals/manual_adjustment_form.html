@@ -1,0 +1,13 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+  <h1>{{ title }}</h1>
+  <form method="post">
+    {% csrf_token %}
+    <table>{{ form.as_table }}</table>
+    <p>
+      <button type="submit" class="default">Apply adjustment</button>
+      <a href="{% url 'admin:referrals_wallettransaction_changelist' %}">Cancel</a>
+    </p>
+  </form>
+{% endblock %}

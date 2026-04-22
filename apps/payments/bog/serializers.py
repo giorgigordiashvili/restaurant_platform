@@ -7,9 +7,13 @@ Keep these separate from the existing Stripe-oriented serializers in
 
 from __future__ import annotations
 
+from decimal import Decimal
+
 from rest_framework import serializers
 
 from apps.menu.models import MenuItem, Modifier
+
+ZERO = Decimal("0")
 
 
 class BogOrderItemSerializer(serializers.Serializer):
@@ -96,6 +100,12 @@ class OrderPayloadSerializer(serializers.Serializer):
     customer_notes = serializers.CharField(required=False, allow_blank=True, default="")
     delivery_address = serializers.CharField(required=False, allow_blank=True, default="")
     tip_amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0, required=False, default=0)
+    # Customer-supplied wallet credit to apply at checkout. Clamped server-side
+    # to min(wallet_balance, subtotal − discount) — over-asking is silently
+    # capped, never errored.
+    wallet_amount = serializers.DecimalField(
+        max_digits=10, decimal_places=2, min_value=ZERO, required=False, default=ZERO
+    )
     items = BogOrderItemSerializer(many=True)
 
     def validate_items(self, value):
@@ -121,6 +131,11 @@ class ReservationPayloadSerializer(serializers.Serializer):
         decimal_places=2,
         required=False,
         min_value=0,
+    )
+    # Wallet credit to apply against the pre-order portion. Deposit is never
+    # discounted by wallet (that's the platform's hold).
+    wallet_amount = serializers.DecimalField(
+        max_digits=10, decimal_places=2, min_value=ZERO, required=False, default=ZERO
     )
     # Optional pre-order bundle: menu items the guest wants prepared for arrival.
     # When present we create an Order(status=pending_payment, reservation=...) and

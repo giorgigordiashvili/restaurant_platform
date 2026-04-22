@@ -436,6 +436,16 @@ def _apply_success_side_effects(txn: FlittTransaction) -> None:
                 to_status="pending",
                 notes="Payment confirmed via Flitt.",
             )
+        # Wallet + referral side-effects. Idempotent per (user, order, kind);
+        # safe under Flitt's webhook retry policy.
+        try:
+            from apps.referrals.services import credit_referral, spend_wallet
+
+            if order.wallet_applied and order.wallet_applied > 0 and order.customer_id:
+                spend_wallet(order.customer, order.wallet_applied, order)
+            credit_referral(order)
+        except Exception:  # pragma: no cover
+            logger.exception("Referral / wallet side-effects failed for order %s", order.id)
     if txn.reservation_id and txn.reservation:
         reservation = txn.reservation
         if reservation.status == "pending_payment":
@@ -595,4 +605,15 @@ class FlittRefundView(APIView):
 
         txn.status = FlittTransaction.STATUS_REVERSED
         txn.save(update_fields=["status", "updated_at"])
+
+        # Reverse referral credit + return wallet spend on the underlying order.
+        if txn.order_id and txn.order:
+            try:
+                from apps.referrals.services import clawback_referral, refund_wallet_spend
+
+                clawback_referral(txn.order)
+                refund_wallet_spend(txn.order)
+            except Exception:  # pragma: no cover
+                logger.exception("Referral clawback / wallet refund failed for order %s", txn.order_id)
+
         return Response({"success": True, "data": response})

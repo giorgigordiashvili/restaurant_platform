@@ -121,6 +121,16 @@ class Order(TimeStampedModel):
         default=0,
         validators=[MinValueValidator(0)],
     )
+    wallet_applied = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        validators=[MinValueValidator(0)],
+        help_text=(
+            "Wallet balance the customer spent on this order. Discount-like; "
+            "calculate_totals subtracts it. Actual debit happens at payment success."
+        ),
+    )
     tip_amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -248,13 +258,16 @@ class Order(TimeStampedModel):
             self.tax_amount = self.subtotal * (self.restaurant.tax_rate / Decimal("100"))
             self.service_charge = self.subtotal * (self.restaurant.service_charge / Decimal("100"))
 
-        # Calculate total (tip is customer-set; not recalculated)
+        # Calculate total (tip is customer-set; not recalculated). Wallet is
+        # treated like a discount — same effect on what the customer pays via
+        # card, but kept separate so refunds can identify wallet-funded amounts.
         self.total = (
             self.subtotal
             + self.tax_amount
             + self.service_charge
             + (self.tip_amount or Decimal("0"))
             - self.discount_amount
+            - (self.wallet_applied or Decimal("0"))
         )
 
         self.save(

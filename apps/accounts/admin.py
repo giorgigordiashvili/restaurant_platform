@@ -12,6 +12,7 @@ from .models import User, UserProfile
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
+    fk_name = "user"
     can_delete = False
     verbose_name_plural = "Profile"
     extra = 0
@@ -130,6 +131,8 @@ class UserProfileAdmin(UnfoldModelAdmin):
         "loyalty_points",
         "total_orders",
         "total_spent",
+        "wallet_balance",
+        "referral_code",
         "email_notifications",
         "created_at",
     ]
@@ -145,6 +148,64 @@ class UserProfileAdmin(UnfoldModelAdmin):
         "user__email",
         "user__first_name",
         "user__last_name",
+        "referral_code",
     ]
 
-    readonly_fields = ["created_at", "updated_at"]
+    readonly_fields = [
+        "created_at",
+        "updated_at",
+        "referral_code",
+        "referred_by",
+        "wallet_balance",
+    ]
+
+    def get_fieldsets(self, request, obj=None):
+        """Show referral / wallet fields only to superusers."""
+        base = [
+            (None, {"fields": ("user",)}),
+            (
+                "Profile",
+                {
+                    "fields": (
+                        "date_of_birth",
+                        "preferences",
+                    )
+                },
+            ),
+            (
+                "Loyalty",
+                {
+                    "fields": (
+                        "loyalty_points",
+                        "total_orders",
+                        "total_spent",
+                    )
+                },
+            ),
+            (
+                "Notifications",
+                {
+                    "fields": (
+                        "email_notifications",
+                        "sms_notifications",
+                        "push_notifications",
+                    )
+                },
+            ),
+        ]
+        if request.user.is_superuser:
+            base.append(
+                (
+                    "Referral & Wallet (superuser)",
+                    {
+                        "fields": (
+                            "referral_code",
+                            "referred_by",
+                            "wallet_balance",
+                            "referral_percent_override",
+                        ),
+                    },
+                )
+            )
+        base.append(("Timestamps", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}))
+        return base

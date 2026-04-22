@@ -1,0 +1,10 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+  {{ block.super }}
+  <li>
+    <a href="{% url 'admin:referrals_wallettransaction_manual_adjustment' %}" class="addlink">
+      Manual adjustment
+    </a>
+  </li>
+{% endblock %}

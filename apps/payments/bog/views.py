@@ -1006,6 +1006,17 @@ def _maybe_record_refund_debit(txn: BogTransaction, receipt: dict[str, Any]) -> 
     if split.restaurant_amount <= 0:
         return
 
+    # Reverse referral credit + refund any wallet spent on the order. Both are
+    # idempotent so the webhook-retry safety of this whole branch is preserved.
+    if txn.order_id and txn.order:
+        try:
+            from apps.referrals.services import clawback_referral, refund_wallet_spend
+
+            clawback_referral(txn.order)
+            refund_wallet_spend(txn.order)
+        except Exception:  # pragma: no cover
+            logger.exception("Referral clawback / wallet refund failed for order %s", txn.order_id)
+
     RestaurantDebit.objects.create(
         restaurant=restaurant,
         amount=split.restaurant_amount,
@@ -1059,6 +1070,17 @@ def _apply_order_status(txn: BogTransaction) -> None:
             accrue_platform_points(order, source="bog")
         except Exception:  # pragma: no cover
             logger.exception("accrue_platform_points failed for order %s", order.id)
+
+        # Wallet + referral side-effects. Both helpers are idempotent per
+        # order, so webhook retries don't double-credit.
+        try:
+            from apps.referrals.services import credit_referral, spend_wallet
+
+            if order.wallet_applied and order.wallet_applied > 0 and order.customer_id:
+                spend_wallet(order.customer, order.wallet_applied, order)
+            credit_referral(order)
+        except Exception:  # pragma: no cover
+            logger.exception("Referral / wallet side-effects failed for order %s", order.id)
     elif txn.status == BogTransaction.STATUS_REJECTED and order.status == "pending_payment":
         order.cancel(reason=f"BOG payment rejected ({txn.code or 'unknown'}): {txn.code_description}")
         OrderStatusHistory.objects.create(

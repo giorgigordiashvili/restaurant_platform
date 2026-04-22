@@ -60,6 +60,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         write_only=True, required=True, validators=[validate_password], style={"input_type": "password"}
     )
     password_confirm = serializers.CharField(write_only=True, required=True, style={"input_type": "password"})
+    referral_code = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True,
+        max_length=8,
+        help_text="Optional code from an existing customer. Sets the new user's referrer.",
+    )
 
     class Meta:
         model = User
@@ -71,6 +78,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             "last_name",
             "phone_number",
             "preferred_language",
+            "referral_code",
         ]
 
     def validate_email(self, value):
@@ -79,6 +87,15 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("A user with this email already exists.")
         return value.lower()
 
+    def validate_referral_code(self, value):
+        """Resolve the referral code to a UserProfile up-front so we can 400 cleanly."""
+        if not value:
+            return ""
+        normalized = value.strip().upper()
+        if not UserProfile.objects.filter(referral_code=normalized).exists():
+            raise serializers.ValidationError("Unknown referral code.")
+        return normalized
+
     def validate(self, attrs):
         """Validate passwords match."""
         if attrs["password"] != attrs["password_confirm"]:
@@ -86,11 +103,21 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        """Create the user."""
+        """Create the user and (if a referral code was supplied) tie the profile to a referrer."""
         validated_data.pop("password_confirm")
         password = validated_data.pop("password")
+        referral_code = validated_data.pop("referral_code", "") or ""
 
         user = User.objects.create_user(password=password, **validated_data)
+
+        if referral_code:
+            referrer_profile = UserProfile.objects.filter(referral_code=referral_code).first()
+            if referrer_profile and referrer_profile.user_id != user.id:
+                # The post_save signal on User creates the empty profile; pull it
+                # back out and attach the referrer. Using update() avoids racing
+                # the signal-created instance through .save() a second time.
+                UserProfile.objects.filter(user=user).update(referred_by_id=referrer_profile.user_id)
+
         return user
 
 
