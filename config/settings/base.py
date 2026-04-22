@@ -441,6 +441,11 @@ GOOGLE_OAUTH_CLIENT_SECRET = config("GOOGLE_OAUTH_CLIENT_SECRET", default="")
 FACEBOOK_APP_ID = config("FACEBOOK_APP_ID", default="")
 FACEBOOK_APP_SECRET = config("FACEBOOK_APP_SECRET", default="")
 
+# Public origin for links we hand back to the frontend — used by the Facebook
+# data-deletion callback to point users at their deletion-status page, and
+# by the referral-summary serializer to build shareable /register?ref= URLs.
+FRONTEND_BASE_URL = config("FRONTEND_BASE_URL", default="https://aimenu.ge")
+
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "APP": {

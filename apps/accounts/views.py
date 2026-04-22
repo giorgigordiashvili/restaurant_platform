@@ -2,11 +2,21 @@
 Views for the accounts app.
 """
 
+import base64
+import hashlib
+import hmac
+import json
+import logging
+import uuid
+
+from django.conf import settings
+
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from dj_rest_auth.registration.views import SocialLoginView
@@ -27,6 +37,8 @@ from .serializers import (
     UserSerializer,
     UserUpdateSerializer,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @extend_schema(tags=["Auth"])
@@ -305,3 +317,95 @@ class FacebookSocialLoginView(SocialLoginView):
     serializer_class = SocialLoginSerializer
     client_class = None
     throttle_classes = [AuthRateThrottle]
+
+
+# ── Facebook data-deletion callback ────────────────────────────────────
+#
+# Facebook's Data Deletion Callback is the endpoint Meta requires before an
+# app with Facebook Login can go Live. When a user requests deletion from
+# their Facebook Settings, Meta POSTs a `signed_request` to this URL. We:
+#
+#   1. Split the signed_request on "." → [base64url-encoded HMAC, payload].
+#   2. Verify the HMAC using FACEBOOK_APP_SECRET so we know Facebook sent
+#      it and nobody is spoofing a deletion for another user.
+#   3. Parse the payload JSON → contains user_id (the Facebook uid).
+#   4. Delete the SocialAccount row that links that Facebook user to our
+#      User record — unlinks the Facebook login. The underlying User
+#      account keeps its email/password/orders/reservations because those
+#      are first-party data owned by Telos LLC, not by Facebook. Full
+#      account deletion is a separate self-service flow via /profile.
+#   5. Return JSON { url, confirmation_code } per Meta's spec — the user
+#      visits that URL to check their deletion status.
+#
+# Spec: https://developers.facebook.com/docs/development/create-an-app/app-dashboard/data-deletion-callback/
+
+
+def _parse_fb_signed_request(signed_request: str, app_secret: str) -> dict | None:
+    """Return the decoded payload dict, or None if HMAC fails or the body is malformed."""
+    if not signed_request or "." not in signed_request:
+        return None
+    try:
+        encoded_sig, encoded_payload = signed_request.split(".", 1)
+    except ValueError:
+        return None
+
+    # base64url decode — pad with '=' so Python's decoder doesn't reject it.
+    def _b64url(s: str) -> bytes:
+        return base64.urlsafe_b64decode(s + "=" * (-len(s) % 4))
+
+    try:
+        sig = _b64url(encoded_sig)
+        payload_bytes = _b64url(encoded_payload)
+    except Exception:
+        return None
+
+    expected = hmac.new(app_secret.encode(), encoded_payload.encode(), hashlib.sha256).digest()
+    if not hmac.compare_digest(sig, expected):
+        return None
+
+    try:
+        return json.loads(payload_bytes)
+    except json.JSONDecodeError:
+        return None
+
+
+@extend_schema(tags=["Auth"])
+class FacebookDataDeletionView(APIView):
+    """
+    Meta's data-deletion-callback endpoint. POST only, public (Facebook
+    authenticates itself via the HMAC-signed payload, not with a bearer token).
+    """
+
+    permission_classes = [AllowAny]
+    authentication_classes: list = []  # no CSRF / JWT — signed_request IS the auth.
+
+    def post(self, request, *args, **kwargs):
+        signed_request = request.data.get("signed_request") or request.POST.get("signed_request") or ""
+        app_secret = getattr(settings, "FACEBOOK_APP_SECRET", "")
+        if not app_secret:
+            logger.warning("Facebook data-deletion called but FACEBOOK_APP_SECRET is not configured.")
+            return Response({"error": "facebook_not_configured"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+        payload = _parse_fb_signed_request(signed_request, app_secret)
+        if payload is None:
+            return Response({"error": "invalid_signed_request"}, status=status.HTTP_400_BAD_REQUEST)
+
+        fb_user_id = str(payload.get("user_id") or "").strip()
+        if not fb_user_id:
+            return Response({"error": "missing_user_id"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Unlink the Facebook social account. Keep the underlying User so the
+        # customer still has their orders, loyalty, and referral code — if
+        # they want a full account delete they can do it from /profile.
+        deleted_count, _ = SocialAccount.objects.filter(provider="facebook", uid=fb_user_id).delete()
+        logger.info(
+            "Facebook data-deletion callback: removed %s SocialAccount row(s) for uid=%s", deleted_count, fb_user_id
+        )
+
+        confirmation_code = uuid.uuid4().hex
+        base_url = getattr(settings, "FRONTEND_BASE_URL", "https://aimenu.ge").rstrip("/")
+        status_url = f"{base_url}/data-deletion?code={confirmation_code}"
+        return Response(
+            {"url": status_url, "confirmation_code": confirmation_code},
+            status=status.HTTP_200_OK,
+        )

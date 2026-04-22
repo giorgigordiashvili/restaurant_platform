@@ -13,6 +13,7 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+from apps.accounts.views import FacebookDataDeletionView
 from apps.core.admin_sites import tenant_admin_site
 from apps.core.admin_views import set_simulated_restaurant
 from apps.core.views import health_check, readiness_check
@@ -52,6 +53,10 @@ urlpatterns = [
     # Health checks (for load balancers and monitoring)
     path("api/v1/health/", health_check, name="health_check"),
     path("api/v1/ready/", readiness_check, name="readiness_check"),
+    # Facebook data-deletion callback — mounted at the root so the URL we
+    # hand Meta (https://admin.aimenu.ge/data-deletion/) is clean and
+    # memorable rather than buried under /api/v1/auth/.
+    path("data-deletion/", FacebookDataDeletionView.as_view(), name="data-deletion"),
     # Language switching
     path("i18n/", include("django.conf.urls.i18n")),
     # Admin - tenant simulation URL must come before admin.site.urls
