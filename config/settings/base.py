@@ -116,10 +116,17 @@ DATABASES = {
 }
 
 # Cache
+_REDIS_CACHE_URL = config("REDIS_URL", default="redis://redis:6379/0")
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": config("REDIS_URL", default="redis://redis:6379/0"),
+        "LOCATION": _REDIS_CACHE_URL,
+        # DO-managed Valkey enforces TLS (rediss://) but its URI doesn't
+        # carry the ssl_cert_reqs query param the Python redis client
+        # expects. Fall through to CERT_NONE: the connection stays
+        # encrypted, we just skip CA-verification (DO's internal network
+        # + firewall-trusted-sources is the security boundary).
+        "OPTIONS": ({"ssl_cert_reqs": "none"} if _REDIS_CACHE_URL.startswith("rediss://") else {}),
     }
 }
 
@@ -386,6 +393,18 @@ PLATFORM_COMMISSION_PERCENT = config("PLATFORM_COMMISSION_PERCENT", default="5")
 # Celery Configuration
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://redis:6379/1")
 CELERY_RESULT_BACKEND = config("REDIS_URL", default="redis://redis:6379/0")
+# DO-managed Valkey speaks TLS on port 25061 (rediss://). The URI DO
+# returns doesn't set ssl_cert_reqs, which redis-py requires on rediss
+# URLs — map to CERT_NONE (encrypted tunnel, no cert-verify). See the
+# CACHES block above for the same pattern on the Django cache client.
+if CELERY_BROKER_URL.startswith("rediss://"):
+    import ssl as _ssl
+
+    CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": _ssl.CERT_NONE}
+if CELERY_RESULT_BACKEND.startswith("rediss://"):
+    import ssl as _ssl  # noqa: F811
+
+    CELERY_REDIS_BACKEND_USE_SSL = {"ssl_cert_reqs": _ssl.CERT_NONE}
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
