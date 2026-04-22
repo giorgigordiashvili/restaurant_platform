@@ -216,6 +216,16 @@ REST_FRAMEWORK = {
         # /api/v1/contact/ — public, unauthenticated form. 10 genuine
         # retries per IP per hour is plenty; bots hit the same ceiling.
         "contact": "10/hour",
+        # /api/v1/reviews/ scopes — authenticated writes. A real diner
+        # writes maybe one review after a meal; anything past 10/hour
+        # is the spam shape we want to throttle. Media uploads are per
+        # review so 30/hour covers a full 5-image + 1-video batch plus
+        # retries. Reports come from restaurant staff; 20/hour is
+        # generous without letting a rogue account carpet-bomb.
+        "review_create": "10/hour",
+        "review_edit": "30/hour",
+        "review_media": "30/hour",
+        "review_report": "20/hour",
     },
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",

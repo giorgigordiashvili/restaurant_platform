@@ -14,6 +14,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from drf_spectacular.utils import OpenApiTypes, extend_schema
@@ -139,6 +140,8 @@ class ReviewCreateView(generics.CreateAPIView):
 
     serializer_class = ReviewCreateSerializer
     permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "review_create"
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -156,6 +159,14 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     serializer_class = ReviewSerializer
     lookup_field = "id"
+    # Retrieves are public and pass through the default anon/user rates;
+    # scoped rate only bites on PATCH / DELETE (see get_throttles below).
+    throttle_scope = "review_edit"
+
+    def get_throttles(self):
+        if self.request.method in ("PATCH", "PUT", "DELETE"):
+            return [ScopedRateThrottle()]
+        return super().get_throttles()
 
     def get_queryset(self):
         return Review.objects.select_related("user", "restaurant", "order").prefetch_related("media")
@@ -193,6 +204,8 @@ class ReviewMediaUploadView(APIView):
 
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "review_media"
 
     def post(self, request, review_id):
         review = get_object_or_404(Review, id=review_id)
@@ -267,6 +280,8 @@ class ReviewReportCreateView(APIView):
     """Flag a review for platform-admin moderation. Restaurant staff only."""
 
     permission_classes = [IsAuthenticated, IsStaffOfReviewedRestaurant]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "review_report"
 
     def post(self, request, review_id):
         review = get_object_or_404(Review, id=review_id)
