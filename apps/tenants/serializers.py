@@ -111,6 +111,8 @@ class RestaurantListSerializer(serializers.ModelSerializer):
             "accepts_remote_orders",
             "accepts_reservations",
             "accepts_platform_loyalty",
+            "accepts_bog_payments",
+            "accepts_flitt_payments",
         ]
 
     def get_is_open_now(self, obj):
@@ -184,6 +186,8 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
             "accepts_remote_orders",
             "accepts_reservations",
             "accepts_takeaway",
+            "accepts_bog_payments",
+            "accepts_flitt_payments",
             # Stats
             "average_rating",
             "total_reviews",
