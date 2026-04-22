@@ -266,3 +266,59 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["preferred_language"] = user.preferred_language
 
         return token
+
+
+# ── Social auth (allauth + dj-rest-auth) ─────────────────────────────
+#
+# Everything below is loaded lazily: the imports reach into dj-rest-auth
+# which pulls allauth in, so importing at module top level would fail in any
+# environment that hasn't installed the packages. Module-load stays cheap.
+
+
+class SocialJWTSerializer(serializers.Serializer):
+    """
+    Shape dj-rest-auth's JWT response so it matches ``CustomTokenObtainPairSerializer``'s
+    response verbatim. The frontend's AuthContext consumes
+    ``{access, refresh, user}`` and we don't want it to branch on whether the
+    login came from password or from Google/Facebook.
+    """
+
+    access = serializers.CharField()
+    refresh = serializers.CharField()
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, instance):
+        user = instance.get("user")
+        if not user:
+            return None
+        return {
+            "id": str(user.id),
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "preferred_language": user.preferred_language,
+        }
+
+
+def _build_social_login_serializer():
+    """
+    Factory for the provider-agnostic social-login input serializer. dj-rest-auth's
+    ``SocialLoginSerializer`` already validates the posted ``access_token`` /
+    ``id_token`` against the configured provider adapter — we only add our
+    optional ``referral_code`` field so the adapter can read it back off the
+    request at save-user time.
+    """
+    from dj_rest_auth.registration.serializers import SocialLoginSerializer as BaseSocialLoginSerializer
+
+    class SocialLoginSerializer(BaseSocialLoginSerializer):
+        referral_code = serializers.CharField(required=False, allow_blank=True, max_length=8)
+
+        def validate_referral_code(self, value):
+            if not value:
+                return ""
+            return value.strip().upper()
+
+    return SocialLoginSerializer
+
+
+SocialLoginSerializer = _build_social_login_serializer()

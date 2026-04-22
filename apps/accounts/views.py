@@ -7,6 +7,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from dj_rest_auth.registration.views import SocialLoginView
 from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -19,6 +22,7 @@ from .serializers import (
     CustomTokenObtainPairSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetRequestSerializer,
+    SocialLoginSerializer,
     UserRegistrationSerializer,
     UserSerializer,
     UserUpdateSerializer,
@@ -273,3 +277,31 @@ class DeleteAccountView(APIView):
         user.save()
 
         return Response({"success": True, "message": "Account has been deactivated"}, status=status.HTTP_200_OK)
+
+
+# ── Social login ──────────────────────────────────────────────────────
+#
+# The frontend (GoogleOAuthProvider / Facebook JS SDK) does the OAuth dance
+# and hands us an access_token. allauth's provider adapters verify that
+# token with the provider, which gives us the user's email + profile. Our
+# custom SocialAccountAdapter (apps.accounts.adapters) then auto-links on
+# verified-email match, rejects Facebook-without-email, and applies the
+# optional referral_code the frontend posted. ``client_class=None`` keeps
+# dj-rest-auth in the access-token flow instead of trying to do a
+# code-exchange with an OAuth client secret it doesn't need.
+
+
+@extend_schema(tags=["Auth"])
+class GoogleSocialLoginView(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+    serializer_class = SocialLoginSerializer
+    client_class = None
+    throttle_classes = [AuthRateThrottle]
+
+
+@extend_schema(tags=["Auth"])
+class FacebookSocialLoginView(SocialLoginView):
+    adapter_class = FacebookOAuth2Adapter
+    serializer_class = SocialLoginSerializer
+    client_class = None
+    throttle_classes = [AuthRateThrottle]

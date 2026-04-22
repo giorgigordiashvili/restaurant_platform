@@ -8,6 +8,8 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
     ChangePasswordView,
+    FacebookSocialLoginView,
+    GoogleSocialLoginView,
     LoginView,
     LogoutView,
     PasswordResetConfirmView,
@@ -29,4 +31,8 @@ urlpatterns = [
     path("password/reset/", PasswordResetRequestView.as_view(), name="password_reset"),
     path("password/reset/confirm/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("password/change/", ChangePasswordView.as_view(), name="password_change"),
+    # Social auth — frontend posts {access_token, referral_code?} and gets
+    # back the same {access, refresh, user} shape as /login/.
+    path("social/google/", GoogleSocialLoginView.as_view(), name="social-google"),
+    path("social/facebook/", FacebookSocialLoginView.as_view(), name="social-facebook"),
 ]

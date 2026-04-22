@@ -7,6 +7,13 @@ psycopg[binary]>=3.1
 djangorestframework-simplejwt>=5.3
 argon2-cffi>=23.1
 
+# Social auth (Google + Facebook via OAuth2).
+# Allauth handles provider token verification + SocialAccount linking.
+# dj-rest-auth exposes DRF endpoints that return simplejwt tokens.
+# Pin on dj-rest-auth 6.0 — it caps allauth at <0.62 via its extra.
+django-allauth>=0.57,<0.62
+dj-rest-auth[with_social]>=6.0,<7.0
+
 # Multi-language support
 django-parler>=2.3
 django-parler-rest>=2.2

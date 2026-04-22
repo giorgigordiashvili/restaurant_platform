@@ -30,6 +30,8 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Required by django-allauth; we pin SITE_ID=1 below.
+    "django.contrib.sites",
 ]
 
 THIRD_PARTY_APPS = [
@@ -42,7 +44,19 @@ THIRD_PARTY_APPS = [
     "parler",
     "django_celery_beat",
     "storages",
+    # Social auth (Google + Facebook). Allauth handles provider-token
+    # verification; dj-rest-auth exposes DRF endpoints that mint simplejwt
+    # tokens in the same {access, refresh, user} shape as our password login.
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.facebook",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
 ]
+
+SITE_ID = 1
 
 LOCAL_APPS = [
     "apps.core",
@@ -79,6 +93,9 @@ MIDDLEWARE = [
     "apps.core.middleware.tenant.TenantMiddleware",
     "apps.core.middleware.admin_router.TenantAdminRouterMiddleware",  # Route tenant admin
     "apps.core.middleware.audit.AuditMiddleware",
+    # allauth >= 0.56 requires this middleware to populate request metadata
+    # used by its account/socialaccount logic.
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -396,6 +413,81 @@ PLATFORM_COMMISSION_PERCENT = config("PLATFORM_COMMISSION_PERCENT", default="5")
 # UserProfile.referral_percent_override (superuser-editable). Decimal-cast in
 # apps.referrals.services to avoid float drift.
 REFERRAL_DEFAULT_PERCENT = config("REFERRAL_DEFAULT_PERCENT", default="0.5")
+
+# ---------------------------------------------------------------------------
+# Social auth (django-allauth + dj-rest-auth)
+# ---------------------------------------------------------------------------
+# We skip email verification — JWT app, no transactional email infra yet.
+# Email is still required at the User model level; social signups that come
+# back without one are rejected by the adapter (see apps.accounts.adapters).
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+
+# Auto-link a verified social email onto an existing User — a user who
+# originally registered with password + email lands in the same account when
+# they later click "Continue with Google". Only applied when the provider
+# reports email_verified=true; see apps.accounts.adapters for the guard.
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+# Inline provider config — client_id / secret come from env so Django /admin/
+# SocialApp rows aren't needed per environment. Keeps credentials in DO's
+# encrypted env panel rather than in the application database.
+GOOGLE_OAUTH_CLIENT_ID = config("GOOGLE_OAUTH_CLIENT_ID", default="")
+GOOGLE_OAUTH_CLIENT_SECRET = config("GOOGLE_OAUTH_CLIENT_SECRET", default="")
+FACEBOOK_APP_ID = config("FACEBOOK_APP_ID", default="")
+FACEBOOK_APP_SECRET = config("FACEBOOK_APP_SECRET", default="")
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": GOOGLE_OAUTH_CLIENT_ID,
+            "secret": GOOGLE_OAUTH_CLIENT_SECRET,
+            "key": "",
+        },
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+    },
+    "facebook": {
+        "APP": {
+            "client_id": FACEBOOK_APP_ID,
+            "secret": FACEBOOK_APP_SECRET,
+            "key": "",
+        },
+        "METHOD": "oauth2",
+        "SCOPE": ["email", "public_profile"],
+        "FIELDS": ["id", "email", "first_name", "last_name"],
+    },
+}
+
+SOCIALACCOUNT_ADAPTER = "apps.accounts.adapters.SocialAccountAdapter"
+
+# Allauth's auth backend is required alongside Django's default so
+# SocialAccount login + password login both resolve against our User model.
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+# dj-rest-auth: hand back simplejwt tokens directly (no session cookie, no
+# rest-framework legacy tokens). JWT_SERIALIZER shapes the response to match
+# CustomTokenObtainPairSerializer so the frontend AuthContext.login() flow
+# doesn't branch on "was this password or social?".
+REST_AUTH = {
+    "USE_JWT": True,
+    "JWT_AUTH_HTTPONLY": False,
+    "SESSION_LOGIN": False,
+    "JWT_AUTH_RETURN_EXPIRATION": False,
+    # We're JWT-only — dj-rest-auth's legacy DRF-token path isn't used, but
+    # importing dj_rest_auth.models unconditionally asks for a token model.
+    # Setting it to None disables the resolve.
+    "TOKEN_MODEL": None,
+    "USER_DETAILS_SERIALIZER": "apps.accounts.serializers.UserSerializer",
+    "JWT_SERIALIZER": "apps.accounts.serializers.SocialJWTSerializer",
+}
 
 # Celery Configuration
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://redis:6379/1")
