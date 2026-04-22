@@ -33,6 +33,16 @@ services:
       - key: DATABASE_URL
         scope: RUN_TIME
         value: ${db.DATABASE_URL}
+      # Redis is the Celery broker and also serves Django's cache backend
+      # (see CACHES in config/settings/base.py). One managed DB, two
+      # consumers — cheapest option that still keeps broker + cache off
+      # the web box's own memory.
+      - key: REDIS_URL
+        scope: RUN_TIME
+        value: ${redis.DATABASE_URL}
+      - key: CELERY_BROKER_URL
+        scope: RUN_TIME
+        value: ${redis.DATABASE_URL}
       - key: MINIO_ENDPOINT
         scope: RUN_TIME
         type: SECRET
@@ -49,12 +59,133 @@ services:
       - key: MINIO_EXTERNAL_ENDPOINT
         scope: RUN_TIME
         type: SECRET
+      # Payment provider credentials — web reads these on every
+      # initiate-payment call.
+      - key: BOG_CLIENT_ID
+        scope: RUN_TIME
+        type: SECRET
+      - key: BOG_CLIENT_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: BOG_WEBHOOK_PUBLIC_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: BOG_SANDBOX
+        value: "False"
+      - key: FLITT_MERCHANT_ID
+        scope: RUN_TIME
+        type: SECRET
+      - key: FLITT_SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: FLITT_PLATFORM_SUB_MERCHANT_ID
+        scope: RUN_TIME
+        type: SECRET
+
+workers:
+  # Celery worker — executes background tasks. Primary current jobs:
+  # payments.retry_failed_flitt_settlements (hourly Beat schedule) and
+  # core.backfill_blurhash_task (on-demand via Django admin). --concurrency
+  # tuned for basic-xxs (512 MB); bump when traffic warrants it.
+  - name: celery-worker
+    github:
+      repo: giorgigordiashvili/restaurant_platform
+      branch: main
+      deploy_on_push: true
+    dockerfile_path: Dockerfile
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    run_command: celery -A config worker --loglevel=info --concurrency=2
+    envs:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        value: ${db.DATABASE_URL}
+      - key: REDIS_URL
+        scope: RUN_TIME
+        value: ${redis.DATABASE_URL}
+      - key: CELERY_BROKER_URL
+        scope: RUN_TIME
+        value: ${redis.DATABASE_URL}
+      - key: MINIO_ENDPOINT
+        scope: RUN_TIME
+        type: SECRET
+      - key: MINIO_ACCESS_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: MINIO_SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: MINIO_BUCKET_NAME
+        value: restaurant-media
+      - key: MINIO_USE_SSL
+        value: "True"
+      - key: MINIO_EXTERNAL_ENDPOINT
+        scope: RUN_TIME
+        type: SECRET
+      # Flitt creds — the retry task calls /api/settlement from the
+      # worker, so the credentials are needed here too.
+      - key: FLITT_MERCHANT_ID
+        scope: RUN_TIME
+        type: SECRET
+      - key: FLITT_SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: FLITT_PLATFORM_SUB_MERCHANT_ID
+        scope: RUN_TIME
+        type: SECRET
+
+  # Celery Beat — the scheduler. MUST run at instance_count: 1 or the
+  # same Beat schedule will fire twice per interval. Reads the schedule
+  # from the DB (django-celery-beat DatabaseScheduler), so new schedules
+  # can be added via Django /admin/ without a redeploy.
+  - name: celery-beat
+    github:
+      repo: giorgigordiashvili/restaurant_platform
+      branch: main
+      deploy_on_push: true
+    dockerfile_path: Dockerfile
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    run_command: celery -A config beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    envs:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        value: ${db.DATABASE_URL}
+      - key: REDIS_URL
+        scope: RUN_TIME
+        value: ${redis.DATABASE_URL}
+      - key: CELERY_BROKER_URL
+        scope: RUN_TIME
+        value: ${redis.DATABASE_URL}
 
 databases:
   # PostgreSQL Database
   - name: db
     engine: PG
     version: "16"
+    size: db-s-dev-database
+    num_nodes: 1
+
+  # Redis — Celery broker + Django cache backend (see CACHES in
+  # config/settings/base.py). Managed by DigitalOcean so we don't pay
+  # the cost of running Redis on the web box.
+  - name: redis
+    engine: REDIS
+    version: "7"
     size: db-s-dev-database
     num_nodes: 1
 
