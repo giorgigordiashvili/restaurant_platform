@@ -781,6 +781,23 @@ class RestaurantSettingsAdmin(UnfoldModelAdmin):
             },
         ),
         (
+            "Payments",
+            {
+                "description": (
+                    "Configure where card payments flow. Each provider is "
+                    "opt-in — toggle it on AND fill in the matching payout "
+                    "identifier below. Restaurants with neither configured "
+                    "can only accept cash settled via the POS."
+                ),
+                "fields": (
+                    "accepts_bog_payments",
+                    "bog_payout_iban",
+                    "accepts_flitt_payments",
+                    "flitt_sub_merchant_id",
+                ),
+            },
+        ),
+        (
             "Orders & Pricing",
             {
                 "fields": ("tax_rate", "service_charge", "minimum_order_amount", "average_preparation_time"),

@@ -2,6 +2,8 @@
 Payment models for restaurant payment processing.
 """
 
+import uuid
+
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -546,3 +548,261 @@ class BogTransaction(TimeStampedModel):
     @property
     def is_successful(self) -> bool:
         return self.status in {self.STATUS_COMPLETED, self.STATUS_PARTIAL_COMPLETED}
+
+
+class FlittTransaction(TimeStampedModel):
+    """
+    Ledger entry for every Flitt (pay.flitt.com) interaction — the Flitt
+    counterpart to :class:`BogTransaction`.
+
+    We keep the two provider ledgers as sibling models rather than one
+    polymorphic table. Each provider has materially different shape (Flitt
+    needs a two-step `/api/settlement` call the platform owns, BOG does the
+    split inline), and collapsing them under a `provider` discriminator
+    would bury those differences behind nullable fields.
+    """
+
+    FLOW_ORDER = "order"
+    FLOW_RESERVATION = "reservation"
+    FLOW_SESSION_SETTLE = "session_settle"
+    FLOW_ADD_CARD = "add_card"
+    FLOW_CHOICES = [
+        (FLOW_ORDER, "Order"),
+        (FLOW_RESERVATION, "Reservation"),
+        (FLOW_SESSION_SETTLE, "Session settle"),
+        (FLOW_ADD_CARD, "Add card"),
+    ]
+
+    # Checkout status — mirrors Flitt's own `order_status` values.
+    STATUS_CREATED = "created"
+    STATUS_PROCESSING = "processing"
+    STATUS_APPROVED = "approved"
+    STATUS_DECLINED = "declined"
+    STATUS_EXPIRED = "expired"
+    STATUS_REVERSED = "reversed"
+    STATUS_REVERSED_PARTIALLY = "reversed_partially"
+    STATUS_CHOICES = [
+        (STATUS_CREATED, "Created"),
+        (STATUS_PROCESSING, "Processing"),
+        (STATUS_APPROVED, "Approved"),
+        (STATUS_DECLINED, "Declined"),
+        (STATUS_EXPIRED, "Expired"),
+        (STATUS_REVERSED, "Reversed"),
+        (STATUS_REVERSED_PARTIALLY, "Reversed partially"),
+    ]
+
+    # Settlement status — second-step POST /api/settlement.
+    SETTLEMENT_NOT_STARTED = "not_started"
+    SETTLEMENT_PENDING = "pending"
+    SETTLEMENT_SETTLED = "settled"
+    SETTLEMENT_ERROR = "error"
+    SETTLEMENT_CHOICES = [
+        (SETTLEMENT_NOT_STARTED, "Not started"),
+        (SETTLEMENT_PENDING, "Pending retry"),
+        (SETTLEMENT_SETTLED, "Settled"),
+        (SETTLEMENT_ERROR, "Error"),
+    ]
+
+    # Flitt returns an integer payment_id; we persist as string to keep the
+    # model provider-neutral (BogTransaction also uses CharField for the id).
+    flitt_payment_id = models.CharField(max_length=64, blank=True, default="", db_index=True)
+    flitt_order_id = models.CharField(max_length=64, unique=True)
+
+    flow_type = models.CharField(max_length=20, choices=FLOW_CHOICES, db_index=True)
+    status = models.CharField(
+        max_length=32,
+        choices=STATUS_CHOICES,
+        default=STATUS_CREATED,
+        db_index=True,
+    )
+
+    order = models.ForeignKey(
+        "orders.Order",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="flitt_transactions",
+    )
+    reservation = models.ForeignKey(
+        "reservations.Reservation",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="flitt_transactions",
+    )
+    session = models.ForeignKey(
+        "tables.TableSession",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="flitt_transactions",
+    )
+    covered_orders = models.ManyToManyField(
+        "orders.Order",
+        blank=True,
+        related_name="flitt_settle_transactions",
+    )
+    initiated_by = models.ForeignKey(
+        "accounts.User",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+
+    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    currency = models.CharField(max_length=3, default="GEL")
+
+    checkout_url = models.URLField(max_length=1024, blank=True, default="")
+    return_url = models.URLField(max_length=1024, blank=True, default="")
+    callback_url = models.URLField(max_length=1024, blank=True, default="")
+
+    # Payload snapshots — invaluable when debugging a Flitt support ticket.
+    request_payload = models.JSONField(null=True, blank=True)
+    response_payload = models.JSONField(null=True, blank=True)
+    last_webhook_payload = models.JSONField(null=True, blank=True)
+    last_webhook_at = models.DateTimeField(null=True, blank=True)
+    last_reconciled_at = models.DateTimeField(null=True, blank=True)
+
+    # Settlement (the second-step /api/settlement call that fans the
+    # approved amount out to the platform + restaurant sub-merchants).
+    settlement_status = models.CharField(
+        max_length=16,
+        choices=SETTLEMENT_CHOICES,
+        default=SETTLEMENT_NOT_STARTED,
+        db_index=True,
+    )
+    settlement_id = models.CharField(max_length=64, blank=True, default="")
+    settlement_error = models.TextField(blank=True, default="")
+    settled_at = models.DateTimeField(null=True, blank=True)
+    # Split snapshot frozen at settlement time — retained verbatim so refund
+    # /api/reverse/ can use the exact same receiver[] breakdown.
+    split_snapshot = models.JSONField(null=True, blank=True)
+
+    class Meta:
+        db_table = "flitt_transactions"
+        ordering = ["-created_at"]
+        verbose_name = "Flitt Transaction"
+        verbose_name_plural = "Flitt Transactions"
+        indexes = [
+            models.Index(fields=["flow_type", "status"]),
+            models.Index(fields=["status", "created_at"]),
+            models.Index(fields=["settlement_status"]),
+        ]
+
+    def __str__(self) -> str:  # pragma: no cover - admin str
+        return f"Flitt {self.flow_type} {self.flitt_order_id} ({self.status})"
+
+    @property
+    def is_terminal(self) -> bool:
+        return self.status in {
+            self.STATUS_APPROVED,
+            self.STATUS_DECLINED,
+            self.STATUS_EXPIRED,
+            self.STATUS_REVERSED,
+            self.STATUS_REVERSED_PARTIALLY,
+        }
+
+    @property
+    def is_successful(self) -> bool:
+        return self.status == self.STATUS_APPROVED
+
+    @property
+    def restaurant_for_txn(self):
+        """Resolve the restaurant this transaction belongs to regardless of flow."""
+        if self.order_id:
+            return self.order.restaurant  # type: ignore[union-attr]
+        if self.reservation_id:
+            return self.reservation.restaurant  # type: ignore[union-attr]
+        if self.session_id:
+            return self.session.restaurant  # type: ignore[union-attr]
+        return None
+
+
+class RestaurantDebit(TimeStampedModel):
+    """
+    Amount the platform is owed by a restaurant that couldn't be auto-collected.
+
+    Primary use case: BOG refunds don't claw back the restaurant's 95 % share
+    from the split — the money already landed in the restaurant's bank account.
+    We write a ``RestaurantDebit`` row for the restaurant's portion of the
+    refund and platform admin settles it off-platform (invoice, next payout
+    netting, etc.).
+
+    Flitt refunds use ``/api/reverse/`` with explicit ``receiver[]`` per-leg
+    amounts, so no debit is created on that path.
+    """
+
+    SOURCE_BOG_REFUND = "bog_refund"
+    SOURCE_MANUAL = "manual_adjustment"
+    SOURCE_CHOICES = [
+        (SOURCE_BOG_REFUND, "BOG refund claw-back"),
+        (SOURCE_MANUAL, "Manual adjustment"),
+    ]
+
+    STATUS_OUTSTANDING = "outstanding"
+    STATUS_SETTLED = "settled"
+    STATUS_WRITTEN_OFF = "written_off"
+    STATUS_CHOICES = [
+        (STATUS_OUTSTANDING, "Outstanding"),
+        (STATUS_SETTLED, "Settled"),
+        (STATUS_WRITTEN_OFF, "Written off"),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    restaurant = models.ForeignKey(
+        "tenants.Restaurant",
+        on_delete=models.PROTECT,
+        related_name="platform_debits",
+    )
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+    )
+    currency = models.CharField(max_length=3, default="GEL")
+    source = models.CharField(max_length=32, choices=SOURCE_CHOICES, db_index=True)
+
+    source_bog_transaction = models.ForeignKey(
+        BogTransaction,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="restaurant_debits",
+    )
+    source_refund = models.ForeignKey(
+        Refund,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="restaurant_debits",
+    )
+
+    status = models.CharField(
+        max_length=16,
+        choices=STATUS_CHOICES,
+        default=STATUS_OUTSTANDING,
+        db_index=True,
+    )
+    settled_at = models.DateTimeField(null=True, blank=True)
+    settled_by = models.ForeignKey(
+        "accounts.User",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    notes = models.TextField(blank=True, default="")
+
+    class Meta:
+        db_table = "restaurant_debits"
+        ordering = ["-created_at"]
+        verbose_name = "Restaurant Debit"
+        verbose_name_plural = "Restaurant Debits"
+        indexes = [
+            models.Index(fields=["restaurant", "status"]),
+            models.Index(fields=["source", "-created_at"]),
+        ]
+
+    def __str__(self) -> str:  # pragma: no cover
+        return f"{self.restaurant} owes {self.amount} {self.currency} ({self.status})"

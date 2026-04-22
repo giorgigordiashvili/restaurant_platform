@@ -10,6 +10,11 @@ from .bog.views import (
     InitiateAddCardView,
     InitiatePaymentView,
 )
+from .flitt.views import (
+    FlittInitiatePaymentView,
+    FlittStatusView,
+    FlittWebhookView,
+)
 from .views import (
     CustomerPaymentHistoryView,
     CustomerPaymentMethodDetailView,
@@ -29,4 +34,12 @@ urlpatterns = [
     path("bog/initiate/", InitiatePaymentView.as_view(), name="bog-initiate"),
     path("bog/status/<str:bog_order_id>/", BogStatusView.as_view(), name="bog-status"),
     path("bog/webhook/", BogWebhookView.as_view(), name="bog-webhook"),
+    # Flitt (pay.flitt.com) integration — second provider, with native split.
+    path("flitt/initiate/", FlittInitiatePaymentView.as_view(), name="flitt-initiate"),
+    path(
+        "flitt/status/<str:flitt_order_id>/",
+        FlittStatusView.as_view(),
+        name="flitt-status",
+    ),
+    path("flitt/webhook/", FlittWebhookView.as_view(), name="flitt-webhook"),
 ]

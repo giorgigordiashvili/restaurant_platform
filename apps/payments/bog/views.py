@@ -118,6 +118,40 @@ def _resolve_restaurant(slug: str) -> Restaurant:
         raise ValueError(f"Restaurant '{slug}' not found") from exc
 
 
+def _split_config(restaurant: Restaurant | None, amount: Decimal) -> dict[str, Any] | None:
+    """
+    Build the ``config.split`` block BOG attaches to an ecommerce order.
+
+    Returns ``None`` when the restaurant hasn't opted into BOG split payouts
+    (either the flag is off or the IBAN is blank); callers should then omit
+    ``config`` from the payload entirely — BOG treats missing config as "send
+    everything to the master account", which is also our pre-split behaviour
+    and keeps existing merchants working while we onboard IBANs.
+    """
+    from apps.payments.splits import compute_split
+
+    if restaurant is None:
+        return None
+    if not restaurant.accepts_bog_payments or not restaurant.bog_payout_iban.strip():
+        return None
+
+    split = compute_split(amount, restaurant)
+    if split.restaurant_amount <= 0:
+        return None
+
+    return {
+        "split": {
+            "split_payments": [
+                {
+                    "iban": restaurant.bog_payout_iban.strip(),
+                    "amount": float(split.restaurant_amount),
+                    "description": f"{restaurant.name} share",
+                }
+            ]
+        }
+    }
+
+
 def _redirect_urls(return_url: str, external_order_id: str) -> dict[str, str]:
     """
     BOG redirects the browser back to whatever ``redirect_urls.success`` / ``fail``
@@ -332,6 +366,9 @@ class InitiatePaymentView(APIView):
             },
             "redirect_urls": _redirect_urls(return_url, order.order_number),
         }
+        split_config = _split_config(order.restaurant, Decimal(str(amount)))
+        if split_config:
+            bog_payload["config"] = split_config
         response = get_client().create_order(
             bog_payload,
             idempotency_key=str(order.id),
@@ -463,6 +500,11 @@ class InitiatePaymentView(APIView):
             },
             "redirect_urls": _redirect_urls(return_url, external_id),
         }
+        # All orders in a single session belong to one restaurant; use that
+        # restaurant's IBAN for the split so the 95 % lands directly.
+        split_config = _split_config(restaurant, Decimal(str(amount)))
+        if split_config:
+            bog_payload["config"] = split_config
         # BOG requires the Idempotency-Key header to be a valid UUID v4.
         # Our `external_id` is a human-readable string (`settle-…-…`), so
         # we mint a fresh UUID for the header and keep external_id for
@@ -601,6 +643,9 @@ class InitiatePaymentView(APIView):
             },
             "redirect_urls": _redirect_urls(return_url, reservation.confirmation_code),
         }
+        split_config = _split_config(reservation.restaurant, Decimal(str(amount)))
+        if split_config:
+            bog_payload["config"] = split_config
         response = get_client().create_order(
             bog_payload,
             idempotency_key=str(reservation.id),
@@ -905,7 +950,74 @@ def _apply_receipt(txn: BogTransaction, receipt: dict[str, Any], *, source: str)
     elif txn.flow_type == BogTransaction.FLOW_SESSION_SETTLE:
         _apply_session_settle_status(txn)
 
+    # Whenever BOG reports a refund — full or partial — and the original
+    # order was split-paid, the restaurant's 95 % share has already landed
+    # in their bank account. BOG does not claw that back, so we record a
+    # RestaurantDebit (platform admin settles off-platform).
+    _maybe_record_refund_debit(txn, receipt)
+
     txn.save()
+
+
+def _maybe_record_refund_debit(txn: BogTransaction, receipt: dict[str, Any]) -> None:
+    """
+    Write a RestaurantDebit row the first time we see a refund status on a
+    split-paid transaction. Idempotent — guarded by a presence check on the
+    transaction so replayed webhooks don't pile up duplicate debits.
+    """
+    from apps.payments.models import RestaurantDebit
+    from apps.payments.splits import compute_split
+
+    REFUND_STATUSES = {
+        BogTransaction.STATUS_REFUNDED,
+        BogTransaction.STATUS_REFUNDED_PARTIALLY,
+    }
+    if txn.status not in REFUND_STATUSES:
+        return
+
+    restaurant = None
+    if txn.order_id and txn.order:
+        restaurant = txn.order.restaurant
+    elif txn.reservation_id and txn.reservation:
+        restaurant = txn.reservation.restaurant
+    elif txn.session_id and txn.session:
+        restaurant = txn.session.restaurant
+    if restaurant is None or not restaurant.accepts_bog_payments:
+        return  # No split was configured → nothing on the restaurant side to claw back.
+
+    if RestaurantDebit.objects.filter(
+        source_bog_transaction=txn,
+        source=RestaurantDebit.SOURCE_BOG_REFUND,
+    ).exists():
+        return  # Already recorded on an earlier webhook pass.
+
+    # Prefer the refunded amount BOG stamps on the receipt; fall back to the
+    # original transaction total if BOG didn't include a refunded_amount field.
+    payment_detail = receipt.get("payment_detail") or {}
+    refunded_amount_raw = payment_detail.get("refunded_amount") or receipt.get("refunded_amount")
+    try:
+        refunded_amount = Decimal(str(refunded_amount_raw)) if refunded_amount_raw else txn.amount
+    except Exception:
+        refunded_amount = txn.amount
+    if refunded_amount <= 0:
+        return
+
+    split = compute_split(refunded_amount, restaurant)
+    if split.restaurant_amount <= 0:
+        return
+
+    RestaurantDebit.objects.create(
+        restaurant=restaurant,
+        amount=split.restaurant_amount,
+        currency=txn.currency or "GEL",
+        source=RestaurantDebit.SOURCE_BOG_REFUND,
+        source_bog_transaction=txn,
+        notes=(
+            f"BOG refund of {refunded_amount} {txn.currency or 'GEL'}; "
+            f"platform refunded the customer but the restaurant's split of "
+            f"{split.restaurant_amount} was not clawed back."
+        ),
+    )
 
 
 def _apply_order_status(txn: BogTransaction) -> None:

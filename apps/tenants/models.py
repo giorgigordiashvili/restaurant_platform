@@ -2,6 +2,9 @@
 Restaurant (tenant) models for multi-tenant restaurant platform.
 """
 
+from decimal import Decimal
+
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
 from django.utils.text import slugify
@@ -307,6 +310,56 @@ class Restaurant(TimeStampedModel):
         ),
     )
 
+    # Payment provider activation + payout identifiers. Each provider is
+    # independently opt-in; when the flag is on, the corresponding payout
+    # identifier is required (enforced in clean() below).
+    accepts_bog_payments = models.BooleanField(
+        default=False,
+        help_text=(
+            "Accept card payments via Bank of Georgia. Requires a valid "
+            "BOG payout IBAN below. Net of the platform's commission is "
+            "split to the IBAN automatically on settlement."
+        ),
+    )
+    bog_payout_iban = models.CharField(
+        max_length=34,
+        blank=True,
+        default="",
+        validators=[
+            RegexValidator(
+                regex=r"^GE\d{2}[A-Z]{2}\d{16}$",
+                message="Must be a Georgian IBAN in the form GE##XX################.",
+            )
+        ],
+        help_text="Georgian IBAN (GE## + bank code + 16 digits) that receives the restaurant's share.",
+    )
+    accepts_flitt_payments = models.BooleanField(
+        default=False,
+        help_text=(
+            "Accept card payments via Flitt. Requires the restaurant's "
+            "Flitt sub-merchant id below. The platform charges the full "
+            "amount to its master Flitt account and settles the restaurant's "
+            "share via a follow-up /api/settlement call."
+        ),
+    )
+    flitt_sub_merchant_id = models.CharField(
+        max_length=32,
+        blank=True,
+        default="",
+        help_text="Flitt sub-merchant id provided by Flitt after onboarding.",
+    )
+
+    # Platform commission override. Falls back to settings.PLATFORM_COMMISSION_PERCENT
+    # when unset by the superuser. Intentionally not exposed in tenant admin
+    # so restaurant owners can't zero it out — Django /admin/ only.
+    platform_commission_percent = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal("5.00"),
+        validators=[MinValueValidator(Decimal("0")), MaxValueValidator(Decimal("100"))],
+        help_text="Superuser-only. Percentage the platform keeps on every paid order.",
+    )
+
     # Tax settings
     tax_rate = models.DecimalField(
         max_digits=5,
@@ -356,6 +409,18 @@ class Restaurant(TimeStampedModel):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        super().clean()
+        # Opt-in provider flags demand a payout identifier — otherwise a
+        # "checkout with BOG" button would render with no way to route the
+        # restaurant's share, and the initiate call would 500 in production.
+        if self.accepts_bog_payments and not self.bog_payout_iban.strip():
+            raise ValidationError({"bog_payout_iban": ("BOG payout IBAN is required when BOG payments are enabled.")})
+        if self.accepts_flitt_payments and not self.flitt_sub_merchant_id.strip():
+            raise ValidationError(
+                {"flitt_sub_merchant_id": ("Flitt sub-merchant id is required when Flitt payments are enabled.")}
+            )
 
     def save(self, *args, **kwargs):
         if not self.slug:

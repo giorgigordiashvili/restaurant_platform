@@ -353,6 +353,36 @@ BOG_RESERVATION_DEPOSIT_AMOUNT = config("BOG_RESERVATION_DEPOSIT_AMOUNT", defaul
 # BOG's sandbox can reach the callback.
 BOG_WEBHOOK_URL = config("BOG_WEBHOOK_URL", default="")
 
+# ---------------------------------------------------------------------------
+# Flitt payment provider (pay.flitt.com) — sibling of BOG. Uses HMAC-SHA1
+# signing rather than OAuth2. Split payments require a two-step call:
+# charge the master merchant, then POST /api/settlement with a receiver[]
+# breakdown after the webhook confirms approval. Restaurants hand us their
+# sub-merchant id during onboarding; we never hold their signing secret.
+# ---------------------------------------------------------------------------
+FLITT_MERCHANT_ID = config("FLITT_MERCHANT_ID", default="")
+FLITT_SECRET_KEY = config("FLITT_SECRET_KEY", default="")
+FLITT_API_URL = config("FLITT_API_URL", default="https://pay.flitt.com")
+# The platform's *own* Flitt sub-merchant id — the receiver for our 5 %
+# leg on every split. Configure this once per environment.
+FLITT_PLATFORM_SUB_MERCHANT_ID = config("FLITT_PLATFORM_SUB_MERCHANT_ID", default="")
+# IP allowlist for Flitt server-callback traffic, documented at
+# https://docs.flitt.com/api/payments/callbacks/.
+FLITT_ALLOWED_WEBHOOK_IPS = [
+    ip.strip()
+    for ip in config(
+        "FLITT_ALLOWED_WEBHOOK_IPS",
+        default="54.154.216.60,3.75.125.89",
+    ).split(",")
+    if ip.strip()
+]
+
+# Platform commission percentage applied to every paid order — both BOG and
+# Flitt. Overridable per-restaurant via `Restaurant.platform_commission_percent`
+# (superuser-editable only). Keep this as a string; apps.payments.splits
+# casts it to Decimal on use to avoid floating-point drift.
+PLATFORM_COMMISSION_PERCENT = config("PLATFORM_COMMISSION_PERCENT", default="5")
+
 # Celery Configuration
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://redis:6379/1")
 CELERY_RESULT_BACKEND = config("REDIS_URL", default="redis://redis:6379/0")
