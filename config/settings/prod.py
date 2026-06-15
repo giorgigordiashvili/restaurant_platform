@@ -50,7 +50,9 @@ if DATABASE_URL:
         default=DATABASE_URL,
         conn_max_age=600,
         conn_health_checks=True,
-        ssl_require=True,
+        # Managed providers (DO) require SSL; a Postgres container on a private
+        # Docker network does not. Default True keeps managed deploys working.
+        ssl_require=config("DB_SSL_REQUIRE", default=True, cast=bool),
     )
 
 # Security settings for production

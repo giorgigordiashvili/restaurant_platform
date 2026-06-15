@@ -6,13 +6,14 @@ from django.core.cache import cache
 from django.db import connection
 
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
+@throttle_classes([])  # health is polled every few seconds by the container/monitor — never throttle it
 def health_check(request):
     """
     Health check endpoint for load balancers and monitoring.
