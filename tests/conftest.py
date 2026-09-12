@@ -182,6 +182,19 @@ def waiter_staff(create_staff_member, waiter_user, restaurant, staff_roles):
 
 
 @pytest.fixture
+def kitchen_user(create_user):
+    """Create a user for the kitchen role."""
+    return create_user(email="kitchen@example.com", first_name="Kitchen", last_name="Staff")
+
+
+@pytest.fixture
+def kitchen_staff(create_staff_member, kitchen_user, restaurant, staff_roles):
+    """Create a kitchen staff member."""
+    kitchen_role = next(r for r in staff_roles if r.name == "kitchen")
+    return create_staff_member(user=kitchen_user, restaurant=restaurant, role=kitchen_role)
+
+
+@pytest.fixture
 def manager_user(create_user):
     """Create a user for manager role."""
     return create_user(email="manager@example.com", first_name="Manager", last_name="Staff")
@@ -210,6 +223,14 @@ def authenticated_owner_client(api_client, user):
 def authenticated_manager_client(api_client, manager_user):
     """Return an authenticated client for manager."""
     refresh = RefreshToken.for_user(manager_user)
+    api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+    return api_client
+
+
+@pytest.fixture
+def authenticated_kitchen_client(api_client, kitchen_user):
+    """Return an authenticated client for kitchen staff."""
+    refresh = RefreshToken.for_user(kitchen_user)
     api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
     return api_client
 

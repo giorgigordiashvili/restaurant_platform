@@ -215,7 +215,10 @@ class OrderListSerializer(serializers.ModelSerializer):
 
 
 class KitchenOrderSerializer(serializers.ModelSerializer):
-    """Serializer for kitchen display."""
+    """
+    One kitchen ticket. Every station's items are included (the POS kitchen
+    screen is shared by kitchen and bar); the client tags bar items itself.
+    """
 
     items = serializers.SerializerMethodField()
     table_number = serializers.CharField(source="table.number", read_only=True)
@@ -229,19 +232,22 @@ class KitchenOrderSerializer(serializers.ModelSerializer):
             "order_type",
             "status",
             "table_number",
+            "customer_name",
             "customer_notes",
             "items",
             "elapsed_minutes",
+            "confirmed_at",
+            "estimated_ready_at",
             "created_at",
         ]
 
     def get_items(self, obj):
-        # Only show kitchen items
-        items = obj.items.filter(preparation_station__in=["kitchen", "both"])
+        # Walk the prefetch instead of re-querying per ticket.
+        items = [i for i in obj.items.all() if i.status != "cancelled"]
         return OrderItemSerializer(items, many=True).data
 
     def get_elapsed_minutes(self, obj):
         from django.utils import timezone
 
-        delta = timezone.now() - obj.created_at
-        return int(delta.total_seconds() / 60)
+        delta = timezone.now() - (obj.confirmed_at or obj.created_at)
+        return max(int(delta.total_seconds() / 60), 0)

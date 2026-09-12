@@ -3,7 +3,7 @@ Views for orders app.
 """
 
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import F, Q
 from django.utils import timezone
 
 from rest_framework import generics, status
@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
 from apps.core.middleware.tenant import require_restaurant
-from apps.core.permissions import IsTenantManager
+from apps.core.permissions import HasStaffPermission, IsTenantStaff
 from apps.inventory import hooks as inventory_hooks
 from apps.tables.models import Table, TableSession
 
@@ -39,7 +39,9 @@ class OrderListView(generics.ListAPIView):
     """List orders for a restaurant."""
 
     serializer_class = OrderListSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    # Role-based: kitchen/bar/waiter get here through StaffRole permissions.
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission]
+    required_permission = ("orders", "read")
 
     @require_restaurant
     def get_queryset(self):
@@ -94,7 +96,9 @@ class OrderDetailView(generics.RetrieveAPIView):
     """Get order details."""
 
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    # Role-based: kitchen/bar/waiter get here through StaffRole permissions.
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission]
+    required_permission = ("orders", "read")
     lookup_field = "id"
 
     @require_restaurant
@@ -139,7 +143,9 @@ def _add_items(order, items_data):
 class OrderCreateView(APIView):
     """Create a new order."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    # Role-based: kitchen/bar/waiter get here through StaffRole permissions.
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission]
+    required_permission = ("orders", "create")
 
     @require_restaurant
     def post(self, request):
@@ -223,7 +229,9 @@ class OrderCreateView(APIView):
 class OrderStatusUpdateView(APIView):
     """Update order status."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    # Role-based: kitchen/bar/waiter get here through StaffRole permissions.
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission]
+    required_permission = ("orders", "update")
 
     @require_restaurant
     def patch(self, request, id):
@@ -263,7 +271,9 @@ class OrderStatusUpdateView(APIView):
 class OrderAddItemView(APIView):
     """Add item to an existing order."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    # Role-based: kitchen/bar/waiter get here through StaffRole permissions.
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission]
+    required_permission = ("orders", "update")
 
     @require_restaurant
     def post(self, request, id):
@@ -307,7 +317,9 @@ class OrderAddItemView(APIView):
 class OrderItemStatusUpdateView(APIView):
     """Update order item status (for kitchen)."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    # Role-based: kitchen/bar/waiter get here through StaffRole permissions.
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission]
+    required_permission = ("orders", "update")
 
     @require_restaurant
     def patch(self, request, order_id, item_id):
@@ -350,18 +362,23 @@ class KitchenOrdersView(generics.ListAPIView):
     """Get orders for kitchen display."""
 
     serializer_class = KitchenOrderSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    # Role-based: kitchen/bar/waiter get here through StaffRole permissions.
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission]
+    required_permission = ("orders", "read")
+
+    KITCHEN_STATUSES = ("confirmed", "preparing", "ready")
 
     @require_restaurant
     def get_queryset(self):
+        statuses = [s for s in self.request.query_params.get("status", "").split(",") if s in self.KITCHEN_STATUSES]
         return (
             Order.objects.filter(
                 restaurant=self.request.restaurant,
-                status__in=["confirmed", "preparing"],
+                status__in=statuses or self.KITCHEN_STATUSES,
             )
             .select_related("table")
             .prefetch_related("items__modifiers")
-            .order_by("created_at")
+            .order_by(F("confirmed_at").asc(nulls_last=True), "created_at")
         )
 
 
@@ -370,7 +387,9 @@ class OrderHistoryView(generics.ListAPIView):
     """Get order status history."""
 
     serializer_class = OrderStatusHistorySerializer
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    # Role-based: kitchen/bar/waiter get here through StaffRole permissions.
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission]
+    required_permission = ("orders", "read")
 
     @require_restaurant
     def get_queryset(self):
@@ -393,7 +412,9 @@ class OrderServerAssignView(APIView):
     PATCH body: {"server_id": "<user-uuid>" | null}
     """
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    # Role-based: kitchen/bar/waiter get here through StaffRole permissions.
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission]
+    required_permission = ("orders", "update")
 
     @require_restaurant
     def patch(self, request, id):
@@ -451,7 +472,9 @@ class TipReportView(APIView):
     restaurant to distribute manually.
     """
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    # Role-based: kitchen/bar/waiter get here through StaffRole permissions.
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission]
+    required_permission = ("analytics", "read")
 
     @require_restaurant
     def get(self, request):
