@@ -2,14 +2,19 @@
 Table models for restaurant table management and QR code ordering.
 """
 
+import hashlib
 import secrets
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
+
+from .qr_links import DESTINATION_AUTO, DESTINATION_CHOICES, DESTINATION_CUSTOM, short_link, validate_custom_url
 
 
 class TableSection(TimeStampedModel):
@@ -216,6 +221,23 @@ class TableQRCode(TimeStampedModel):
     scans_count = models.PositiveIntegerField(default=0)
     last_scanned_at = models.DateTimeField(null=True, blank=True)
 
+    # Dynamic destination (see apps.tables.qr_links). The printed code encodes
+    # a short link; where it goes is decided at scan time from these fields
+    # and the table's current state.
+    destination = models.CharField(max_length=16, choices=DESTINATION_CHOICES, default=DESTINATION_AUTO)
+    custom_url = models.URLField(
+        max_length=2000,
+        blank=True,
+        validators=[URLValidator(schemes=["http", "https"])],
+        help_text="Only used when destination is 'Custom URL'.",
+    )
+    # What the stored PNG encodes. Images printed before short links exist
+    # encode the direct URL; they keep working but cannot be re-pointed.
+    qr_image_url = models.CharField(max_length=2000, blank=True, default="")
+    # Short-link hits; scans_count stays the validate-endpoint count.
+    resolves_count = models.PositiveIntegerField(default=0)
+    last_resolved_at = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         db_table = "table_qr_codes"
         verbose_name = _("Table QR Code")
@@ -232,19 +254,57 @@ class TableQRCode(TimeStampedModel):
         if not self.qr_image:
             self.generate_qr_image()
 
+    def clean(self):
+        super().clean()
+        if self.destination == DESTINATION_CUSTOM:
+            try:
+                self.custom_url = validate_custom_url(self.custom_url)
+            except ValidationError as exc:
+                raise ValidationError({"custom_url": exc.messages})
+        else:
+            self.custom_url = ""
+
     def get_qr_url(self):
-        """URL the QR code points to: {FRONTEND_BASE_URL}/restaurant/{slug}?table={code}."""
+        """What new QR images encode: the short link {FRONTEND_BASE_URL}/q/{code}."""
+        return short_link(self.code)
+
+    def direct_url(self):
+        """The legacy direct URL ({base}/restaurant/{slug}?table={code}); still valid, not re-pointable."""
         base = settings.FRONTEND_BASE_URL.rstrip("/")
         return f"{base}/restaurant/{self.table.restaurant.slug}?table={self.code}"
 
+    @property
+    def image_is_current(self):
+        return bool(self.qr_image) and self.qr_image_url == self.get_qr_url()
+
     def generate_qr_image(self):
-        """Generate and save QR code image."""
+        """Render and store the QR image for the current short link."""
         from django.core.files.base import ContentFile
 
         from .qr import render_qr_png
 
-        filename = f"qr_{self.table.restaurant.slug}_{self.table.number}_{self.code[:8]}.png"
-        self.qr_image.save(filename, ContentFile(render_qr_png(self.get_qr_url())), save=True)
+        url = self.get_qr_url()
+        # A new file name per encoded URL: object stores and browsers cache the
+        # old bytes under the old name.
+        digest = hashlib.sha1(url.encode()).hexdigest()[:6]
+        filename = f"qr_{self.table.restaurant.slug}_{self.table.number}_{self.code[:8]}_{digest}.png"
+        self.qr_image_url = url
+        self.qr_image.save(filename, ContentFile(render_qr_png(url)), save=False)
+        self.save(update_fields=["qr_image", "qr_image_url", "updated_at"])
+
+    def regenerate_qr_image(self):
+        """Replace the stored image (e.g. a legacy direct-URL image) with a short-link one."""
+        if self.qr_image:
+            self.qr_image.delete(save=False)
+        self.generate_qr_image()
+
+    def record_resolve(self):
+        """Count a short-link hit."""
+        from django.utils import timezone
+
+        self.resolves_count += 1
+        self.last_resolved_at = timezone.now()
+        self.save(update_fields=["resolves_count", "last_resolved_at"])
 
     def record_scan(self):
         """Record a QR code scan."""

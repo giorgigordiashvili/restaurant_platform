@@ -56,6 +56,10 @@ doubles as the request history.
             <td class="py-1 pr-3">{{ vt.min_capacity }}–{{ vt.capacity }}</td>
             <td class="py-1 pr-3">
               {% if vt.qr_image %}<a href="{{ vt.qr_image.url }}" download class="text-primary-600 hover:underline">{% translate "Download" %}</a>{% endif %}
+              {% if vt.qr_image and not vt.image_is_current %}<span class="ml-2 text-xs text-red-600">{% translate "legacy image" %}</span>{% endif %}
+              {% if can_manage %}
+              <form method="post" action="{% url 'tenant_admin:venues_venuesharerequest_table_regenerate_qr' vt.pk %}" class="inline">{% csrf_token %}<button type="submit" class="ml-2 text-xs text-primary-600 hover:underline">{% translate "Regenerate" %}</button></form>
+              {% endif %}
               <span class="block text-xs text-base-500 break-all">{{ vt.get_qr_url }}</span>
             </td>
             <td class="py-1 pr-3">{% if local %}<a href="{% url 'tenant_admin:tables_table_change' local.pk %}" class="text-primary-600 hover:underline">{{ local.number }}</a>{% else %}—{% endif %}</td>

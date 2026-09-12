@@ -9,6 +9,7 @@ from .views import (
     TableListCreateView,
     TableQRCodeDetailView,
     TableQRCodeListCreateView,
+    TableQRCodeRegenerateView,
     TableSectionDetailView,
     TableSectionListCreateView,
     TableSessionCloseView,
@@ -31,6 +32,7 @@ urlpatterns = [
     # QR Codes
     path("<uuid:table_id>/qr-codes/", TableQRCodeListCreateView.as_view(), name="qr-list"),
     path("qr-codes/<uuid:id>/", TableQRCodeDetailView.as_view(), name="qr-detail"),
+    path("qr-codes/<uuid:id>/regenerate/", TableQRCodeRegenerateView.as_view(), name="qr-regenerate"),
     # Sessions
     path("sessions/", TableSessionListView.as_view(), name="session-list"),
     path("sessions/start/", TableSessionCreateView.as_view(), name="session-start"),

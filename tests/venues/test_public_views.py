@@ -129,15 +129,15 @@ class TestRestaurantSerializersVenueField:
 
 
 @pytest.mark.django_db
-def test_qr_urls_use_frontend_base_url(venue_pair, a):
+def test_qr_urls_are_short_links_and_direct_urls_keep_legacy_format(venue_pair, a):
     mirror = Table.objects.get(restaurant=a, number="1")
-    assert (
-        mirror.qr_codes.first().get_qr_url()
-        == f"https://example.test/restaurant/{a.slug}?table={mirror.qr_codes.first().code}"
-    )
+    qr = mirror.qr_codes.first()
+    assert qr.get_qr_url() == f"https://example.test/q/{qr.code}"
+    assert qr.direct_url() == f"https://example.test/restaurant/{a.slug}?table={qr.code}"
     vt = mirror.venue_table
-    assert vt.get_qr_url() == f"https://example.test/venue/{venue_pair.slug}?table={vt.code}"
-    assert vt.code.startswith("v_") and vt.qr_image
+    assert vt.get_qr_url() == f"https://example.test/q/{vt.code}"
+    assert vt.direct_url() == f"https://example.test/venue/{venue_pair.slug}?table={vt.code}"
+    assert vt.code.startswith("v_") and vt.qr_image and vt.image_is_current
 
 
 @pytest.mark.django_db

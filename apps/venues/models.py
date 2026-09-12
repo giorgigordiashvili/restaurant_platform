@@ -8,6 +8,7 @@ so every existing per-restaurant scope (sessions, orders, payments, POS) is
 untouched. Membership is a OneToOne on Restaurant: one venue per restaurant.
 """
 
+import hashlib
 import secrets
 
 from django.conf import settings
@@ -129,6 +130,11 @@ class VenueTable(TimeStampedModel):
     qr_image = models.ImageField(upload_to="venue_qr_codes/", blank=True, null=True)
     scans_count = models.PositiveIntegerField(default=0)
     last_scanned_at = models.DateTimeField(null=True, blank=True)
+    # What the stored PNG encodes (short link vs legacy direct URL) and
+    # short-link hit counts; see apps.tables.qr_links.
+    qr_image_url = models.CharField(max_length=2000, blank=True, default="")
+    resolves_count = models.PositiveIntegerField(default=0)
+    last_resolved_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = "venue_tables"
@@ -159,16 +165,41 @@ class VenueTable(TimeStampedModel):
             self.generate_qr_image()
 
     def get_qr_url(self):
+        """What new QR images encode: the short link {FRONTEND_BASE_URL}/q/{code}."""
+        from apps.tables.qr_links import short_link
+
+        return short_link(self.code)
+
+    def direct_url(self):
+        """The legacy direct URL ({base}/venue/{slug}?table={code})."""
         base = settings.FRONTEND_BASE_URL.rstrip("/")
         return f"{base}/venue/{self.venue.slug}?table={self.code}"
+
+    @property
+    def image_is_current(self):
+        return bool(self.qr_image) and self.qr_image_url == self.get_qr_url()
 
     def generate_qr_image(self):
         from django.core.files.base import ContentFile
 
         from apps.tables.qr import render_qr_png
 
-        filename = f"venue_qr_{self.venue.slug}_{self.number}_{self.code[2:10]}.png"
-        self.qr_image.save(filename, ContentFile(render_qr_png(self.get_qr_url())), save=True)
+        url = self.get_qr_url()
+        digest = hashlib.sha1(url.encode()).hexdigest()[:6]
+        filename = f"venue_qr_{self.venue.slug}_{self.number}_{self.code[2:10]}_{digest}.png"
+        self.qr_image_url = url
+        self.qr_image.save(filename, ContentFile(render_qr_png(url)), save=False)
+        self.save(update_fields=["qr_image", "qr_image_url", "updated_at"])
+
+    def regenerate_qr_image(self):
+        if self.qr_image:
+            self.qr_image.delete(save=False)
+        self.generate_qr_image()
+
+    def record_resolve(self):
+        self.resolves_count += 1
+        self.last_resolved_at = timezone.now()
+        self.save(update_fields=["resolves_count", "last_resolved_at"])
 
     def record_scan(self):
         self.scans_count += 1

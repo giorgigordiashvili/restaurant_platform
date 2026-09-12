@@ -105,7 +105,7 @@ class TestRegistry:
         listed = a_api.get(URL + "tables/").json()["data"]
         assert [t["number"] for t in listed] == ["1", "2", "3"]
         assert listed[0]["local_table_id"] == str(Table.objects.get(restaurant=a, number="1").pk)
-        assert listed[0]["qr_url"].startswith("https://example.test/venue/")
+        assert listed[0]["qr_url"].startswith("https://example.test/q/v_")
 
         resp = a_api.post(URL + "tables/", {"number": "15", "capacity": 6}, format="json")
         assert resp.status_code == 201, resp.json()

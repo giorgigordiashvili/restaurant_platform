@@ -615,6 +615,11 @@ class VenueShareRequestTenantAdmin(TenantModelAdmin):
                 wrap(require_POST(self.table_deactivate_view)),
                 name="venues_venuesharerequest_table_deactivate",
             ),
+            path(
+                "tables/<uuid:table_id>/regenerate-qr/",
+                wrap(require_POST(self.table_regenerate_qr_view)),
+                name="venues_venuesharerequest_table_regenerate_qr",
+            ),
         ]
         return custom + super().get_urls()
 
@@ -723,6 +728,16 @@ class VenueShareRequestTenantAdmin(TenantModelAdmin):
         skipped = venue_services.deactivate_venue_table(vt)
         note = f" (kept active at {', '.join(skipped)}: session in progress)" if skipped else ""
         messages.success(request, f"Table {vt.number} retired{note}.")
+        return self._back()
+
+    def table_regenerate_qr_view(self, request, table_id):
+        self._guard(request)
+        membership = venue_services.get_membership(request.restaurant)
+        vt = membership.venue.tables.filter(pk=table_id).first() if membership else None
+        if vt is None:
+            raise PermissionDenied
+        vt.regenerate_qr_image()
+        messages.success(request, f"QR image for table {vt.number} regenerated (short link). Download and reprint it.")
         return self._back()
 
 
@@ -929,27 +944,92 @@ class TableQRCodeTenantAdmin(TenantModelAdmin):
     permission_resource = "tables"
     restaurant_field = None  # QR code links through table
 
-    list_display = ["table", "name", "is_active", "qr_preview", "download_link", "scans_count"]
-    list_filter = ["is_active"]
+    list_display = [
+        "table",
+        "name",
+        "destination",
+        "is_active",
+        "image_status",
+        "qr_preview",
+        "download_link",
+        "resolves_count",
+    ]
+    list_filter = ["is_active", "destination"]
     search_fields = ["code", "name", "table__number"]
-    readonly_fields = ["code", "scans_count", "last_scanned_at", "qr_code_display", "qr_url_display"]
+    readonly_fields = [
+        "code",
+        "scans_count",
+        "last_scanned_at",
+        "resolves_count",
+        "last_resolved_at",
+        "qr_code_display",
+        "qr_url_display",
+        "resolved_destination",
+        "image_status",
+    ]
     ordering = ["table__number"]
+    actions = ["regenerate_qr_images"]
     fieldsets = (
         (None, {"fields": ("table", "name", "is_active")}),
         (
+            "Destination",
+            {
+                "fields": ("destination", "custom_url", "resolved_destination"),
+                "description": (
+                    "The printed code never changes; where it goes is decided when it is scanned. "
+                    "'Automatic' follows the table (this restaurant's page, or the shared venue page "
+                    "when the table is shared). To move a code to another table, just change the table above."
+                ),
+            },
+        ),
+        (
             "QR Code",
             {
-                "fields": ("qr_code_display", "qr_url_display", "code"),
-                "description": "QR code is auto-generated when you save.",
+                "fields": ("qr_code_display", "qr_url_display", "image_status", "code"),
+                "description": "The image encodes the short link. Regenerate it before reprinting a legacy image.",
             },
         ),
         (
             "Statistics",
             {
-                "fields": ("scans_count", "last_scanned_at"),
+                "fields": ("resolves_count", "last_resolved_at", "scans_count", "last_scanned_at"),
             },
         ),
     )
+
+    @admin.display(description="Currently goes to")
+    def resolved_destination(self, obj):
+        from apps.tables.qr_links import resolve
+
+        destination = resolve(obj.code)
+        if destination is None:
+            return "Not resolvable (code, table or restaurant inactive)"
+        return format_html(
+            '{} → <a href="{}" target="_blank">{}</a>', destination.kind, destination.url, destination.url
+        )
+
+    @admin.display(description="Image")
+    def image_status(self, obj):
+        if not obj.qr_image:
+            return "No image yet"
+        if obj.image_is_current:
+            return format_html('<span class="text-primary-600 font-semibold">Short link ✓</span>')
+        return format_html(
+            '<span class="text-red-600 font-semibold" title="{}">Legacy — regenerate before reprinting</span>',
+            obj.qr_image_url or obj.direct_url(),
+        )
+
+    @admin.action(description="Regenerate QR image (short link)")
+    def regenerate_qr_images(self, request, queryset):
+        count = 0
+        for qr in queryset.select_related("table__restaurant"):
+            qr.regenerate_qr_image()
+            count += 1
+        messages.success(
+            request, f"Regenerated {count} QR image(s). Download and reprint them to make the codes dynamic."
+        )
+
+    regenerate_qr_images.allowed_permissions = ("change",)
 
     def get_queryset(self, request):
         """Filter by restaurant via table."""

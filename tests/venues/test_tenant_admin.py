@@ -90,3 +90,20 @@ class TestSharedTableRows:
         assert 'name="number"' in b_admin.get(f"/tenant-admin/tables/table/{private.pk}/change/").content.decode()
         shared = Table.objects.get(restaurant=b, number="2")
         assert b_admin.get(f"/tenant-admin/tables/table/{shared.pk}/delete/").status_code == 403
+
+
+@pytest.mark.django_db
+def test_regenerate_venue_qr_from_shared_venue_page(venue_pair, a_admin, a_waiter, a):
+    from apps.venues.models import VenueTable
+
+    vt = venue_pair.tables.get(number="2")
+    VenueTable.objects.filter(pk=vt.pk).update(qr_image_url="legacy")
+    html = a_admin.get(PAGE).content.decode()
+    assert "legacy image" in html
+
+    from .conftest import _admin
+
+    assert _admin(a_waiter, a).post(PAGE + f"tables/{vt.pk}/regenerate-qr/").status_code == 403
+    assert a_admin.post(PAGE + f"tables/{vt.pk}/regenerate-qr/").status_code == 302
+    vt.refresh_from_db()
+    assert vt.image_is_current and vt.qr_image.storage.exists(vt.qr_image.name)

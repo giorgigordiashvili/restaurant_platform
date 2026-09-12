@@ -17,6 +17,7 @@ from apps.accounts.views import FacebookDataDeletionView
 from apps.core.admin_sites import tenant_admin_site
 from apps.core.admin_views import set_simulated_restaurant
 from apps.core.views import health_check, readiness_check, tls_check
+from apps.tables.views import QRResolveView, qr_short_link_redirect
 
 
 def get_admin_urls(request):
@@ -62,6 +63,12 @@ urlpatterns = [
     # hand Meta (https://admin.aimenu.ge/data-deletion/) is clean and
     # memorable rather than buried under /api/v1/auth/.
     path("data-deletion/", FacebookDataDeletionView.as_view(), name="data-deletion"),
+    # Dynamic QR short links. The printed code is stable; the destination is
+    # resolved at scan time (apps/tables/qr_links.py). aimenu.ge/q/<code> is
+    # the canonical form (the frontend asks the API below); the root /q/ here
+    # does the same redirect for anyone hitting the API host directly.
+    path("api/v1/qr/<str:code>/", QRResolveView.as_view(), name="qr-resolve"),
+    path("q/<str:code>/", qr_short_link_redirect, name="qr-short-link"),
     # Language switching
     path("i18n/", include("django.conf.urls.i18n")),
     # Admin - tenant simulation URL must come before admin.site.urls

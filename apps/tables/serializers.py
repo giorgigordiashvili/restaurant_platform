@@ -50,7 +50,11 @@ class TableSectionSerializer(serializers.ModelSerializer):
 
 
 class TableQRCodeSerializer(serializers.ModelSerializer):
-    """Serializer for QR codes."""
+    """Serializer for QR codes (dynamic short links; see apps.tables.qr_links)."""
+
+    qr_url = serializers.SerializerMethodField(help_text="The short link the printed image should encode")
+    resolved_url = serializers.SerializerMethodField(help_text="Where the short link currently goes")
+    image_is_current = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = TableQRCode
@@ -59,10 +63,66 @@ class TableQRCodeSerializer(serializers.ModelSerializer):
             "code",
             "name",
             "is_active",
+            "destination",
+            "custom_url",
+            "qr_url",
+            "qr_image",
+            "image_is_current",
+            "resolved_url",
             "scans_count",
             "last_scanned_at",
+            "resolves_count",
+            "last_resolved_at",
         ]
-        read_only_fields = ["id", "code", "scans_count", "last_scanned_at"]
+        read_only_fields = [
+            "id",
+            "code",
+            "qr_image",
+            "scans_count",
+            "last_scanned_at",
+            "resolves_count",
+            "last_resolved_at",
+        ]
+
+    def get_qr_url(self, obj):
+        return obj.get_qr_url()
+
+    def get_resolved_url(self, obj):
+        from .qr_links import resolve
+
+        destination = resolve(obj.code)
+        return destination.url if destination else None
+
+    def validate(self, attrs):
+        from django.core.exceptions import ValidationError as DjangoValidationError
+
+        from .qr_links import DESTINATION_CUSTOM, validate_custom_url
+
+        destination = attrs.get("destination", getattr(self.instance, "destination", None))
+        if destination == DESTINATION_CUSTOM:
+            try:
+                attrs["custom_url"] = validate_custom_url(
+                    attrs.get("custom_url", getattr(self.instance, "custom_url", ""))
+                )
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError({"custom_url": exc.messages})
+        elif "destination" in attrs:
+            attrs["custom_url"] = ""
+        return attrs
+
+
+class QRResolveDataSerializer(serializers.Serializer):
+    kind = serializers.ChoiceField(choices=["restaurant", "venue", "menu", "custom"])
+    path = serializers.CharField(allow_null=True)
+    url = serializers.URLField()
+    restaurant_slug = serializers.CharField(allow_null=True)
+    venue_slug = serializers.CharField(allow_null=True)
+    table_code = serializers.CharField(allow_null=True)
+
+
+class QRResolveResponseSerializer(serializers.Serializer):
+    success = serializers.BooleanField()
+    data = QRResolveDataSerializer()
 
 
 class TableSerializer(serializers.ModelSerializer):

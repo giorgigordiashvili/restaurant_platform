@@ -2,6 +2,12 @@
 Views for tables app.
 """
 
+from django.conf import settings
+from django.http import HttpResponseRedirect
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_GET
+
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -15,9 +21,11 @@ from apps.core.permissions import IsTenantManager
 from apps.venues.services import venue_for_table
 
 from .models import Table, TableQRCode, TableSection, TableSession, TableSessionGuest
+from .qr_links import CODE_RE, resolve
 from .serializers import (
     JoinSessionSerializer,
     QRCodeScanSerializer,
+    QRResolveResponseSerializer,
     SessionInviteResponseSerializer,
     SessionJoinPreviewSerializer,
     TableCreateSerializer,
@@ -31,6 +39,48 @@ from .serializers import (
 )
 
 # ============== Public Views ==============
+
+
+@extend_schema(tags=["Tables"], responses={200: QRResolveResponseSerializer, 404: None})
+class QRResolveView(APIView):
+    """
+    Resolve a QR short-link code to its current destination.
+    GET /api/v1/qr/{code}/
+
+    Called server-side by the frontend's /q/<code> route on every scan -- all
+    from one IP, which is why it is exempt from the anonymous throttle.
+    """
+
+    permission_classes = [AllowAny]
+    authentication_classes: list = []
+    throttle_classes: list = []
+
+    @method_decorator(never_cache)
+    def get(self, request, code):
+        destination = resolve(code, record=True) if CODE_RE.match(code or "") else None
+        if destination is None:
+            return Response(
+                {"success": False, "error": {"code": "unknown_code", "message": "Unknown or inactive QR code."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        response = Response({"success": True, "data": destination.as_dict()})
+        response["Cache-Control"] = "no-store"
+        return response
+
+
+@never_cache
+@require_GET
+def qr_short_link_redirect(request, code):
+    """
+    GET /q/<code>/ on the API host: 302 to the current destination.
+
+    The canonical short link lives on the customer site (aimenu.ge/q/...),
+    which resolves through QRResolveView; this is the same thing for anyone
+    who hits the API host directly.
+    """
+    destination = resolve(code, record=True) if CODE_RE.match(code or "") else None
+    base = settings.FRONTEND_BASE_URL.rstrip("/")
+    return HttpResponseRedirect(destination.url if destination else f"{base}/scan?error=invalid")
 
 
 @extend_schema(tags=["Tables"])
@@ -327,6 +377,27 @@ class TableQRCodeDetailView(generics.RetrieveUpdateDestroyAPIView):
     @require_restaurant
     def get_queryset(self):
         return TableQRCode.objects.filter(table__restaurant=self.request.restaurant)
+
+
+@extend_schema(tags=["Dashboard - Tables"], request=None, responses={200: TableQRCodeSerializer})
+class TableQRCodeRegenerateView(APIView):
+    """Re-render a QR image so it encodes the short link (e.g. before reprinting a legacy one)."""
+
+    permission_classes = [IsAuthenticated, IsTenantManager]
+
+    @require_restaurant
+    def post(self, request, id):
+        qr = (
+            TableQRCode.objects.filter(id=id, table__restaurant=request.restaurant)
+            .select_related("table__restaurant")
+            .first()
+        )
+        if qr is None:
+            return Response(
+                {"success": False, "error": {"message": "QR code not found."}}, status=status.HTTP_404_NOT_FOUND
+            )
+        qr.regenerate_qr_image()
+        return Response({"success": True, "data": TableQRCodeSerializer(qr, context={"request": request}).data})
 
 
 @extend_schema(tags=["Dashboard - Tables"])
