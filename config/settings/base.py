@@ -587,6 +587,20 @@ UNFOLD = {
     "SHOW_LANGUAGES": True,
 }
 
+# The tenant admin (<slug>.ADMIN_DOMAIN) gets its own copy with a
+# module-aware sidebar; keep every key of UNFOLD here too (shallow copy).
+UNFOLD_TENANT = {
+    **UNFOLD,
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": False,
+        "navigation": "apps.core.sidebar.navigation",
+    },
+}
+
+# Where the staff POS app lives (sidebar links, invitation emails).
+POS_BASE_URL = config("POS_BASE_URL", default="https://pos.aimenu.ge")
+
 # Logging Configuration
 LOGGING = {
     "version": 1,

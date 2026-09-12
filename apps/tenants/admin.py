@@ -167,7 +167,39 @@ class RestaurantAdmin(SuperadminOnlyMixin, ExportMixin, UnfoldModelAdmin):
                 )
             },
         ),
-        ("Features", {"fields": ("accepts_remote_orders", "accepts_reservations", "accepts_takeaway")}),
+        (
+            "Modules",
+            {
+                "fields": (
+                    "accepts_remote_orders",
+                    "accepts_takeaway",
+                    "tables_enabled",
+                    "accepts_reservations",
+                    "kitchen_enabled",
+                    "warehouse_enabled",
+                    "loyalty_enabled",
+                    "accepts_platform_loyalty",
+                    "reviews_enabled",
+                ),
+                "description": (
+                    "Force modules on/off for this restaurant; restaurants manage these themselves "
+                    "under Settings -> Modules in their own admin."
+                ),
+            },
+        ),
+        (
+            "Payments",
+            {
+                "fields": (
+                    "accepts_bog_payments",
+                    "bog_payout_iban",
+                    "accepts_flitt_payments",
+                    "flitt_sub_merchant_id",
+                    "platform_commission_percent",
+                ),
+                "classes": ("collapse",),
+            },
+        ),
         (
             "Statistics",
             {

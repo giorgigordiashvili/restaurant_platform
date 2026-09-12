@@ -159,3 +159,27 @@ def staff_can(request, resource, action):
     if restaurant.owner_id == user.pk:
         return True
     return _member_can(user, restaurant, resource, action)
+
+
+def ModuleRequired(code):
+    """
+    Permission class factory: the request's restaurant must have the module
+    switched on (see apps.core.modules). Renders as 403 {"code": "module_disabled"}.
+    """
+    from rest_framework.exceptions import PermissionDenied
+
+    class _ModuleRequired(BasePermission):
+        message = f"The {code} module is switched off at this restaurant."
+
+        def has_permission(self, request, view):
+            from apps.core.modules import is_enabled
+
+            restaurant = getattr(request, "restaurant", None)
+            if restaurant is None:
+                return True  # tenant resolution failures are reported by the other classes
+            if is_enabled(restaurant, code):
+                return True
+            raise PermissionDenied({"code": "module_disabled", "module": code, "message": self.message})
+
+    _ModuleRequired.__name__ = f"ModuleRequired_{code}"
+    return _ModuleRequired

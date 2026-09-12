@@ -21,6 +21,9 @@ class TenantAdminSite(UnfoldAdminSite):
     site_header = "Restaurant Dashboard"
     site_title = "Restaurant Dashboard"
     index_title = "Dashboard"
+    # Own Unfold config (module-aware sidebar) -- the platform /admin/ keeps UNFOLD.
+    settings_name = "UNFOLD_TENANT"
+    index_template = "admin/tenant_index.html"
 
     # Model name to permission resource mapping
     MODEL_TO_RESOURCE = {
@@ -62,6 +65,12 @@ class TenantAdminSite(UnfoldAdminSite):
         "loyaltyprogram": "menu",
         "loyaltycounter": "menu",
         "loyaltyredemption": "menu",
+        # Reviews share the menu-manager bucket too.
+        "review": "menu",
+        "reviewreport": "menu",
+        # Modules page + hours inline live with settings.
+        "restaurantmodules": "settings",
+        "restauranthours": "settings",
         # Warehouse (hidden entirely until Restaurant.warehouse_enabled).
         "warehouseoverview": "warehouse",
         "stockitem": "warehouse",
@@ -104,23 +113,42 @@ class TenantAdminSite(UnfoldAdminSite):
 
     def get_app_list(self, request, app_label=None):
         """
-        Filter the app list based on staff role permissions.
-
-        Only shows models that the user's role has 'read' permission for.
+        The app list feeds the index and the command palette: drop whatever
+        belongs to a module the restaurant has switched off, then keep only
+        the models the user's role may read.
         """
+        from apps.core import modules
+
         app_list = super().get_app_list(request, app_label)
-
-        # The warehouse is opt-in per restaurant: keep it out of the sidebar
-        # (for everyone, superusers included) until it is switched on.
         restaurant = getattr(request, "restaurant", None)
-        if not (restaurant and restaurant.warehouse_enabled):
-            app_list = [app for app in app_list if app.get("app_label") != "inventory"]
+        if not restaurant:
+            return []
 
-        # Superusers see everything
+        hidden_apps = modules.hidden_apps(restaurant)
+        hidden_models = modules.hidden_models(restaurant)
+        pruned = []
+        for app in app_list:
+            if app.get("app_label") in hidden_apps:
+                continue
+            kept = [
+                m
+                for m in app.get("models", [])
+                if (app.get("app_label"), m.get("object_name", "").lower()) not in hidden_models
+            ]
+            if kept:
+                pruned.append({**app, "models": kept})
+
         if request.user.is_superuser:
-            return app_list
+            return pruned
+        return self._filter_by_role_permissions(request, pruned)
 
-        return self._filter_by_role_permissions(request, app_list)
+    def index(self, request, extra_context=None):
+        from apps.core.dashboard import module_cards
+
+        extra_context = dict(extra_context or {})
+        if getattr(request, "restaurant", None):
+            extra_context["module_cards"] = module_cards(request)
+        return super().index(request, extra_context)
 
     def _filter_by_role_permissions(self, request, app_list):
         """Filter models based on StaffRole permissions."""

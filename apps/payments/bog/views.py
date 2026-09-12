@@ -266,6 +266,8 @@ class InitiatePaymentView(APIView):
         # too so raw API clients can't bypass it.
         if not restaurant.accepts_remote_orders:
             raise ValueError("Ordering is disabled at this restaurant.")
+        if payload.get("order_type", "dine_in") != "dine_in" and not restaurant.accepts_takeaway:
+            raise ValueError("This restaurant only takes dine-in orders.")
 
         table = None
         if payload.get("table_id"):

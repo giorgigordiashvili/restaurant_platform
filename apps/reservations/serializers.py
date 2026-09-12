@@ -333,11 +333,11 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
         if not restaurant:
             raise serializers.ValidationError("Restaurant context is required.")
 
-        # Check if restaurant accepts reservations
+        # The Reservations module switch lives on the restaurant.
+        if not restaurant.accepts_reservations:
+            raise serializers.ValidationError("This restaurant does not accept online reservations.")
         try:
             settings = restaurant.reservation_settings
-            if not settings.accepts_reservations:
-                raise serializers.ValidationError("This restaurant does not accept online reservations.")
 
             # Check advance booking window
             reservation_datetime = timezone.make_aware(

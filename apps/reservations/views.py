@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.core.middleware.tenant import get_current_restaurant, require_restaurant
-from apps.core.permissions import IsTenantStaff
+from apps.core.permissions import IsTenantStaff, ModuleRequired
 
 from .models import (
     Reservation,
@@ -79,14 +79,14 @@ class PublicAvailabilityView(APIView):
         date = serializer.validated_data["date"]
         party_size = serializer.validated_data["party_size"]
 
+        if not restaurant.accepts_reservations:
+            return Response(
+                {"error": "This restaurant does not accept online reservations."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         # Get restaurant settings
         try:
             settings = restaurant.reservation_settings
-            if not settings.accepts_reservations:
-                return Response(
-                    {"error": "This restaurant does not accept online reservations."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
             slot_interval = settings.slot_interval_minutes
         except ReservationSettings.DoesNotExist:
             slot_interval = 30
@@ -397,7 +397,7 @@ class DashboardReservationSettingsView(generics.RetrieveUpdateAPIView):
     """Get or update reservation settings."""
 
     serializer_class = ReservationSettingsAdminSerializer
-    permission_classes = [IsAuthenticated, IsTenantStaff]
+    permission_classes = [IsAuthenticated, IsTenantStaff, ModuleRequired("reservations")]
 
     @require_restaurant
     def get(self, request, *args, **kwargs):
@@ -421,7 +421,7 @@ class DashboardReservationListView(generics.ListAPIView):
     """List reservations for dashboard."""
 
     serializer_class = ReservationListSerializer
-    permission_classes = [IsAuthenticated, IsTenantStaff]
+    permission_classes = [IsAuthenticated, IsTenantStaff, ModuleRequired("reservations")]
 
     @require_restaurant
     def get(self, request, *args, **kwargs):
@@ -472,7 +472,7 @@ class DashboardReservationCreateView(generics.CreateAPIView):
     """Create a reservation from dashboard."""
 
     serializer_class = ReservationDashboardCreateSerializer
-    permission_classes = [IsAuthenticated, IsTenantStaff]
+    permission_classes = [IsAuthenticated, IsTenantStaff, ModuleRequired("reservations")]
 
     @require_restaurant
     def post(self, request, *args, **kwargs):
@@ -501,7 +501,7 @@ class DashboardReservationDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Get, update, or delete a reservation."""
 
     serializer_class = ReservationDetailSerializer
-    permission_classes = [IsAuthenticated, IsTenantStaff]
+    permission_classes = [IsAuthenticated, IsTenantStaff, ModuleRequired("reservations")]
 
     @require_restaurant
     def get(self, request, *args, **kwargs):
@@ -532,7 +532,7 @@ class DashboardReservationDetailView(generics.RetrieveUpdateDestroyAPIView):
 class DashboardReservationStatusView(APIView):
     """Update reservation status."""
 
-    permission_classes = [IsAuthenticated, IsTenantStaff]
+    permission_classes = [IsAuthenticated, IsTenantStaff, ModuleRequired("reservations")]
 
     @require_restaurant
     def post(self, request, pk):
@@ -565,7 +565,7 @@ class DashboardReservationStatusView(APIView):
 class DashboardReservationAssignTableView(APIView):
     """Assign a table to a reservation."""
 
-    permission_classes = [IsAuthenticated, IsTenantStaff]
+    permission_classes = [IsAuthenticated, IsTenantStaff, ModuleRequired("reservations")]
 
     @require_restaurant
     def post(self, request, pk):
@@ -601,7 +601,7 @@ class DashboardTodayReservationsView(generics.ListAPIView):
     """Get today's reservations."""
 
     serializer_class = ReservationListSerializer
-    permission_classes = [IsAuthenticated, IsTenantStaff]
+    permission_classes = [IsAuthenticated, IsTenantStaff, ModuleRequired("reservations")]
 
     @require_restaurant
     def get(self, request, *args, **kwargs):
@@ -621,7 +621,7 @@ class DashboardUpcomingReservationsView(generics.ListAPIView):
     """Get upcoming reservations."""
 
     serializer_class = ReservationListSerializer
-    permission_classes = [IsAuthenticated, IsTenantStaff]
+    permission_classes = [IsAuthenticated, IsTenantStaff, ModuleRequired("reservations")]
 
     @require_restaurant
     def get(self, request, *args, **kwargs):
@@ -640,7 +640,7 @@ class DashboardBlockedTimeListView(generics.ListCreateAPIView):
     """List and create blocked times."""
 
     serializer_class = ReservationBlockedTimeSerializer
-    permission_classes = [IsAuthenticated, IsTenantStaff]
+    permission_classes = [IsAuthenticated, IsTenantStaff, ModuleRequired("reservations")]
 
     @require_restaurant
     def get(self, request, *args, **kwargs):
@@ -664,7 +664,7 @@ class DashboardBlockedTimeDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Get, update, or delete a blocked time."""
 
     serializer_class = ReservationBlockedTimeSerializer
-    permission_classes = [IsAuthenticated, IsTenantStaff]
+    permission_classes = [IsAuthenticated, IsTenantStaff, ModuleRequired("reservations")]
 
     @require_restaurant
     def get(self, request, *args, **kwargs):
@@ -695,7 +695,7 @@ class DashboardBlockedTimeDetailView(generics.RetrieveUpdateDestroyAPIView):
 class DashboardReservationStatsView(APIView):
     """Get reservation statistics."""
 
-    permission_classes = [IsAuthenticated, IsTenantStaff]
+    permission_classes = [IsAuthenticated, IsTenantStaff, ModuleRequired("reservations")]
 
     @require_restaurant
     def get(self, request):

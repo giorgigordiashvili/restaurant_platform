@@ -27,6 +27,7 @@ from unfold.decorators import display
 
 from apps.core.tenant_admin_base import (
     UNFOLD_INPUT_CLASSES,
+    ModuleEnabledMixin,
     TenantForeignKeyScopingMixin,
     TenantInlineMixin,
     TenantModelAdmin,
@@ -63,27 +64,10 @@ def _membership(request):
 _fmt = fmt_qty
 
 
-class WarehouseEnabledMixin:
-    """Hide the whole warehouse until the restaurant switches it on in Settings."""
+class WarehouseEnabledMixin(ModuleEnabledMixin):
+    """Hide the whole warehouse until the restaurant switches the module on."""
 
-    def _warehouse_on(self, request):
-        restaurant = getattr(request, "restaurant", None)
-        return bool(restaurant and restaurant.warehouse_enabled)
-
-    def has_module_permission(self, request):
-        return self._warehouse_on(request) and super().has_module_permission(request)
-
-    def has_view_permission(self, request, obj=None):
-        return self._warehouse_on(request) and super().has_view_permission(request, obj)
-
-    def has_add_permission(self, request):
-        return self._warehouse_on(request) and super().has_add_permission(request)
-
-    def has_change_permission(self, request, obj=None):
-        return self._warehouse_on(request) and super().has_change_permission(request, obj)
-
-    def has_delete_permission(self, request, obj=None):
-        return self._warehouse_on(request) and super().has_delete_permission(request, obj)
+    module_code = "warehouse"
 
 
 class ReadOnlyAfterSaveMixin:

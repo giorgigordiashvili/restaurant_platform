@@ -50,6 +50,8 @@ def accrue_platform_points(order, *, source: str) -> None:
     restaurant = getattr(order, "restaurant", None)
     if not restaurant or not getattr(restaurant, "accepts_platform_loyalty", False):
         return
+    if not getattr(restaurant, "loyalty_enabled", True):
+        return
 
     customer = getattr(order, "customer", None)
     if not customer:

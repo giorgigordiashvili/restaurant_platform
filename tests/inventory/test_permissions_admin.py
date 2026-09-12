@@ -260,6 +260,10 @@ def test_recipe_inline_hidden_when_warehouse_off(manager_admin, wh, salad):
 
 
 def test_settings_toggle_and_platform_inline(wh, manager_admin, pizza, flour, lots, order_factory):
+    # The module switch moved to Settings -> Modules; the delivery platform
+    # inline stays on the settings page while the warehouse is on.
     html = manager_admin.get(f"/tenant-admin/tenants/restaurant/{wh.pk}/change/").content.decode()
-    assert 'name="warehouse_enabled"' in html
+    assert 'name="warehouse_enabled"' not in html
     assert "delivery_platforms-TOTAL_FORMS" in html
+    modules_html = manager_admin.get("/tenant-admin/tenants/restaurantmodules/").content.decode()
+    assert 'data-testid="module-warehouse"' in modules_html

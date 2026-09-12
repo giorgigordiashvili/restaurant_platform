@@ -1,0 +1,8 @@
+You're invited to join {{ restaurant.name }} on AiMenu as {{ role }}.
+{% if invited_by %}Invited by {{ invited_by.full_name|default:invited_by.email }}.{% endif %}
+{% if message %}
+Message: {{ message }}
+{% endif %}
+Accept the invitation: {{ accept_url }}
+
+The link expires on {{ expires_at|date:"Y-m-d H:i" }}.

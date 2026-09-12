@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
 from apps.core.middleware.tenant import get_current_restaurant, require_restaurant
-from apps.core.permissions import IsTenantManager
+from apps.core.permissions import IsTenantManager, ModuleRequired
 
 from .models import LoyaltyCounter, LoyaltyProgram, LoyaltyRedemption
 from .serializers import (
@@ -94,6 +94,8 @@ class CustomerLoyaltyRedeemView(APIView):
         except LoyaltyProgram.DoesNotExist:
             return _err("not_found", "Program not found.", status.HTTP_404_NOT_FOUND)
 
+        if not program.restaurant.loyalty_enabled:
+            return _err("module_disabled", "Loyalty is switched off at this restaurant.", status.HTTP_403_FORBIDDEN)
         if not program.is_live():
             return _err("not_live", "This program is not currently running.")
 
@@ -138,7 +140,7 @@ class CustomerLoyaltyRedeemView(APIView):
 
 @extend_schema(tags=["Dashboard - Loyalty"])
 class DashboardProgramListCreateView(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("loyalty")]
 
     def get_serializer_class(self):
         if self.request.method == "POST":
@@ -169,7 +171,7 @@ class DashboardProgramListCreateView(generics.ListCreateAPIView):
 
 @extend_schema(tags=["Dashboard - Loyalty"])
 class DashboardProgramDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("loyalty")]
 
     def get_serializer_class(self):
         if self.request.method in ("PUT", "PATCH"):
@@ -203,7 +205,7 @@ class DashboardValidateView(APIView):
     """Staff types/scans a code; returns the redemption context (no state
     change). Used to pre-fill the confirm screen on the POS."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("loyalty")]
 
     @require_restaurant
     def post(self, request):
@@ -233,7 +235,7 @@ class DashboardValidateView(APIView):
 class DashboardConfirmView(APIView):
     """Commit the redemption: counter -= threshold, status = redeemed."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("loyalty")]
 
     @require_restaurant
     def post(self, request):

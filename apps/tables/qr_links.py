@@ -85,7 +85,8 @@ def _for_table_qr(qr):
 
     if destination == DESTINATION_CUSTOM and qr.custom_url:
         return QRDestination(kind="custom", path=None, url=qr.custom_url, restaurant_slug=slug)
-    if destination == DESTINATION_MENU_ONLY:
+    if destination == DESTINATION_MENU_ONLY or not table.restaurant.tables_enabled:
+        # Tables module off: printed codes keep working, but land on the menu.
         return _platform("menu", f"/restaurant/{slug}", restaurant_slug=slug)
     if destination == DESTINATION_RESTAURANT:
         query = {"table": qr.code}

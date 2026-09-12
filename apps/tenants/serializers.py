@@ -98,6 +98,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
     amenities = AmenitySerializer(many=True, read_only=True)
     city_obj = serializers.SerializerMethodField()
     venue = serializers.SerializerMethodField()
+    modules = serializers.SerializerMethodField()
 
     class Meta:
         model = Restaurant
@@ -121,8 +122,11 @@ class RestaurantListSerializer(serializers.ModelSerializer):
             "accepts_platform_loyalty",
             "accepts_bog_payments",
             "accepts_flitt_payments",
-            "warehouse_enabled",
+            "modules",
         ]
+
+    def get_modules(self, obj):
+        return obj.modules
 
     def get_is_open_now(self, obj):
         return obj.is_open_now
@@ -157,6 +161,8 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
     venue = serializers.SerializerMethodField()
     category = RestaurantCategorySerializer(read_only=True)
     amenities = AmenitySerializer(many=True, read_only=True)
+
+    modules = serializers.SerializerMethodField()
 
     class Meta:
         model = Restaurant
@@ -200,7 +206,13 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
             "accepts_takeaway",
             "accepts_bog_payments",
             "accepts_flitt_payments",
+            "accepts_platform_loyalty",
             "warehouse_enabled",
+            "tables_enabled",
+            "kitchen_enabled",
+            "loyalty_enabled",
+            "reviews_enabled",
+            "modules",
             # Stats
             "average_rating",
             "total_reviews",
@@ -223,6 +235,9 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def get_modules(self, obj):
+        return obj.modules
 
     def get_is_open_now(self, obj):
         return obj.is_open_now
@@ -325,19 +340,39 @@ class RestaurantUpdateSerializer(serializers.ModelSerializer):
             "accepts_remote_orders",
             "accepts_reservations",
             "accepts_takeaway",
+            "accepts_platform_loyalty",
             "warehouse_enabled",
+            "tables_enabled",
+            "kitchen_enabled",
+            "loyalty_enabled",
+            "reviews_enabled",
             "minimum_order_amount",
             "average_preparation_time",
         ]
 
-    def update(self, instance, validated_data):
-        was_enabled = instance.warehouse_enabled
-        instance = super().update(instance, validated_data)
-        if "warehouse_enabled" in validated_data and validated_data["warehouse_enabled"] != was_enabled:
-            from apps.inventory import hooks
+    MODULE_FLAGS = (
+        "accepts_remote_orders",
+        "accepts_reservations",
+        "warehouse_enabled",
+        "tables_enabled",
+        "kitchen_enabled",
+        "loyalty_enabled",
+        "reviews_enabled",
+    )
 
-            hooks.on_feature_toggled(instance, validated_data["warehouse_enabled"])
-        return instance
+    def update(self, instance, validated_data):
+        # Module switches go through the registry so dependency rules, module
+        # hooks (warehouse recompute, reservation settings mirror) and the
+        # audit trail apply exactly as they do on the admin's Modules page.
+        from apps.core import modules
+
+        flags = {name: validated_data.pop(name) for name in self.MODULE_FLAGS if name in validated_data}
+        request = self.context.get("request")
+        try:
+            modules.apply_flags(instance, flags, by=getattr(request, "user", None))
+        except modules.ModuleError as exc:
+            raise serializers.ValidationError({"modules": exc.messages})
+        return super().update(instance, validated_data)
 
 
 class RestaurantHoursUpdateSerializer(serializers.Serializer):

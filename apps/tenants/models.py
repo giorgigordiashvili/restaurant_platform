@@ -318,6 +318,22 @@ class Restaurant(TimeStampedModel):
             "menu until it is on."
         ),
     )
+    tables_enabled = models.BooleanField(
+        default=True,
+        help_text="Tables & QR module: sections, tables, QR codes, table sessions, shared venues.",
+    )
+    kitchen_enabled = models.BooleanField(
+        default=True,
+        help_text="Kitchen display in the POS app. Needs Ordering.",
+    )
+    loyalty_enabled = models.BooleanField(
+        default=True,
+        help_text="Loyalty module: punch-card programs; platform tier discounts are an option inside it.",
+    )
+    reviews_enabled = models.BooleanField(
+        default=True,
+        help_text="Reviews module: customer reviews on the restaurant page.",
+    )
 
     # Payment provider activation + payout identifiers. Each provider is
     # independently opt-in; when the flag is on, the corresponding payout
@@ -418,6 +434,13 @@ class Restaurant(TimeStampedModel):
 
     def __str__(self):
         return self.name
+
+    @property
+    def modules(self) -> dict:
+        """{module code: enabled} -- see apps.core.modules."""
+        from apps.core.modules import modules_dict
+
+        return modules_dict(self)
 
     def clean(self):
         super().clean()
@@ -531,3 +554,12 @@ class RestaurantHours(TimeStampedModel):
             )
             hours.append(hour)
         return hours
+
+
+class RestaurantModules(Restaurant):
+    """Proxy so the tenant admin can hang the Modules page on its own sidebar entry."""
+
+    class Meta:
+        proxy = True
+        verbose_name = "Modules"
+        verbose_name_plural = "Modules"

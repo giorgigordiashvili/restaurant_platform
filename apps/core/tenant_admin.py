@@ -9,20 +9,25 @@ checked against the user's StaffRole.
 from django import forms
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Q
 from django.shortcuts import redirect
-from django.urls import path
+from django.urls import path, reverse
 from django.utils.html import format_html
 from django.views.decorators.http import require_POST
 
 from parler.admin import TranslatableAdmin, TranslatableTabularInline
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
 from unfold.admin import TabularInline as UnfoldTabularInline
+from unfold.decorators import display
 
+from apps.core import modules
 from apps.core.admin_sites import tenant_admin_site
+from apps.core.permission_widgets import PermissionMatrixField, rows_for
 from apps.core.tenant_admin_base import (  # noqa: F401 -- re-exported for existing imports
     UNFOLD_INPUT_CLASSES,
     UNFOLD_TEXTAREA_CLASSES,
+    ModuleEnabledMixin,
     OptionalTranslationInlineForm,
     TenantForeignKeyScopingMixin,
     TenantInlineMixin,
@@ -33,7 +38,6 @@ from apps.core.tenant_admin_base import (  # noqa: F401 -- re-exported for exist
     has_resource_permission,
     staff_permissions,
 )
-from apps.inventory import hooks as inventory_hooks
 from apps.inventory.tenant_admin import (
     MenuItemRecipeLineInline,
     ModifierRecipeLineInline,
@@ -44,13 +48,13 @@ from apps.loyalty.models import LoyaltyCounter, LoyaltyProgram, LoyaltyRedemptio
 
 # Import models
 from apps.menu.models import MenuCategory, MenuItem, MenuItemModifierGroup, Modifier, ModifierGroup
-from apps.reservations.models import (
-    ReservationSettings,
-)
+from apps.orders.models import Order, OrderItem, OrderStatusHistory
+from apps.reservations.models import Reservation, ReservationBlockedTime, ReservationSettings
 from apps.reviews.models import Review, ReviewReport
+from apps.staff import services as staff_services
 from apps.staff.models import StaffInvitation, StaffMember, StaffRole
 from apps.tables.models import Table, TableQRCode, TableSection, TableSession
-from apps.tenants.models import Restaurant, RestaurantHours
+from apps.tenants.models import Restaurant, RestaurantHours, RestaurantModules
 from apps.venues import services as venue_services
 from apps.venues.models import VenueShareRequest
 
@@ -273,7 +277,7 @@ class VenueTableForm(forms.Form):
     section = forms.UUIDField(required=False)
 
 
-class VenueShareRequestTenantAdmin(TenantModelAdmin):
+class VenueShareRequestTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
     """
     The "Shared venue" page: current venue, its tables, incoming/outgoing
     share requests and the invite form. The stock add/change forms are
@@ -283,6 +287,7 @@ class VenueShareRequestTenantAdmin(TenantModelAdmin):
     """
 
     permission_resource = "settings"
+    module_code = "tables"
     restaurant_field = None
     list_display = ["direction_display", "other_restaurant", "venue_name", "status", "created_at"]
     list_filter = ["status"]
@@ -517,93 +522,58 @@ class VenueShareRequestTenantAdmin(TenantModelAdmin):
 # =============================================================================
 
 
-class OrderTenantAdmin(TenantModelAdmin):
-    """Admin for orders."""
+class OrderItemInline(TenantInlineMixin, UnfoldTabularInline):
+    permission_resource = "orders"
+    permission_actions = {"view": "read", "add": "read", "change": "read", "delete": "read"}
+    model = OrderItem
+    extra = 0
+    can_delete = False
+    fields = ["item_name", "quantity", "unit_price", "total_price", "status", "preparation_station"]
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+class OrderStatusHistoryInline(TenantInlineMixin, UnfoldTabularInline):
+    permission_resource = "orders"
+    permission_actions = {"view": "read", "add": "read", "change": "read", "delete": "read"}
+    model = OrderStatusHistory
+    extra = 0
+    can_delete = False
+    fields = ["from_status", "to_status", "changed_by", "notes", "created_at"]
+    readonly_fields = fields
+    ordering = ["-created_at"]
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+class OrderTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
+    """
+    Orders, read-only. Status changes happen in the POS / API so the
+    warehouse hooks and the status history always run.
+    """
 
     permission_resource = "orders"
-    list_display = [
-        "order_number",
-        "status",
-        "order_type",
-        "table",
-        "total",
-        "created_at",
-    ]
+    module_code = "ordering"
+    list_display = ["order_number", "status", "order_type", "table", "customer_name", "total", "created_at"]
     list_filter = ["status", "order_type", "created_at"]
     search_fields = ["order_number", "customer_name", "customer_phone"]
-    readonly_fields = [
-        "order_number",
-        "subtotal",
-        "tax_amount",
-        "service_charge",
-        "total",
-        "created_at",
-        "updated_at",
-    ]
     ordering = ["-created_at"]
     date_hierarchy = "created_at"
+    inlines = [OrderItemInline, OrderStatusHistoryInline]
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("table", "customer")
 
-
-class OrderItemTenantAdmin(TenantModelAdmin):
-    """Admin for order items."""
-
-    permission_resource = "orders"
-    restaurant_field = None  # OrderItem doesn't have direct restaurant FK
-
-    list_display = [
-        "item_name",
-        "order",
-        "quantity",
-        "unit_price",
-        "total_price",
-        "status",
-    ]
-    list_filter = ["status", "preparation_station"]
-    search_fields = ["item_name", "order__order_number"]
-    ordering = ["-created_at"]
-
-    def get_queryset(self, request):
-        """Filter by restaurant via order."""
-        qs = super().get_queryset(request)
-        restaurant = getattr(request, "restaurant", None)
-        if restaurant:
-            qs = qs.filter(order__restaurant=restaurant)
-        return qs.select_related("order", "menu_item")
-
-
-class OrderStatusHistoryTenantAdmin(TenantModelAdmin):
-    """Admin for order status history."""
-
-    permission_resource = "orders"
-    restaurant_field = None
-
-    list_display = ["order", "from_status", "to_status", "changed_by", "created_at"]
-    list_filter = ["to_status", "created_at"]
-    search_fields = ["order__order_number"]
-    readonly_fields = ["order", "from_status", "to_status", "changed_by", "created_at"]
-    ordering = ["-created_at"]
-
-    def get_queryset(self, request):
-        """Filter by restaurant via order."""
-        qs = super().get_queryset(request)
-        restaurant = getattr(request, "restaurant", None)
-        if restaurant:
-            qs = qs.filter(order__restaurant=restaurant)
-        return qs.select_related("order", "changed_by")
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in Order._meta.fields if f.name != "id"]
 
     def has_add_permission(self, request):
-        """Status history is auto-generated, not manually added."""
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        """Status history is immutable."""
         return False
 
     def has_delete_permission(self, request, obj=None):
-        """Status history should not be deleted."""
         return False
 
 
@@ -672,10 +642,11 @@ class VenueManagedRowsMixin:
         super().delete_queryset(request, queryset.filter(**{f"{self.link_field}__isnull": True}))
 
 
-class TableSectionTenantAdmin(VenueManagedRowsMixin, TenantModelAdmin):
+class TableSectionTenantAdmin(ModuleEnabledMixin, VenueManagedRowsMixin, TenantModelAdmin):
     """Admin for table sections."""
 
     permission_resource = "tables"
+    module_code = "tables"
     link_field = "venue_section"
     locked_fields = ("name",)
     list_display = ["name", "shared_badge", "display_order", "is_active"]
@@ -685,10 +656,11 @@ class TableSectionTenantAdmin(VenueManagedRowsMixin, TenantModelAdmin):
     ordering = ["display_order"]
 
 
-class TableTenantAdmin(VenueManagedRowsMixin, TenantModelAdmin):
+class TableTenantAdmin(ModuleEnabledMixin, VenueManagedRowsMixin, TenantModelAdmin):
     """Admin for tables."""
 
     permission_resource = "tables"
+    module_code = "tables"
     link_field = "venue_table"
     locked_fields = ("number", "name", "capacity", "min_capacity", "section", "shape")
     list_display = [
@@ -709,10 +681,11 @@ class TableTenantAdmin(VenueManagedRowsMixin, TenantModelAdmin):
         return super().get_queryset(request).select_related("section", "venue_table")
 
 
-class TableQRCodeTenantAdmin(TenantModelAdmin):
+class TableQRCodeTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
     """Admin for table QR codes."""
 
     permission_resource = "tables"
+    module_code = "tables"
     restaurant_field = None  # QR code links through table
 
     list_display = [
@@ -851,10 +824,11 @@ class TableQRCodeTenantAdmin(TenantModelAdmin):
         return "-"
 
 
-class TableSessionTenantAdmin(TenantModelAdmin):
+class TableSessionTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
     """Admin for table sessions."""
 
     permission_resource = "tables"
+    module_code = "tables"
     restaurant_field = None  # Session links through table
 
     list_display = [
@@ -884,48 +858,218 @@ class TableSessionTenantAdmin(TenantModelAdmin):
 # =============================================================================
 
 
+class StaffRoleForm(forms.ModelForm):
+    class Meta:
+        model = StaffRole
+        fields = ["name", "display_name", "description", "permissions"]
+
+    restaurant = None  # set by the admin; the FK is not on the form
+
+    def clean(self):
+        data = super().clean()
+        name = data.get("name") or getattr(self.instance, "name", None) or "custom"
+        display_name = (data.get("display_name") or "").strip()
+        if name == "custom":
+            if not display_name:
+                self.add_error("display_name", "Give the custom role a name.")
+            elif self.restaurant is not None:
+                # The DB constraint involves the (excluded) restaurant FK, so
+                # Django's form validation skips it -- check here instead.
+                clash = StaffRole.objects.filter(restaurant=self.restaurant, name="custom", display_name=display_name)
+                if self.instance.pk:
+                    clash = clash.exclude(pk=self.instance.pk)
+                if clash.exists():
+                    self.add_error("display_name", "A role with this name already exists.")
+        return data
+
+
 class StaffRoleTenantAdmin(TenantModelAdmin):
-    """Admin for staff roles."""
+    """
+    Roles: the built-in ones can be re-tuned, and any number of custom roles
+    can be added. Permissions are a checkbox grid over the modules that are
+    switched on; permissions of switched-off modules are kept untouched.
+    """
 
     permission_resource = "staff"
-    list_display = ["name", "display_name", "is_system_role"]
-    list_filter = ["name", "is_system_role"]
+    form = StaffRoleForm
+    list_display = ["role_label", "name", "is_system_role", "members_count"]
+    list_filter = ["is_system_role"]
     search_fields = ["name", "display_name"]
-    ordering = ["name"]
+    ordering = ["-is_system_role", "name", "display_name"]
+    fields = ["name", "display_name", "description", "permissions"]
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.restaurant = request.restaurant
+        rows = rows_for(request.restaurant)
+        visible = {r for r, _ in rows}
+        current = obj.permissions if obj else {}
+        keep = {k: v for k, v in current.items() if k not in visible}
+        form.base_fields["permissions"] = PermissionMatrixField(rows, keep=keep, label="Permissions")
+        if "name" in form.base_fields and (obj is None or not obj.is_system_role):
+            form.base_fields["name"].choices = [("custom", "Custom role")]
+            form.base_fields["name"].initial = "custom"
+        return form
+
+    def get_readonly_fields(self, request, obj=None):
+        return ["name"] if obj is not None and obj.is_system_role else []
 
     def has_delete_permission(self, request, obj=None):
-        """Prevent deletion of system roles."""
-        if obj and obj.is_system_role:
+        if obj is not None and (obj.is_system_role or obj.members.exists()):
             return False
         return super().has_delete_permission(request, obj)
 
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.name = "custom"
+            obj.is_system_role = False
+        super().save_model(request, obj, form, change)
+
+    @display(description="Role")
+    def role_label(self, obj):
+        return obj.get_display_name()
+
+    @display(description="Members")
+    def members_count(self, obj):
+        return obj.members.filter(is_active=True).count()
+
 
 class StaffMemberTenantAdmin(TenantModelAdmin):
-    """Admin for staff members."""
+    """Members are added by invitation; here a manager changes role, access and extra permissions."""
 
     permission_resource = "staff"
-    list_display = ["user", "role", "is_active", "joined_at"]
+    list_display = ["email", "full_name", "role", "is_active", "last_login"]
     list_filter = ["role", "is_active"]
-    list_editable = ["is_active"]
     search_fields = ["user__email", "user__first_name", "user__last_name"]
     ordering = ["-created_at"]
+    fields = ["user_display", "role", "is_active", "permissions_override", "notes", "joined_at", "invited_by"]
+    readonly_fields = ["user_display", "joined_at", "invited_by"]
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("user", "role")
 
+    def has_add_permission(self, request):
+        return False  # invitations only
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        rows = rows_for(request.restaurant)
+        visible = {r for r, _ in rows}
+        current = obj.permissions_override if obj else {}
+        keep = {k: v for k, v in current.items() if k not in visible}
+        form.base_fields["permissions_override"] = PermissionMatrixField(
+            rows,
+            keep=keep,
+            label="Extra permissions",
+            help_text="Added on top of the role for this person only.",
+        )
+        return form
+
+    def save_model(self, request, obj, form, change):
+        if not obj.is_active and obj.user_id in (request.restaurant.owner_id, request.user.pk):
+            messages.error(request, "The owner and your own account cannot be deactivated here.")
+            obj.is_active = True
+        super().save_model(request, obj, form, change)
+
+    @display(description="Email")
+    def email(self, obj):
+        return obj.user.email
+
+    @display(description="Name")
+    def full_name(self, obj):
+        return obj.user.full_name
+
+    @display(description="Last login")
+    def last_login(self, obj):
+        return obj.user.last_login
+
+    @display(description="Person")
+    def user_display(self, obj):
+        return f"{obj.user.full_name} <{obj.user.email}>"
+
+
+class StaffInviteAdminForm(forms.ModelForm):
+    class Meta:
+        model = StaffInvitation
+        fields = ["email", "role", "message"]
+
 
 class StaffInvitationTenantAdmin(TenantModelAdmin):
-    """Admin for staff invitations."""
+    """Invite by email; the invitation is emailed on save and immutable afterwards."""
 
     permission_resource = "staff"
-    list_display = ["email", "role", "status", "invited_by", "expires_at"]
+    form = StaffInviteAdminForm
+    list_display = ["email", "role", "status_badge", "invited_by", "expires_at", "created_at"]
     list_filter = ["status", "role"]
     search_fields = ["email"]
-    readonly_fields = ["token", "accepted_at", "accepted_by"]
     ordering = ["-created_at"]
+    actions = ["resend_invitations", "cancel_invitations"]
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("role", "invited_by")
+
+    def get_fields(self, request, obj=None):
+        if obj is None:
+            return ["email", "role", "message"]
+        return ["email", "role", "message", "status", "invited_by", "expires_at", "accepted_at", "accepted_by"]
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj is None:
+            return []
+        return ["email", "role", "message", "status", "invited_by", "expires_at", "accepted_at", "accepted_by"]
+
+    def has_change_permission(self, request, obj=None):
+        if obj is not None:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def save_model(self, request, obj, form, change):
+        try:
+            staff_services.invite(
+                request.restaurant,
+                obj.email,
+                obj.role,
+                invited_by=request.user,
+                message=obj.message,
+                instance=obj,
+            )
+        except staff_services.InviteError as exc:
+            messages.error(request, str(exc))
+            raise PermissionDenied(str(exc))
+
+    def response_add(self, request, obj, post_url_continue=None):
+        messages.success(request, f"Invitation emailed to {obj.email}.")
+        return redirect("tenant_admin:staff_staffinvitation_changelist")
+
+    @display(
+        description="Status",
+        label={"pending": "info", "accepted": "success", "expired": "warning", "cancelled": "danger"},
+    )
+    def status_badge(self, obj):
+        return "expired" if obj.status == "pending" and obj.is_expired else obj.status
+
+    @admin.action(description="Resend invitation email")
+    def resend_invitations(self, request, queryset):
+        if not has_resource_permission(request, "staff", "create"):
+            raise PermissionDenied
+        n = 0
+        for inv in queryset.filter(status="pending"):
+            staff_services.resend(inv, by=request.user)
+            n += 1
+        self.message_user(request, f"{n} invitation(s) resent.")
+
+    @admin.action(description="Cancel invitations")
+    def cancel_invitations(self, request, queryset):
+        if not has_resource_permission(request, "staff", "delete"):
+            raise PermissionDenied
+        n = 0
+        for inv in queryset.filter(status="pending"):
+            staff_services.cancel(inv, by=request.user)
+            n += 1
+        self.message_user(request, f"{n} invitation(s) cancelled.")
 
 
 # =============================================================================
@@ -933,10 +1077,11 @@ class StaffInvitationTenantAdmin(TenantModelAdmin):
 # =============================================================================
 
 
-class ReservationTenantAdmin(TenantModelAdmin):
-    """Admin for reservations."""
+class ReservationTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
+    """Reservations: read-mostly; status moves through the actions below."""
 
     permission_resource = "reservations"
+    module_code = "reservations"
     list_display = [
         "confirmation_code",
         "guest_name",
@@ -947,30 +1092,70 @@ class ReservationTenantAdmin(TenantModelAdmin):
         "status",
     ]
     list_filter = ["status", "source", "reservation_date"]
-    search_fields = [
-        "confirmation_code",
-        "guest_name",
-        "guest_email",
-        "guest_phone",
-    ]
-    readonly_fields = ["confirmation_code", "created_at", "updated_at"]
+    search_fields = ["confirmation_code", "guest_name", "guest_email", "guest_phone"]
+    readonly_fields = ["confirmation_code", "status", "created_at", "updated_at"]
     ordering = ["reservation_date", "reservation_time"]
     date_hierarchy = "reservation_date"
+    actions = [
+        "confirm_reservations",
+        "seat_reservations",
+        "complete_reservations",
+        "no_show_reservations",
+        "cancel_reservations",
+    ]
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("table", "customer")
 
+    def has_add_permission(self, request):
+        return False
 
-class ReservationSettingsTenantAdmin(TenantModelAdmin):
+    def _transition(self, request, queryset, statuses, method, label, **kwargs):
+        if not has_resource_permission(request, "reservations", "update"):
+            raise PermissionDenied
+        n = 0
+        for reservation in queryset.filter(status__in=statuses):
+            getattr(reservation, method)(**kwargs)
+            n += 1
+        self.message_user(request, f"{n} reservation(s) {label}.")
+
+    @admin.action(description="Confirm")
+    def confirm_reservations(self, request, queryset):
+        self._transition(request, queryset, ["pending", "waitlist"], "confirm", "confirmed", confirmed_by=request.user)
+
+    @admin.action(description="Mark seated")
+    def seat_reservations(self, request, queryset):
+        self._transition(request, queryset, ["pending", "confirmed"], "mark_seated", "seated")
+
+    @admin.action(description="Mark completed")
+    def complete_reservations(self, request, queryset):
+        self._transition(request, queryset, ["seated", "confirmed"], "mark_completed", "completed")
+
+    @admin.action(description="Mark no-show")
+    def no_show_reservations(self, request, queryset):
+        self._transition(request, queryset, ["pending", "confirmed"], "mark_no_show", "marked no-show")
+
+    @admin.action(description="Cancel")
+    def cancel_reservations(self, request, queryset):
+        self._transition(
+            request,
+            queryset,
+            ["pending", "confirmed", "waitlist"],
+            "cancel",
+            "cancelled",
+            cancelled_by=request.user,
+            reason="Cancelled by staff",
+        )
+
+
+class ReservationSettingsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
     """Admin for reservation settings."""
 
     permission_resource = "reservations"
-    list_display = [
-        "restaurant",
-        "accepts_reservations",
-        "min_party_size",
-        "max_party_size",
-    ]
+    module_code = "reservations"
+    list_display = ["min_party_size", "max_party_size", "advance_booking_days", "require_confirmation"]
+    # The on/off switch is the Reservations module (Settings -> Modules).
+    exclude = ["accepts_reservations"]
 
     def has_add_permission(self, request):
         """Only one settings object per restaurant."""
@@ -984,10 +1169,11 @@ class ReservationSettingsTenantAdmin(TenantModelAdmin):
         return False
 
 
-class ReservationBlockedTimeTenantAdmin(TenantModelAdmin):
+class ReservationBlockedTimeTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
     """Admin for blocked reservation times."""
 
     permission_resource = "reservations"
+    module_code = "reservations"
     list_display = [
         "start_datetime",
         "end_datetime",
@@ -1023,18 +1209,13 @@ class RestaurantSettingsAdmin(UnfoldModelAdmin):
     """
     Admin for editing the current restaurant's settings.
 
-    Only shows the current restaurant - no list view needed.
+    Only shows the current restaurant - no list view needed. Module switches
+    (ordering, reservations, warehouse, payments...) live on the Modules page.
     """
 
     list_display = ["name", "is_active", "default_currency", "timezone"]
     readonly_fields = ["slug", "owner", "average_rating", "total_reviews", "total_orders", "created_at", "updated_at"]
-    inlines = [RestaurantHoursInline, RestaurantDeliveryPlatformInline]
-
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-        if "warehouse_enabled" in form.changed_data:
-            inventory_hooks.on_feature_toggled(obj, obj.warehouse_enabled, by=request.user)
-
+    inlines = [RestaurantHoursInline]
     filter_horizontal = ["amenities"]
 
     fieldsets = (
@@ -1042,93 +1223,33 @@ class RestaurantSettingsAdmin(UnfoldModelAdmin):
             "Basic Info",
             {
                 "fields": ("name", "slug", "description", "category", "is_active"),
-            },
-        ),
-        (
-            "Amenities",
-            {
-                "fields": ("amenities",),
-            },
-        ),
-        (
-            "Contact",
-            {
-                "fields": ("email", "phone", "website"),
-            },
-        ),
-        (
-            "Address",
-            {
-                "fields": ("address", "city", "postal_code", "country", "latitude", "longitude"),
-            },
-        ),
-        (
-            "Branding",
-            {
-                "fields": ("logo", "cover_image", "primary_color", "secondary_color"),
-            },
-        ),
-        (
-            "Settings",
-            {
-                "fields": ("default_currency", "timezone", "default_language"),
-            },
-        ),
-        (
-            "Features",
-            {
-                "fields": (
-                    "accepts_remote_orders",
-                    "accepts_reservations",
-                    "accepts_takeaway",
-                    "accepts_platform_loyalty",
-                    "warehouse_enabled",
-                ),
                 "description": (
-                    "Warehouse management adds a Warehouse section: stock in lots, recipes on dishes, "
-                    "automatic sold-out and buy lists. Add your delivery platforms below to get "
-                    "enable/disable checklists when a dish sells out."
+                    "Which features this restaurant uses (ordering, reservations, warehouse, "
+                    "payments...) is set under Settings -> Modules."
                 ),
             },
         ),
-        (
-            "Payments",
-            {
-                "description": (
-                    "Configure where card payments flow. Each provider is "
-                    "opt-in — toggle it on AND fill in the matching payout "
-                    "identifier below. Restaurants with neither configured "
-                    "can only accept cash settled via the POS."
-                ),
-                "fields": (
-                    "accepts_bog_payments",
-                    "bog_payout_iban",
-                    "accepts_flitt_payments",
-                    "flitt_sub_merchant_id",
-                ),
-            },
-        ),
+        ("Amenities", {"fields": ("amenities",)}),
+        ("Contact", {"fields": ("email", "phone", "website")}),
+        ("Address", {"fields": ("address", "city", "postal_code", "country", "latitude", "longitude")}),
+        ("Branding", {"fields": ("logo", "cover_image", "primary_color", "secondary_color")}),
+        ("Settings", {"fields": ("default_currency", "timezone", "default_language")}),
         (
             "Orders & Pricing",
-            {
-                "fields": ("tax_rate", "service_charge", "minimum_order_amount", "average_preparation_time"),
-            },
+            {"fields": ("tax_rate", "service_charge", "minimum_order_amount", "average_preparation_time")},
         ),
         (
             "Statistics (read-only)",
-            {
-                "fields": ("average_rating", "total_reviews", "total_orders"),
-                "classes": ("collapse",),
-            },
+            {"fields": ("average_rating", "total_reviews", "total_orders"), "classes": ("collapse",)},
         ),
-        (
-            "System",
-            {
-                "fields": ("owner", "created_at", "updated_at"),
-                "classes": ("collapse",),
-            },
-        ),
+        ("System", {"fields": ("owner", "created_at", "updated_at"), "classes": ("collapse",)}),
     )
+
+    def get_inlines(self, request, obj):
+        inlines = list(super().get_inlines(request, obj))
+        if obj is not None and modules.is_enabled(obj, "warehouse"):
+            inlines.append(RestaurantDeliveryPlatformInline)
+        return inlines
 
     def get_queryset(self, request):
         """Only show the current restaurant."""
@@ -1139,52 +1260,150 @@ class RestaurantSettingsAdmin(UnfoldModelAdmin):
         return qs.none()
 
     def has_add_permission(self, request):
-        """Don't allow adding new restaurants from tenant admin."""
         return False
 
     def has_delete_permission(self, request, obj=None):
-        """Don't allow deleting the restaurant from tenant admin."""
         return False
 
+    # Role-based like every other page: a custom role granted settings
+    # read/update works the same as the built-in manager.
     def has_module_permission(self, request):
-        """Check if user can see this model in admin sidebar."""
-        restaurant = getattr(request, "restaurant", None)
-        if not restaurant:
-            return False
-        if request.user.is_superuser:
-            return True
-        # Check if user is staff of this restaurant with settings read permission
-        try:
-            staff = request.user.staff_memberships.get(restaurant=restaurant, is_active=True)
-            return "read" in staff.get_effective_permissions().get("settings", [])
-        except Exception:
-            return False
+        return bool(getattr(request, "restaurant", None)) and has_resource_permission(request, "settings", "read")
 
     def has_view_permission(self, request, obj=None):
-        """Allow viewing if user has staff access."""
-        restaurant = getattr(request, "restaurant", None)
-        if not restaurant:
-            return False
-        if request.user.is_superuser:
-            return True
-        # Check if user is staff of this restaurant
-        return request.user.staff_memberships.filter(restaurant=restaurant, is_active=True).exists()
+        return bool(getattr(request, "restaurant", None)) and has_resource_permission(request, "settings", "read")
 
     def has_change_permission(self, request, obj=None):
-        """Only owner or manager can change settings."""
+        return bool(getattr(request, "restaurant", None)) and has_resource_permission(request, "settings", "update")
+
+
+class ModulesTenantAdmin(TenantModelAdmin):
+    """
+    The Modules page: one card per product area with an on/off switch and
+    the module's options. Every change goes through apps.core.modules so
+    dependency rules, hooks and the audit trail apply.
+    """
+
+    permission_resource = "settings"
+    restaurant_field = None
+    change_list_template = "admin/tenants/restaurantmodules/change_list.html"
+    list_display = ["name"]
+
+    def get_queryset(self, request):
         restaurant = getattr(request, "restaurant", None)
-        if not restaurant:
-            return False
-        if request.user.is_superuser:
-            return True
-        if restaurant.owner == request.user:
-            return True
-        # Check for manager role
+        qs = super().get_queryset(request)
+        return qs.filter(pk=restaurant.pk) if restaurant else qs.none()
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        raise PermissionDenied
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = dict(extra_context or {})
+        extra_context.update(self._page_context(request))
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def _page_context(self, request):
+        restaurant = request.restaurant
+        cards = []
+        for m in modules.MODULES:
+            on = modules.is_enabled(restaurant, m.code)
+            options = []
+            for name in (*m.sub_flags, *m.sub_fields):
+                field = restaurant._meta.get_field(name)
+                options.append(
+                    {
+                        "name": name,
+                        "label": str(field.verbose_name).capitalize(),
+                        "help": str(field.help_text),
+                        "is_bool": name in m.sub_flags,
+                        "value": getattr(restaurant, name),
+                    }
+                )
+            cards.append(
+                {
+                    "module": m,
+                    "enabled": on,
+                    "blockers": modules.check_dependencies(restaurant, m.code, not on) if m.switchable else [],
+                    "warnings": modules.warnings(restaurant, m.code) if (on or not m.switchable) else [],
+                    "options": options,
+                    "toggle_url": (
+                        reverse(
+                            f"tenant_admin:tenants_restaurantmodules_{'disable' if on else 'enable'}", args=[m.code]
+                        )
+                        if m.switchable
+                        else None
+                    ),
+                    "options_url": (
+                        reverse("tenant_admin:tenants_restaurantmodules_options", args=[m.code]) if options else None
+                    ),
+                }
+            )
+        return {"cards": cards, "can_manage": has_resource_permission(request, "settings", "update")}
+
+    def get_urls(self):
+        wrap = self.admin_site.admin_view
+        custom = [
+            path("<slug:code>/enable/", wrap(require_POST(self.enable_view)), name="tenants_restaurantmodules_enable"),
+            path(
+                "<slug:code>/disable/",
+                wrap(require_POST(self.disable_view)),
+                name="tenants_restaurantmodules_disable",
+            ),
+            path(
+                "<slug:code>/options/",
+                wrap(require_POST(self.options_view)),
+                name="tenants_restaurantmodules_options",
+            ),
+        ]
+        return custom + super().get_urls()
+
+    def _back(self):
+        return redirect("tenant_admin:tenants_restaurantmodules_changelist")
+
+    def _guard(self, request, code):
+        if (
+            not getattr(request, "restaurant", None)
+            or code not in modules.MODULES_BY_CODE
+            or not has_resource_permission(request, "settings", "update")
+        ):
+            raise PermissionDenied
+
+    def _toggle(self, request, code, enabled):
+        self._guard(request, code)
+        title = modules.MODULES_BY_CODE[code].title
         try:
-            staff = request.user.staff_memberships.get(restaurant=restaurant, is_active=True)
-            return staff.role and staff.role.name == "manager"
-        except Exception:
-            return False
+            modules.set_module(request.restaurant, code, enabled, by=request.user)
+            messages.success(request, f"{title} {'switched on' if enabled else 'switched off'}.")
+        except modules.ModuleError as exc:
+            messages.error(request, " ".join(exc.messages))
+        return self._back()
+
+    def enable_view(self, request, code):
+        return self._toggle(request, code, True)
+
+    def disable_view(self, request, code):
+        return self._toggle(request, code, False)
+
+    def options_view(self, request, code):
+        self._guard(request, code)
+        m = modules.MODULES_BY_CODE[code]
+        data = {name: bool(request.POST.get(name)) for name in m.sub_flags}
+        data.update({name: request.POST.get(name, "").strip() for name in m.sub_fields})
+        try:
+            modules.set_options(request.restaurant, code, data, by=request.user)
+            messages.success(request, f"{m.title} options saved.")
+        except DjangoValidationError as exc:
+            messages.error(request, "; ".join(exc.messages))
+        return self._back()
 
 
 # =============================================================================
@@ -1195,8 +1414,9 @@ from apps.inventory.tenant_admin import register_inventory_admin  # noqa: E402
 
 register_inventory_admin(tenant_admin_site)
 
-# Restaurant Settings
+# Restaurant Settings + Modules
 tenant_admin_site.register(Restaurant, RestaurantSettingsAdmin)
+tenant_admin_site.register(RestaurantModules, ModulesTenantAdmin)
 
 # Menu
 tenant_admin_site.register(MenuCategory, MenuCategoryTenantAdmin)
@@ -1204,10 +1424,8 @@ tenant_admin_site.register(MenuItem, MenuItemTenantAdmin)
 tenant_admin_site.register(ModifierGroup, ModifierGroupTenantAdmin)
 tenant_admin_site.register(Modifier, ModifierTenantAdmin)
 
-# Orders (temporarily hidden)
-# tenant_admin_site.register(Order, OrderTenantAdmin)
-# tenant_admin_site.register(OrderItem, OrderItemTenantAdmin)
-# tenant_admin_site.register(OrderStatusHistory, OrderStatusHistoryTenantAdmin)
+# Orders (visible while the Ordering module is on)
+tenant_admin_site.register(Order, OrderTenantAdmin)
 
 # Tables
 tenant_admin_site.register(TableSection, TableSectionTenantAdmin)
@@ -1221,15 +1439,16 @@ tenant_admin_site.register(StaffRole, StaffRoleTenantAdmin)
 tenant_admin_site.register(StaffMember, StaffMemberTenantAdmin)
 tenant_admin_site.register(StaffInvitation, StaffInvitationTenantAdmin)
 
-# Reservations (temporarily hidden)
-# tenant_admin_site.register(Reservation, ReservationTenantAdmin)
-# tenant_admin_site.register(ReservationSettings, ReservationSettingsTenantAdmin)
-# tenant_admin_site.register(ReservationBlockedTime, ReservationBlockedTimeTenantAdmin)
+# Reservations (visible while the Reservations module is on)
+tenant_admin_site.register(Reservation, ReservationTenantAdmin)
+tenant_admin_site.register(ReservationSettings, ReservationSettingsTenantAdmin)
+tenant_admin_site.register(ReservationBlockedTime, ReservationBlockedTimeTenantAdmin)
 
 
 # Loyalty
-class LoyaltyProgramTenantAdmin(TenantModelAdmin):
+class LoyaltyProgramTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
     permission_resource = "menu"  # reuses the menu-manager role bucket
+    module_code = "loyalty"
     restaurant_field = "restaurant"
     list_display = [
         "name",
@@ -1272,8 +1491,9 @@ class LoyaltyProgramTenantAdmin(TenantModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-class LoyaltyCounterTenantAdmin(TenantModelAdmin):
+class LoyaltyCounterTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
     permission_resource = "menu"
+    module_code = "loyalty"
     restaurant_field = "program__restaurant"
     list_display = ["program", "user", "phone_number", "punches", "last_earned_at"]
     list_filter = ["program"]
@@ -1282,8 +1502,9 @@ class LoyaltyCounterTenantAdmin(TenantModelAdmin):
     readonly_fields = ["punches", "last_earned_at"]
 
 
-class LoyaltyRedemptionTenantAdmin(TenantModelAdmin):
+class LoyaltyRedemptionTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
     permission_resource = "menu"
+    module_code = "loyalty"
     restaurant_field = "program__restaurant"
     list_display = [
         "code",
@@ -1314,8 +1535,9 @@ tenant_admin_site.register(LoyaltyRedemption, LoyaltyRedemptionTenantAdmin)
 # Reviews — owners / managers can browse reviews and flag ones they
 # want platform admins to look at. Everything is read-only; the Report
 # action files a ReviewReport row against the current user.
-class ReviewTenantAdmin(TenantModelAdmin):
+class ReviewTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
     permission_resource = "menu"  # managers who edit the menu can browse reviews
+    module_code = "reviews"
     restaurant_field = "restaurant"
 
     list_display = [
@@ -1362,7 +1584,8 @@ class ReviewTenantAdmin(TenantModelAdmin):
     def has_change_permission(self, request, obj=None):
         # Everything on this admin is read-only; the Report action creates
         # new ReviewReport rows without mutating the Review itself.
-        return self._has_resource_permission(request, "read")
+        # The mixin must still win when the Reviews module is off.
+        return self._module_on(request) and self._has_resource_permission(request, "read")
 
     @admin.action(description="Report selected reviews to platform moderators")
     def report_reviews(self, request, queryset):

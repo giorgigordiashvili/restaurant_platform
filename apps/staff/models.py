@@ -103,8 +103,19 @@ class StaffRole(TimeStampedModel):
 
     class Meta:
         db_table = "staff_roles"
-        unique_together = ["restaurant", "name"]
         ordering = ["name"]
+        constraints = [
+            # One of each built-in role per restaurant...
+            models.UniqueConstraint(
+                fields=["restaurant", "name"], condition=~models.Q(name="custom"), name="staff_role_system_name_unique"
+            ),
+            # ...and any number of custom roles, told apart by their display name.
+            models.UniqueConstraint(
+                fields=["restaurant", "display_name"],
+                condition=models.Q(name="custom"),
+                name="staff_role_custom_display_name_unique",
+            ),
+        ]
         verbose_name = _("Staff Role")
         verbose_name_plural = _("Staff Roles")
 
@@ -316,6 +327,11 @@ class StaffInvitation(TimeStampedModel):
             staff_member.is_active = True
             staff_member.joined_at = timezone.now()
             staff_member.save()
+
+        # The tenant admin's login gate is Django's is_staff.
+        if not user.is_staff:
+            user.is_staff = True
+            user.save(update_fields=["is_staff"])
 
         # Mark invitation as accepted
         self.status = "accepted"

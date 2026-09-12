@@ -420,6 +420,7 @@ class MyRestaurantSerializer(serializers.Serializer):
     is_owner = serializers.BooleanField()
     venue = serializers.DictField(allow_null=True)
     warehouse_enabled = serializers.BooleanField()
+    modules = serializers.DictField(child=serializers.BooleanField())
 
 
 @extend_schema(tags=["Users"], responses={200: MyRestaurantSerializer(many=True)})
@@ -459,6 +460,7 @@ class MyRestaurantsView(APIView):
                 "is_owner": is_owner,
                 "venue": venue_ref(r),
                 "warehouse_enabled": r.warehouse_enabled,
+                "modules": r.modules,
             }
             for r, role, is_owner in sorted(rows.values(), key=lambda t: t[0].name.lower())
         ]

@@ -41,17 +41,28 @@ class UnfoldTranslatableModelForm(TranslatableModelForm):
 
 
 def staff_permissions(request):
-    """Effective role permissions of request.user at request.restaurant ({} if none)."""
+    """
+    Effective role permissions of request.user at request.restaurant ({} if none).
+
+    Memoised on the request: the sidebar asks once per link, the dashboard
+    once per card -- one membership query per page instead of dozens.
+    """
     restaurant = getattr(request, "restaurant", None)
     if not restaurant or not request.user.is_authenticated:
         return {}
+    cached = getattr(request, "_tenant_staff_permissions", None)
+    if cached is not None:
+        return cached
     if request.user.is_superuser:
-        return {"*": ["create", "read", "update", "delete"]}
-    try:
-        staff = request.user.staff_memberships.get(restaurant=restaurant, is_active=True)
-        return staff.get_effective_permissions()
-    except Exception:
-        return {}
+        perms = {"*": ["create", "read", "update", "delete"]}
+    else:
+        try:
+            staff = request.user.staff_memberships.get(restaurant=restaurant, is_active=True)
+            perms = staff.get_effective_permissions()
+        except Exception:
+            perms = {}
+    request._tenant_staff_permissions = perms
+    return perms
 
 
 def has_resource_permission(request, resource, action):
@@ -63,6 +74,38 @@ def has_resource_permission(request, resource, action):
         return True
     resource_perms = permissions.get(resource, [])
     return action in resource_perms or "*" in resource_perms
+
+
+class ModuleEnabledMixin:
+    """
+    Everything of a module disappears while the restaurant has it switched
+    off (see apps.core.modules): the sidebar entry, the changelist, add /
+    change / delete. Put it *first* in the bases so it wins over the
+    role-based checks of TenantModelAdmin.
+    """
+
+    module_code = None
+
+    def _module_on(self, request):
+        from apps.core.modules import is_enabled
+
+        restaurant = getattr(request, "restaurant", None)
+        return bool(restaurant) and (self.module_code is None or is_enabled(restaurant, self.module_code))
+
+    def has_module_permission(self, request):
+        return self._module_on(request) and super().has_module_permission(request)
+
+    def has_view_permission(self, request, obj=None):
+        return self._module_on(request) and super().has_view_permission(request, obj)
+
+    def has_add_permission(self, request):
+        return self._module_on(request) and super().has_add_permission(request)
+
+    def has_change_permission(self, request, obj=None):
+        return self._module_on(request) and super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        return self._module_on(request) and super().has_delete_permission(request, obj)
 
 
 class TenantInlineMixin:

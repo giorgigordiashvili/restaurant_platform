@@ -1,0 +1,65 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% comment %}
+Modules page: switch product areas on/off and edit their options. Posts go
+to ModulesTenantAdmin, which calls apps.core.modules (same rules as the API).
+{% endcomment %}
+
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-3 py-1.5 text-sm w-full" %}
+<div class="mb-6" data-testid="modules-page">
+  <p class="text-sm text-base-500 mb-4">{% translate "Switch on what your restaurant uses. Everything else disappears from this dashboard, the customer page and the POS app." %}</p>
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    {% for card in cards %}
+    <div class="{{ base }} flex flex-col gap-3 {% if not card.enabled %}opacity-90{% endif %}" data-testid="module-{{ card.module.code }}">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined {% if card.enabled %}text-primary-600{% else %}text-base-400{% endif %}">{{ card.module.icon }}</span>
+          <h3 class="font-semibold">{{ card.module.title }}</h3>
+        </div>
+        {% if card.enabled %}
+          <span class="text-xs uppercase px-2 py-0.5 rounded bg-green-100 text-green-700">{% translate "On" %}</span>
+        {% else %}
+          <span class="text-xs uppercase px-2 py-0.5 rounded bg-base-100 text-base-500 dark:bg-base-800">{% translate "Off" %}</span>
+        {% endif %}
+      </div>
+      <p class="text-sm text-base-500">{{ card.module.description }}</p>
+      {% for w in card.warnings %}<p class="text-xs text-amber-600">{{ w }}</p>{% endfor %}
+      {% for b in card.blockers %}<p class="text-xs text-red-600">{{ b }}</p>{% endfor %}
+
+      {% if card.toggle_url and can_manage %}
+      <form method="post" action="{{ card.toggle_url }}" {% if card.enabled %}onsubmit="return confirm('{% translate "Switch this module off?" %}')"{% endif %}>
+        {% csrf_token %}
+        <button type="submit" class="{% if card.enabled %}{{ btn2 }}{% else %}{{ btn }}{% endif %}" {% if card.blockers %}disabled title="{{ card.blockers|join:' ' }}"{% endif %}>
+          {% if card.enabled %}{% translate "Switch off" %}{% else %}{% translate "Switch on" %}{% endif %}
+        </button>
+      </form>
+      {% elif card.module.always_on %}
+      <p class="text-xs text-base-500">{% translate "Always on." %}</p>
+      {% endif %}
+
+      {% if card.options %}
+      <form method="post" action="{{ card.options_url }}" class="border-t border-base-200 dark:border-base-800 pt-3 flex flex-col gap-2">
+        {% csrf_token %}
+        {% for opt in card.options %}
+          {% if opt.is_bool %}
+          <label class="flex items-start gap-2 text-sm">
+            <input type="checkbox" name="{{ opt.name }}" value="1" {% if opt.value %}checked{% endif %} {% if not can_manage %}disabled{% endif %} class="mt-1">
+            <span>{{ opt.label }}{% if opt.help %}<span class="block text-xs text-base-500">{{ opt.help }}</span>{% endif %}</span>
+          </label>
+          {% else %}
+          <label class="text-sm">{{ opt.label }}
+            <input type="text" name="{{ opt.name }}" value="{{ opt.value }}" {% if not can_manage %}disabled{% endif %} class="{{ input }}">
+            {% if opt.help %}<span class="block text-xs text-base-500">{{ opt.help }}</span>{% endif %}
+          </label>
+          {% endif %}
+        {% endfor %}
+        {% if can_manage %}<button type="submit" class="{{ btn2 }} self-start">{% translate "Save options" %}</button>{% endif %}
+      </form>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endwith %}
+{% endblock %}

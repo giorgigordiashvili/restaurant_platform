@@ -1,0 +1,44 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+{% comment %}
+Tenant dashboard: a card per enabled module (see apps.core.dashboard). Extends
+admin/base.html on purpose -- apps/core/templates/admin/index.html is the
+superuser dashboard of the platform /admin/ and must not be inherited here.
+{% endcomment %}
+
+{% block title %}{{ title }} | {{ site_title }}{% endblock %}
+{% block branding %}{% include "unfold/helpers/site_branding.html" %}{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" %}
+<div class="mb-6" data-testid="tenant-dashboard">
+  <h1 class="text-lg font-semibold mb-4">{{ restaurant.name }}</h1>
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    {% for card in module_cards %}
+    <div class="{{ base }}" data-testid="card-{{ card.code }}">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-primary-600">{{ card.icon }}</span>
+        <h3 class="font-semibold">{{ card.title }}</h3>
+      </div>
+      {% if card.stats %}
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        {% for stat in card.stats %}
+        <a href="{{ stat.url }}" class="block">
+          <p class="text-xs uppercase text-base-500">{{ stat.label }}</p>
+          <p class="text-2xl font-semibold">{{ stat.value }}</p>
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <div class="flex flex-wrap gap-3">
+        {% for link in card.links %}<a href="{{ link.url }}" class="text-sm text-primary-600 hover:underline">{{ link.title }}</a>{% endfor %}
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-sm text-base-500">{% translate "Nothing to show yet -- ask a manager to give your role access to a module." %}</p>
+    {% endfor %}
+  </div>
+</div>
+{% endwith %}
+{% endblock %}

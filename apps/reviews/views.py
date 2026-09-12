@@ -69,7 +69,7 @@ class RestaurantReviewsListView(generics.ListAPIView):
 
     def get_queryset(self):
         slug = self.kwargs["slug"]
-        return _public_review_qs().filter(restaurant__slug=slug)
+        return _public_review_qs().filter(restaurant__slug=slug, restaurant__reviews_enabled=True)
 
 
 @extend_schema(tags=["Reviews"], responses=ReviewStatsSerializer)
@@ -81,6 +81,8 @@ class RestaurantReviewStatsView(APIView):
     def get(self, request, slug):
         restaurant = get_object_or_404(Restaurant, slug=slug, is_active=True)
         qs = Review.objects.filter(restaurant=restaurant, is_hidden=False)
+        if not restaurant.reviews_enabled:
+            qs = qs.none()
         rows = qs.values("rating").annotate(n=Count("id"))
         distribution = {str(i): 0 for i in range(1, 6)}
         for row in rows:
@@ -146,6 +148,12 @@ class ReviewCreateView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        order = serializer.validated_data.get("order")
+        if order is not None and not order.restaurant.reviews_enabled:
+            return Response(
+                {"success": False, "error": {"code": "module_disabled", "module": "reviews"}},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         review = serializer.save()
         # Return the read-serializer shape so the frontend gets media=[],
         # user_name, etc. in a single round trip.

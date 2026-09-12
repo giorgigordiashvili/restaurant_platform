@@ -2,9 +2,7 @@
 Staff management views for restaurant dashboard.
 """
 
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
+from django.conf import settings
 
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -16,6 +14,7 @@ from drf_spectacular.utils import extend_schema
 from apps.core.middleware.tenant import require_restaurant
 from apps.core.permissions import IsTenantManager
 
+from . import emails, services
 from .models import StaffInvitation, StaffMember, StaffRole
 from .serializers import (
     AcceptInvitationSerializer,
@@ -120,10 +119,17 @@ class StaffInviteView(APIView):
             },
         )
         serializer.is_valid(raise_exception=True)
-        invitation = serializer.save()
-
-        # Send invitation email
-        self._send_invitation_email(invitation, request)
+        data = serializer.validated_data
+        try:
+            invitation = services.invite(
+                request.restaurant,
+                data["email"],
+                data["role_id"],
+                invited_by=request.user,
+                message=data.get("message", ""),
+            )
+        except services.InviteError as exc:
+            return Response({"success": False, "error": {"message": str(exc)}}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
             {
@@ -133,51 +139,6 @@ class StaffInviteView(APIView):
             },
             status=status.HTTP_201_CREATED,
         )
-
-    def _send_invitation_email(self, invitation, request):
-        """Send staff invitation email."""
-        # Build invitation URL
-        invite_url = f"https://{request.get_host()}/staff/accept/{invitation.token}/"
-
-        subject = f"You're invited to join {invitation.restaurant.name}"
-        context = {
-            "restaurant": invitation.restaurant,
-            "role": invitation.role.get_display_name(),
-            "invited_by": invitation.invited_by,
-            "message": invitation.message,
-            "invite_url": invite_url,
-            "expires_at": invitation.expires_at,
-        }
-
-        try:
-            # Try to use template
-            html_message = render_to_string("staff/email/invitation.html", context)
-            plain_message = strip_tags(html_message)
-        except Exception:
-            # Fallback to simple message
-            plain_message = f"""
-You've been invited to join {invitation.restaurant.name} as {invitation.role.get_display_name()}.
-
-{f'Message from {invitation.invited_by.full_name}: {invitation.message}' if invitation.message else ''}
-
-Click here to accept: {invite_url}
-
-This invitation expires on {invitation.expires_at.strftime('%Y-%m-%d %H:%M')}.
-            """.strip()
-            html_message = None
-
-        try:
-            send_mail(
-                subject=subject,
-                message=plain_message,
-                from_email=None,  # Use DEFAULT_FROM_EMAIL
-                recipient_list=[invitation.email],
-                html_message=html_message,
-                fail_silently=True,
-            )
-        except Exception:
-            # Email sending failed, but invitation is still created
-            pass
 
 
 @extend_schema(tags=["Dashboard - Staff"])
@@ -240,7 +201,13 @@ class AcceptInvitationView(APIView):
             {
                 "success": True,
                 "message": f"You have joined {invitation.restaurant.name} as {staff_member.role.get_display_name()}.",
-                "data": StaffMemberDetailSerializer(staff_member).data,
+                "data": {
+                    **StaffMemberDetailSerializer(staff_member).data,
+                    "restaurant_name": invitation.restaurant.name,
+                    "restaurant_slug": invitation.restaurant.slug,
+                    "admin_url": emails.admin_url(invitation.restaurant),
+                    "pos_url": settings.POS_BASE_URL,
+                },
             },
             status=status.HTTP_200_OK,
         )
@@ -261,11 +228,21 @@ class InvitationDetailsView(APIView):
                     "success": True,
                     "data": {
                         "restaurant_name": invitation.restaurant.name,
+                        "restaurant_slug": invitation.restaurant.slug,
+                        "restaurant_logo": (
+                            request.build_absolute_uri(invitation.restaurant.logo.url)
+                            if invitation.restaurant.logo
+                            else None
+                        ),
                         "role": invitation.role.get_display_name(),
-                        "invited_by": invitation.invited_by.full_name,
+                        "invited_by": invitation.invited_by.full_name if invitation.invited_by_id else "",
                         "is_valid": invitation.is_valid,
                         "expires_at": invitation.expires_at,
-                        "status": invitation.status,
+                        "status": (
+                            "expired" if invitation.status == "pending" and invitation.is_expired else invitation.status
+                        ),
+                        "admin_url": emails.admin_url(invitation.restaurant),
+                        "pos_url": settings.POS_BASE_URL,
                     },
                 },
                 status=status.HTTP_200_OK,

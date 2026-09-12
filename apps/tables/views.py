@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
 from apps.core.middleware.tenant import require_restaurant
-from apps.core.permissions import IsTenantManager
+from apps.core.permissions import IsTenantManager, ModuleRequired
 from apps.venues.services import venue_for_table
 
 from .models import Table, TableQRCode, TableSection, TableSession, TableSessionGuest
@@ -141,11 +141,19 @@ class TableValidateView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        # Record the scan
-        qr.record_scan()
-
         table = qr.table
         restaurant = table.restaurant
+        if not restaurant.tables_enabled:
+            return Response(
+                {
+                    "success": False,
+                    "error": {"code": "tables_disabled", "message": "Table service is not enabled at this restaurant."},
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Record the scan
+        qr.record_scan()
 
         # Join or start a session: if none is active, auto-create an anonymous
         # session so guests can order + invite friends without needing a
@@ -211,7 +219,7 @@ class TableSectionListCreateView(generics.ListCreateAPIView):
     """List or create table sections."""
 
     serializer_class = TableSectionSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
 
     @require_restaurant
     def get_queryset(self):
@@ -227,7 +235,7 @@ class TableSectionDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Get, update, or delete a table section."""
 
     serializer_class = TableSectionSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
     lookup_field = "id"
 
     @require_restaurant
@@ -246,7 +254,7 @@ class TableSectionDetailView(generics.RetrieveUpdateDestroyAPIView):
 class TableListCreateView(generics.ListCreateAPIView):
     """List or create tables."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
 
     def get_serializer_class(self):
         if self.request.method == "POST":
@@ -290,7 +298,7 @@ class TableDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Get, update, or delete a table."""
 
     serializer_class = TableSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
     lookup_field = "id"
 
     @require_restaurant
@@ -313,7 +321,7 @@ class TableDetailView(generics.RetrieveUpdateDestroyAPIView):
 class TableStatusUpdateView(APIView):
     """Update table status."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
 
     @require_restaurant
     def patch(self, request, id):
@@ -349,7 +357,7 @@ class TableQRCodeListCreateView(generics.ListCreateAPIView):
     """List or create QR codes for a table."""
 
     serializer_class = TableQRCodeSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
 
     @require_restaurant
     def get_queryset(self):
@@ -371,7 +379,7 @@ class TableQRCodeDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Get, update, or delete a QR code."""
 
     serializer_class = TableQRCodeSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
     lookup_field = "id"
 
     @require_restaurant
@@ -383,7 +391,7 @@ class TableQRCodeDetailView(generics.RetrieveUpdateDestroyAPIView):
 class TableQRCodeRegenerateView(APIView):
     """Re-render a QR image so it encodes the short link (e.g. before reprinting a legacy one)."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
 
     @require_restaurant
     def post(self, request, id):
@@ -405,7 +413,7 @@ class TableSessionListView(generics.ListAPIView):
     """List table sessions."""
 
     serializer_class = TableSessionSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
 
     @require_restaurant
     def get_queryset(self):
@@ -432,7 +440,7 @@ class TableSessionListView(generics.ListAPIView):
 class TableSessionCreateView(APIView):
     """Start a new table session."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
 
     @require_restaurant
     def post(self, request):
@@ -499,7 +507,7 @@ class TableSessionCreateView(APIView):
 class TableSessionCloseView(APIView):
     """Close a table session."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
 
     @require_restaurant
     def post(self, request, id):
@@ -573,7 +581,7 @@ class TableSessionMarkCashPaidView(APIView):
     who recorded the cash). No BOG API call is made.
     """
 
-    permission_classes = [IsAuthenticated, IsTenantManager]
+    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
 
     @require_restaurant
     def post(self, request, id):

@@ -577,6 +577,15 @@ class CustomerOrderCreateView(APIView):
 
         data = serializer.validated_data
 
+        if data.get("order_type", "dine_in") != "dine_in" and not restaurant.accepts_takeaway:
+            return Response(
+                {
+                    "success": False,
+                    "error": {"code": "takeaway_disabled", "message": "This restaurant only takes dine-in orders."},
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         # Get table
         table = None
         session = None
