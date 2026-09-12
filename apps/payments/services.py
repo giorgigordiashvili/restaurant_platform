@@ -487,6 +487,13 @@ def record_payment(
         for o in newly_paid:
             _accrue_loyalty(o, method)
 
+    try:
+        from apps.printing import hooks as printing_hooks
+
+        printing_hooks.on_payment_completed(payment)
+    except Exception:  # pragma: no cover - printing must never break a payment
+        logger.exception("Receipt print hook failed for payment %s", payment.pk)
+
     _audit(
         "payment_collect",
         restaurant,

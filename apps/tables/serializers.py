@@ -38,6 +38,9 @@ class TableSectionSerializer(serializers.ModelSerializer):
             "description",
             "display_order",
             "is_active",
+            "floor_width",
+            "floor_height",
+            "background_note",
             "tables_count",
             "is_shared",
         ]
@@ -152,6 +155,9 @@ class TableSerializer(serializers.ModelSerializer):
             "section_name",
             "position_x",
             "position_y",
+            "rotation",
+            "width",
+            "height",
             "shape",
             "qr_codes",
             "is_shared",
@@ -179,6 +185,9 @@ class TableCreateSerializer(serializers.ModelSerializer):
             "section",
             "position_x",
             "position_y",
+            "rotation",
+            "width",
+            "height",
             "shape",
             "generate_qr",
         ]
@@ -199,6 +208,21 @@ class TableCreateSerializer(serializers.ModelSerializer):
             TableQRCode.objects.create(table=table)
 
         return table
+
+
+class TableLayoutItemSerializer(serializers.Serializer):
+    """One table's place on the floor plan (bulk PATCH /dashboard/tables/layout/)."""
+
+    id = serializers.UUIDField()
+    position_x = serializers.IntegerField(min_value=0, max_value=4000)
+    position_y = serializers.IntegerField(min_value=0, max_value=4000)
+    rotation = serializers.IntegerField(min_value=0, max_value=359, required=False, default=0)
+    width = serializers.IntegerField(min_value=20, max_value=1000, required=False)
+    height = serializers.IntegerField(min_value=20, max_value=1000, required=False)
+
+
+class TableLayoutSerializer(serializers.Serializer):
+    tables = TableLayoutItemSerializer(many=True)
 
 
 class TableSessionSerializer(serializers.ModelSerializer):

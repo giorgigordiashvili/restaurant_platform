@@ -1,0 +1,14 @@
+[Unit]
+Description=AiMenu print bridge
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/aimenu-print-bridge
+ExecStart=/opt/aimenu-print-bridge/venv/bin/python /opt/aimenu-print-bridge/aimenu_print_bridge.py --config /opt/aimenu-print-bridge/bridge.toml
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

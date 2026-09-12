@@ -151,6 +151,18 @@ MODULES: tuple[Module, ...] = (
         resources=("menu",),
     ),
     Module(
+        "printing",
+        "Printing",
+        "Kitchen and bar ticket printers, receipt printers and cash drawer through the print bridge (any cheap ESC/POS printer).",
+        "print",
+        "printing_enabled",
+        recommends=("ordering",),
+        app_labels=("printing",),
+        model_names=(("printing", "printer"), ("printing", "printjob")),
+        resources=("settings", "orders"),
+        hooks=("apps.printing.hooks.on_module_toggled",),
+    ),
+    Module(
         "cash",
         "Cash & payments",
         "Cash shifts with X/Z reports, taking payments in the POS, discounts, comps, voids and refunds.",

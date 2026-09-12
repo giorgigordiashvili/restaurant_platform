@@ -255,6 +255,30 @@ def module_cards(request):
             "menu",
         )
 
+    if "printing" in on and has_resource_permission(request, "settings", "read"):
+        from apps.printing import services as printing
+
+        st = printing.printer_status(restaurant)
+        card(
+            "printing",
+            "Printing",
+            "print",
+            [
+                {
+                    "label": "Printers offline",
+                    "value": len(st["offline"]),
+                    "url": _url("printing_printer_changelist"),
+                },
+                {
+                    "label": "Failed jobs",
+                    "value": st["failed_jobs"],
+                    "url": _url("printing_printjob_changelist") + "?status__exact=failed",
+                },
+            ],
+            [_link("Printers", "printing_printer_changelist"), _link("Print jobs", "printing_printjob_changelist")],
+            "settings",
+        )
+
     if has_resource_permission(request, "analytics", "read"):
         from apps.reports import queries
         from apps.reports.periods import parse_period

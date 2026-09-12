@@ -112,6 +112,8 @@ urlpatterns = [
     path("api/v1/referrals/", include("apps.referrals.urls")),
     path("api/v1/dashboard/audit/", include("apps.audit.urls_dashboard")),
     path("api/v1/dashboard/reports/", include("apps.reports.urls_dashboard")),
+    path("api/v1/dashboard/printing/", include("apps.printing.urls_dashboard")),
+    path("api/v1/print-bridge/", include("apps.printing.urls_bridge")),
     # Admin API (platform-wide, staff only)
     path("api/v1/admin/audit/", include("apps.audit.urls")),
 ]

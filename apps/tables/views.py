@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
 from apps.core.middleware.tenant import require_restaurant
-from apps.core.permissions import HasStaffPermission, IsTenantManager, IsTenantStaff, ModuleRequired
+from apps.core.permissions import HasStaffPermission, IsTenantStaff, ModuleRequired
 from apps.venues.services import venue_for_table
 
 from .models import Table, TableQRCode, TableSection, TableSession, TableSessionGuest
@@ -29,6 +29,7 @@ from .serializers import (
     SessionInviteResponseSerializer,
     SessionJoinPreviewSerializer,
     TableCreateSerializer,
+    TableLayoutSerializer,
     TableQRCodeSerializer,
     TableSectionSerializer,
     TableSerializer,
@@ -214,12 +215,69 @@ class TableValidateView(APIView):
 # ============== Dashboard Views ==============
 
 
+class TablesRolePermissionMixin:
+    """Role-based tables permission: read for GET, create/update/delete by method (waiters: read + update)."""
+
+    def get_permissions(self):
+        method = self.request.method
+        action = {"POST": "create", "DELETE": "delete"}.get(
+            method, "read" if method in ("GET", "HEAD", "OPTIONS") else "update"
+        )
+        self.required_permission = ("tables", action)
+        return super().get_permissions()
+
+
+@extend_schema(tags=["Dashboard - Tables"], request=TableLayoutSerializer, responses={200: TableSerializer(many=True)})
+class TableLayoutUpdateView(APIView):
+    """Bulk floor-plan update: positions, rotation and size of many tables in one transaction."""
+
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
+    required_permission = ("tables", "update")
+
+    @require_restaurant
+    def patch(self, request):
+        serializer = TableLayoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        rows = serializer.validated_data["tables"]
+        ids = [r["id"] for r in rows]
+        from django.db import transaction
+
+        with transaction.atomic():
+            tables = {
+                t.pk: t
+                for t in Table.objects.filter(restaurant=request.restaurant, id__in=ids)
+                .order_by("pk")
+                .select_for_update(of=("self",))
+            }
+            if len(tables) != len(set(ids)):
+                return Response(
+                    {"success": False, "error": {"message": "One of the tables does not belong to this restaurant."}},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+            for r in rows:
+                t = tables[r["id"]]
+                t.position_x = r["position_x"]
+                t.position_y = r["position_y"]
+                t.rotation = r.get("rotation", t.rotation)
+                if r.get("width"):
+                    t.width = r["width"]
+                if r.get("height"):
+                    t.height = r["height"]
+                t.save(update_fields=["position_x", "position_y", "rotation", "width", "height", "updated_at"])
+        data = TableSerializer(
+            Table.objects.filter(pk__in=ids).select_related("section").prefetch_related("qr_codes"),
+            many=True,
+            context={"request": request},
+        ).data
+        return Response({"success": True, "data": data})
+
+
 @extend_schema(tags=["Dashboard - Tables"])
-class TableSectionListCreateView(generics.ListCreateAPIView):
+class TableSectionListCreateView(TablesRolePermissionMixin, generics.ListCreateAPIView):
     """List or create table sections."""
 
     serializer_class = TableSectionSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
 
     @require_restaurant
     def get_queryset(self):
@@ -231,11 +289,11 @@ class TableSectionListCreateView(generics.ListCreateAPIView):
 
 
 @extend_schema(tags=["Dashboard - Tables"])
-class TableSectionDetailView(generics.RetrieveUpdateDestroyAPIView):
+class TableSectionDetailView(TablesRolePermissionMixin, generics.RetrieveUpdateDestroyAPIView):
     """Get, update, or delete a table section."""
 
     serializer_class = TableSectionSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
     lookup_field = "id"
 
     @require_restaurant
@@ -251,10 +309,10 @@ class TableSectionDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 @extend_schema(tags=["Dashboard - Tables"])
-class TableListCreateView(generics.ListCreateAPIView):
+class TableListCreateView(TablesRolePermissionMixin, generics.ListCreateAPIView):
     """List or create tables."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
 
     def get_serializer_class(self):
         if self.request.method == "POST":
@@ -294,11 +352,11 @@ class TableListCreateView(generics.ListCreateAPIView):
 
 
 @extend_schema(tags=["Dashboard - Tables"])
-class TableDetailView(generics.RetrieveUpdateDestroyAPIView):
+class TableDetailView(TablesRolePermissionMixin, generics.RetrieveUpdateDestroyAPIView):
     """Get, update, or delete a table."""
 
     serializer_class = TableSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
     lookup_field = "id"
 
     @require_restaurant
@@ -321,7 +379,8 @@ class TableDetailView(generics.RetrieveUpdateDestroyAPIView):
 class TableStatusUpdateView(APIView):
     """Update table status."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
+    required_permission = ("tables", "update")
 
     @require_restaurant
     def patch(self, request, id):
@@ -353,11 +412,11 @@ class TableStatusUpdateView(APIView):
 
 
 @extend_schema(tags=["Dashboard - Tables"])
-class TableQRCodeListCreateView(generics.ListCreateAPIView):
+class TableQRCodeListCreateView(TablesRolePermissionMixin, generics.ListCreateAPIView):
     """List or create QR codes for a table."""
 
     serializer_class = TableQRCodeSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
 
     @require_restaurant
     def get_queryset(self):
@@ -375,11 +434,11 @@ class TableQRCodeListCreateView(generics.ListCreateAPIView):
 
 
 @extend_schema(tags=["Dashboard - Tables"])
-class TableQRCodeDetailView(generics.RetrieveUpdateDestroyAPIView):
+class TableQRCodeDetailView(TablesRolePermissionMixin, generics.RetrieveUpdateDestroyAPIView):
     """Get, update, or delete a QR code."""
 
     serializer_class = TableQRCodeSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
     lookup_field = "id"
 
     @require_restaurant
@@ -391,7 +450,8 @@ class TableQRCodeDetailView(generics.RetrieveUpdateDestroyAPIView):
 class TableQRCodeRegenerateView(APIView):
     """Re-render a QR image so it encodes the short link (e.g. before reprinting a legacy one)."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
+    required_permission = ("tables", "update")
 
     @require_restaurant
     def post(self, request, id):

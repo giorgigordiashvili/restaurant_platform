@@ -44,6 +44,8 @@ ICONS = {
     "cashshift": "point_of_sale",
     "payment": "payments",
     "discountreason": "sell",
+    "printer": "print",
+    "printjob": "print_connect",
     "salesreport": "monitoring",
     "menureport": "restaurant_menu",
     "foodcostreport": "savings",

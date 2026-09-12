@@ -32,6 +32,11 @@ class TableSection(TimeStampedModel):
     description = models.TextField(blank=True)
     display_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    floor_width = models.PositiveSmallIntegerField(default=1000, help_text="Floor-plan canvas width (logical px).")
+    floor_height = models.PositiveSmallIntegerField(default=700, help_text="Floor-plan canvas height (logical px).")
+    background_note = models.CharField(
+        max_length=200, blank=True, default="", help_text="Shown under the section name on the POS floor plan."
+    )
 
     # Set when this section mirrors a shared venue section (see apps.venues).
     venue_section = models.ForeignKey(
@@ -123,6 +128,12 @@ class Table(TimeStampedModel):
         blank=True,
         help_text="Y coordinate on floor plan",
     )
+
+    rotation = models.PositiveSmallIntegerField(default=0, help_text="Degrees, 0-359, on the floor plan.")
+    width = models.PositiveSmallIntegerField(
+        default=100, help_text="Floor-plan width (logical px on a 1000-wide canvas)."
+    )
+    height = models.PositiveSmallIntegerField(default=100, help_text="Floor-plan height (logical px).")
 
     # Table shape for floor plan
     shape = models.CharField(

@@ -1,0 +1,11 @@
+[bridge]
+server_url = "https://admin.aimenu.ge"
+key = "PASTE-THE-BRIDGE-KEY-FROM-DASHBOARD-PRINTERS"
+# One of:
+#   usb://                      first USB printer found (or usb://0x04b8:0x0202, see --list-usb)
+#   net://192.168.1.50:9100     LAN / Wi-Fi printer
+#   serial:///dev/rfcomm0:9600  Bluetooth SPP or serial (Windows: serial://COM3:9600)
+#   win://POS-80                a printer installed in Windows
+#   file:///tmp/tickets.bin     testing without a printer
+printer = "usb://"
+paper = "80"

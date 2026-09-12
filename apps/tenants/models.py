@@ -334,6 +334,13 @@ class Restaurant(TimeStampedModel):
         default=True,
         help_text="Reviews module: customer reviews on the restaurant page.",
     )
+    printing_enabled = models.BooleanField(
+        default=False,
+        help_text=(
+            "Printing module: kitchen / bar ticket printers and receipt printers through the print bridge "
+            "(any cheap ESC/POS printer). Off by default; the POS prints receipts through the browser until then."
+        ),
+    )
     cash_enabled = models.BooleanField(
         default=True,
         help_text=(

@@ -327,6 +327,9 @@ class OrderAddItemView(APIView):
             order_item = _add_items(order, [data])[0]
             order.calculate_totals()
             inventory_hooks.on_order_items_added(order, [order_item])
+        from apps.printing import hooks as printing_hooks
+
+        printing_hooks.on_items_added(order, [order_item], by=request.user)
 
         return Response(
             {

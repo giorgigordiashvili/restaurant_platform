@@ -61,6 +61,9 @@ class TenantAdminSite(UnfoldAdminSite):
         "shiftsreport": "analytics",
         "reservationsreport": "analytics",
         "reviewsreport": "analytics",
+        # Printing
+        "printer": "settings",
+        "printjob": "orders",
         # Cash & payments
         "payment": "cash",
         "refund": "cash",

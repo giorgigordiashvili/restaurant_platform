@@ -6,6 +6,7 @@ from django.urls import path
 
 from .views import (
     TableDetailView,
+    TableLayoutUpdateView,
     TableListCreateView,
     TableQRCodeDetailView,
     TableQRCodeListCreateView,
@@ -28,6 +29,7 @@ urlpatterns = [
     path("sections/<uuid:id>/", TableSectionDetailView.as_view(), name="section-detail"),
     # Tables
     path("", TableListCreateView.as_view(), name="table-list"),
+    path("layout/", TableLayoutUpdateView.as_view(), name="table-layout"),
     path("<uuid:id>/", TableDetailView.as_view(), name="table-detail"),
     path("<uuid:id>/status/", TableStatusUpdateView.as_view(), name="table-status"),
     # QR Codes

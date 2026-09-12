@@ -73,6 +73,10 @@ def transition_order(
         from apps.inventory import hooks
 
         hooks.on_order_status_changed(order, old_status, new_status, by=by)
+        if new_status == "confirmed":
+            from apps.printing import hooks as printing_hooks
+
+            printing_hooks.on_order_confirmed(order, by=by)
     return order
 
 
