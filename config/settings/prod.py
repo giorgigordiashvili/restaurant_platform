@@ -38,6 +38,17 @@ ALLOWED_HOSTS.extend(
     ]
 )
 
+# Callers inside the Docker network address us by service name or loopback,
+# not by public hostname: the container healthcheck curls localhost:8000 and
+# Caddy's on-demand TLS `ask` hits http://web:8000/. Without these, Django
+# answers those with 400 DisallowedHost -- which Caddy reads as "deny", and
+# no tenant subdomain ever gets a certificate.
+ALLOWED_HOSTS.extend(config("INTERNAL_HOSTS", default="web,localhost,127.0.0.1", cast=Csv()))
+
+# The tenant-admin domain. Restaurant staff use <slug>.ADMIN_DOMAIN, and
+# tls_check will only authorize certificates under this suffix.
+ADMIN_DOMAIN = config("ADMIN_DOMAIN", default="admin.aimenu.ge")
+
 # Also add APP_DOMAIN if set by DigitalOcean
 APP_DOMAIN = config("APP_DOMAIN", default="")
 if APP_DOMAIN and APP_DOMAIN not in ALLOWED_HOSTS:
@@ -57,6 +68,15 @@ if DATABASE_URL:
 
 # Security settings for production
 SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=True, cast=bool)
+
+# These are called over plain HTTP from inside the Docker network. Left to the
+# normal redirect they would answer 301, and Caddy treats any non-2xx from the
+# on-demand TLS `ask` as a refusal to issue.
+SECURE_REDIRECT_EXEMPT = [
+    r"^api/v1/tls-check/$",
+    r"^api/v1/health/$",
+    r"^api/v1/ready/$",
+]
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
@@ -64,10 +84,16 @@ SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
-# CSRF trusted origins for DigitalOcean
+# CSRF trusted origins
 CSRF_TRUSTED_ORIGINS: list = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
 # Filter out empty strings
 CSRF_TRUSTED_ORIGINS = [origin for origin in CSRF_TRUSTED_ORIGINS if origin]
+
+# Every restaurant gets its own admin origin (<slug>.admin.aimenu.ge), so they
+# cannot be enumerated in the env var. Without this, logging into a tenant
+# admin fails the CSRF referer check with 403 even though TLS is fine.
+if f"https://*.{ADMIN_DOMAIN}" not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(f"https://*.{ADMIN_DOMAIN}")
 
 # CORS - Restricted in production
 CORS_ALLOW_ALL_ORIGINS = False

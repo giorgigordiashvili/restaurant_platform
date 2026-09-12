@@ -16,7 +16,7 @@ from drf_spectacular.views import (
 from apps.accounts.views import FacebookDataDeletionView
 from apps.core.admin_sites import tenant_admin_site
 from apps.core.admin_views import set_simulated_restaurant
-from apps.core.views import health_check, readiness_check
+from apps.core.views import health_check, readiness_check, tls_check
 
 
 def get_admin_urls(request):
@@ -53,6 +53,11 @@ urlpatterns = [
     # Health checks (for load balancers and monitoring)
     path("api/v1/health/", health_check, name="health_check"),
     path("api/v1/ready/", readiness_check, name="readiness_check"),
+    # Caddy on-demand TLS gate -- called during the TLS handshake to decide
+    # whether a hostname may get a certificate. Internal to the Docker
+    # network; not part of the public API, so it is deliberately unversioned
+    # in spirit and excluded from the schema.
+    path("api/v1/tls-check/", tls_check, name="tls_check"),
     # Facebook data-deletion callback — mounted at the root so the URL we
     # hand Meta (https://admin.aimenu.ge/data-deletion/) is clean and
     # memorable rather than buried under /api/v1/auth/.

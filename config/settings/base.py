@@ -16,6 +16,11 @@ SECRET_KEY = config("SECRET_KEY")
 # Main domain for subdomain tenant resolution
 MAIN_DOMAIN = config("MAIN_DOMAIN", default="localhost")
 
+# Domain the Django admin is served from. Restaurant staff reach their own
+# admin at <slug>.ADMIN_DOMAIN, so this is also the suffix the on-demand TLS
+# check (apps/core/views.py::tls_check) is willing to issue certificates for.
+ADMIN_DOMAIN = config("ADMIN_DOMAIN", default="localhost")
+
 # Application definition
 # Unfold must come BEFORE django.contrib.admin for its templates to load
 UNFOLD_APPS = [
