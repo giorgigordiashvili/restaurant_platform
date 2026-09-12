@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-12 21:45+0400\n"
+"POT-Creation-Date: 2026-09-12 22:24+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
@@ -24,7 +24,6 @@ msgstr "Аккаунты"
 msgid "Audit"
 msgstr "Аудит"
 
-#| msgid "User Profile"
 msgid "User Login"
 msgstr "Вход пользователя"
 
@@ -34,55 +33,42 @@ msgstr "Выход пользователя"
 msgid "Failed Login"
 msgstr "Неудачный вход"
 
-#| msgid "Password"
 msgid "Password Change"
 msgstr "Смена пароля"
 
-#| msgid "Password"
 msgid "Password Reset"
 msgstr "Сброс пароля"
 
-#| msgid "Created"
 msgid "User Created"
 msgstr "Пользователь создан"
 
-#| msgid "Updated"
 msgid "User Updated"
 msgstr "Пользователь обновлён"
 
-#| msgid "Delete"
 msgid "User Deleted"
 msgstr "Пользователь удалён"
 
-#| msgid "Staff Role"
 msgid "Staff Added"
 msgstr "Сотрудник добавлен"
 
-#| msgid "Staff Role"
 msgid "Staff Removed"
 msgstr "Сотрудник удалён"
 
-#| msgid "Created"
 msgid "Order Created"
 msgstr "Заказ создан"
 
-#| msgid "Updated"
 msgid "Order Updated"
 msgstr "Заказ обновлён"
 
-#| msgid "Cancelled"
 msgid "Order Cancelled"
 msgstr "Заказ отменён"
 
-#| msgid "Payment Method"
 msgid "Payment Collected"
 msgstr "Оплата принята"
 
-#| msgid "Settings"
 msgid "Settings Updated"
 msgstr "Настройки обновлены"
 
-#| msgid "Export"
 msgid "Data Exported"
 msgstr "Данные экспортированы"
 
@@ -98,7 +84,6 @@ msgstr "Товар списан"
 msgid "Employee Meal Recorded"
 msgstr "Питание сотрудника записано"
 
-#| msgid "Updated"
 msgid "Recipe Updated"
 msgstr "Рецепт обновлён"
 
@@ -114,29 +99,28 @@ msgstr "Кассовая смена закрыта"
 msgid "Cash Paid In / Out"
 msgstr "Внесение / изъятие наличных"
 
-#| msgid "Refunds"
 msgid "Refund Issued"
 msgstr "Возврат выполнен"
 
 # Models - Orders
-#| msgid "Orders"
 msgid "Order Discount"
 msgstr "Скидка на заказ"
 
-#| msgid "Completed"
 msgid "Item Comped"
 msgstr "Позиция за счёт заведения"
 
 msgid "Item Voided"
 msgstr "Позиция аннулирована"
 
-#| msgid "Order Item"
 msgid "Order Split"
 msgstr "Заказ разделён"
 
-#| msgid "Order Item"
 msgid "Order Moved"
 msgstr "Заказ перенесён"
+
+#| msgid "Prices and availability sync queued."
+msgid "Dish availability changed"
+msgstr "Доступность блюда изменена"
 
 msgid "Audit Log"
 msgstr "Запись аудита"
@@ -156,7 +140,6 @@ msgid "Open now"
 msgstr "Открытые сейчас"
 
 # Models - Orders
-#| msgid "Orders"
 msgid "All orders"
 msgstr "Все заказы"
 
@@ -164,20 +147,16 @@ msgstr "Все заказы"
 msgid "Reservations"
 msgstr "Бронирования"
 
-#| msgid "Password confirmation"
 msgid "Awaiting confirmation"
 msgstr "Ожидают подтверждения"
 
-#| msgid "Blocked Times"
 msgid "Blocked times"
 msgstr "Заблокированное время"
 
 # Models - Tables
-#| msgid "Tables"
 msgid "Tables & QR"
 msgstr "Столы и QR"
 
-#| msgid "Table Sessions"
 msgid "Active sessions"
 msgstr "Активные сессии"
 
@@ -185,7 +164,6 @@ msgstr "Активные сессии"
 msgid "Tables"
 msgstr "Столики"
 
-#| msgid "Table QR Codes"
 msgid "QR codes"
 msgstr "QR-коды"
 
@@ -193,7 +171,6 @@ msgid "Open shift"
 msgstr "Открытая смена"
 
 # Dates and times
-#| msgid "Today"
 msgid "Taken today"
 msgstr "Принято сегодня"
 
@@ -201,7 +178,6 @@ msgid "Cash in drawer"
 msgstr "Наличные в кассе"
 
 # Models - Payments
-#| msgid "Payments"
 msgid "Cash & payments"
 msgstr "Касса и оплаты"
 
@@ -218,7 +194,6 @@ msgstr "Причины"
 msgid "Warehouse"
 msgstr "Склад"
 
-#| msgid "Log out"
 msgid "Low / out"
 msgstr "Мало / нет"
 
@@ -234,7 +209,6 @@ msgstr "Приход товара"
 msgid "Dishes"
 msgstr "Блюда"
 
-#| msgid "Log out"
 msgid "Sold out"
 msgstr "Распродано"
 
@@ -242,11 +216,9 @@ msgstr "Распродано"
 msgid "Menu"
 msgstr "Меню"
 
-#| msgid "items"
 msgid "Items"
 msgstr "Позиции"
 
-#| msgid "Menu Categories"
 msgid "Categories"
 msgstr "Категории"
 
@@ -262,7 +234,6 @@ msgstr "Программы"
 msgid "Reviews"
 msgstr "Отзывы"
 
-#| msgid "Past 7 days"
 msgid "Last 7 days"
 msgstr "Последние 7 дней"
 
@@ -281,6 +252,25 @@ msgstr "Платформы"
 msgid "Setup guide"
 msgstr "Руководство по настройке"
 
+#| msgid "Promotion"
+msgid "Promotions"
+msgstr "Акции"
+
+msgid "Active"
+msgstr "Активен"
+
+msgid "Happy hours live now"
+msgstr "Активные happy hour"
+
+# Models - Orders
+#| msgid "Orders today"
+msgid "Codes used today"
+msgstr "Кодов использовано сегодня"
+
+#| msgid "Modules"
+msgid "Schedules"
+msgstr "Расписания"
+
 msgid "Fiscal & VAT"
 msgstr "Фискализация и НДС"
 
@@ -294,11 +284,9 @@ msgid "Documents"
 msgstr "Документы"
 
 # Profile Settings
-#| msgid "Profile Settings"
 msgid "Fiscal settings"
 msgstr "Фискальные настройки"
 
-#| msgid "Print"
 msgid "Printing"
 msgstr "Печать"
 
@@ -308,11 +296,9 @@ msgstr "Принтеры офлайн"
 msgid "Failed jobs"
 msgstr "Неудачные задания"
 
-#| msgid "Print"
 msgid "Printers"
 msgstr "Принтеры"
 
-#| msgid "Print"
 msgid "Print jobs"
 msgstr "Задания печати"
 
@@ -320,7 +306,6 @@ msgid "Sales today"
 msgstr "Продажи сегодня"
 
 # Models - Orders
-#| msgid "Orders"
 msgid "Orders today"
 msgstr "Заказы сегодня"
 
@@ -331,25 +316,21 @@ msgstr "Продажи"
 msgid "Staff"
 msgstr "Персонал"
 
-#| msgid "Staff Members"
 msgid "Members"
 msgstr "Сотрудники"
 
-#| msgid "Staff Invitations"
 msgid "Pending invitations"
 msgstr "Ожидающие приглашения"
 
 msgid "Invite"
 msgstr "Пригласить"
 
-#| msgid "Staff Roles"
 msgid "Roles"
 msgstr "Роли"
 
 msgid "Modules on"
 msgstr "Включённые модули"
 
-#| msgid "Restaurants"
 msgid "Restaurant settings"
 msgstr "Настройки ресторана"
 
@@ -359,7 +340,6 @@ msgstr "Модули"
 msgid "Categories, dishes and modifiers. The QR menu customers browse."
 msgstr "Категории, блюда и модификаторы. QR-меню, которое видят гости."
 
-#| msgid "Order"
 msgid "Ordering"
 msgstr "Заказы"
 
@@ -428,7 +408,16 @@ msgstr ""
 "Профиль НДС, последовательные чеки и чеки возврата, экспорт накладных RS.ge."
 " Фискальный провайдер подключается позже."
 
-#| msgid "Staff Invitations"
+msgid "Promotions & schedules"
+msgstr "Акции и расписания"
+
+msgid ""
+"Breakfast / lunch menus by time, '86 today', happy hours, promo codes and "
+"combo menus."
+msgstr ""
+"Меню завтрака / обеда по времени, «сегодня нет», happy hour, промокоды и "
+"комбо-меню."
+
 msgid "Notifications"
 msgstr "Уведомления"
 
@@ -440,7 +429,6 @@ msgstr ""
 "сбои принтера, Z-отчёты); SMS / email гостям о бронях."
 
 # Models - Payments
-#| msgid "Payments"
 msgid "Online payments"
 msgstr "Онлайн-оплаты"
 
@@ -454,7 +442,6 @@ msgstr ""
 msgid "View"
 msgstr "Просмотр"
 
-#| msgid "Created"
 msgid "Create"
 msgstr "Создание"
 
@@ -473,7 +460,6 @@ msgstr "Настройки"
 msgid "Analytics"
 msgstr "Аналитика"
 
-#| msgid "Updated"
 msgid "update"
 msgstr "изменение"
 
@@ -499,11 +485,9 @@ msgstr "Панель управления"
 msgid "Kitchen screen (POS)"
 msgstr "Экран кухни (POS)"
 
-#| msgid "Export"
 msgid "Reports"
 msgstr "Отчёты"
 
-#| msgid "Staff Invitations"
 msgid "Invitations"
 msgstr "Приглашения"
 
@@ -547,7 +531,6 @@ msgstr "Включить"
 msgid "Always on."
 msgstr "Всегда включён."
 
-#| msgid "Table Sections"
 msgid "Save options"
 msgstr "Сохранить параметры"
 
@@ -563,7 +546,6 @@ msgstr "Покинуть площадку? Ваши столы останутс�
 msgid "Leave venue"
 msgstr "Покинуть площадку"
 
-#| msgid "Restaurants"
 msgid "Restaurants at this venue"
 msgstr "Рестораны на этой площадке"
 
@@ -583,7 +565,6 @@ msgstr "Номер"
 msgid "Name"
 msgstr "Название"
 
-#| msgid "Action"
 msgid "Section"
 msgstr "Зона"
 
@@ -660,7 +641,6 @@ msgstr "Принять"
 msgid "Decline"
 msgstr "Отклонить"
 
-#| msgid "None"
 msgid "None."
 msgstr "Нет."
 
@@ -673,7 +653,6 @@ msgstr "истекает"
 msgid "Cancel"
 msgstr "Отмена"
 
-#| msgid "Restaurants"
 msgid "Restaurant slug"
 msgstr "Slug ресторана"
 
@@ -687,11 +666,9 @@ msgid "Invite to share tables"
 msgstr "Пригласить делить столы"
 
 # Misc
-#| msgid "Optional"
 msgid "Options"
 msgstr "Опции"
 
-#| msgid "Description"
 msgid "Direction"
 msgstr "Направление"
 
@@ -754,14 +731,12 @@ msgstr ""
 "Пересоздано QR-изображений: {p0}. Скачайте и распечатайте, чтобы коды стали "
 "динамическими."
 
-#| msgid "Table QR Code"
 msgid "QR Code"
 msgstr "QR-код"
 
 msgid "QR URL"
 msgstr "QR-ссылка"
 
-#| msgid "Previous"
 msgid "Preview"
 msgstr "Предпросмотр"
 
@@ -787,23 +762,18 @@ msgstr "Приглашение отправлено на {p0}."
 msgid "Status"
 msgstr "Статус"
 
-#| msgid "Reservation Settings"
 msgid "Resend invitation email"
 msgstr "Отправить приглашение повторно"
 
-#| msgid "Staff Invitations"
 msgid "Cancel invitations"
 msgstr "Отменить приглашения"
 
-#| msgid "Confirmed"
 msgid "Confirm"
 msgstr "Подтвердить"
 
-#| msgid "Created"
 msgid "Mark seated"
 msgstr "Гости сели"
 
-#| msgid "Completed"
 msgid "Mark completed"
 msgstr "Отметить завершённым"
 
@@ -826,7 +796,6 @@ msgstr "Заказ получен"
 msgid "Order cancelled by platform"
 msgstr "Заказ отменён платформой"
 
-#| msgid "Status"
 msgid "Status pushed"
 msgstr "Статус отправлен"
 
@@ -836,11 +805,9 @@ msgstr "Статус синхронизации меню"
 msgid "Cancellation requested by restaurant"
 msgstr "Отмену запросил ресторан"
 
-#| msgid "Order Status History"
 msgid "Order status notification"
 msgstr "Уведомление о статусе заказа"
 
-#| msgid "Refunds"
 msgid "Refund pushed"
 msgstr "Возврат отправлен"
 
@@ -854,7 +821,6 @@ msgid "Platform event"
 msgstr "Событие платформы"
 
 # Models - Payments
-#| msgid "Payments"
 msgid "Platform events"
 msgstr "События платформы"
 
@@ -870,11 +836,9 @@ msgstr "Обрабатывается"
 msgid "Success"
 msgstr "Успех"
 
-#| msgid "Menu Items"
 msgid "Menu sync"
 msgstr "Синхронизация меню"
 
-#| msgid "Menu Items"
 msgid "Menu syncs"
 msgstr "Синхронизации меню"
 
@@ -887,11 +851,9 @@ msgstr "Предпросмотр готов"
 msgid "Importing images"
 msgstr "Импорт изображений"
 
-#| msgid "Import"
 msgid "Imported"
 msgstr "Импортировано"
 
-#| msgid "Import"
 msgid "Import failed"
 msgstr "Импорт не удался"
 
@@ -901,11 +863,9 @@ msgstr "Меню платформы в полученном виде."
 msgid "[[menu_item_id, url], ...] still to download."
 msgstr "[[menu_item_id, url], ...] ещё не загружено."
 
-#| msgid "Menu Item"
 msgid "Menu import"
 msgstr "Импорт меню"
 
-#| msgid "Menu Items"
 msgid "Menu imports"
 msgstr "Импорты меню"
 
@@ -936,7 +896,6 @@ msgstr "задан"
 msgid "not set"
 msgstr "не задан"
 
-#| msgid "Table"
 msgid "Enabled"
 msgstr "Включено"
 
@@ -958,11 +917,9 @@ msgstr "Ещё не настроено: нужны ID магазина и учё
 msgid "Give these to the platform's onboarding team"
 msgstr "Передайте это команде подключения платформы"
 
-#| msgid "Order Item"
 msgid "Order webhook"
 msgstr "Webhook заказов"
 
-#| msgid "Cancelled"
 msgid "Cancel webhook"
 msgstr "Webhook отмены"
 
@@ -984,7 +941,6 @@ msgstr "Секрета ещё нет: создайте его и передай�
 msgid "No per-store webhook token: the platform-wide token is used."
 msgstr "Токена магазина нет: используется общий токен платформы."
 
-#| msgid "Menu Item"
 msgid "Menu feed"
 msgstr "Лента меню"
 
@@ -1036,7 +992,6 @@ msgstr "Последняя отправка меню"
 msgid "products"
 msgstr "продуктов"
 
-#| msgid "Recent actions"
 msgid "Recent events"
 msgstr "Последние события"
 
@@ -1152,7 +1107,6 @@ msgstr "Найдено"
 msgid "dishes in"
 msgstr "блюд в"
 
-#| msgid "Menu Categories"
 msgid "categories"
 msgstr "категориях"
 
@@ -1181,7 +1135,6 @@ msgstr ""
 msgid "Update prices of dishes that already exist"
 msgstr "Обновить цены уже существующих блюд"
 
-#| msgid "Download"
 msgid "Download photos"
 msgstr "Скачать фото"
 
@@ -1206,7 +1159,6 @@ msgstr "Открыть меню"
 msgid "Back"
 msgstr "Назад"
 
-#| msgid "Menu Category"
 msgid "existing category"
 msgstr "существующая категория"
 
@@ -1219,7 +1171,6 @@ msgstr "Цена"
 msgid "Photo"
 msgstr "Фото"
 
-#| msgid "Language"
 msgid "Languages"
 msgstr "Языки"
 
@@ -1302,18 +1253,15 @@ msgstr "Как зарегистрировано в RS."
 msgid "ს/კ — 9 digits (company) or 11 (individual)."
 msgstr "ს/კ — 9 цифр (компания) или 11 (физлицо)."
 
-#| msgid "User Profile"
 msgid "Fiscal profile"
 msgstr "Фискальный профиль"
 
-#| msgid "User Profiles"
 msgid "Fiscal profiles"
 msgstr "Фискальные профили"
 
 msgid "Receipt"
 msgstr "Чек"
 
-#| msgid "Refund"
 msgid "Refund receipt"
 msgstr "Чек возврата"
 
@@ -1347,14 +1295,12 @@ msgstr "Фискальный документ"
 msgid "Fiscal documents"
 msgstr "Фискальные документы"
 
-#| msgid "Confirmed"
 msgid "Confirmed documents"
 msgstr "Подтверждённые документы"
 
 msgid "Draft waybills"
 msgstr "Черновики накладных"
 
-#| msgid "Quantity"
 msgid "Legal entity"
 msgstr "Юридическое лицо"
 
@@ -1367,7 +1313,6 @@ msgstr "Юридическое название"
 msgid "Tax id (ს/კ)"
 msgstr "ИНН (ს/კ)"
 
-#| msgid "Address"
 msgid "Legal address"
 msgstr "Юридический адрес"
 
@@ -1444,7 +1389,6 @@ msgstr "XML"
 msgid "Retry / send"
 msgstr "Повторить / отправить"
 
-#| msgid "Cancelled"
 msgid "Cancel draft"
 msgstr "Отменить черновик"
 
@@ -1453,7 +1397,6 @@ msgid "{p0} queued again."
 msgstr "{p0} снова в очереди."
 
 #, python-brace-format
-#| msgid "Cancelled"
 msgid "{p0} cancelled."
 msgstr "{p0} отменён."
 
@@ -1488,11 +1431,9 @@ msgstr "Стоимость базовой единицы, когда цена п
 msgid "Stock item"
 msgstr "Складская позиция"
 
-#| msgid "items"
 msgid "Stock items"
 msgstr "Складские позиции"
 
-#| msgid "Please wait..."
 msgid "Per base unit."
 msgstr "За базовую единицу."
 
@@ -1533,11 +1474,9 @@ msgid "Kitchen mistake"
 msgstr "Ошибка кухни"
 
 # Models - Accounts
-#| msgid "Accounts"
 msgid "Stock count"
 msgstr "Инвентаризация"
 
-#| msgid "Action"
 msgid "Correction"
 msgstr "Корректировка"
 
@@ -1665,7 +1604,6 @@ msgstr "Перепроверить наличие"
 msgid "Done"
 msgstr "Готово"
 
-#| msgid "None"
 msgid "on"
 msgstr "—"
 
@@ -1685,7 +1623,6 @@ msgstr "Что купить на"
 msgid "Show"
 msgstr "Показать"
 
-#| msgid "Menu Item"
 msgid "Item"
 msgstr "Позиция"
 
@@ -1694,7 +1631,6 @@ msgid "Available"
 msgstr "Свободен"
 
 # Filter labels
-#| msgid "By"
 msgid "Buy"
 msgstr "Купить"
 
@@ -1728,12 +1664,10 @@ msgstr "Осталось"
 msgid "Expires"
 msgstr "Истекает"
 
-#| msgid "Required"
 msgid "expired"
 msgstr "просрочено"
 
 # Dates and times
-#| msgid "Today"
 msgid "today"
 msgstr "сегодня"
 
@@ -1749,7 +1683,6 @@ msgstr "Списать"
 msgid "Nothing expiring within the warning window."
 msgstr "В окне предупреждения ничего не истекает."
 
-#| msgid "Reservation History"
 msgid "Alert history"
 msgstr "История оповещений"
 
@@ -1768,7 +1701,6 @@ msgstr "Уровень"
 msgid "Used in"
 msgstr "Используется в"
 
-#| msgid "Warning"
 msgid "Remaining"
 msgstr "Остаток"
 
@@ -1778,7 +1710,6 @@ msgstr "Срок"
 msgid "Quantity"
 msgstr "Количество"
 
-#| msgid "Active"
 msgid "Ate"
 msgstr "Ел"
 
@@ -1850,6 +1781,9 @@ msgstr "Реестр лояльности платформы"
 msgid "BlurHash string for the image — used as an inline LQIP."
 msgstr "BlurHash изображения — используется как встроенный LQIP."
 
+msgid "Only shown / orderable inside this window (e.g. Breakfast)."
+msgstr "Показывается / заказывается только в этом окне (напр. Завтрак)."
+
 msgid "Menu Category"
 msgstr "Категория меню"
 
@@ -1913,6 +1847,15 @@ msgstr "Список кодов аллергенов (напр. ['gluten', 'dair
 msgid "Spicy level 0-5 (0 = not spicy)"
 msgstr "Острота 0-5 (0 = не острое)"
 
+msgid "Only orderable inside this window; empty = follows the category."
+msgstr "Заказывается только в этом окне; пусто = как у категории."
+
+msgid "'86 today': hidden from ordering until this moment."
+msgstr "«Сегодня нет»: скрыто из заказа до этого момента."
+
+msgid "Set menu: the warehouse consumes the components' recipes."
+msgstr "Сет-меню: склад списывает рецепты компонентов."
+
 msgid "Deprecated: see Warehouse recipes."
 msgstr "Устарело: см. рецепты склада."
 
@@ -1922,11 +1865,9 @@ msgstr "Позиция меню"
 msgid "Menu Items"
 msgstr "Позиции меню"
 
-#| msgid "Table Section"
 msgid "Single Selection"
 msgstr "Один вариант"
 
-#| msgid "Table Section"
 msgid "Multiple Selection"
 msgstr "Несколько вариантов"
 
@@ -1976,7 +1917,6 @@ msgstr "Данные ссылки для POS (kind, id)."
 msgid "Admin page to open."
 msgstr "Страница админки для открытия."
 
-#| msgid "Position"
 msgid "Notification"
 msgstr "Уведомление"
 
@@ -1995,18 +1935,15 @@ msgstr "Email гостям, если они указали адрес."
 msgid "Shown as the restaurant name."
 msgstr "Отображается как название ресторана."
 
-#| msgid "Reservation Settings"
 msgid "Notification settings"
 msgstr "Настройки уведомлений"
 
 msgid "Skipped"
 msgstr "Пропущено"
 
-#| msgid "Reservation History"
 msgid "Reservation confirmation"
 msgstr "Подтверждение брони"
 
-#| msgid "Reservation Settings"
 msgid "Reservation reminder"
 msgstr "Напоминание о брони"
 
@@ -2031,7 +1968,6 @@ msgstr "Исходящее сообщение"
 msgid "Outbound messages"
 msgstr "Исходящие сообщения"
 
-#| msgid "Staff Roles"
 msgid "Staff push"
 msgstr "Push персоналу"
 
@@ -2081,11 +2017,9 @@ msgid "Send email to guests"
 msgstr "Отправлять email гостям"
 
 # Login
-#| msgid "Username"
 msgid "Sender name"
 msgstr "Имя отправителя"
 
-#| msgid "Change"
 msgid "Channel"
 msgstr "Канал"
 
@@ -2136,7 +2070,6 @@ msgstr "Выберите SMS или email и укажите адресата."
 msgid "Test {p0} sent to {p1}."
 msgstr "Тестовое {p0} отправлено на {p1}."
 
-#| msgid "Reserved"
 msgid "Resend"
 msgstr "Отправить повторно"
 
@@ -2150,11 +2083,9 @@ msgstr "Вручную"
 msgid "Loyalty tier"
 msgstr "Уровень лояльности"
 
-#| msgid "Position"
 msgid "Promotion"
 msgstr "Акция"
 
-#| msgid "Payment"
 msgid "Pending Payment"
 msgstr "Ожидает оплаты"
 
@@ -2183,11 +2114,9 @@ msgstr "Навынос"
 msgid "Delivery"
 msgstr "Доставка"
 
-#| msgid "View site"
 msgid "Website"
 msgstr "Сайт"
 
-#| msgid "Table"
 msgid "QR table"
 msgstr "QR-стол"
 
@@ -2224,7 +2153,6 @@ msgstr "Особые пожелания или заметки гостя"
 msgid "Staff member who handled this order"
 msgstr "Сотрудник, обработавший заказ"
 
-#| msgid "Order Status Histories"
 msgid "Order status histories"
 msgstr "История статусов заказа"
 
@@ -2244,7 +2172,6 @@ msgid "Cash shifts"
 msgstr "Кассовые смены"
 
 # Models - Accounts
-#| msgid "Accounts"
 msgid "Discount"
 msgstr "Скидка"
 
@@ -2266,11 +2193,9 @@ msgstr "Причина скидки / аннулирования"
 msgid "Discount / void reasons"
 msgstr "Причины скидок / аннулирований"
 
-#| msgid "Refund"
 msgid "Refunded"
 msgstr "Возвращено"
 
-#| msgid "Partially Paid"
 msgid "Partially Refunded"
 msgstr "Частично возвращено"
 
@@ -2292,7 +2217,6 @@ msgstr "Ваучер"
 msgid "Card"
 msgstr "Карта"
 
-#| msgid "Payment"
 msgid "Mobile Payment"
 msgstr "Мобильная оплата"
 
@@ -2306,7 +2230,6 @@ msgstr ""
 msgid "Staff member who processed this payment"
 msgstr "Сотрудник, принявший оплату"
 
-#| msgid "Amount"
 msgid "Amount + tip"
 msgstr "Сумма + чаевые"
 
@@ -2328,14 +2251,12 @@ msgstr "Платёж"
 msgid "Customer Request"
 msgstr "Запрос гостя"
 
-#| msgid "Unavailable"
 msgid "Item Unavailable"
 msgstr "Позиция недоступна"
 
 msgid "Quality Issue"
 msgstr "Проблема качества"
 
-#| msgid "Group Order"
 msgid "Wrong Order"
 msgstr "Неверный заказ"
 
@@ -2350,7 +2271,6 @@ msgid "Refund ID from external provider"
 msgstr "ID возврата у внешнего провайдера"
 
 # Models - Accounts
-#| msgid "Accounts"
 msgid "Bank Account"
 msgstr "Банковский счёт"
 
@@ -2382,22 +2302,18 @@ msgstr ""
 msgid "BOG Transaction"
 msgstr "Транзакция BOG"
 
-#| msgid "My actions"
 msgid "BOG Transactions"
 msgstr "Транзакции BOG"
 
-#| msgid "Site administration"
 msgid "Flitt Transaction"
 msgstr "Транзакция Flitt"
 
 msgid "Flitt Transactions"
 msgstr "Транзакции Flitt"
 
-#| msgid "Restaurant"
 msgid "Restaurant Debit"
 msgstr "Дебет ресторана"
 
-#| msgid "Restaurants"
 msgid "Restaurant Debits"
 msgstr "Дебеты ресторана"
 
@@ -2424,7 +2340,6 @@ msgstr "Чековые принтеры: открывать ящик при оп
 msgid "Last poll from the bridge."
 msgstr "Последний опрос от bridge."
 
-#| msgid "Print"
 msgid "Printer"
 msgstr "Принтер"
 
@@ -2434,7 +2349,6 @@ msgstr "Что было сформировано (для повторной пе
 msgid "Rendered ESC/POS bytes the bridge writes to the device."
 msgstr "Байты ESC/POS, которые bridge пишет на устройство."
 
-#| msgid "Print"
 msgid "Print job"
 msgstr "Задание печати"
 
@@ -2474,6 +2388,204 @@ msgstr "Повторить (снова в очередь)"
 msgid "{p0} job(s) queued again."
 msgstr "Заданий снова в очереди: {p0}."
 
+#| msgid "None available"
+msgid "Not available today"
+msgstr "Сегодня недоступно"
+
+# Days of week
+msgid "Monday"
+msgstr "Понедельник"
+
+msgid "Tuesday"
+msgstr "Вторник"
+
+msgid "Wednesday"
+msgstr "Среда"
+
+msgid "Thursday"
+msgstr "Четверг"
+
+#| msgid "Holiday"
+msgid "Friday"
+msgstr "Пятница"
+
+msgid "Saturday"
+msgstr "Суббота"
+
+msgid "Sunday"
+msgstr "Воскресенье"
+
+msgid "E.g. 'Breakfast', 'Lunch', 'Happy hour'."
+msgstr "Напр. «Завтрак», «Обед», «Happy hour»."
+
+msgid "0 = Monday … 6 = Sunday. Empty = every day."
+msgstr "0 = понедельник … 6 = воскресенье. Пусто = каждый день."
+
+msgid "Earlier than the start = the window runs past midnight."
+msgstr "Раньше начала = окно переходит за полночь."
+
+#| msgid "Menu push queued."
+msgid "Menu schedule"
+msgstr "Расписание меню"
+
+#| msgid "Menu syncs"
+msgid "Menu schedules"
+msgstr "Расписания меню"
+
+msgid "Combo component"
+msgstr "Компонент комбо"
+
+msgid "Combo components"
+msgstr "Компоненты комбо"
+
+msgid "Happy hour (automatic)"
+msgstr "Happy hour (автоматически)"
+
+#| msgid "Promotion"
+msgid "Promo code"
+msgstr "Промокод"
+
+#| msgid "Write off"
+msgid "Percent off"
+msgstr "Скидка в процентах"
+
+msgid "Fixed amount off"
+msgstr "Фиксированная скидка"
+
+# Models - Orders
+#| msgid "All orders"
+msgid "Whole order"
+msgstr "Весь заказ"
+
+#| msgid "categories"
+msgid "Selected categories"
+msgstr "Выбранные категории"
+
+#| msgid "Distinct dishes"
+msgid "Selected dishes"
+msgstr "Выбранные блюда"
+
+msgid "Shown to guests on the menu."
+msgstr "Показывается гостям в меню."
+
+msgid ""
+"Happy hour: only inside this window. Promo codes: optional restriction."
+msgstr "Happy hour: только в этом окне. Промокод: необязательное ограничение."
+
+msgid "Guests type this at checkout."
+msgstr "Гости вводят это при оформлении."
+
+msgid "0 = unlimited."
+msgstr "0 = без ограничений."
+
+msgid "Empty = everywhere (web, QR, POS)."
+msgstr "Пусто = везде (сайт, QR, POS)."
+
+msgid "May combine with other promotions on one order."
+msgstr "Может сочетаться с другими акциями в одном заказе."
+
+#| msgid "Promotion"
+msgid "Promotion use"
+msgstr "Использование акции"
+
+#| msgid "Promotion"
+msgid "Promotion uses"
+msgstr "Использования акций"
+
+msgid "Promotions are not enabled."
+msgstr "Акции не включены."
+
+msgid "This code is not valid."
+msgstr "Этот код недействителен."
+
+# Form validation
+#| msgid "This field is required."
+msgid "This code has expired."
+msgstr "Срок действия кода истёк."
+
+msgid "This code has been used up."
+msgstr "Этот код исчерпан."
+
+#| msgid "This field cannot be blank."
+msgid "This code cannot be used here."
+msgstr "Этот код здесь не действует."
+
+#, python-format
+msgid "This code only works during %(window)s."
+msgstr "Этот код работает только в %(window)s."
+
+msgid "You have already used this code."
+msgstr "Вы уже использовали этот код."
+
+#, python-format
+msgid "Add %(amount)s more to use this code."
+msgstr "Добавьте ещё %(amount)s, чтобы использовать код."
+
+msgid "This code cannot be combined with another promotion."
+msgstr "Этот код нельзя сочетать с другой акцией."
+
+#| msgid "Nothing in this period."
+msgid "Nothing in this order is eligible for the code."
+msgstr "В этом заказе нет позиций, подходящих под код."
+
+# Form validation
+#| msgid "This field is required."
+msgid "This code is already applied."
+msgstr "Этот код уже применён."
+
+msgid "Days"
+msgstr "Дни"
+
+msgid "Window"
+msgstr "Окно"
+
+msgid "Every day"
+msgstr "Каждый день"
+
+#| msgid "Used in"
+msgid "Used by"
+msgstr "Используется"
+
+#| msgid "Promotion"
+msgid "promotions"
+msgstr "акций"
+
+#| msgid "Channel"
+msgid "Channels"
+msgstr "Каналы"
+
+msgid "Empty = everywhere."
+msgstr "Пусто = везде."
+
+msgid "A promo code needs a code."
+msgstr "Промокоду нужен код."
+
+msgid "A happy hour needs a schedule (when it is on)."
+msgstr "Happy hour нужно расписание (когда действует)."
+
+msgid "Percent cannot exceed 100."
+msgstr "Процент не может превышать 100."
+
+#| msgid "Open now"
+msgid "Live now"
+msgstr "Действует сейчас"
+
+# Models - Accounts
+#| msgid "Discount"
+msgid "Discount total"
+msgstr "Сумма скидок"
+
+#| msgid "Active"
+msgid "Activate"
+msgstr "Активировать"
+
+#| msgid "Is active"
+msgid "Deactivate"
+msgstr "Деактивировать"
+
+msgid "Combo components (tick 'Is combo' on the dish)"
+msgstr "Компоненты комбо (отметьте «Комбо» у блюда)"
+
 msgid "Referrals"
 msgstr "Рефералы"
 
@@ -2483,7 +2595,6 @@ msgstr "Применить"
 msgid "vs previous period"
 msgstr "к прошлому периоду"
 
-#| msgid "Export"
 msgid "Export CSV"
 msgstr "Экспорт CSV"
 
@@ -2499,7 +2610,6 @@ msgstr "Порог популярности"
 msgid "margin threshold"
 msgstr "порог маржи"
 
-#| msgid "Position"
 msgid "portion"
 msgstr "порция"
 
@@ -2533,14 +2643,12 @@ msgstr "Без рецепта (не классифицированы):"
 msgid "Yesterday"
 msgstr "Вчера"
 
-#| msgid "This year"
 msgid "This week"
 msgstr "Эта неделя"
 
 msgid "This month"
 msgstr "В этом месяце"
 
-#| msgid "Menu Items"
 msgid "Menu & dishes"
 msgstr "Меню и блюда"
 
@@ -2557,7 +2665,6 @@ msgid "Gross total"
 msgstr "Общий итог"
 
 # Models - Accounts
-#| msgid "Accounts"
 msgid "Discounts"
 msgstr "Скидки"
 
@@ -2570,20 +2677,16 @@ msgstr "Сервисный сбор"
 msgid "Tax"
 msgstr "Налог"
 
-#| msgid "Cancelled"
 msgid "Cancelled orders"
 msgstr "Отменённые заказы"
 
-#| msgid "Order Items"
 msgid "Voided items"
 msgstr "Аннулированные позиции"
 
-#| msgid "Past 7 days"
 msgid "Sales by day"
 msgstr "Продажи по дням"
 
 # Models - Orders
-#| msgid "Orders"
 msgid "Orders by hour"
 msgstr "Заказы по часам"
 
@@ -2596,7 +2699,6 @@ msgstr "Брутто"
 msgid "Type"
 msgstr "Тип"
 
-#| msgid "Payment Method"
 msgid "Method"
 msgstr "Способ"
 
@@ -2621,7 +2723,6 @@ msgstr "Позиций за счёт заведения"
 msgid "Top 10 dishes by revenue"
 msgstr "Топ-10 блюд по выручке"
 
-#| msgid "Menu Category"
 msgid "Category"
 msgstr "Категория"
 
@@ -2640,7 +2741,6 @@ msgstr "Доля выручки"
 msgid "Avg price"
 msgstr "Ср. цена"
 
-#| msgid "Modifiers"
 msgid "Modifiers / line"
 msgstr "Модификаторов / строка"
 
@@ -2664,6 +2764,16 @@ msgstr "Маржа / порция"
 
 msgid "Food cost %"
 msgstr "Себестоимость %"
+
+msgid "Kind"
+msgstr "Тип"
+
+#| msgid "QR Code"
+msgid "Code"
+msgstr "Код"
+
+msgid "Uses"
+msgstr "Использований"
 
 msgid "Cost of sales (COGS)"
 msgstr "Себестоимость продаж"
@@ -2701,14 +2811,12 @@ msgstr "Лучший официант"
 msgid "Sales by server"
 msgstr "Продажи по официантам"
 
-#| msgid "Served"
 msgid "Server"
 msgstr "Официант"
 
 msgid "Avg ticket"
 msgstr "Ср. чек"
 
-#| msgid "Order Item"
 msgid "Orders entered"
 msgstr "Введено заказов"
 
@@ -2733,14 +2841,12 @@ msgstr "Открыл"
 msgid "Opened"
 msgstr "Открыта"
 
-#| msgid "Close"
 msgid "Closed"
 msgstr "Закрыта"
 
 msgid "Expected"
 msgstr "Ожидалось"
 
-#| msgid "Amount"
 msgid "Counted"
 msgstr "Подсчитано"
 
@@ -2753,11 +2859,9 @@ msgstr "Неявки"
 msgid "No-show rate"
 msgstr "Доля неявок"
 
-#| msgid "Reservation History"
 msgid "Reservations & covers by day"
 msgstr "Брони и гости по дням"
 
-#| msgid "Amount"
 msgid "Count"
 msgstr "Количество"
 
@@ -2777,7 +2881,6 @@ msgid "Average rating by day"
 msgstr "Средняя оценка по дням"
 
 # Admin site
-#| msgid "Django administration"
 msgid "Rating distribution"
 msgstr "Распределение оценок"
 
@@ -2817,18 +2920,15 @@ msgstr "Максимум броней в час (0 = без лимита)"
 msgid "Reservation Settings"
 msgstr "Настройки бронирования"
 
-#| msgid "Password confirmation"
 msgid "Pending Confirmation"
 msgstr "Ожидает подтверждения"
 
 msgid "Waitlisted"
 msgstr "В листе ожидания"
 
-#| msgid "Created"
 msgid "Seated"
 msgstr "Гости за столом"
 
-#| msgid "Show"
 msgid "No Show"
 msgstr "Не пришли"
 
@@ -2859,7 +2959,6 @@ msgstr "Бронирование"
 msgid "Leave empty to block all tables"
 msgstr "Оставьте пустым, чтобы заблокировать все столы"
 
-#| msgid "Friday"
 msgid "Holiday"
 msgstr "Праздник"
 
@@ -2869,7 +2968,6 @@ msgstr "Частное мероприятие"
 msgid "Maintenance"
 msgstr "Техобслуживание"
 
-#| msgid "Staff Role"
 msgid "Staff Shortage"
 msgstr "Нехватка персонала"
 
@@ -2910,7 +3008,6 @@ msgid "Kitchen Staff"
 msgstr "Персонал кухни"
 
 # Models - Staff
-#| msgid "Staff"
 msgid "Bar Staff"
 msgstr "Персонал бара"
 
@@ -3031,10 +3128,6 @@ msgstr "QR-код столика"
 msgid "Table QR Codes"
 msgstr "QR-коды столиков"
 
-msgid "Active"
-msgstr "Активен"
-
-#| msgid "Payment Method"
 msgid "Payment Pending"
 msgstr "Ожидает оплаты"
 
@@ -3075,11 +3168,9 @@ msgstr "Города"
 msgid "Material icon name (e.g., 'restaurant', 'local_cafe', 'fastfood')"
 msgstr "Имя иконки Material (напр. 'restaurant', 'local_cafe', 'fastfood')"
 
-#| msgid "Restaurant Hours"
 msgid "Restaurant Category"
 msgstr "Категория ресторана"
 
-#| msgid "Restaurant Hours"
 msgid "Restaurant Categories"
 msgstr "Категории ресторанов"
 
@@ -3186,18 +3277,15 @@ msgstr "Площадка"
 msgid "This restaurant's tables seeded the venue layout (historical)."
 msgstr "Столы этого ресторана задали планировку площадки (исторически)."
 
-#| msgid "Remember me"
 msgid "Venue member"
 msgstr "Участник площадки"
 
 msgid "Venue members"
 msgstr "Участники площадки"
 
-#| msgid "Table Section"
 msgid "Venue section"
 msgstr "Зона площадки"
 
-#| msgid "Table Sections"
 msgid "Venue sections"
 msgstr "Зоны площадки"
 
@@ -3280,9 +3368,6 @@ msgstr "Запрос на общую площадку"
 #~ msgid "Click here to select all objects across all pages"
 #~ msgstr "Выбрать все объекты на всех страницах"
 
-#~ msgid "None available"
-#~ msgstr "Недоступно"
-
 #~ msgid "Unknown content"
 #~ msgstr "Неизвестное содержимое"
 
@@ -3313,33 +3398,11 @@ msgstr "Запрос на общую площадку"
 #~ msgid "Unpaid"
 #~ msgstr "Не оплачено"
 
-# Days of week
-#~ msgid "Monday"
-#~ msgstr "Понедельник"
-
-#~ msgid "Tuesday"
-#~ msgstr "Вторник"
-
-#~ msgid "Wednesday"
-#~ msgstr "Среда"
-
-#~ msgid "Thursday"
-#~ msgstr "Четверг"
-
-#~ msgid "Saturday"
-#~ msgstr "Суббота"
-
-#~ msgid "Sunday"
-#~ msgstr "Воскресенье"
-
 #~ msgid "Created at"
 #~ msgstr "Дата создания"
 
 #~ msgid "Updated at"
 #~ msgstr "Дата обновления"
-
-#~ msgid "Is active"
-#~ msgstr "Активен"
 
 #~ msgid "Is available"
 #~ msgstr "Доступен"
@@ -3434,10 +3497,6 @@ msgstr "Запрос на общую площадку"
 #~ msgid "Change Password"
 #~ msgstr "Сменить пароль"
 
-# Form validation
-#~ msgid "This field is required."
-#~ msgstr "Это поле обязательно."
-
 #~ msgid "Enter a valid email address."
 #~ msgstr "Введите корректный адрес эл. почты."
 
@@ -3452,9 +3511,6 @@ msgstr "Запрос на общую площадку"
 
 #~ msgid "Enter a valid time."
 #~ msgstr "Введите корректное время."
-
-#~ msgid "This field cannot be blank."
-#~ msgstr "Это поле не может быть пустым."
 
 #~ msgid "Please correct the error below."
 #~ msgstr "Пожалуйста, исправьте ошибку ниже."

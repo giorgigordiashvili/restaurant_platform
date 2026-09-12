@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-12 21:45+0400\n"
+"POT-Creation-Date: 2026-09-12 22:24+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Georgian\n"
@@ -24,7 +24,6 @@ msgstr "ანგარიშები"
 msgid "Audit"
 msgstr "აუდიტი"
 
-#| msgid "User Profile"
 msgid "User Login"
 msgstr "მომხმარებლის შესვლა"
 
@@ -34,55 +33,42 @@ msgstr "მომხმარებლის გასვლა"
 msgid "Failed Login"
 msgstr "წარუმატებელი შესვლა"
 
-#| msgid "Password"
 msgid "Password Change"
 msgstr "პაროლის შეცვლა"
 
-#| msgid "Password"
 msgid "Password Reset"
 msgstr "პაროლის აღდგენა"
 
-#| msgid "Created"
 msgid "User Created"
 msgstr "მომხმარებელი შეიქმნა"
 
-#| msgid "Updated"
 msgid "User Updated"
 msgstr "მომხმარებელი განახლდა"
 
-#| msgid "Delete"
 msgid "User Deleted"
 msgstr "მომხმარებელი წაიშალა"
 
-#| msgid "Staff Role"
 msgid "Staff Added"
 msgstr "თანამშრომელი დაემატა"
 
-#| msgid "Staff Role"
 msgid "Staff Removed"
 msgstr "თანამშრომელი წაიშალა"
 
-#| msgid "Created"
 msgid "Order Created"
 msgstr "შეკვეთა შეიქმნა"
 
-#| msgid "Updated"
 msgid "Order Updated"
 msgstr "შეკვეთა განახლდა"
 
-#| msgid "Cancelled"
 msgid "Order Cancelled"
 msgstr "შეკვეთა გაუქმდა"
 
-#| msgid "Payment Method"
 msgid "Payment Collected"
 msgstr "გადახდა მიღებულია"
 
-#| msgid "Settings"
 msgid "Settings Updated"
 msgstr "პარამეტრები განახლდა"
 
-#| msgid "Export"
 msgid "Data Exported"
 msgstr "მონაცემები ექსპორტირებულია"
 
@@ -98,7 +84,6 @@ msgstr "მარაგი ჩამოწერილია"
 msgid "Employee Meal Recorded"
 msgstr "თანამშრომლის კვება ჩაწერილია"
 
-#| msgid "Updated"
 msgid "Recipe Updated"
 msgstr "რეცეპტი განახლდა"
 
@@ -114,29 +99,28 @@ msgstr "სალაროს ცვლა დაიხურა"
 msgid "Cash Paid In / Out"
 msgstr "ნაღდი ფულის შეტანა / გატანა"
 
-#| msgid "Refunds"
 msgid "Refund Issued"
 msgstr "თანხა დაბრუნებულია"
 
 # Models - Orders
-#| msgid "Orders"
 msgid "Order Discount"
 msgstr "შეკვეთის ფასდაკლება"
 
-#| msgid "Completed"
 msgid "Item Comped"
 msgstr "კერძი უფასოდ"
 
 msgid "Item Voided"
 msgstr "კერძი ანულირებულია"
 
-#| msgid "Order Item"
 msgid "Order Split"
 msgstr "შეკვეთა გაიყო"
 
-#| msgid "Order Item"
 msgid "Order Moved"
 msgstr "შეკვეთა გადატანილია"
+
+#| msgid "Prices and availability sync queued."
+msgid "Dish availability changed"
+msgstr "კერძის ხელმისაწვდომობა შეიცვალა"
 
 msgid "Audit Log"
 msgstr "აუდიტის ჩანაწერი"
@@ -156,7 +140,6 @@ msgid "Open now"
 msgstr "ახლა ღია"
 
 # Models - Orders
-#| msgid "Orders"
 msgid "All orders"
 msgstr "ყველა შეკვეთა"
 
@@ -164,20 +147,16 @@ msgstr "ყველა შეკვეთა"
 msgid "Reservations"
 msgstr "დაჯავშნები"
 
-#| msgid "Password confirmation"
 msgid "Awaiting confirmation"
 msgstr "დადასტურების მოლოდინში"
 
-#| msgid "Blocked Times"
 msgid "Blocked times"
 msgstr "დაბლოკილი დრო"
 
 # Models - Tables
-#| msgid "Tables"
 msgid "Tables & QR"
 msgstr "მაგიდები და QR"
 
-#| msgid "Table Sessions"
 msgid "Active sessions"
 msgstr "აქტიური სესიები"
 
@@ -185,7 +164,6 @@ msgstr "აქტიური სესიები"
 msgid "Tables"
 msgstr "მაგიდები"
 
-#| msgid "Table QR Codes"
 msgid "QR codes"
 msgstr "QR კოდები"
 
@@ -193,7 +171,6 @@ msgid "Open shift"
 msgstr "ღია ცვლა"
 
 # Dates and times
-#| msgid "Today"
 msgid "Taken today"
 msgstr "დღეს მიღებული"
 
@@ -201,7 +178,6 @@ msgid "Cash in drawer"
 msgstr "ნაღდი სალაროში"
 
 # Models - Payments
-#| msgid "Payments"
 msgid "Cash & payments"
 msgstr "სალარო და გადახდები"
 
@@ -218,7 +194,6 @@ msgstr "მიზეზები"
 msgid "Warehouse"
 msgstr "საწყობი"
 
-#| msgid "Log out"
 msgid "Low / out"
 msgstr "მცირე / ამოწურული"
 
@@ -234,7 +209,6 @@ msgstr "მარაგის მიღება"
 msgid "Dishes"
 msgstr "კერძები"
 
-#| msgid "Log out"
 msgid "Sold out"
 msgstr "ამოწურულია"
 
@@ -242,11 +216,9 @@ msgstr "ამოწურულია"
 msgid "Menu"
 msgstr "მენიუ"
 
-#| msgid "items"
 msgid "Items"
 msgstr "პოზიციები"
 
-#| msgid "Menu Categories"
 msgid "Categories"
 msgstr "კატეგორიები"
 
@@ -262,7 +234,6 @@ msgstr "პროგრამები"
 msgid "Reviews"
 msgstr "შეფასებები"
 
-#| msgid "Past 7 days"
 msgid "Last 7 days"
 msgstr "ბოლო 7 დღე"
 
@@ -281,6 +252,25 @@ msgstr "პლატფორმები"
 msgid "Setup guide"
 msgstr "დაყენების გზამკვლევი"
 
+#| msgid "Promotion"
+msgid "Promotions"
+msgstr "აქციები"
+
+msgid "Active"
+msgstr "აქტიური"
+
+msgid "Happy hours live now"
+msgstr "აქტიური happy hour"
+
+# Models - Orders
+#| msgid "Orders today"
+msgid "Codes used today"
+msgstr "დღეს გამოყენებული კოდები"
+
+#| msgid "Modules"
+msgid "Schedules"
+msgstr "განრიგები"
+
 msgid "Fiscal & VAT"
 msgstr "ფისკალური და დღგ"
 
@@ -294,11 +284,9 @@ msgid "Documents"
 msgstr "დოკუმენტები"
 
 # Profile Settings
-#| msgid "Profile Settings"
 msgid "Fiscal settings"
 msgstr "ფისკალური პარამეტრები"
 
-#| msgid "Print"
 msgid "Printing"
 msgstr "ბეჭდვა"
 
@@ -308,11 +296,9 @@ msgstr "პრინტერები ოფლაინ"
 msgid "Failed jobs"
 msgstr "წარუმატებელი დავალებები"
 
-#| msgid "Print"
 msgid "Printers"
 msgstr "პრინტერები"
 
-#| msgid "Print"
 msgid "Print jobs"
 msgstr "ბეჭდვის დავალებები"
 
@@ -320,7 +306,6 @@ msgid "Sales today"
 msgstr "გაყიდვები დღეს"
 
 # Models - Orders
-#| msgid "Orders"
 msgid "Orders today"
 msgstr "შეკვეთები დღეს"
 
@@ -331,25 +316,21 @@ msgstr "გაყიდვები"
 msgid "Staff"
 msgstr "პერსონალი"
 
-#| msgid "Staff Members"
 msgid "Members"
 msgstr "წევრები"
 
-#| msgid "Staff Invitations"
 msgid "Pending invitations"
 msgstr "მოლოდინში მოწვევები"
 
 msgid "Invite"
 msgstr "მოწვევა"
 
-#| msgid "Staff Roles"
 msgid "Roles"
 msgstr "როლები"
 
 msgid "Modules on"
 msgstr "ჩართული მოდულები"
 
-#| msgid "Restaurants"
 msgid "Restaurant settings"
 msgstr "რესტორნის პარამეტრები"
 
@@ -361,7 +342,6 @@ msgstr ""
 "კატეგორიები, კერძები და მოდიფიკატორები. QR მენიუ, რომელსაც სტუმრები "
 "ათვალიერებენ."
 
-#| msgid "Order"
 msgid "Ordering"
 msgstr "შეკვეთები"
 
@@ -432,7 +412,16 @@ msgstr ""
 "დღგ პროფილი, თანმიმდევრული ჩეკები და დაბრუნების ჩეკები, RS.ge ზედნადებების "
 "ექსპორტი. ფისკალური პროვაიდერი მოგვიანებით დაემატება."
 
-#| msgid "Staff Invitations"
+msgid "Promotions & schedules"
+msgstr "აქციები და განრიგები"
+
+msgid ""
+"Breakfast / lunch menus by time, '86 today', happy hours, promo codes and "
+"combo menus."
+msgstr ""
+"საუზმის / ლანჩის მენიუ დროის მიხედვით, „დღეს არ არის“, happy hour, პრომო "
+"კოდები და კომბო მენიუ."
+
 msgid "Notifications"
 msgstr "შეტყობინებები"
 
@@ -445,7 +434,6 @@ msgstr ""
 "ჯავშნებზე."
 
 # Models - Payments
-#| msgid "Payments"
 msgid "Online payments"
 msgstr "ონლაინ გადახდები"
 
@@ -459,7 +447,6 @@ msgstr ""
 msgid "View"
 msgstr "ნახვა"
 
-#| msgid "Created"
 msgid "Create"
 msgstr "შექმნა"
 
@@ -478,7 +465,6 @@ msgstr "პარამეტრები"
 msgid "Analytics"
 msgstr "ანალიტიკა"
 
-#| msgid "Updated"
 msgid "update"
 msgstr "რედაქტირება"
 
@@ -504,11 +490,9 @@ msgstr "მთავარი პანელი"
 msgid "Kitchen screen (POS)"
 msgstr "სამზარეულოს ეკრანი (POS)"
 
-#| msgid "Export"
 msgid "Reports"
 msgstr "ანგარიშები"
 
-#| msgid "Staff Invitations"
 msgid "Invitations"
 msgstr "მოწვევები"
 
@@ -553,7 +537,6 @@ msgstr "ჩართვა"
 msgid "Always on."
 msgstr "ყოველთვის ჩართულია."
 
-#| msgid "Table Sections"
 msgid "Save options"
 msgstr "პარამეტრების შენახვა"
 
@@ -569,7 +552,6 @@ msgstr "დავტოვოთ სივრცე? თქვენი მა�
 msgid "Leave venue"
 msgstr "სივრცის დატოვება"
 
-#| msgid "Restaurants"
 msgid "Restaurants at this venue"
 msgstr "რესტორნები ამ სივრცეში"
 
@@ -589,7 +571,6 @@ msgstr "ნომერი"
 msgid "Name"
 msgstr "სახელი"
 
-#| msgid "Action"
 msgid "Section"
 msgstr "სექცია"
 
@@ -666,7 +647,6 @@ msgstr "მიღება"
 msgid "Decline"
 msgstr "უარყოფა"
 
-#| msgid "None"
 msgid "None."
 msgstr "არაფერი."
 
@@ -679,7 +659,6 @@ msgstr "ვადა იწურება"
 msgid "Cancel"
 msgstr "გაუქმება"
 
-#| msgid "Restaurants"
 msgid "Restaurant slug"
 msgstr "რესტორნის slug"
 
@@ -693,11 +672,9 @@ msgid "Invite to share tables"
 msgstr "მოწვევა მაგიდების გასაზიარებლად"
 
 # Misc
-#| msgid "Optional"
 msgid "Options"
 msgstr "ოფციები"
 
-#| msgid "Description"
 msgid "Direction"
 msgstr "მიმართულება"
 
@@ -760,14 +737,12 @@ msgstr ""
 "ხელახლა შეიქმნა {p0} QR სურათი. ჩამოტვირთეთ და დაბეჭდეთ, რომ კოდები "
 "დინამიური გახდეს."
 
-#| msgid "Table QR Code"
 msgid "QR Code"
 msgstr "QR კოდი"
 
 msgid "QR URL"
 msgstr "QR ბმული"
 
-#| msgid "Previous"
 msgid "Preview"
 msgstr "გადახედვა"
 
@@ -793,23 +768,18 @@ msgstr "მოწვევა გაიგზავნა {p0}-ზე."
 msgid "Status"
 msgstr "სტატუსი"
 
-#| msgid "Reservation Settings"
 msgid "Resend invitation email"
 msgstr "მოწვევის ხელახლა გაგზავნა"
 
-#| msgid "Staff Invitations"
 msgid "Cancel invitations"
 msgstr "მოწვევების გაუქმება"
 
-#| msgid "Confirmed"
 msgid "Confirm"
 msgstr "დადასტურება"
 
-#| msgid "Created"
 msgid "Mark seated"
 msgstr "დასხდნენ"
 
-#| msgid "Completed"
 msgid "Mark completed"
 msgstr "დასრულებულად მონიშვნა"
 
@@ -832,7 +802,6 @@ msgstr "შეკვეთა მიღებულია"
 msgid "Order cancelled by platform"
 msgstr "შეკვეთა გააუქმა პლატფორმამ"
 
-#| msgid "Status"
 msgid "Status pushed"
 msgstr "სტატუსი გაგზავნილია"
 
@@ -842,11 +811,9 @@ msgstr "მენიუს სინქრონიზაციის სტა�
 msgid "Cancellation requested by restaurant"
 msgstr "გაუქმება მოითხოვა რესტორანმა"
 
-#| msgid "Order Status History"
 msgid "Order status notification"
 msgstr "შეკვეთის სტატუსის შეტყობინება"
 
-#| msgid "Refunds"
 msgid "Refund pushed"
 msgstr "დაბრუნება გაგზავნილია"
 
@@ -860,7 +827,6 @@ msgid "Platform event"
 msgstr "პლატფორმის მოვლენა"
 
 # Models - Payments
-#| msgid "Payments"
 msgid "Platform events"
 msgstr "პლატფორმის მოვლენები"
 
@@ -876,11 +842,9 @@ msgstr "მუშავდება"
 msgid "Success"
 msgstr "წარმატება"
 
-#| msgid "Menu Items"
 msgid "Menu sync"
 msgstr "მენიუს სინქრონიზაცია"
 
-#| msgid "Menu Items"
 msgid "Menu syncs"
 msgstr "მენიუს სინქრონიზაციები"
 
@@ -893,11 +857,9 @@ msgstr "გადახედილია"
 msgid "Importing images"
 msgstr "სურათების იმპორტი"
 
-#| msgid "Import"
 msgid "Imported"
 msgstr "იმპორტირებულია"
 
-#| msgid "Import"
 msgid "Import failed"
 msgstr "იმპორტი ვერ მოხერხდა"
 
@@ -907,11 +869,9 @@ msgstr "პლატფორმის მენიუ, როგორც მ�
 msgid "[[menu_item_id, url], ...] still to download."
 msgstr "[[menu_item_id, url], ...] ჩამოსატვირთი."
 
-#| msgid "Menu Item"
 msgid "Menu import"
 msgstr "მენიუს იმპორტი"
 
-#| msgid "Menu Items"
 msgid "Menu imports"
 msgstr "მენიუს იმპორტები"
 
@@ -942,7 +902,6 @@ msgstr "დაყენებულია"
 msgid "not set"
 msgstr "არ არის დაყენებული"
 
-#| msgid "Table"
 msgid "Enabled"
 msgstr "ჩართული"
 
@@ -964,11 +923,9 @@ msgstr "ჯერ არ არის დაყენებული: საჭ�
 msgid "Give these to the platform's onboarding team"
 msgstr "გადაეცით ეს პლატფორმის ინტეგრაციის გუნდს"
 
-#| msgid "Order Item"
 msgid "Order webhook"
 msgstr "შეკვეთის webhook"
 
-#| msgid "Cancelled"
 msgid "Cancel webhook"
 msgstr "გაუქმების webhook"
 
@@ -990,7 +947,6 @@ msgstr "საიდუმლო ჯერ არ არის: შექმე�
 msgid "No per-store webhook token: the platform-wide token is used."
 msgstr "მაღაზიის ტოკენი არ არის: გამოიყენება საერთო ტოკენი."
 
-#| msgid "Menu Item"
 msgid "Menu feed"
 msgstr "მენიუს ბმული"
 
@@ -1042,7 +998,6 @@ msgstr "ბოლო მენიუს გაგზავნა"
 msgid "products"
 msgstr "პროდუქტი"
 
-#| msgid "Recent actions"
 msgid "Recent events"
 msgstr "ბოლო მოვლენები"
 
@@ -1158,7 +1113,6 @@ msgstr "ნაპოვნია"
 msgid "dishes in"
 msgstr "კერძი"
 
-#| msgid "Menu Categories"
 msgid "categories"
 msgstr "კატეგორიაში"
 
@@ -1187,7 +1141,6 @@ msgstr ""
 msgid "Update prices of dishes that already exist"
 msgstr "არსებული კერძების ფასების განახლება"
 
-#| msgid "Download"
 msgid "Download photos"
 msgstr "ფოტოების ჩამოტვირთვა"
 
@@ -1212,7 +1165,6 @@ msgstr "მენიუს გახსნა"
 msgid "Back"
 msgstr "უკან"
 
-#| msgid "Menu Category"
 msgid "existing category"
 msgstr "არსებული კატეგორია"
 
@@ -1225,7 +1177,6 @@ msgstr "ფასი"
 msgid "Photo"
 msgstr "ფოტო"
 
-#| msgid "Language"
 msgid "Languages"
 msgstr "ენები"
 
@@ -1308,18 +1259,15 @@ msgstr "როგორც RS-შია რეგისტრირებულ�
 msgid "ს/კ — 9 digits (company) or 11 (individual)."
 msgstr "ს/კ — 9 ციფრი (კომპანია) ან 11 (ფიზიკური პირი)."
 
-#| msgid "User Profile"
 msgid "Fiscal profile"
 msgstr "ფისკალური პროფილი"
 
-#| msgid "User Profiles"
 msgid "Fiscal profiles"
 msgstr "ფისკალური პროფილები"
 
 msgid "Receipt"
 msgstr "ჩეკი"
 
-#| msgid "Refund"
 msgid "Refund receipt"
 msgstr "დაბრუნების ჩეკი"
 
@@ -1353,14 +1301,12 @@ msgstr "ფისკალური დოკუმენტი"
 msgid "Fiscal documents"
 msgstr "ფისკალური დოკუმენტები"
 
-#| msgid "Confirmed"
 msgid "Confirmed documents"
 msgstr "დადასტურებული დოკუმენტები"
 
 msgid "Draft waybills"
 msgstr "ზედნადებების მონახაზები"
 
-#| msgid "Quantity"
 msgid "Legal entity"
 msgstr "იურიდიული პირი"
 
@@ -1373,7 +1319,6 @@ msgstr "იურიდიული სახელი"
 msgid "Tax id (ს/კ)"
 msgstr "საიდენტიფიკაციო კოდი (ს/კ)"
 
-#| msgid "Address"
 msgid "Legal address"
 msgstr "იურიდიული მისამართი"
 
@@ -1450,7 +1395,6 @@ msgstr "XML"
 msgid "Retry / send"
 msgstr "ხელახლა / გაგზავნა"
 
-#| msgid "Cancelled"
 msgid "Cancel draft"
 msgstr "მონახაზის გაუქმება"
 
@@ -1459,7 +1403,6 @@ msgid "{p0} queued again."
 msgstr "{p0} ხელახლა რიგშია."
 
 #, python-brace-format
-#| msgid "Cancelled"
 msgid "{p0} cancelled."
 msgstr "{p0} გაუქმებულია."
 
@@ -1494,11 +1437,9 @@ msgstr "ძირითადი ერთეულის ღირებულ�
 msgid "Stock item"
 msgstr "საწყობის პოზიცია"
 
-#| msgid "items"
 msgid "Stock items"
 msgstr "საწყობის პოზიციები"
 
-#| msgid "Please wait..."
 msgid "Per base unit."
 msgstr "ძირითად ერთეულზე."
 
@@ -1539,11 +1480,9 @@ msgid "Kitchen mistake"
 msgstr "სამზარეულოს შეცდომა"
 
 # Models - Accounts
-#| msgid "Accounts"
 msgid "Stock count"
 msgstr "აღრიცხვა"
 
-#| msgid "Action"
 msgid "Correction"
 msgstr "კორექცია"
 
@@ -1671,7 +1610,6 @@ msgstr "ხელმისაწვდომობის გადამოწ�
 msgid "Done"
 msgstr "შესრულებულია"
 
-#| msgid "None"
 msgid "on"
 msgstr "—"
 
@@ -1691,7 +1629,6 @@ msgstr "რა ვიყიდოთ"
 msgid "Show"
 msgstr "ჩვენება"
 
-#| msgid "Menu Item"
 msgid "Item"
 msgstr "პოზიცია"
 
@@ -1700,7 +1637,6 @@ msgid "Available"
 msgstr "თავისუფალი"
 
 # Filter labels
-#| msgid "By"
 msgid "Buy"
 msgstr "ყიდვა"
 
@@ -1734,12 +1670,10 @@ msgstr "დარჩა"
 msgid "Expires"
 msgstr "ვადა"
 
-#| msgid "Required"
 msgid "expired"
 msgstr "ვადაგასული"
 
 # Dates and times
-#| msgid "Today"
 msgid "today"
 msgstr "დღეს"
 
@@ -1755,7 +1689,6 @@ msgstr "ჩამოწერა"
 msgid "Nothing expiring within the warning window."
 msgstr "გაფრთხილების პერიოდში ვადა არაფერს ეწურება."
 
-#| msgid "Reservation History"
 msgid "Alert history"
 msgstr "შეტყობინებების ისტორია"
 
@@ -1774,7 +1707,6 @@ msgstr "დონე"
 msgid "Used in"
 msgstr "გამოიყენება"
 
-#| msgid "Warning"
 msgid "Remaining"
 msgstr "ნაშთი"
 
@@ -1784,7 +1716,6 @@ msgstr "ვადა"
 msgid "Quantity"
 msgstr "რაოდენობა"
 
-#| msgid "Active"
 msgid "Ate"
 msgstr "ჭამა"
 
@@ -1856,6 +1787,9 @@ msgstr "პლატფორმის ლოიალობის რეეს�
 msgid "BlurHash string for the image — used as an inline LQIP."
 msgstr "სურათის BlurHash — გამოიყენება ჩაშენებულ LQIP-ად."
 
+msgid "Only shown / orderable inside this window (e.g. Breakfast)."
+msgstr "ჩანს / იკვეთება მხოლოდ ამ დროის ფარგლებში (მაგ. საუზმე)."
+
 msgid "Menu Category"
 msgstr "მენიუს კატეგორია"
 
@@ -1920,6 +1854,15 @@ msgstr "ალერგენების კოდები (მაგ. ['glute
 msgid "Spicy level 0-5 (0 = not spicy)"
 msgstr "სიცხარე 0-5 (0 = არ არის ცხარე)"
 
+msgid "Only orderable inside this window; empty = follows the category."
+msgstr "იკვეთება მხოლოდ ამ დროის ფარგლებში; ცარიელი = კატეგორიის მიხედვით."
+
+msgid "'86 today': hidden from ordering until this moment."
+msgstr "„დღეს არ არის“: შეკვეთისთვის დამალულია ამ მომენტამდე."
+
+msgid "Set menu: the warehouse consumes the components' recipes."
+msgstr "სეტ მენიუ: საწყობი კომპონენტების რეცეპტებს მოიხმარს."
+
 msgid "Deprecated: see Warehouse recipes."
 msgstr "მოძველებულია: იხ. საწყობის რეცეპტები."
 
@@ -1929,11 +1872,9 @@ msgstr "მენიუს ერთეული"
 msgid "Menu Items"
 msgstr "მენიუს ერთეულები"
 
-#| msgid "Table Section"
 msgid "Single Selection"
 msgstr "ერთი არჩევანი"
 
-#| msgid "Table Section"
 msgid "Multiple Selection"
 msgstr "რამდენიმე არჩევანი"
 
@@ -1983,7 +1924,6 @@ msgstr "ბმულის მონაცემები POS-ისთვის
 msgid "Admin page to open."
 msgstr "გასახსნელი ადმინ გვერდი."
 
-#| msgid "Position"
 msgid "Notification"
 msgstr "შეტყობინება"
 
@@ -2002,18 +1942,15 @@ msgstr "ელფოსტა სტუმრებს, თუ მისამ�
 msgid "Shown as the restaurant name."
 msgstr "ჩანს რესტორნის სახელად."
 
-#| msgid "Reservation Settings"
 msgid "Notification settings"
 msgstr "შეტყობინებების პარამეტრები"
 
 msgid "Skipped"
 msgstr "გამოტოვებულია"
 
-#| msgid "Reservation History"
 msgid "Reservation confirmation"
 msgstr "ჯავშნის დადასტურება"
 
-#| msgid "Reservation Settings"
 msgid "Reservation reminder"
 msgstr "ჯავშნის შეხსენება"
 
@@ -2038,7 +1975,6 @@ msgstr "გასული შეტყობინება"
 msgid "Outbound messages"
 msgstr "გასული შეტყობინებები"
 
-#| msgid "Staff Roles"
 msgid "Staff push"
 msgstr "პერსონალის push"
 
@@ -2088,11 +2024,9 @@ msgid "Send email to guests"
 msgstr "ელფოსტის გაგზავნა სტუმრებს"
 
 # Login
-#| msgid "Username"
 msgid "Sender name"
 msgstr "გამგზავნის სახელი"
 
-#| msgid "Change"
 msgid "Channel"
 msgstr "არხი"
 
@@ -2143,7 +2077,6 @@ msgstr "აირჩიეთ SMS ან ელფოსტა და მიუ�
 msgid "Test {p0} sent to {p1}."
 msgstr "სატესტო {p0} გაიგზავნა {p1}-ზე."
 
-#| msgid "Reserved"
 msgid "Resend"
 msgstr "ხელახლა გაგზავნა"
 
@@ -2157,11 +2090,9 @@ msgstr "ხელით"
 msgid "Loyalty tier"
 msgstr "ლოიალობის დონე"
 
-#| msgid "Position"
 msgid "Promotion"
 msgstr "აქცია"
 
-#| msgid "Payment"
 msgid "Pending Payment"
 msgstr "გადახდის მოლოდინში"
 
@@ -2190,11 +2121,9 @@ msgstr "წასაღები"
 msgid "Delivery"
 msgstr "მიწოდება"
 
-#| msgid "View site"
 msgid "Website"
 msgstr "ვებსაიტი"
 
-#| msgid "Table"
 msgid "QR table"
 msgstr "QR მაგიდა"
 
@@ -2231,7 +2160,6 @@ msgstr "სტუმრის სპეციალური მოთხოვ�
 msgid "Staff member who handled this order"
 msgstr "თანამშრომელი, რომელმაც შეკვეთა დაამუშავა"
 
-#| msgid "Order Status Histories"
 msgid "Order status histories"
 msgstr "შეკვეთის სტატუსის ისტორია"
 
@@ -2251,7 +2179,6 @@ msgid "Cash shifts"
 msgstr "სალაროს ცვლები"
 
 # Models - Accounts
-#| msgid "Accounts"
 msgid "Discount"
 msgstr "ფასდაკლება"
 
@@ -2273,11 +2200,9 @@ msgstr "ფასდაკლების / ანულირების მ�
 msgid "Discount / void reasons"
 msgstr "ფასდაკლების / ანულირების მიზეზები"
 
-#| msgid "Refund"
 msgid "Refunded"
 msgstr "დაბრუნებულია"
 
-#| msgid "Partially Paid"
 msgid "Partially Refunded"
 msgstr "ნაწილობრივ დაბრუნებულია"
 
@@ -2299,7 +2224,6 @@ msgstr "ვაუჩერი"
 msgid "Card"
 msgstr "ბარათი"
 
-#| msgid "Payment"
 msgid "Mobile Payment"
 msgstr "მობილური გადახდა"
 
@@ -2313,7 +2237,6 @@ msgstr ""
 msgid "Staff member who processed this payment"
 msgstr "თანამშრომელი, რომელმაც გადახდა მიიღო"
 
-#| msgid "Amount"
 msgid "Amount + tip"
 msgstr "თანხა + ჩაი"
 
@@ -2335,14 +2258,12 @@ msgstr "გადახდა"
 msgid "Customer Request"
 msgstr "სტუმრის მოთხოვნა"
 
-#| msgid "Unavailable"
 msgid "Item Unavailable"
 msgstr "პოზიცია მიუწვდომელია"
 
 msgid "Quality Issue"
 msgstr "ხარისხის პრობლემა"
 
-#| msgid "Group Order"
 msgid "Wrong Order"
 msgstr "არასწორი შეკვეთა"
 
@@ -2356,7 +2277,6 @@ msgid "Refund ID from external provider"
 msgstr "დაბრუნების ID გარე პროვაიდერისგან"
 
 # Models - Accounts
-#| msgid "Accounts"
 msgid "Bank Account"
 msgstr "საბანკო ანგარიში"
 
@@ -2388,22 +2308,18 @@ msgstr ""
 msgid "BOG Transaction"
 msgstr "BOG ტრანზაქცია"
 
-#| msgid "My actions"
 msgid "BOG Transactions"
 msgstr "BOG ტრანზაქციები"
 
-#| msgid "Site administration"
 msgid "Flitt Transaction"
 msgstr "Flitt ტრანზაქცია"
 
 msgid "Flitt Transactions"
 msgstr "Flitt ტრანზაქციები"
 
-#| msgid "Restaurant"
 msgid "Restaurant Debit"
 msgstr "რესტორნის დებეტი"
 
-#| msgid "Restaurants"
 msgid "Restaurant Debits"
 msgstr "რესტორნის დებეტები"
 
@@ -2432,7 +2348,6 @@ msgstr "ჩეკის პრინტერები: ნაღდი გა�
 msgid "Last poll from the bridge."
 msgstr "ბოლო კავშირი bridge-დან."
 
-#| msgid "Print"
 msgid "Printer"
 msgstr "პრინტერი"
 
@@ -2442,7 +2357,6 @@ msgstr "რა დაიბეჭდა (ხელახლა ბეჭდვ�
 msgid "Rendered ESC/POS bytes the bridge writes to the device."
 msgstr "ESC/POS ბაიტები, რომლებსაც bridge მოწყობილობაზე წერს."
 
-#| msgid "Print"
 msgid "Print job"
 msgstr "ბეჭდვის დავალება"
 
@@ -2483,6 +2397,204 @@ msgstr "ხელახლა (რიგში დაბრუნება)"
 msgid "{p0} job(s) queued again."
 msgstr "{p0} დავალება ხელახლა რიგშია."
 
+#| msgid "None available"
+msgid "Not available today"
+msgstr "დღეს არ არის"
+
+# Days of week
+msgid "Monday"
+msgstr "ორშაბათი"
+
+msgid "Tuesday"
+msgstr "სამშაბათი"
+
+msgid "Wednesday"
+msgstr "ოთხშაბათი"
+
+msgid "Thursday"
+msgstr "ხუთშაბათი"
+
+#| msgid "Holiday"
+msgid "Friday"
+msgstr "პარასკევი"
+
+msgid "Saturday"
+msgstr "შაბათი"
+
+msgid "Sunday"
+msgstr "კვირა"
+
+msgid "E.g. 'Breakfast', 'Lunch', 'Happy hour'."
+msgstr "მაგ. „საუზმე“, „ლანჩი“, „Happy hour“."
+
+msgid "0 = Monday … 6 = Sunday. Empty = every day."
+msgstr "0 = ორშაბათი … 6 = კვირა. ცარიელი = ყოველდღე."
+
+msgid "Earlier than the start = the window runs past midnight."
+msgstr "დაწყებაზე ადრე = ფანჯარა შუაღამეს გადადის."
+
+#| msgid "Menu push queued."
+msgid "Menu schedule"
+msgstr "მენიუს განრიგი"
+
+#| msgid "Menu syncs"
+msgid "Menu schedules"
+msgstr "მენიუს განრიგები"
+
+msgid "Combo component"
+msgstr "კომბოს კომპონენტი"
+
+msgid "Combo components"
+msgstr "კომბოს კომპონენტები"
+
+msgid "Happy hour (automatic)"
+msgstr "Happy hour (ავტომატური)"
+
+#| msgid "Promotion"
+msgid "Promo code"
+msgstr "პრომო კოდი"
+
+#| msgid "Write off"
+msgid "Percent off"
+msgstr "პროცენტული ფასდაკლება"
+
+msgid "Fixed amount off"
+msgstr "ფიქსირებული ფასდაკლება"
+
+# Models - Orders
+#| msgid "All orders"
+msgid "Whole order"
+msgstr "მთელი შეკვეთა"
+
+#| msgid "categories"
+msgid "Selected categories"
+msgstr "არჩეული კატეგორიები"
+
+#| msgid "Distinct dishes"
+msgid "Selected dishes"
+msgstr "არჩეული კერძები"
+
+msgid "Shown to guests on the menu."
+msgstr "სტუმრებს მენიუში უჩვენებს."
+
+msgid ""
+"Happy hour: only inside this window. Promo codes: optional restriction."
+msgstr "Happy hour: მხოლოდ ამ ფანჯარაში. პრომო კოდი: არასავალდებულო შეზღუდვა."
+
+msgid "Guests type this at checkout."
+msgstr "სტუმრები ამას გადახდისას შეიყვანენ."
+
+msgid "0 = unlimited."
+msgstr "0 = ულიმიტო."
+
+msgid "Empty = everywhere (web, QR, POS)."
+msgstr "ცარიელი = ყველგან (ვები, QR, POS)."
+
+msgid "May combine with other promotions on one order."
+msgstr "შეიძლება სხვა აქციებთან ერთად ერთ შეკვეთაზე."
+
+#| msgid "Promotion"
+msgid "Promotion use"
+msgstr "აქციის გამოყენება"
+
+#| msgid "Promotion"
+msgid "Promotion uses"
+msgstr "აქციის გამოყენებები"
+
+msgid "Promotions are not enabled."
+msgstr "აქციები ჩართული არ არის."
+
+msgid "This code is not valid."
+msgstr "ეს კოდი არასწორია."
+
+# Form validation
+#| msgid "This field is required."
+msgid "This code has expired."
+msgstr "ამ კოდს ვადა გაუვიდა."
+
+msgid "This code has been used up."
+msgstr "ეს კოდი ამოწურულია."
+
+#| msgid "This field cannot be blank."
+msgid "This code cannot be used here."
+msgstr "ეს კოდი აქ არ გამოიყენება."
+
+#, python-format
+msgid "This code only works during %(window)s."
+msgstr "ეს კოდი მუშაობს მხოლოდ %(window)s."
+
+msgid "You have already used this code."
+msgstr "თქვენ ეს კოდი უკვე გამოიყენეთ."
+
+#, python-format
+msgid "Add %(amount)s more to use this code."
+msgstr "დაამატეთ კიდევ %(amount)s ამ კოდის გამოსაყენებლად."
+
+msgid "This code cannot be combined with another promotion."
+msgstr "ეს კოდი სხვა აქციასთან არ ერთდება."
+
+#| msgid "Nothing in this period."
+msgid "Nothing in this order is eligible for the code."
+msgstr "ამ შეკვეთაში კოდისთვის შესაფერისი არაფერია."
+
+# Form validation
+#| msgid "This field is required."
+msgid "This code is already applied."
+msgstr "ეს კოდი უკვე გამოყენებულია."
+
+msgid "Days"
+msgstr "დღეები"
+
+msgid "Window"
+msgstr "ფანჯარა"
+
+msgid "Every day"
+msgstr "ყოველდღე"
+
+#| msgid "Used in"
+msgid "Used by"
+msgstr "გამოიყენება"
+
+#| msgid "Promotion"
+msgid "promotions"
+msgstr "აქცია"
+
+#| msgid "Channel"
+msgid "Channels"
+msgstr "არხები"
+
+msgid "Empty = everywhere."
+msgstr "ცარიელი = ყველგან."
+
+msgid "A promo code needs a code."
+msgstr "პრომო კოდს კოდი სჭირდება."
+
+msgid "A happy hour needs a schedule (when it is on)."
+msgstr "Happy hour-ს განრიგი სჭირდება (როდის მოქმედებს)."
+
+msgid "Percent cannot exceed 100."
+msgstr "პროცენტი 100-ს ვერ გადააჭარბებს."
+
+#| msgid "Open now"
+msgid "Live now"
+msgstr "ახლა აქტიური"
+
+# Models - Accounts
+#| msgid "Discount"
+msgid "Discount total"
+msgstr "ფასდაკლება ჯამში"
+
+#| msgid "Active"
+msgid "Activate"
+msgstr "გააქტიურება"
+
+#| msgid "Is active"
+msgid "Deactivate"
+msgstr "დეაქტივაცია"
+
+msgid "Combo components (tick 'Is combo' on the dish)"
+msgstr "კომბოს კომპონენტები (მონიშნეთ „კომბო“ კერძზე)"
+
 msgid "Referrals"
 msgstr "რეფერალები"
 
@@ -2492,7 +2604,6 @@ msgstr "გამოყენება"
 msgid "vs previous period"
 msgstr "წინა პერიოდთან"
 
-#| msgid "Export"
 msgid "Export CSV"
 msgstr "CSV ექსპორტი"
 
@@ -2508,7 +2619,6 @@ msgstr "პოპულარობის ზღვარი"
 msgid "margin threshold"
 msgstr "მარჟის ზღვარი"
 
-#| msgid "Position"
 msgid "portion"
 msgstr "ულუფა"
 
@@ -2542,14 +2652,12 @@ msgstr "რეცეპტის გარეშე (არ არის კლ�
 msgid "Yesterday"
 msgstr "გუშინ"
 
-#| msgid "This year"
 msgid "This week"
 msgstr "ეს კვირა"
 
 msgid "This month"
 msgstr "ამ თვეში"
 
-#| msgid "Menu Items"
 msgid "Menu & dishes"
 msgstr "მენიუ და კერძები"
 
@@ -2566,7 +2674,6 @@ msgid "Gross total"
 msgstr "მთლიანი ჯამი"
 
 # Models - Accounts
-#| msgid "Accounts"
 msgid "Discounts"
 msgstr "ფასდაკლებები"
 
@@ -2579,20 +2686,16 @@ msgstr "მომსახურების საფასური"
 msgid "Tax"
 msgstr "გადასახადი"
 
-#| msgid "Cancelled"
 msgid "Cancelled orders"
 msgstr "გაუქმებული შეკვეთები"
 
-#| msgid "Order Items"
 msgid "Voided items"
 msgstr "ანულირებული პოზიციები"
 
-#| msgid "Past 7 days"
 msgid "Sales by day"
 msgstr "გაყიდვები დღეების მიხედვით"
 
 # Models - Orders
-#| msgid "Orders"
 msgid "Orders by hour"
 msgstr "შეკვეთები საათების მიხედვით"
 
@@ -2605,7 +2708,6 @@ msgstr "მთლიანი"
 msgid "Type"
 msgstr "ტიპი"
 
-#| msgid "Payment Method"
 msgid "Method"
 msgstr "მეთოდი"
 
@@ -2630,7 +2732,6 @@ msgstr "უფასო პოზიციები"
 msgid "Top 10 dishes by revenue"
 msgstr "ტოპ 10 კერძი შემოსავლით"
 
-#| msgid "Menu Category"
 msgid "Category"
 msgstr "კატეგორია"
 
@@ -2649,7 +2750,6 @@ msgstr "წილი შემოსავალში"
 msgid "Avg price"
 msgstr "საშ. ფასი"
 
-#| msgid "Modifiers"
 msgid "Modifiers / line"
 msgstr "მოდიფიკატორი / ხაზზე"
 
@@ -2673,6 +2773,16 @@ msgstr "მარჟა / ულუფა"
 
 msgid "Food cost %"
 msgstr "პროდუქტების ღირებულება %"
+
+msgid "Kind"
+msgstr "ტიპი"
+
+#| msgid "QR Code"
+msgid "Code"
+msgstr "კოდი"
+
+msgid "Uses"
+msgstr "გამოყენება"
 
 msgid "Cost of sales (COGS)"
 msgstr "გაყიდვების თვითღირებულება"
@@ -2710,14 +2820,12 @@ msgstr "ტოპ მიმტანი"
 msgid "Sales by server"
 msgstr "გაყიდვები მიმტანების მიხედვით"
 
-#| msgid "Served"
 msgid "Server"
 msgstr "მიმტანი"
 
 msgid "Avg ticket"
 msgstr "საშ. ჩეკი"
 
-#| msgid "Order Item"
 msgid "Orders entered"
 msgstr "შეყვანილი შეკვეთები"
 
@@ -2742,14 +2850,12 @@ msgstr "გახსნა"
 msgid "Opened"
 msgstr "გახსნილია"
 
-#| msgid "Close"
 msgid "Closed"
 msgstr "დახურულია"
 
 msgid "Expected"
 msgstr "მოსალოდნელი"
 
-#| msgid "Amount"
 msgid "Counted"
 msgstr "დათვლილი"
 
@@ -2762,11 +2868,9 @@ msgstr "არ მოვიდნენ"
 msgid "No-show rate"
 msgstr "არმოსვლის წილი"
 
-#| msgid "Reservation History"
 msgid "Reservations & covers by day"
 msgstr "ჯავშნები და სტუმრები დღეების მიხედვით"
 
-#| msgid "Amount"
 msgid "Count"
 msgstr "რაოდენობა"
 
@@ -2786,7 +2890,6 @@ msgid "Average rating by day"
 msgstr "საშუალო შეფასება დღეების მიხედვით"
 
 # Admin site
-#| msgid "Django administration"
 msgid "Rating distribution"
 msgstr "შეფასებების განაწილება"
 
@@ -2826,18 +2929,15 @@ msgstr "მაქსიმუმ ჯავშანი საათში (0 = �
 msgid "Reservation Settings"
 msgstr "დაჯავშნის პარამეტრები"
 
-#| msgid "Password confirmation"
 msgid "Pending Confirmation"
 msgstr "დადასტურების მოლოდინში"
 
 msgid "Waitlisted"
 msgstr "მოლოდინის სიაში"
 
-#| msgid "Created"
 msgid "Seated"
 msgstr "დასხდნენ"
 
-#| msgid "Show"
 msgid "No Show"
 msgstr "არ მოვიდა"
 
@@ -2868,7 +2968,6 @@ msgstr "დაჯავშნა"
 msgid "Leave empty to block all tables"
 msgstr "დატოვეთ ცარიელი ყველა მაგიდის დასაბლოკად"
 
-#| msgid "Friday"
 msgid "Holiday"
 msgstr "დღესასწაული"
 
@@ -2878,7 +2977,6 @@ msgstr "კერძო ღონისძიება"
 msgid "Maintenance"
 msgstr "ტექნიკური სამუშაოები"
 
-#| msgid "Staff Role"
 msgid "Staff Shortage"
 msgstr "პერსონალის ნაკლებობა"
 
@@ -2919,7 +3017,6 @@ msgid "Kitchen Staff"
 msgstr "სამზარეულოს პერსონალი"
 
 # Models - Staff
-#| msgid "Staff"
 msgid "Bar Staff"
 msgstr "ბარის პერსონალი"
 
@@ -3040,10 +3137,6 @@ msgstr "მაგიდის QR კოდი"
 msgid "Table QR Codes"
 msgstr "მაგიდის QR კოდები"
 
-msgid "Active"
-msgstr "აქტიური"
-
-#| msgid "Payment Method"
 msgid "Payment Pending"
 msgstr "გადახდის მოლოდინში"
 
@@ -3085,11 +3178,9 @@ msgstr "ქალაქები"
 msgid "Material icon name (e.g., 'restaurant', 'local_cafe', 'fastfood')"
 msgstr "Material ხატულის სახელი (მაგ. 'restaurant', 'local_cafe', 'fastfood')"
 
-#| msgid "Restaurant Hours"
 msgid "Restaurant Category"
 msgstr "რესტორნის კატეგორია"
 
-#| msgid "Restaurant Hours"
 msgid "Restaurant Categories"
 msgstr "რესტორნის კატეგორიები"
 
@@ -3198,18 +3289,15 @@ msgstr "სივრცე"
 msgid "This restaurant's tables seeded the venue layout (historical)."
 msgstr "ამ რესტორნის მაგიდებმა შექმნა სივრცის განლაგება (ისტორიული)."
 
-#| msgid "Remember me"
 msgid "Venue member"
 msgstr "სივრცის წევრი"
 
 msgid "Venue members"
 msgstr "სივრცის წევრები"
 
-#| msgid "Table Section"
 msgid "Venue section"
 msgstr "სივრცის სექცია"
 
-#| msgid "Table Sections"
 msgid "Venue sections"
 msgstr "სივრცის სექციები"
 
@@ -3292,9 +3380,6 @@ msgstr "საერთო სივრცის მოთხოვნა"
 #~ msgid "Click here to select all objects across all pages"
 #~ msgstr "ყველა ობიექტის მონიშვნა ყველა გვერდზე"
 
-#~ msgid "None available"
-#~ msgstr "არ არის ხელმისაწვდომი"
-
 #~ msgid "Unknown content"
 #~ msgstr "უცნობი კონტენტი"
 
@@ -3325,33 +3410,11 @@ msgstr "საერთო სივრცის მოთხოვნა"
 #~ msgid "Unpaid"
 #~ msgstr "გადაუხდელი"
 
-# Days of week
-#~ msgid "Monday"
-#~ msgstr "ორშაბათი"
-
-#~ msgid "Tuesday"
-#~ msgstr "სამშაბათი"
-
-#~ msgid "Wednesday"
-#~ msgstr "ოთხშაბათი"
-
-#~ msgid "Thursday"
-#~ msgstr "ხუთშაბათი"
-
-#~ msgid "Saturday"
-#~ msgstr "შაბათი"
-
-#~ msgid "Sunday"
-#~ msgstr "კვირა"
-
 #~ msgid "Created at"
 #~ msgstr "შექმნის თარიღი"
 
 #~ msgid "Updated at"
 #~ msgstr "განახლების თარიღი"
-
-#~ msgid "Is active"
-#~ msgstr "აქტიურია"
 
 #~ msgid "Is available"
 #~ msgstr "ხელმისაწვდომია"
@@ -3446,10 +3509,6 @@ msgstr "საერთო სივრცის მოთხოვნა"
 #~ msgid "Change Password"
 #~ msgstr "პაროლის შეცვლა"
 
-# Form validation
-#~ msgid "This field is required."
-#~ msgstr "ეს ველი სავალდებულოა."
-
 #~ msgid "Enter a valid email address."
 #~ msgstr "შეიყვანეთ სწორი ელ. ფოსტა."
 
@@ -3464,9 +3523,6 @@ msgstr "საერთო სივრცის მოთხოვნა"
 
 #~ msgid "Enter a valid time."
 #~ msgstr "შეიყვანეთ სწორი დრო."
-
-#~ msgid "This field cannot be blank."
-#~ msgstr "ეს ველი არ შეიძლება იყოს ცარიელი."
 
 #~ msgid "Please correct the error below."
 #~ msgstr "გთხოვთ, გაასწოროთ ქვემოთ მოცემული შეცდომა."
