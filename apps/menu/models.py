@@ -47,6 +47,14 @@ class MenuCategory(TranslatableModel, TimeStampedModel):
     )
     display_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    schedule = models.ForeignKey(
+        "promotions.MenuSchedule",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="categories",
+        help_text=_("Only shown / orderable inside this window (e.g. Breakfast)."),
+    )
 
     class Meta:
         db_table = "menu_categories"
@@ -160,6 +168,21 @@ class MenuItem(TranslatableModel, TimeStampedModel):
     spicy_level = models.PositiveSmallIntegerField(
         default=0,
         help_text=_("Spicy level 0-5 (0 = not spicy)"),
+    )
+
+    schedule = models.ForeignKey(
+        "promotions.MenuSchedule",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="items",
+        help_text=_("Only orderable inside this window; empty = follows the category."),
+    )
+    unavailable_until = models.DateTimeField(
+        null=True, blank=True, help_text=_("'86 today': hidden from ordering until this moment.")
+    )
+    is_combo = models.BooleanField(
+        default=False, help_text=_("Set menu: the warehouse consumes the components' recipes.")
     )
 
     # Deprecated per-item counters -- superseded by warehouse recipes

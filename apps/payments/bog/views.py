@@ -333,6 +333,19 @@ class InitiatePaymentView(APIView):
             order_item.recalculate_total()
 
         order.calculate_totals()
+        from apps.promotions import hooks as promotion_hooks
+
+        promotion_hooks.on_order_items_changed(order, channel=order.source)
+        if data.get("promo_code"):
+            from apps.promotions import services as promotion_services
+
+            try:
+                promotion_services.redeem_code(order, data["promo_code"], by=request.user, channel=order.source)
+            except promotion_services.PromotionError as exc:
+                return Response(
+                    {"success": False, "error": {"code": exc.code, "message": exc.message}},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         # Hold the ingredients now (InsufficientStock -> 409, order rolls back).
         inventory_hooks.on_order_created(order)
         notification_hooks.on_order_created(order)

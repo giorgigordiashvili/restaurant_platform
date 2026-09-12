@@ -379,6 +379,10 @@ class TestModifierGroupsOnItemInline:
         }
         mgmt = {
             "modifier_groups_link-TOTAL_FORMS": "1",
+            "combo_components-TOTAL_FORMS": "0",
+            "combo_components-INITIAL_FORMS": "0",
+            "combo_components-MIN_NUM_FORMS": "0",
+            "combo_components-MAX_NUM_FORMS": "1000",
             "modifier_groups_link-INITIAL_FORMS": "0",
             "modifier_groups_link-MIN_NUM_FORMS": "0",
             "modifier_groups_link-MAX_NUM_FORMS": "1000",

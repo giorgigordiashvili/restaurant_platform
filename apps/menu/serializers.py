@@ -78,6 +78,12 @@ class ModifierGroupListSerializer(TranslatableModelSerializer):
 
 
 class MenuCategorySerializer(TranslatableModelSerializer):
+    schedule_label = serializers.SerializerMethodField()
+
+    def get_schedule_label(self, obj):
+        schedule = getattr(obj, "schedule", None)
+        return schedule.label() if schedule is not None else ""
+
     """Serializer for menu categories."""
 
     translations = TranslatedFieldsField(shared_model=MenuCategory)
@@ -86,6 +92,7 @@ class MenuCategorySerializer(TranslatableModelSerializer):
     class Meta:
         model = MenuCategory
         fields = [
+            "schedule_label",
             "id",
             "translations",
             "image",
@@ -110,6 +117,36 @@ class MenuCategoryListSerializer(TranslatableModelSerializer):
         fields = ["id", "translations", "display_order", "is_active"]
 
 
+def _availability_fields(obj, context) -> dict:
+    """available_now / available_from / promo_price / promo_label, computed once per request when possible."""
+    from apps.promotions.availability import availability
+
+    cache = context.setdefault("_promo_cache", {}) if isinstance(context, dict) else {}
+    restaurant = getattr(obj, "restaurant", None)
+    if restaurant is None:
+        return {"available_now": True, "available_from": "", "promo_price": None, "promo_label": ""}
+    ok, reason = availability(obj, restaurant=restaurant)
+    promo_price, promo_label = None, ""
+    if getattr(restaurant, "promotions_enabled", False):
+        prices = cache.get(("prices", restaurant.pk))
+        if prices is None:
+            from apps.promotions.services import promo_prices
+
+            channel = context.get("channel", "") if isinstance(context, dict) else ""
+            items = cache.get(("items", restaurant.pk)) or [obj]
+            prices = promo_prices(restaurant, items, channel=channel)
+            cache[("prices", restaurant.pk)] = prices
+        hit = prices.get(obj.pk)
+        if hit is None and obj.pk not in (cache.get(("seen", restaurant.pk)) or set()):
+            from apps.promotions.services import promo_prices
+
+            hit = promo_prices(restaurant, [obj]).get(obj.pk)
+            prices[obj.pk] = hit
+        if hit:
+            promo_price, promo_label = str(hit[0]), hit[1].name
+    return {"available_now": ok, "available_from": reason, "promo_price": promo_price, "promo_label": promo_label}
+
+
 class MenuItemSerializer(TranslatableModelSerializer):
     """Full serializer for menu items."""
 
@@ -124,6 +161,11 @@ class MenuItemSerializer(TranslatableModelSerializer):
     )
     modifier_groups = serializers.SerializerMethodField()
     dietary_tags = serializers.SerializerMethodField()
+    available_now = serializers.SerializerMethodField()
+    available_from = serializers.SerializerMethodField()
+    promo_price = serializers.SerializerMethodField()
+    promo_label = serializers.SerializerMethodField()
+    combo_components = serializers.SerializerMethodField()
 
     class Meta:
         model = MenuItem
@@ -133,6 +175,14 @@ class MenuItemSerializer(TranslatableModelSerializer):
             "category",
             "category_id",
             "price",
+            "available_now",
+            "available_from",
+            "promo_price",
+            "promo_label",
+            "is_combo",
+            "combo_components",
+            "schedule",
+            "unavailable_until",
             "image",
             "image_blurhash",
             "is_available",
@@ -152,12 +202,42 @@ class MenuItemSerializer(TranslatableModelSerializer):
             "stock_quantity",
             "modifier_groups",
         ]
-        read_only_fields = ["id", "dietary_tags", "image_blurhash"]
+        read_only_fields = ["id", "dietary_tags", "image_blurhash", "unavailable_until"]
 
     def get_modifier_groups(self, obj):
         links = obj.modifier_groups_link.select_related("modifier_group").all()
         groups = [link.modifier_group for link in links]
         return ModifierGroupSerializer(groups, many=True).data
+
+    def _avail(self, obj):
+        key = f"_avail_{obj.pk}"
+        if key not in self.context:
+            self.context[key] = _availability_fields(obj, self.context)
+        return self.context[key]
+
+    def get_available_now(self, obj):
+        return self._avail(obj)["available_now"]
+
+    def get_available_from(self, obj):
+        return self._avail(obj)["available_from"]
+
+    def get_promo_price(self, obj):
+        return self._avail(obj)["promo_price"]
+
+    def get_promo_label(self, obj):
+        return self._avail(obj)["promo_label"]
+
+    def get_combo_components(self, obj):
+        if not getattr(obj, "is_combo", False):
+            return []
+        return [
+            {
+                "menu_item_id": str(c.item_id),
+                "name": c.item.safe_translation_getter("name", any_language=True),
+                "quantity": c.quantity,
+            }
+            for c in obj.combo_components.select_related("item")
+        ]
 
     def get_dietary_tags(self, obj):
         return obj.get_dietary_tags()
@@ -169,6 +249,10 @@ class MenuItemListSerializer(TranslatableModelSerializer):
     translations = TranslatedFieldsField(shared_model=MenuItem)
     dietary_tags = serializers.SerializerMethodField()
     modifier_groups = serializers.SerializerMethodField()
+    available_now = serializers.SerializerMethodField()
+    available_from = serializers.SerializerMethodField()
+    promo_price = serializers.SerializerMethodField()
+    promo_label = serializers.SerializerMethodField()
 
     class Meta:
         model = MenuItem
@@ -180,6 +264,11 @@ class MenuItemListSerializer(TranslatableModelSerializer):
             "image_blurhash",
             "is_available",
             "is_featured",
+            "is_combo",
+            "available_now",
+            "available_from",
+            "promo_price",
+            "promo_label",
             "dietary_tags",
             "preparation_time_minutes",
             "modifier_groups",
@@ -187,6 +276,24 @@ class MenuItemListSerializer(TranslatableModelSerializer):
 
     def get_dietary_tags(self, obj):
         return obj.get_dietary_tags()
+
+    def _avail(self, obj):
+        key = f"_avail_{obj.pk}"
+        if key not in self.context:
+            self.context[key] = _availability_fields(obj, self.context)
+        return self.context[key]
+
+    def get_available_now(self, obj):
+        return self._avail(obj)["available_now"]
+
+    def get_available_from(self, obj):
+        return self._avail(obj)["available_from"]
+
+    def get_promo_price(self, obj):
+        return self._avail(obj)["promo_price"]
+
+    def get_promo_label(self, obj):
+        return self._avail(obj)["promo_label"]
 
     def get_modifier_groups(self, obj):
         links = obj.modifier_groups_link.select_related("modifier_group").all()
@@ -350,19 +457,24 @@ class FullMenuSerializer(serializers.Serializer):
                 Prefetch(
                     "items",
                     queryset=MenuItem.objects.filter(SELLABLE)
+                    .select_related("restaurant", "schedule", "category__schedule")
                     .prefetch_related("modifier_groups_link__modifier_group__modifiers")
                     .order_by("display_order"),
                 )
             )
+            .select_related("schedule")
             .order_by("display_order")
         )
 
         result = []
+        categories = list(categories)
+        all_items = [i for c in categories for i in c.items.all()]
+        context = {"_promo_cache": {("items", self.restaurant.pk): all_items}, "channel": "web"}
         for category in categories:
             result.append(
                 {
                     "category": MenuCategorySerializer(category).data,
-                    "items": MenuItemListSerializer(category.items.all(), many=True).data,
+                    "items": MenuItemListSerializer(category.items.all(), many=True, context=context).data,
                 }
             )
         return result

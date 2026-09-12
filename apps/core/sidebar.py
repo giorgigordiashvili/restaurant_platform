@@ -46,6 +46,8 @@ ICONS = {
     "payment": "payments",
     "discountreason": "sell",
     "deliveryplatformspage": "delivery_dining",
+    "promotion": "sell",
+    "menuschedule": "schedule",
     "notificationsettingspage": "notifications_active",
     "outboundmessage": "outgoing_mail",
     "fiscalsettingspage": "receipt",

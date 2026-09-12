@@ -7,7 +7,9 @@ from django.db.models import F, Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from rest_framework import generics, status
+from rest_framework import generics
+from rest_framework import serializers as serializers_module
+from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -18,6 +20,8 @@ from apps.core.middleware.tenant import require_restaurant
 from apps.core.permissions import HasStaffPermission, IsTenantStaff, ModuleRequired, staff_can
 from apps.inventory import hooks as inventory_hooks
 from apps.notifications import hooks as notification_hooks
+from apps.promotions import hooks as promotion_hooks
+from apps.promotions import services as promotion_services
 from apps.tables.models import Table, TableSession
 
 from . import services
@@ -236,6 +240,12 @@ class OrderCreateView(APIView):
             )
             _add_items(order, data["items"])
             order.calculate_totals()
+            promotion_hooks.on_order_items_changed(order, channel="pos")
+            if data.get("promo_code"):
+                try:
+                    promotion_services.redeem_code(order, data["promo_code"], by=request.user, channel="pos")
+                except promotion_services.PromotionError as exc:
+                    raise serializers_module.ValidationError({"promo_code": exc.message})
             inventory_hooks.on_order_created(order)
             notification_hooks.on_order_created(order, by=request.user)
 
@@ -334,6 +344,7 @@ class OrderAddItemView(APIView):
         with transaction.atomic():
             order_item = _add_items(order, [data])[0]
             order.calculate_totals()
+            promotion_hooks.on_order_items_changed(order, channel="pos")
             inventory_hooks.on_order_items_added(order, [order_item])
         from apps.printing import hooks as printing_hooks
 
@@ -882,6 +893,12 @@ class CustomerOrderCreateView(APIView):
             )
             _add_items(order, data["items"])
             order.calculate_totals()
+            promotion_hooks.on_order_items_changed(order, channel=order.source)
+            if data.get("promo_code"):
+                try:
+                    promotion_services.redeem_code(order, data["promo_code"], by=request.user, channel=order.source)
+                except promotion_services.PromotionError as exc:
+                    raise serializers_module.ValidationError({"promo_code": exc.message})
             # Reserves ingredients; raises InsufficientStock (409) and rolls
             # the order back when the warehouse cannot cover it.
             inventory_hooks.on_order_created(order)

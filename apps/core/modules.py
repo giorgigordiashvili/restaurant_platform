@@ -206,6 +206,17 @@ MODULES: tuple[Module, ...] = (
         hooks=("apps.fiscal.hooks.on_module_toggled",),
     ),
     Module(
+        "promotions",
+        _("Promotions & schedules"),
+        _("Breakfast / lunch menus by time, '86 today', happy hours, promo codes and combo menus."),
+        "sell",
+        "promotions_enabled",
+        requires=("menu",),
+        app_labels=("promotions",),
+        model_names=(("promotions", "promotion"), ("promotions", "menuschedule")),
+        hooks=("apps.promotions.hooks.on_module_toggled",),
+    ),
+    Module(
         "notifications",
         _("Notifications"),
         _(

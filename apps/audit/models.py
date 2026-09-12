@@ -45,6 +45,7 @@ class AuditLog(TimeStampedModel):
         ("item_void", _("Item Voided")),
         ("order_split", _("Order Split")),
         ("order_move", _("Order Moved")),
+        ("menu_availability", _("Dish availability changed")),
     ]
 
     # Actor

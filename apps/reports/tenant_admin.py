@@ -270,6 +270,12 @@ class MenuReportAdmin(ReportAdminBase):
             out["engineering"] = self._cached(
                 request, "engineering", period, lambda: queries.menu_engineering(r, period)
             )
+        if modules.is_enabled(r, "promotions"):
+            from apps.promotions import services as promo_services
+
+            out["promotions"] = self._cached(
+                request, "promotions", period, lambda: promo_services.usage_report(r, period.start, period.end)
+            )
         return out
 
     def page(self, request, period, data):
@@ -350,6 +356,21 @@ class MenuReportAdmin(ReportAdminBase):
             )
         else:
             notices.append("Turn on Warehouse and give dishes recipes to see costs and menu engineering.")
+        if data.get("promotions") is not None:
+            tables.append(
+                Table(
+                    "promotions",
+                    _("Promotions"),
+                    [
+                        ("name", _("Promotion")),
+                        ("kind", _("Kind")),
+                        ("code", _("Code")),
+                        ("uses", _("Uses")),
+                        ("discount", _("Discount total")),
+                    ],
+                    data["promotions"],
+                )
+            )
         return {"kpis": kpis, "charts": chart_list, "tables": tables, "extra": extra, "notices": notices}
 
 

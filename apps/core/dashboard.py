@@ -284,6 +284,37 @@ def module_cards(request):
             "orders",
         )
 
+    if "promotions" in on and has_resource_permission(request, "menu", "read"):
+        from apps.promotions import services as promo_services
+        from apps.promotions.models import Promotion, PromotionUse
+
+        live = len(promo_services.live_happy_hours(restaurant))
+        card(
+            "promotions",
+            _("Promotions"),
+            "sell",
+            [
+                {
+                    "label": _("Active"),
+                    "value": Promotion.objects.filter(restaurant=restaurant, is_active=True).count(),
+                    "url": _url("promotions_promotion_changelist"),
+                },
+                {"label": _("Happy hours live now"), "value": live, "url": _url("promotions_promotion_changelist")},
+                {
+                    "label": _("Codes used today"),
+                    "value": PromotionUse.objects.filter(
+                        promotion__restaurant=restaurant, promotion__kind="promo_code", created_at__date=today
+                    ).count(),
+                    "url": _url("promotions_promotion_changelist"),
+                },
+            ],
+            [
+                _link(_("Promotions"), "promotions_promotion_changelist"),
+                _link(_("Schedules"), "promotions_menuschedule_changelist"),
+            ],
+            "menu",
+        )
+
     if "fiscal" in on and has_resource_permission(request, "fiscal", "read"):
         from apps.fiscal.models import FiscalDocument
 

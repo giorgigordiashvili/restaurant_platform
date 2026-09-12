@@ -69,6 +69,9 @@ class TenantAdminSite(UnfoldAdminSite):
         "fiscalsettingspage": "fiscal",
         "fiscaldocument": "fiscal",
         "fiscalprofile": "fiscal",
+        # Promotions
+        "promotion": "menu",
+        "menuschedule": "menu",
         # Notifications
         "notificationsettingspage": "settings",
         "outboundmessage": "settings",

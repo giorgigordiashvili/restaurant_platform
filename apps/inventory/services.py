@@ -171,14 +171,24 @@ def _to_base(item: StockItem, qty, unit: UnitOfMeasure) -> Decimal:
 
 
 def recipe_lines_for(target) -> list[RecipeLine]:
-    """Active-ingredient recipe lines of a MenuItem or Modifier (prefetch-aware)."""
+    """Active-ingredient recipe lines of a MenuItem or Modifier (prefetch-aware); combos = their components' lines."""
+    if getattr(target, "is_combo", False):
+        lines = []
+        for comp in target.combo_components.select_related("item").prefetch_related("item__recipe_lines__stock_item"):
+            lines.extend(recipe_lines_for(comp.item))
+        return lines
     lines = target.recipe_lines.all()
     return [line for line in lines if line.stock_item.is_active]
 
 
 def needs_for(target, portions=1) -> dict:
-    """{stock_item_id: base qty} for ``portions`` of a dish or modifier."""
+    """{stock_item_id: base qty} for ``portions`` of a dish or modifier (combos expand to their components)."""
     need = defaultdict(Decimal)
+    if getattr(target, "is_combo", False):
+        for comp in target.combo_components.select_related("item"):
+            for sid, qty in needs_for(comp.item, Decimal(portions) * comp.quantity).items():
+                need[sid] += qty
+        return dict(need)
     for line in recipe_lines_for(target):
         need[line.stock_item_id] += q4(line.qty_base * Decimal(portions))
     return dict(need)

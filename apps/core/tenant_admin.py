@@ -50,6 +50,7 @@ from apps.loyalty.models import LoyaltyCounter, LoyaltyProgram, LoyaltyRedemptio
 # Import models
 from apps.menu.models import MenuCategory, MenuItem, MenuItemModifierGroup, Modifier, ModifierGroup
 from apps.orders.models import Order, OrderItem, OrderStatusHistory
+from apps.promotions.tenant_admin import ComboComponentInline
 from apps.reservations.models import Reservation, ReservationBlockedTime, ReservationSettings
 from apps.reviews.models import Review, ReviewReport
 from apps.staff import services as staff_services
@@ -68,7 +69,18 @@ class MenuCategoryTenantAdmin(TenantTranslatableAdmin):
     """Admin for menu categories."""
 
     permission_resource = "menu"
-    list_display = ["name", "all_languages_column", "display_order", "is_active", "items_count"]
+    list_display = ["name", "all_languages_column", "display_order", "is_active", "schedule", "items_count"]
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        from apps.promotions.models import MenuSchedule
+
+        if "schedule" in form.base_fields:
+            form.base_fields["schedule"].queryset = MenuSchedule.objects.filter(
+                restaurant=getattr(request, "restaurant", None)
+            )
+        return form
+
     list_filter = ["is_active"]
     list_editable = ["display_order", "is_active"]
     search_fields = ["translations__name"]
@@ -122,9 +134,18 @@ class MenuItemTenantAdmin(RecipeAdminMixin, TenantTranslatableAdmin):
     search_fields = ["translations__name", "translations__description"]
     ordering = ["category__display_order", "display_order"]
     autocomplete_fields = ["category"]
-    inlines = [MenuItemModifierGroupInline]
+    inlines = [MenuItemModifierGroupInline, ComboComponentInline]
     # The warehouse owns this flag; staff only ever see it.
     readonly_fields = ["auto_disabled_by_stock"]
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        restaurant = getattr(request, "restaurant", None)
+        from apps.promotions.models import MenuSchedule
+
+        if "schedule" in form.base_fields:
+            form.base_fields["schedule"].queryset = MenuSchedule.objects.filter(restaurant=restaurant)
+        return form
 
     def get_queryset(self, request):
         """Ensure category is also filtered."""
@@ -1425,6 +1446,7 @@ from apps.inventory.tenant_admin import register_inventory_admin  # noqa: E402
 from apps.notifications.tenant_admin import register_notifications_admin  # noqa: E402
 from apps.payments.tenant_admin import register_payments_admin  # noqa: E402
 from apps.printing.tenant_admin import register_printing_admin  # noqa: E402
+from apps.promotions.tenant_admin import register_promotions_admin  # noqa: E402
 from apps.reports.tenant_admin import register_reports_admin  # noqa: E402
 
 register_inventory_admin(tenant_admin_site)
@@ -1434,6 +1456,7 @@ register_printing_admin(tenant_admin_site)
 register_fiscal_admin(tenant_admin_site)
 register_delivery_admin(tenant_admin_site)
 register_notifications_admin(tenant_admin_site)
+register_promotions_admin(tenant_admin_site)
 
 # Restaurant Settings + Modules
 tenant_admin_site.register(Restaurant, RestaurantSettingsAdmin)

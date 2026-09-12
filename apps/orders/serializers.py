@@ -113,10 +113,19 @@ class OrderItemCreateSerializer(serializers.Serializer):
     def validate_menu_item_id(self, value):
         restaurant = self.context.get("restaurant")
         try:
-            item = MenuItem.objects.filter(SELLABLE).get(id=value, restaurant=restaurant)
-            return item
+            item = (
+                MenuItem.objects.filter(SELLABLE)
+                .select_related("restaurant", "schedule", "category__schedule")
+                .get(id=value, restaurant=restaurant)
+            )
         except MenuItem.DoesNotExist:
             raise serializers.ValidationError("Menu item not found or unavailable.")
+        from apps.promotions.availability import availability
+
+        ok, reason = availability(item, restaurant=item.restaurant)
+        if not ok:
+            raise serializers.ValidationError(f"{item.safe_translation_getter('name', any_language=True)}: {reason}")
+        return item
 
     def validate_modifier_ids(self, value):
         if not value:
@@ -252,6 +261,7 @@ class OrderCreateSerializer(serializers.Serializer):
     customer_notes = serializers.CharField(required=False, allow_blank=True)
     delivery_address = serializers.CharField(required=False, allow_blank=True)
     tip_amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0, required=False, default=0)
+    promo_code = serializers.CharField(max_length=30, required=False, allow_blank=True)
     items = OrderItemCreateSerializer(many=True, min_length=1)
 
     def validate(self, data):
@@ -285,6 +295,10 @@ class OrderStatusUpdateSerializer(serializers.Serializer):
 class ReasonMixin(serializers.Serializer):
     reason_id = serializers.UUIDField(required=False, allow_null=True)
     reason_text = serializers.CharField(max_length=200, required=False, allow_blank=True, default="")
+
+
+class PromoCodeSerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=30)
 
 
 class OrderDiscountCreateSerializer(ReasonMixin):

@@ -42,6 +42,9 @@ class OrderDiscount(TimeStampedModel):
     applied_by = models.ForeignKey(
         "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="applied_discounts"
     )
+    promotion = models.ForeignKey(
+        "promotions.Promotion", on_delete=models.SET_NULL, null=True, blank=True, related_name="order_discounts"
+    )
 
     class Meta:
         db_table = "order_discounts"
@@ -505,6 +508,9 @@ class OrderItem(TimeStampedModel):
         "payments.DiscountReason", on_delete=models.SET_NULL, null=True, blank=True, related_name="item_discounts"
     )
     discount_reason_text = models.CharField(max_length=200, blank=True, default="")
+    promotion = models.ForeignKey(
+        "promotions.Promotion", on_delete=models.SET_NULL, null=True, blank=True, related_name="order_items"
+    )
     discounted_by = models.ForeignKey(
         "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="discounted_items"
     )
