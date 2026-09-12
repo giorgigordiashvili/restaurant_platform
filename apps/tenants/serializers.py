@@ -6,8 +6,6 @@ from rest_framework import serializers
 
 from parler_rest.serializers import TranslatableModelSerializer, TranslatedFieldsField
 
-from apps.accounts.serializers import UserSerializer
-
 from .models import Amenity, Restaurant, RestaurantCategory, RestaurantHours
 
 
