@@ -1471,6 +1471,7 @@ class ModulesTenantAdmin(TenantModelAdmin):
 # =============================================================================
 
 from apps.audit.tenant_admin import register_audit_admin  # noqa: E402
+from apps.crm.tenant_admin import register_crm_admin  # noqa: E402
 from apps.delivery.tenant_admin import register_delivery_admin  # noqa: E402
 from apps.fiscal.tenant_admin import register_fiscal_admin  # noqa: E402
 from apps.inventory.tenant_admin import register_inventory_admin  # noqa: E402
@@ -1493,6 +1494,7 @@ register_promotions_admin(tenant_admin_site)
 register_purchasing_admin(tenant_admin_site)
 register_timekeeping_admin(tenant_admin_site)
 register_audit_admin(tenant_admin_site)
+register_crm_admin(tenant_admin_site)
 
 # Restaurant Settings + Modules
 tenant_admin_site.register(Restaurant, RestaurantSettingsAdmin)

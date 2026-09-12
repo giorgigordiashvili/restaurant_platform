@@ -262,6 +262,7 @@ class OrderCreateSerializer(serializers.Serializer):
     delivery_address = serializers.CharField(required=False, allow_blank=True)
     tip_amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0, required=False, default=0)
     promo_code = serializers.CharField(max_length=30, required=False, allow_blank=True)
+    marketing_opt_in = serializers.BooleanField(required=False, default=False)
     items = OrderItemCreateSerializer(many=True, min_length=1)
 
     def validate(self, data):

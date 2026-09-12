@@ -88,6 +88,10 @@ def transition_order(
             from apps.notifications import hooks as notification_hooks
 
             notification_hooks.on_order_cancelled(order, by=by)
+        elif new_status == "completed":
+            from apps.crm import hooks as crm_hooks
+
+            crm_hooks.on_order_completed(order, by=by)
     return order
 
 

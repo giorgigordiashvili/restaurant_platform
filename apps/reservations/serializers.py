@@ -295,9 +295,12 @@ class ReservationDetailSerializer(serializers.ModelSerializer):
 class ReservationCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating a reservation (public)."""
 
+    marketing_opt_in = serializers.BooleanField(required=False, default=False, write_only=True)
+
     class Meta:
         model = Reservation
         fields = [
+            "marketing_opt_in",
             "guest_name",
             "guest_email",
             "guest_phone",
@@ -365,6 +368,7 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
+        consent = validated_data.pop("marketing_opt_in", False)
         """Create reservation with restaurant context."""
         restaurant = self.context.get("restaurant")
         user = self.context.get("request").user
@@ -385,7 +389,11 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
         except ReservationSettings.DoesNotExist:
             validated_data["status"] = "confirmed"
 
-        return super().create(validated_data)
+        reservation = super().create(validated_data)
+        from apps.crm import hooks as crm_hooks
+
+        crm_hooks.on_reservation_created(reservation, consent=consent)
+        return reservation
 
 
 class ReservationDashboardCreateSerializer(serializers.ModelSerializer):

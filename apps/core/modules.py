@@ -206,6 +206,21 @@ MODULES: tuple[Module, ...] = (
         hooks=("apps.fiscal.hooks.on_module_toggled",),
     ),
     Module(
+        "crm",
+        _("CRM & marketing"),
+        _(
+            "Guest records built from orders and bookings, segments, SMS / email campaigns, birthday, review and win-back automations."
+        ),
+        "campaign",
+        "crm_enabled",
+        requires=("ordering",),
+        recommends=("notifications", "loyalty", "promotions"),
+        app_labels=("crm",),
+        model_names=(("crm", "customer"), ("crm", "campaign"), ("crm", "segment"), ("crm", "automation")),
+        resources=("crm",),
+        hooks=("apps.crm.hooks.on_module_toggled",),
+    ),
+    Module(
         "timekeeping",
         _("Timekeeping & rota"),
         _("Clock in / out on the POS, weekly rota with reminders, hours and labour cost report."),

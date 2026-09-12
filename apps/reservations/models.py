@@ -317,12 +317,18 @@ class Reservation(TimeStampedModel):
         self.status = "seated"
         self.seated_at = timezone.now()
         self.save(update_fields=["status", "seated_at", "updated_at"])
+        from apps.crm import hooks as crm_hooks
+
+        crm_hooks.on_reservation_done(self)
 
     def mark_completed(self):
         """Mark the reservation as completed."""
         self.status = "completed"
         self.completed_at = timezone.now()
         self.save(update_fields=["status", "completed_at", "updated_at"])
+        from apps.crm import hooks as crm_hooks
+
+        crm_hooks.on_reservation_done(self)
 
     def mark_no_show(self):
         """Mark the reservation as no-show."""

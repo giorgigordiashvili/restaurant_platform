@@ -25,8 +25,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "email_notifications",
             "sms_notifications",
             "push_notifications",
+            "marketing_opt_in",
+            "marketing_opt_in_at",
         ]
-        read_only_fields = ["loyalty_points", "total_orders", "total_spent"]
+        read_only_fields = ["loyalty_points", "total_orders", "total_spent", "marketing_opt_in_at"]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -148,9 +150,21 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
         # Update profile fields
         if profile_data and hasattr(instance, "profile"):
+            consent_changed = (
+                "marketing_opt_in" in profile_data
+                and profile_data["marketing_opt_in"] != instance.profile.marketing_opt_in
+            )
             for attr, value in profile_data.items():
                 setattr(instance.profile, attr, value)
+            if consent_changed and instance.profile.marketing_opt_in:
+                from django.utils import timezone
+
+                instance.profile.marketing_opt_in_at = timezone.now()
             instance.profile.save()
+            if consent_changed or "date_of_birth" in profile_data:
+                from apps.crm import hooks as crm_hooks
+
+                crm_hooks.on_profile_consent_changed(instance)
 
         return instance
 

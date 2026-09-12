@@ -39,6 +39,7 @@ class StaffRole(TimeStampedModel):
             "cash": ["create", "read", "update", "delete"],
             "fiscal": ["create", "read", "update", "delete"],
             "timekeeping": ["create", "read", "update", "delete"],
+            "crm": ["create", "read", "update", "delete"],
         },
         "manager": {
             "menu": ["create", "read", "update", "delete"],
@@ -53,6 +54,7 @@ class StaffRole(TimeStampedModel):
             "cash": ["create", "read", "update", "delete"],
             "fiscal": ["read", "update"],
             "timekeeping": ["create", "read", "update", "delete"],
+            "crm": ["create", "read", "update", "delete"],
         },
         "warehouse_manager": {
             "timekeeping": ["create", "read"],

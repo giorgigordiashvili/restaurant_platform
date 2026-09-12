@@ -69,6 +69,12 @@ class TenantAdminSite(UnfoldAdminSite):
         "fiscalsettingspage": "fiscal",
         "fiscaldocument": "fiscal",
         "fiscalprofile": "fiscal",
+        # CRM
+        "customer": "crm",
+        "segment": "crm",
+        "campaign": "crm",
+        "automation": "crm",
+        "crmreport": "analytics",
         # Timekeeping / activity
         "timeentry": "timekeeping",
         "rotashift": "timekeeping",

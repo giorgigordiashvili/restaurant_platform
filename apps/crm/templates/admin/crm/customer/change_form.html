@@ -1,0 +1,14 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+{% block after_field_sets %}
+{{ block.super }}
+{% if timeline is not None %}
+<div class="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4 mt-4" data-testid="customer-timeline">
+  <h3 class="font-semibold mb-2">{% translate "Timeline" %}</h3>
+  <ul class="text-sm">
+    {% if not timeline %}<li class="text-base-500">{% translate "No visits recorded yet." %}</li>{% endif %}
+    {% for i in timeline %}<li class="py-1 border-t border-base-100 dark:border-base-800"><span class="text-xs text-base-500">{{ i.when|date:"d.m.Y H:i" }}</span> · <span class="text-xs uppercase text-base-500">{{ i.kind }}</span> · {% if i.url %}<a href="{{ i.url }}" class="underline">{{ i.title }}</a>{% else %}{{ i.title }}{% endif %}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% endblock %}

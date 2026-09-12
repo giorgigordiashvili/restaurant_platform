@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-12 22:49+0400\n"
+"POT-Creation-Date: 2026-09-12 23:03+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Georgian\n"
@@ -133,22 +133,18 @@ msgstr "შესყიდვის შეკვეთა მიღებულ�
 msgid "Purchase order cancelled"
 msgstr "შესყიდვის შეკვეთა გაუქმდა"
 
-#| msgid "Blocked Time"
 msgid "Clocked in"
 msgstr "ცვლა დაიწყო"
 
-#| msgid "Blocked times"
 msgid "Clocked out"
 msgstr "ცვლა დაასრულა"
 
 msgid "Time entry edited"
 msgstr "სამუშაო დროის ჩანაწერი შეიცვალა"
 
-#| msgid "Status pushed"
 msgid "Rota published"
 msgstr "განრიგი გამოქვეყნდა"
 
-#| msgid "Service charge"
 msgid "Price changed"
 msgstr "ფასი შეიცვალა"
 
@@ -158,11 +154,9 @@ msgstr "აუდიტის ჩანაწერი"
 msgid "Audit Logs"
 msgstr "აუდიტის ჟურნალი"
 
-#| msgid "Activate"
 msgid "Activity"
 msgstr "აქტივობა"
 
-#| msgid "Why"
 msgid "Who"
 msgstr "ვინ"
 
@@ -293,10 +287,31 @@ msgstr "პლატფორმები"
 msgid "Setup guide"
 msgstr "დაყენების გზამკვლევი"
 
+#| msgid "Guest SMS"
+msgid "Guests"
+msgstr "სტუმრები"
+
+#| msgid "Used in"
+msgid "Opted in"
+msgstr "თანხმობით"
+
+msgid "New (30 days)"
+msgstr "ახალი (30 დღე)"
+
+#| msgid "Customer Request"
+msgid "Customers"
+msgstr "სტუმრები"
+
+msgid "Campaigns"
+msgstr "კამპანიები"
+
+#| msgid "Account Information"
+msgid "Automations"
+msgstr "ავტომატიზაციები"
+
 msgid "Timekeeping"
 msgstr "სამუშაო დრო"
 
-#| msgid "Blocked Time"
 msgid "Clocked in now"
 msgstr "ახლა ცვლაზე"
 
@@ -309,7 +324,6 @@ msgstr "განრიგი"
 msgid "Time entries"
 msgstr "სამუშაო დროის ჩანაწერები"
 
-#| msgid "Hour"
 msgid "Hours"
 msgstr "საათები"
 
@@ -486,6 +500,16 @@ msgstr ""
 "დღგ პროფილი, თანმიმდევრული ჩეკები და დაბრუნების ჩეკები, RS.ge ზედნადებების "
 "ექსპორტი. ფისკალური პროვაიდერი მოგვიანებით დაემატება."
 
+msgid "CRM & marketing"
+msgstr "CRM და მარკეტინგი"
+
+msgid ""
+"Guest records built from orders and bookings, segments, SMS / email "
+"campaigns, birthday, review and win-back automations."
+msgstr ""
+"სტუმრების ბარათები შეკვეთებიდან და ჯავშნებიდან, სეგმენტები, SMS / ელფოსტის "
+"კამპანიები, დაბადების დღის, შეფასების და დაბრუნების ავტომატიზაციები."
+
 msgid "Timekeeping & rota"
 msgstr "სამუშაო დრო და განრიგი"
 
@@ -574,7 +598,6 @@ msgstr "თანხის დაბრუნებები"
 msgid "Change status, add items, void items"
 msgstr "სტატუსის შეცვლა, პოზიციების დამატება, ანულირება"
 
-#| msgid "Low / out"
 msgid "Clock in / out"
 msgstr "ცვლის დაწყება / დასრულება"
 
@@ -897,6 +920,222 @@ msgstr "{p0}: პარამეტრები შენახულია."
 msgid "Report selected reviews to platform moderators"
 msgstr "არჩეული შეფასებების გაგზავნა მოდერატორებთან"
 
+msgid "Free tags, e.g. vip, corporate, vegan."
+msgstr "თავისუფალი თეგები, მაგ. vip, corporate, vegan."
+
+msgid "First contact: qr, web, pos, reservation…"
+msgstr "პირველი კონტაქტი: qr, web, pos, reservation…"
+
+#| msgid "Custom Role"
+msgid "Customer"
+msgstr "სტუმარი"
+
+msgid ""
+"Keys: min_visits, max_visits, min_spend, last_visit_days_max (visited within"
+" N days), last_visit_days_min (no visit for N days), tags_any (list), "
+"birthday_month (1-12), has_email, has_phone, opt_in (default true)."
+msgstr ""
+"გასაღებები: min_visits, max_visits, min_spend, last_visit_days_max (ვიზიტი N"
+" დღეში), last_visit_days_min (N დღე ვიზიტის გარეშე), tags_any (სია), "
+"birthday_month (1-12), has_email, has_phone, opt_in (ნაგულისხმევად true)."
+
+msgid "Segment"
+msgstr "სეგმენტი"
+
+# Models - Payments
+#| msgid "Payments"
+msgid "Segments"
+msgstr "სეგმენტები"
+
+msgid "Draft"
+msgstr "მონახაზი"
+
+msgid "Scheduled"
+msgstr "დაგეგმილი"
+
+# Status choices - Order
+#| msgid "Pending"
+msgid "Sending"
+msgstr "იგზავნება"
+
+msgid "Sent"
+msgstr "გაგზავნილია"
+
+msgid "Cancelled"
+msgstr "გაუქმებული"
+
+#| msgid "Email"
+msgid "Email only."
+msgstr "მხოლოდ ელფოსტისთვის."
+
+#, python-brace-format
+msgid "Placeholders: {name} {restaurant} {code} {link} {unsubscribe}"
+msgstr "ჩანაცვლებები: {name} {restaurant} {code} {link} {unsubscribe}"
+
+#, python-brace-format
+#| msgid "A promo code needs a code."
+msgid "A promo code to include as {code}."
+msgstr "პრომო კოდი, რომელიც {code}-ად ჩაჯდება."
+
+msgid "Campaign"
+msgstr "კამპანია"
+
+msgid "Birthday greeting"
+msgstr "დაბადების დღის მილოცვა"
+
+#| msgid "Review prompt"
+msgid "Review prompt after a visit"
+msgstr "შეფასების მოწვევა ვიზიტის შემდეგ"
+
+msgid "Win-back for lapsed guests"
+msgstr "დაკარგული სტუმრების დაბრუნება"
+
+msgid "Review prompt: hours after the visit."
+msgstr "შეფასების მოწვევა: საათი ვიზიტის შემდეგ."
+
+msgid "Win-back: days without a visit."
+msgstr "დაბრუნება: დღეები ვიზიტის გარეშე."
+
+#| msgid "Account Information"
+msgid "Automation"
+msgstr "ავტომატიზაცია"
+
+msgid "Order id for review prompts, year for birthdays, month for win-backs."
+msgstr ""
+"შეკვეთის ID შეფასებისთვის, წელი დაბადების დღისთვის, თვე დაბრუნებისთვის."
+
+# Form validation
+#| msgid "This code is already applied."
+msgid "This campaign was already sent."
+msgstr "ეს კამპანია უკვე გაგზავნილია."
+
+msgid "Write the message first."
+msgstr "ჯერ დაწერეთ შეტყობინება."
+
+#, python-format
+msgid "Campaign '%(name)s' sent"
+msgstr "კამპანია „%(name)s“ გაიგზავნა"
+
+#, python-format
+msgid "%(sent)d sent, %(failed)d failed, %(skipped)d skipped"
+msgstr "%(sent)d გაიგზავნა, %(failed)d ვერ, %(skipped)d გამოტოვდა"
+
+msgid "guests in this segment can receive this"
+msgstr "სტუმარს ამ სეგმენტში შეუძლია ამის მიღება:"
+
+#| msgid "Status"
+msgid "status"
+msgstr "სტატუსი"
+
+msgid "sent"
+msgstr "გაგზავნილი"
+
+#| msgid "Failed"
+msgid "failed"
+msgstr "ვერ გაიგზავნა"
+
+#| msgid "Skipped"
+msgid "skipped"
+msgstr "გამოტოვებული"
+
+msgid "Send a test to"
+msgstr "ტესტის გაგზავნა"
+
+msgid "Send test"
+msgstr "ტესტის გაგზავნა"
+
+msgid "Send to everyone in the segment now?"
+msgstr "გავუგზავნოთ სეგმენტში ყველას ახლავე?"
+
+#| msgid "Open now"
+msgid "Send now"
+msgstr "ახლავე გაგზავნა"
+
+msgid ""
+"Or set 'Scheduled at' above and save to send later. Every message carries an"
+" unsubscribe link; only guests who opted in are contacted."
+msgstr ""
+"ან მიუთითეთ „დაგეგმილი დრო“ ზემოთ და შეინახეთ მოგვიანებით გასაგზავნად. ყველა"
+" შეტყობინებას აქვს გამოწერის გაუქმების ბმული; მხოლოდ თანხმობის მქონე "
+"სტუმრებს ეგზავნება."
+
+#| msgid "Decline"
+msgid "Timeline"
+msgstr "ისტორია"
+
+msgid "No visits recorded yet."
+msgstr "ვიზიტები ჯერ არ არის."
+
+msgid "Tags"
+msgstr "თეგები"
+
+msgid "Comma separated, e.g. vip, corporate."
+msgstr "მძიმით გამოყოფილი, მაგ. vip, corporate."
+
+msgid "Consent"
+msgstr "თანხმობა"
+
+msgid "History"
+msgstr "ისტორია"
+
+#| msgid "Last login"
+msgid "Last visit"
+msgstr "ბოლო ვიზიტი"
+
+#, python-format
+msgid "Statistics rebuilt for %(n)d customer(s)."
+msgstr "სტატისტიკა განახლდა %(n)d სტუმარზე."
+
+msgid "Rebuild statistics"
+msgstr "სტატისტიკის განახლება"
+
+msgid "Tag as VIP"
+msgstr "VIP თეგის დამატება"
+
+msgid "Rules (JSON)"
+msgstr "წესები (JSON)"
+
+msgid "Rules must be valid JSON, e.g. {\"min_visits\": 3}"
+msgstr "წესები სწორი JSON უნდა იყოს, მაგ. {\"min_visits\": 3}"
+
+msgid "Rules must be a JSON object."
+msgstr "წესები JSON ობიექტი უნდა იყოს."
+
+#| msgid "Guest SMS"
+msgid "Guests now"
+msgstr "სტუმარი ახლა"
+
+msgid "Enter a phone number or email for the test."
+msgstr "შეიყვანეთ ტელეფონი ან ელფოსტა ტესტისთვის."
+
+#, python-format
+msgid "Test %(status)s: %(to)s %(error)s"
+msgstr "ტესტი %(status)s: %(to)s %(error)s"
+
+#, python-format
+msgid "'%(name)s' is being sent to %(n)d guests."
+msgstr "„%(name)s“ ეგზავნება %(n)d სტუმარს."
+
+#, python-format
+#| msgid "%(number)s cancelled."
+msgid "'%(name)s' cancelled."
+msgstr "„%(name)s“ გაუქმებულია."
+
+#| msgid "This code is not valid."
+msgid "This link is not valid."
+msgstr "ეს ბმული არასწორია."
+
+#, python-format
+msgid "You will no longer receive messages from %(restaurant)s."
+msgstr "თქვენ აღარ მიიღებთ შეტყობინებებს %(restaurant)s-ისგან."
+
+#, python-format
+msgid "Stop receiving messages from %(restaurant)s?"
+msgstr "აღარ მიიღოთ შეტყობინებები %(restaurant)s-ისგან?"
+
+msgid "Unsubscribe"
+msgstr "გამოწერის გაუქმება"
+
 msgid "Order received"
 msgstr "შეკვეთა მიღებულია"
 
@@ -933,9 +1172,6 @@ msgstr "პლატფორმის მოვლენები"
 
 msgid "Queued"
 msgstr "რიგშია"
-
-msgid "Sent"
-msgstr "გაგზავნილია"
 
 msgid "Processing"
 msgstr "მუშავდება"
@@ -1381,14 +1617,8 @@ msgstr "გასული ზედნადები"
 msgid "E-invoice"
 msgstr "ელ. ინვოისი"
 
-msgid "Draft"
-msgstr "მონახაზი"
-
 msgid "Confirmed"
 msgstr "დადასტურებული"
-
-msgid "Cancelled"
-msgstr "გაუქმებული"
 
 msgid "Refund -> receipt"
 msgstr "დაბრუნება -> ჩეკი"
@@ -2136,12 +2366,6 @@ msgstr "გამგზავნის სახელი"
 
 msgid "Channel"
 msgstr "არხი"
-
-msgid "Send a test to"
-msgstr "ტესტის გაგზავნა"
-
-msgid "Send test"
-msgstr "ტესტის გაგზავნა"
 
 msgid "Who hears what"
 msgstr "ვინ რას იგებს"
@@ -3055,10 +3279,44 @@ msgstr "მიწოდებები"
 msgid "Total"
 msgstr "ჯამი"
 
+msgid "New guests"
+msgstr "ახალი სტუმრები"
+
+#| msgid "Active sessions"
+msgid "Active guests"
+msgstr "აქტიური სტუმრები"
+
+#| msgid "Remaining"
+msgid "Returning"
+msgstr "დაბრუნებული"
+
+msgid "Top guests by spend"
+msgstr "ტოპ სტუმრები ხარჯით"
+
+#| msgid "Guest SMS"
+msgid "Guest"
+msgstr "სტუმარი"
+
+msgid "Phone"
+msgstr "ტელეფონი"
+
+msgid "Visits"
+msgstr "ვიზიტები"
+
+msgid "Spend"
+msgstr "ხარჯი"
+
+msgid "Avg ticket"
+msgstr "საშ. ჩეკი"
+
+# Models - Audit
+#| msgid "Audit"
+msgid "Audience"
+msgstr "აუდიტორია"
+
 msgid "Hours worked"
 msgstr "ნამუშევარი საათები"
 
-#| msgid "Food cost"
 msgid "Labour cost"
 msgstr "შრომის ხარჯი"
 
@@ -3070,10 +3328,6 @@ msgstr "ავტომატურად დახურული ჩანა�
 
 msgid "Hours by person"
 msgstr "საათები ადამიანების მიხედვით"
-
-#| msgid "Schedules"
-msgid "Scheduled"
-msgstr "დაგეგმილი"
 
 msgid "Entries"
 msgstr "ჩანაწერები"
@@ -3095,9 +3349,6 @@ msgstr "გაყიდვები მიმტანების მიხე�
 
 msgid "Server"
 msgstr "მიმტანი"
-
-msgid "Avg ticket"
-msgstr "საშ. ჩეკი"
 
 msgid "Orders entered"
 msgstr "შეყვანილი შეკვეთები"
@@ -3210,9 +3461,6 @@ msgstr "დასხდნენ"
 
 msgid "No Show"
 msgstr "არ მოვიდა"
-
-msgid "Phone"
-msgstr "ტელეფონი"
 
 msgid "Walk-in"
 msgstr "უჯავშნოდ"
@@ -3565,23 +3813,18 @@ msgstr "სისტემამ 16 საათის შემდეგ და
 msgid "Time entry"
 msgstr "სამუშაო დროის ჩანაწერი"
 
-#| msgid "Earlier than the start = the window runs past midnight."
 msgid "Earlier than the start = the shift ends after midnight."
 msgstr "დაწყებაზე ადრე = ცვლა შუაღამის შემდეგ მთავრდება."
 
-#| msgid "E.g. 'Breakfast', 'Lunch', 'Happy hour'."
 msgid "E.g. 'Bar', 'Kitchen', 'Floor'."
 msgstr "მაგ. „ბარი“, „სამზარეულო“, „დარბაზი“."
 
-#| msgid "Cash shift"
 msgid "Rota shift"
 msgstr "განრიგის ცვლა"
 
-#| msgid "Already received"
 msgid "Already clocked in."
 msgstr "ცვლა უკვე დაწყებულია."
 
-#| msgid "Not allowed."
 msgid "Not clocked in."
 msgstr "ცვლა არ არის დაწყებული."
 
@@ -3596,19 +3839,15 @@ msgstr "თქვენი ცვლა იწყება %(time)s-ზე"
 msgid "Week of"
 msgstr "კვირა"
 
-#| msgid "Refund pushed"
 msgid "unpublished"
 msgstr "გამოუქვეყნებელი"
 
-#| msgid "vs previous period"
 msgid "Copy previous week"
 msgstr "წინა კვირის კოპირება"
 
-#| msgid "This week"
 msgid "Publish week"
 msgstr "კვირის გამოქვეყნება"
 
-#| msgid "Nothing sent yet."
 msgid "No active staff yet."
 msgstr "აქტიური პერსონალი ჯერ არ არის."
 
@@ -3664,9 +3903,6 @@ msgstr "საერთო სივრცის მოთხოვნა"
 
 #~ msgid "Home"
 #~ msgstr "მთავარი"
-
-#~ msgid "History"
-#~ msgstr "ისტორია"
 
 #~ msgid "View on site"
 #~ msgstr "საიტზე ნახვა"
@@ -3833,9 +4069,6 @@ msgstr "საერთო სივრცის მოთხოვნა"
 
 #~ msgid "Info"
 #~ msgstr "ინფორმაცია"
-
-#~ msgid "Account Information"
-#~ msgstr "ანგარიშის ინფორმაცია"
 
 #~ msgid "Save Language"
 #~ msgstr "ენის შენახვა"

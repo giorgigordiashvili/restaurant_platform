@@ -23,6 +23,7 @@ RESOURCE_LABELS = {
     "cash": _("Cash & payments"),
     "fiscal": _("Fiscal & VAT"),
     "timekeeping": _("Timekeeping & rota"),
+    "crm": _("CRM & marketing"),
     "staff": _("Staff"),
     "settings": _("Settings"),
     "analytics": _("Analytics"),

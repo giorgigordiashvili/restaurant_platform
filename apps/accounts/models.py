@@ -156,6 +156,10 @@ class UserProfile(TimeStampedModel):
     email_notifications = models.BooleanField(default=True)
     sms_notifications = models.BooleanField(default=False)
     push_notifications = models.BooleanField(default=True)
+    marketing_opt_in = models.BooleanField(
+        default=False, help_text="Offers and news from restaurants I visit (SMS / email)."
+    )
+    marketing_opt_in_at = models.DateTimeField(null=True, blank=True)
 
     # Referral + wallet
     referral_code = models.CharField(

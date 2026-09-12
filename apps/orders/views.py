@@ -18,6 +18,7 @@ from drf_spectacular.utils import extend_schema
 
 from apps.core.middleware.tenant import require_restaurant
 from apps.core.permissions import HasStaffPermission, IsTenantStaff, ModuleRequired, staff_can
+from apps.crm import hooks as crm_hooks
 from apps.inventory import hooks as inventory_hooks
 from apps.notifications import hooks as notification_hooks
 from apps.promotions import hooks as promotion_hooks
@@ -248,6 +249,7 @@ class OrderCreateView(APIView):
                     raise serializers_module.ValidationError({"promo_code": exc.message})
             inventory_hooks.on_order_created(order)
             notification_hooks.on_order_created(order, by=request.user)
+            crm_hooks.on_order_created(order, consent=bool(data.get("marketing_opt_in")))
 
             OrderStatusHistory.objects.create(
                 order=order,
@@ -903,6 +905,7 @@ class CustomerOrderCreateView(APIView):
             # the order back when the warehouse cannot cover it.
             inventory_hooks.on_order_created(order)
             notification_hooks.on_order_created(order, by=request.user)
+            crm_hooks.on_order_created(order, consent=bool(data.get("marketing_opt_in")))
 
             OrderStatusHistory.objects.create(
                 order=order,

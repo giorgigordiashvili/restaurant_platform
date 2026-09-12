@@ -284,6 +284,31 @@ def module_cards(request):
             "orders",
         )
 
+    if "crm" in on and has_resource_permission(request, "crm", "read"):
+        from apps.crm import services as crm_services
+
+        cs = crm_services.summary(restaurant)
+        card(
+            "crm",
+            _("Guests"),
+            "campaign",
+            [
+                {"label": _("Guests"), "value": cs["customers"], "url": _url("crm_customer_changelist")},
+                {
+                    "label": _("Opted in"),
+                    "value": cs["opted_in"],
+                    "url": _url("crm_customer_changelist") + "?marketing_opt_in__exact=1",
+                },
+                {"label": _("New (30 days)"), "value": cs["new_30d"], "url": _url("crm_customer_changelist")},
+            ],
+            [
+                _link(_("Customers"), "crm_customer_changelist"),
+                _link(_("Campaigns"), "crm_campaign_changelist"),
+                _link(_("Automations"), "crm_automation_changelist"),
+            ],
+            "crm",
+        )
+
     if "timekeeping" in on and has_resource_permission(request, "timekeeping", "read"):
         from apps.timekeeping import services as tk
         from apps.timekeeping.models import RotaShift

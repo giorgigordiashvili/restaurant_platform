@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-12 22:49+0400\n"
+"POT-Creation-Date: 2026-09-12 23:03+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
@@ -133,22 +133,18 @@ msgstr "Заказ поставщику получен"
 msgid "Purchase order cancelled"
 msgstr "Заказ поставщику отменён"
 
-#| msgid "Blocked Time"
 msgid "Clocked in"
 msgstr "Начал смену"
 
-#| msgid "Blocked times"
 msgid "Clocked out"
 msgstr "Закончил смену"
 
 msgid "Time entry edited"
 msgstr "Запись рабочего времени изменена"
 
-#| msgid "Status pushed"
 msgid "Rota published"
 msgstr "График опубликован"
 
-#| msgid "Service charge"
 msgid "Price changed"
 msgstr "Цена изменена"
 
@@ -158,11 +154,9 @@ msgstr "Запись аудита"
 msgid "Audit Logs"
 msgstr "Журнал аудита"
 
-#| msgid "Activate"
 msgid "Activity"
 msgstr "Активность"
 
-#| msgid "Why"
 msgid "Who"
 msgstr "Кто"
 
@@ -293,10 +287,31 @@ msgstr "Платформы"
 msgid "Setup guide"
 msgstr "Руководство по настройке"
 
+#| msgid "Guest SMS"
+msgid "Guests"
+msgstr "Гости"
+
+#| msgid "Used in"
+msgid "Opted in"
+msgstr "С согласием"
+
+msgid "New (30 days)"
+msgstr "Новые (30 дней)"
+
+#| msgid "Customer Request"
+msgid "Customers"
+msgstr "Клиенты"
+
+msgid "Campaigns"
+msgstr "Кампании"
+
+#| msgid "Account Information"
+msgid "Automations"
+msgstr "Автоматизации"
+
 msgid "Timekeeping"
 msgstr "Учёт времени"
 
-#| msgid "Blocked Time"
 msgid "Clocked in now"
 msgstr "Сейчас на смене"
 
@@ -309,7 +324,6 @@ msgstr "График"
 msgid "Time entries"
 msgstr "Записи рабочего времени"
 
-#| msgid "Hour"
 msgid "Hours"
 msgstr "Часы"
 
@@ -482,6 +496,16 @@ msgstr ""
 "Профиль НДС, последовательные чеки и чеки возврата, экспорт накладных RS.ge."
 " Фискальный провайдер подключается позже."
 
+msgid "CRM & marketing"
+msgstr "CRM и маркетинг"
+
+msgid ""
+"Guest records built from orders and bookings, segments, SMS / email "
+"campaigns, birthday, review and win-back automations."
+msgstr ""
+"Карточки гостей из заказов и броней, сегменты, SMS / email-кампании, "
+"автоматизации: день рождения, отзыв, возврат гостя."
+
 msgid "Timekeeping & rota"
 msgstr "Учёт времени и график"
 
@@ -569,7 +593,6 @@ msgstr "Возвраты"
 msgid "Change status, add items, void items"
 msgstr "Смена статуса, добавление и аннулирование позиций"
 
-#| msgid "Low / out"
 msgid "Clock in / out"
 msgstr "Начало / конец смены"
 
@@ -891,6 +914,220 @@ msgstr "{p0}: параметры сохранены."
 msgid "Report selected reviews to platform moderators"
 msgstr "Пожаловаться модераторам на выбранные отзывы"
 
+msgid "Free tags, e.g. vip, corporate, vegan."
+msgstr "Свободные теги, напр. vip, corporate, vegan."
+
+msgid "First contact: qr, web, pos, reservation…"
+msgstr "Первый контакт: qr, web, pos, reservation…"
+
+#| msgid "Custom Role"
+msgid "Customer"
+msgstr "Клиент"
+
+msgid ""
+"Keys: min_visits, max_visits, min_spend, last_visit_days_max (visited within"
+" N days), last_visit_days_min (no visit for N days), tags_any (list), "
+"birthday_month (1-12), has_email, has_phone, opt_in (default true)."
+msgstr ""
+"Ключи: min_visits, max_visits, min_spend, last_visit_days_max (визит за N "
+"дней), last_visit_days_min (нет визита N дней), tags_any (список), "
+"birthday_month (1-12), has_email, has_phone, opt_in (по умолчанию true)."
+
+msgid "Segment"
+msgstr "Сегмент"
+
+# Models - Payments
+#| msgid "Payments"
+msgid "Segments"
+msgstr "Сегменты"
+
+msgid "Draft"
+msgstr "Черновик"
+
+msgid "Scheduled"
+msgstr "По графику"
+
+# Status choices - Order
+#| msgid "Pending"
+msgid "Sending"
+msgstr "Отправляется"
+
+msgid "Sent"
+msgstr "Отправлено"
+
+msgid "Cancelled"
+msgstr "Отменён"
+
+#| msgid "Email"
+msgid "Email only."
+msgstr "Только для email."
+
+#, python-brace-format
+msgid "Placeholders: {name} {restaurant} {code} {link} {unsubscribe}"
+msgstr "Подстановки: {name} {restaurant} {code} {link} {unsubscribe}"
+
+#, python-brace-format
+#| msgid "A promo code needs a code."
+msgid "A promo code to include as {code}."
+msgstr "Промокод, подставляемый как {code}."
+
+msgid "Campaign"
+msgstr "Кампания"
+
+msgid "Birthday greeting"
+msgstr "Поздравление с днём рождения"
+
+#| msgid "Review prompt"
+msgid "Review prompt after a visit"
+msgstr "Просьба об отзыве после визита"
+
+msgid "Win-back for lapsed guests"
+msgstr "Возврат ушедших гостей"
+
+msgid "Review prompt: hours after the visit."
+msgstr "Просьба об отзыве: часов после визита."
+
+msgid "Win-back: days without a visit."
+msgstr "Возврат: дней без визита."
+
+#| msgid "Account Information"
+msgid "Automation"
+msgstr "Автоматизация"
+
+msgid "Order id for review prompts, year for birthdays, month for win-backs."
+msgstr "ID заказа для отзывов, год для дней рождения, месяц для возвратов."
+
+# Form validation
+#| msgid "This code is already applied."
+msgid "This campaign was already sent."
+msgstr "Эта кампания уже отправлена."
+
+msgid "Write the message first."
+msgstr "Сначала напишите сообщение."
+
+#, python-format
+msgid "Campaign '%(name)s' sent"
+msgstr "Кампания «%(name)s» отправлена"
+
+#, python-format
+msgid "%(sent)d sent, %(failed)d failed, %(skipped)d skipped"
+msgstr "%(sent)d отправлено, %(failed)d ошибок, %(skipped)d пропущено"
+
+msgid "guests in this segment can receive this"
+msgstr "гостей в этом сегменте могут получить это"
+
+#| msgid "Status"
+msgid "status"
+msgstr "статус"
+
+msgid "sent"
+msgstr "отправлено"
+
+#| msgid "Failed"
+msgid "failed"
+msgstr "ошибок"
+
+#| msgid "Skipped"
+msgid "skipped"
+msgstr "пропущено"
+
+msgid "Send a test to"
+msgstr "Отправить тест на"
+
+msgid "Send test"
+msgstr "Отправить тест"
+
+msgid "Send to everyone in the segment now?"
+msgstr "Отправить всем в сегменте сейчас?"
+
+#| msgid "Open now"
+msgid "Send now"
+msgstr "Отправить сейчас"
+
+msgid ""
+"Or set 'Scheduled at' above and save to send later. Every message carries an"
+" unsubscribe link; only guests who opted in are contacted."
+msgstr ""
+"Или задайте «Запланировано на» выше и сохраните, чтобы отправить позже. В "
+"каждом сообщении есть ссылка для отписки; пишем только гостям с согласием."
+
+#| msgid "Decline"
+msgid "Timeline"
+msgstr "История"
+
+msgid "No visits recorded yet."
+msgstr "Визитов пока нет."
+
+msgid "Tags"
+msgstr "Теги"
+
+msgid "Comma separated, e.g. vip, corporate."
+msgstr "Через запятую, напр. vip, corporate."
+
+msgid "Consent"
+msgstr "Согласие"
+
+msgid "History"
+msgstr "История"
+
+#| msgid "Last login"
+msgid "Last visit"
+msgstr "Последний визит"
+
+#, python-format
+msgid "Statistics rebuilt for %(n)d customer(s)."
+msgstr "Статистика пересчитана для %(n)d гостей."
+
+msgid "Rebuild statistics"
+msgstr "Пересчитать статистику"
+
+msgid "Tag as VIP"
+msgstr "Пометить как VIP"
+
+msgid "Rules (JSON)"
+msgstr "Правила (JSON)"
+
+msgid "Rules must be valid JSON, e.g. {\"min_visits\": 3}"
+msgstr "Правила должны быть корректным JSON, напр. {\"min_visits\": 3}"
+
+msgid "Rules must be a JSON object."
+msgstr "Правила должны быть JSON-объектом."
+
+#| msgid "Guest SMS"
+msgid "Guests now"
+msgstr "Гостей сейчас"
+
+msgid "Enter a phone number or email for the test."
+msgstr "Введите телефон или email для теста."
+
+#, python-format
+msgid "Test %(status)s: %(to)s %(error)s"
+msgstr "Тест %(status)s: %(to)s %(error)s"
+
+#, python-format
+msgid "'%(name)s' is being sent to %(n)d guests."
+msgstr "«%(name)s» отправляется %(n)d гостям."
+
+#, python-format
+#| msgid "%(number)s cancelled."
+msgid "'%(name)s' cancelled."
+msgstr "«%(name)s» отменена."
+
+#| msgid "This code is not valid."
+msgid "This link is not valid."
+msgstr "Эта ссылка недействительна."
+
+#, python-format
+msgid "You will no longer receive messages from %(restaurant)s."
+msgstr "Вы больше не будете получать сообщения от %(restaurant)s."
+
+#, python-format
+msgid "Stop receiving messages from %(restaurant)s?"
+msgstr "Отписаться от сообщений %(restaurant)s?"
+
+msgid "Unsubscribe"
+msgstr "Отписаться"
+
 msgid "Order received"
 msgstr "Заказ получен"
 
@@ -927,9 +1164,6 @@ msgstr "События платформы"
 
 msgid "Queued"
 msgstr "В очереди"
-
-msgid "Sent"
-msgstr "Отправлено"
 
 msgid "Processing"
 msgstr "Обрабатывается"
@@ -1375,14 +1609,8 @@ msgstr "Исходящая накладная"
 msgid "E-invoice"
 msgstr "Электронный счёт"
 
-msgid "Draft"
-msgstr "Черновик"
-
 msgid "Confirmed"
 msgstr "Подтверждён"
-
-msgid "Cancelled"
-msgstr "Отменён"
 
 msgid "Refund -> receipt"
 msgstr "Возврат -> чек"
@@ -2129,12 +2357,6 @@ msgstr "Имя отправителя"
 
 msgid "Channel"
 msgstr "Канал"
-
-msgid "Send a test to"
-msgstr "Отправить тест на"
-
-msgid "Send test"
-msgstr "Отправить тест"
 
 msgid "Who hears what"
 msgstr "Кто что получает"
@@ -3047,10 +3269,44 @@ msgstr "Поставки"
 msgid "Total"
 msgstr "Итого"
 
+msgid "New guests"
+msgstr "Новые гости"
+
+#| msgid "Active sessions"
+msgid "Active guests"
+msgstr "Активные гости"
+
+#| msgid "Remaining"
+msgid "Returning"
+msgstr "Вернувшиеся"
+
+msgid "Top guests by spend"
+msgstr "Топ гостей по тратам"
+
+#| msgid "Guest SMS"
+msgid "Guest"
+msgstr "Гость"
+
+msgid "Phone"
+msgstr "Телефон"
+
+msgid "Visits"
+msgstr "Визиты"
+
+msgid "Spend"
+msgstr "Траты"
+
+msgid "Avg ticket"
+msgstr "Ср. чек"
+
+# Models - Audit
+#| msgid "Audit"
+msgid "Audience"
+msgstr "Аудитория"
+
 msgid "Hours worked"
 msgstr "Отработано часов"
 
-#| msgid "Food cost"
 msgid "Labour cost"
 msgstr "Затраты на персонал"
 
@@ -3062,10 +3318,6 @@ msgstr "Автоматически закрытые записи"
 
 msgid "Hours by person"
 msgstr "Часы по сотрудникам"
-
-#| msgid "Schedules"
-msgid "Scheduled"
-msgstr "По графику"
 
 msgid "Entries"
 msgstr "Записи"
@@ -3087,9 +3339,6 @@ msgstr "Продажи по официантам"
 
 msgid "Server"
 msgstr "Официант"
-
-msgid "Avg ticket"
-msgstr "Ср. чек"
 
 msgid "Orders entered"
 msgstr "Введено заказов"
@@ -3202,9 +3451,6 @@ msgstr "Гости за столом"
 
 msgid "No Show"
 msgstr "Не пришли"
-
-msgid "Phone"
-msgstr "Телефон"
 
 msgid "Walk-in"
 msgstr "Без брони"
@@ -3554,23 +3800,18 @@ msgstr "Закрыто системой через 16 часов; проверь
 msgid "Time entry"
 msgstr "Запись рабочего времени"
 
-#| msgid "Earlier than the start = the window runs past midnight."
 msgid "Earlier than the start = the shift ends after midnight."
 msgstr "Раньше начала = смена заканчивается после полуночи."
 
-#| msgid "E.g. 'Breakfast', 'Lunch', 'Happy hour'."
 msgid "E.g. 'Bar', 'Kitchen', 'Floor'."
 msgstr "Напр. «Бар», «Кухня», «Зал»."
 
-#| msgid "Cash shift"
 msgid "Rota shift"
 msgstr "Смена в графике"
 
-#| msgid "Already received"
 msgid "Already clocked in."
 msgstr "Смена уже начата."
 
-#| msgid "Not allowed."
 msgid "Not clocked in."
 msgstr "Смена не начата."
 
@@ -3585,19 +3826,15 @@ msgstr "Ваша смена начинается в %(time)s"
 msgid "Week of"
 msgstr "Неделя с"
 
-#| msgid "Refund pushed"
 msgid "unpublished"
 msgstr "не опубликовано"
 
-#| msgid "vs previous period"
 msgid "Copy previous week"
 msgstr "Скопировать прошлую неделю"
 
-#| msgid "This week"
 msgid "Publish week"
 msgstr "Опубликовать неделю"
 
-#| msgid "Nothing sent yet."
 msgid "No active staff yet."
 msgstr "Активных сотрудников пока нет."
 
@@ -3653,9 +3890,6 @@ msgstr "Запрос на общую площадку"
 
 #~ msgid "Home"
 #~ msgstr "Главная"
-
-#~ msgid "History"
-#~ msgstr "История"
 
 #~ msgid "View on site"
 #~ msgstr "Смотреть на сайте"
@@ -3822,9 +4056,6 @@ msgstr "Запрос на общую площадку"
 
 #~ msgid "Info"
 #~ msgstr "Информация"
-
-#~ msgid "Account Information"
-#~ msgstr "Информация об аккаунте"
 
 #~ msgid "Save Language"
 #~ msgstr "Сохранить язык"

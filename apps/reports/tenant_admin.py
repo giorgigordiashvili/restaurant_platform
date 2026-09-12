@@ -21,6 +21,7 @@ from apps.reports import charts, queries
 from apps.reports.cache import cached
 from apps.reports.exports import csv_response
 from apps.reports.models import (
+    CrmReport,
     FoodCostReport,
     HoursReport,
     MenuReport,
@@ -49,6 +50,7 @@ REPORTS = (
     ("food_cost", _("Food cost"), FoodCostReport, "warehouse"),
     ("staff", _("Staff"), StaffReport, None),
     ("hours", _("Hours"), HoursReport, "timekeeping"),
+    ("crm", _("Guests"), CrmReport, "crm"),
     ("shifts", _("Cash shifts"), ShiftsReport, "cash"),
     ("reservations", _("Reservations"), ReservationsReport, "reservations"),
     ("reviews", _("Reviews"), ReviewsReport, "reviews"),
@@ -449,6 +451,56 @@ class FoodCostReportAdmin(ReportAdminBase):
 # ── Staff ─────────────────────────────────────────────────────────────────
 
 
+class CrmReportAdmin(ReportAdminBase):
+    module_code = "crm"
+    report_key = "crm"
+    title = "Guests"
+
+    def data(self, request, period):
+        from apps.crm import services as crm
+
+        r = request.restaurant
+        return self._cached(request, "crm", period, lambda: crm.crm_report(r, period.start, period.end))
+
+    def page(self, request, period, data):
+        kpis = [
+            kpi(_("New guests"), data["new"], kind="int"),
+            kpi(_("Active guests"), data["active"], kind="int"),
+            kpi(_("Returning"), data["returning"], kind="int"),
+            kpi(_("Opted in"), data["opted_in"], kind="int"),
+        ]
+        tables = [
+            Table(
+                "top",
+                _("Top guests by spend"),
+                [
+                    ("name", _("Guest")),
+                    ("phone", _("Phone")),
+                    ("visits", _("Visits")),
+                    ("total_spend", _("Spend")),
+                    ("avg_ticket", _("Avg ticket")),
+                    ("last_visit_at", _("Last visit")),
+                ],
+                data["top"],
+            ),
+            Table(
+                "campaigns",
+                _("Campaigns"),
+                [
+                    ("name", _("Campaign")),
+                    ("channel", _("Channel")),
+                    ("audience_count", _("Audience")),
+                    ("sent_count", _("Sent")),
+                    ("failed_count", _("Failed")),
+                    ("skipped_count", _("Skipped")),
+                    ("status", _("Status")),
+                ],
+                data["campaigns"],
+            ),
+        ]
+        return {"kpis": kpis, "charts": [], "tables": tables}
+
+
 class HoursReportAdmin(ReportAdminBase):
     module_code = "timekeeping"
     report_key = "hours"
@@ -703,6 +755,7 @@ class ReviewsReportAdmin(ReportAdminBase):
 
 
 ADMINS = {
+    "crm": CrmReportAdmin,
     "hours": HoursReportAdmin,
     "sales": SalesReportAdmin,
     "menu": MenuReportAdmin,

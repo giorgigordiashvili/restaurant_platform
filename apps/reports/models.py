@@ -4,6 +4,7 @@ own sidebar entry, URL and permission row in the tenant admin; no report
 ever reads through them (the queries live in apps.reports.queries).
 """
 
+from apps.crm.models import Customer
 from apps.inventory.models import StockMovement
 from apps.orders.models import Order, OrderItem
 from apps.payments.models import CashShift
@@ -74,3 +75,11 @@ class HoursReport(TimeEntry):
         app_label = "reports"
         verbose_name = "Hours"
         verbose_name_plural = "Hours"
+
+
+class CrmReport(Customer):
+    class Meta:
+        proxy = True
+        app_label = "reports"
+        verbose_name = "Guests"
+        verbose_name_plural = "Guests"
