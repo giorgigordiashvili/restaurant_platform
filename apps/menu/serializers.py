@@ -49,6 +49,18 @@ class ModifierGroupSerializer(TranslatableModelSerializer):
         read_only_fields = ["id"]
 
 
+class ModifierGroupDashboardSerializer(ModifierGroupSerializer):
+    """
+    Dashboard view of a modifier group: adds the staff-only ``internal_name``.
+
+    Kept separate from ``ModifierGroupSerializer`` because that one is nested in
+    the public menu item payload and must never leak the internal label.
+    """
+
+    class Meta(ModifierGroupSerializer.Meta):
+        fields = ModifierGroupSerializer.Meta.fields + ["internal_name"]
+
+
 class ModifierGroupListSerializer(TranslatableModelSerializer):
     """Minimal serializer for modifier groups list."""
 
@@ -394,6 +406,7 @@ class ModifierGroupCreateSerializer(TranslatableModelSerializer):
         model = ModifierGroup
         fields = [
             "translations",
+            "internal_name",
             "selection_type",
             "min_selections",
             "max_selections",

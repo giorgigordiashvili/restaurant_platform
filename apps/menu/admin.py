@@ -110,6 +110,7 @@ class ModifierGroupAdmin(TenantAwareTranslatableAdmin):
     tenant_field = "restaurant"
 
     list_display = [
+        "internal_name",
         "name",
         "restaurant",
         "selection_type",
@@ -119,10 +120,22 @@ class ModifierGroupAdmin(TenantAwareTranslatableAdmin):
         "is_active",
     ]
     list_filter = ["selection_type", "is_required", "is_active"]
-    search_fields = ["translations__name", "restaurant__name"]
+    search_fields = ["internal_name", "translations__name", "restaurant__name"]
     ordering = ["restaurant", "display_order"]
     inlines = [ModifierInline]
     actions = ["export_as_csv", "export_as_json", make_active, make_inactive]
+    fields = (
+        "internal_name",
+        "name",
+        "description",
+        "restaurant",
+        "selection_type",
+        "is_required",
+        "min_selections",
+        "max_selections",
+        "display_order",
+        "is_active",
+    )
 
 
 @admin.register(Modifier)

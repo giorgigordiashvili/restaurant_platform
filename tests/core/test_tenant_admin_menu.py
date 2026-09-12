@@ -442,3 +442,55 @@ class TestLanguageFallbacks:
 def test_platform_admin_forms_have_their_translated_name_field(admin_client, url):
     html = admin_client.get(url).content.decode()
     assert 'name="name"' in html, url
+
+
+# ---------------------------------------------------------------------------
+# Modifier groups: staff-only internal name, and the picker that uses it.
+# ---------------------------------------------------------------------------
+
+PICKER_URL = "/tenant-admin/autocomplete/?app_label=menu&model_name=menuitemmodifiergroup&field_name=modifier_group"
+
+
+@pytest.mark.django_db
+class TestModifierGroupInternalName:
+    def test_internal_name_is_saved_and_listed(self, manager_client, restaurant):
+        resp = manager_client.post(
+            "/tenant-admin/menu/modifiergroup/add/",
+            {
+                "internal_name": "ქათმის ხვეულა - ექსტრა",
+                "name": "ექსტრა",
+                "description": "",
+                "selection_type": "multiple",
+                "min_selections": "0",
+                "max_selections": "3",
+                "display_order": "0",
+                "is_active": "on",
+                **NO_INLINE_MODIFIERS,
+            },
+        )
+        assert resp.status_code == 302, resp.content[:800]
+
+        group = ModifierGroup.objects.get(restaurant=restaurant)
+        assert group.internal_name == "ქათმის ხვეულა - ექსტრა"
+        assert group.admin_label == "ქათმის ხვეულა - ექსტრა"
+        assert "ქათმის ხვეულა - ექსტრა" in manager_client.get("/tenant-admin/menu/modifiergroup/").content.decode()
+
+    def test_picker_shows_internal_name_customer_name_and_options(self, manager_client, restaurant, rival):
+        group, _ = _group_with_options(restaurant)  # ka name "ხინკალი", options პატარა / დიდი
+        group.internal_name = "ქათმის ხვეულა - ექსტრა"
+        group.save(update_fields=["internal_name"])
+        theirs, _ = _group_with_options(rival)
+        theirs.internal_name = "RIVAL ხვეულა"
+        theirs.save(update_fields=["internal_name"])
+
+        resp = manager_client.get(PICKER_URL + "&term=ხვეულა")
+        assert resp.status_code == 200, resp.content[:300]
+        texts = [r["text"] for r in resp.json()["results"]]
+
+        assert texts == ["ქათმის ხვეულა - ექსტრა · shows as: ხინკალი · options: პატარა, დიდი"]
+        assert not any("RIVAL" in t for t in texts)
+
+    def test_picker_falls_back_to_customer_name(self, manager_client, restaurant):
+        _group_with_options(restaurant, names=())
+        resp = manager_client.get(PICKER_URL + "&term=ხინკალი")
+        assert [r["text"] for r in resp.json()["results"]] == ["ხინკალი"]

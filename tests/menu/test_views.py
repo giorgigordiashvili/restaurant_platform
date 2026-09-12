@@ -278,3 +278,52 @@ class TestMenuTranslations:
         response = api_client.get(url, HTTP_ACCEPT_LANGUAGE="ru,en;q=0.9")
         assert response.status_code == status.HTTP_200_OK
         assert response.headers.get("Content-Language") == "ru"
+
+
+@pytest.mark.django_db
+class TestModifierGroupInternalName:
+    """The staff-only internal name reaches the dashboard, never the public menu."""
+
+    def test_public_item_response_never_exposes_internal_name(
+        self, api_client, restaurant, menu_item, modifier_group, create_modifier
+    ):
+        from apps.menu.models import MenuItemModifierGroup
+
+        modifier_group.internal_name = "Chicken roll - extras"
+        modifier_group.save(update_fields=["internal_name"])
+        MenuItemModifierGroup.objects.create(menu_item=menu_item, modifier_group=modifier_group)
+        create_modifier(group=modifier_group, name="Small")
+
+        response = api_client.get(f"/api/v1/restaurants/{restaurant.slug}/menu/items/{menu_item.id}/")
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["modifier_groups"], "fixture did not link the group"
+        for group in response.data["modifier_groups"]:
+            assert "internal_name" not in group
+        assert "Chicken roll - extras" not in response.content.decode()
+
+    def test_dashboard_list_detail_and_create_carry_internal_name(
+        self, authenticated_owner_client, restaurant, modifier_group
+    ):
+        client = authenticated_owner_client
+        client.defaults["HTTP_X_RESTAURANT"] = restaurant.slug
+        modifier_group.internal_name = "Chicken roll - extras"
+        modifier_group.save(update_fields=["internal_name"])
+
+        listed = client.get("/api/v1/dashboard/menu/modifier-groups/")
+        assert listed.status_code == status.HTTP_200_OK
+        assert listed.data["results"][0]["internal_name"] == "Chicken roll - extras"
+
+        detail = client.get(f"/api/v1/dashboard/menu/modifier-groups/{modifier_group.id}/")
+        assert detail.data["internal_name"] == "Chicken roll - extras"
+
+        created = client.post(
+            "/api/v1/dashboard/menu/modifier-groups/",
+            {
+                "translations": {"en": {"name": "Extras"}},
+                "internal_name": "Khinkali - extras",
+                "selection_type": "multiple",
+            },
+            format="json",
+        )
+        assert created.status_code == status.HTTP_201_CREATED, created.data
+        assert created.data["internal_name"] == "Khinkali - extras"

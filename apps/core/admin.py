@@ -63,6 +63,16 @@ import types
 admin.site.index = types.MethodType(_custom_admin_index, admin.site)
 
 
+def _picker_autocomplete_view(self, request):
+    """Richer autocomplete text (modifier groups show their internal name)."""
+    from apps.menu.admin_autocomplete import PickerAutocompleteJsonView
+
+    return PickerAutocompleteJsonView.as_view(admin_site=self)(request)
+
+
+admin.site.autocomplete_view = types.MethodType(_picker_autocomplete_view, admin.site)
+
+
 class SuperadminOnlyMixin:
     """
     Restricts admin access to superusers only.

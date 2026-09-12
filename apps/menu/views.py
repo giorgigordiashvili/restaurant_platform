@@ -23,7 +23,7 @@ from .serializers import (
     MenuItemSerializer,
     MenuItemUpdateSerializer,
     ModifierGroupCreateSerializer,
-    ModifierGroupSerializer,
+    ModifierGroupDashboardSerializer,
 )
 
 # ============== Public Views ==============
@@ -299,7 +299,7 @@ class ModifierGroupListCreateView(generics.ListCreateAPIView):
     def get_serializer_class(self):
         if self.request.method == "POST":
             return ModifierGroupCreateSerializer
-        return ModifierGroupSerializer
+        return ModifierGroupDashboardSerializer
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -323,7 +323,7 @@ class ModifierGroupListCreateView(generics.ListCreateAPIView):
 class ModifierGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Get, update, or delete a modifier group."""
 
-    serializer_class = ModifierGroupSerializer
+    serializer_class = ModifierGroupDashboardSerializer
     permission_classes = [IsAuthenticated, IsTenantManager]
     required_permission = ("menu", "update")
     lookup_field = "id"

@@ -225,6 +225,15 @@ class ModifierGroup(TranslatableModel, TimeStampedModel):
     )
     display_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    # Staff-only. A restaurant easily ends up with five groups all called
+    # "ექსტრა"; this is how staff tell them apart in pickers and lists, while
+    # customers keep seeing the translated ``name``.
+    internal_name = models.CharField(
+        max_length=150,
+        blank=True,
+        default="",
+        help_text="Only staff see this. Use it to tell similar groups apart, e.g. 'ქათმის ხვეულა - ექსტრა'.",
+    )
 
     class Meta:
         db_table = "modifier_groups"
@@ -234,6 +243,13 @@ class ModifierGroup(TranslatableModel, TimeStampedModel):
 
     def __str__(self):
         return self.safe_translation_getter("name", default=f"Modifier Group {self.pk}")
+
+    @property
+    def admin_label(self):
+        """What staff see: the internal name when set, otherwise the customer-facing name."""
+        return (
+            self.internal_name or self.safe_translation_getter("name", any_language=True) or f"Modifier Group {self.pk}"
+        )
 
 
 class Modifier(TranslatableModel, TimeStampedModel):

@@ -383,6 +383,7 @@ class ModifierGroupTenantAdmin(TenantTranslatableAdmin):
 
     permission_resource = "menu"
     list_display = [
+        "internal_name",
         "name",
         "all_languages_column",
         "selection_type",
@@ -393,7 +394,7 @@ class ModifierGroupTenantAdmin(TenantTranslatableAdmin):
         "modifiers_count",
     ]
     list_filter = ["selection_type", "is_required", "is_active"]
-    search_fields = ["translations__name"]
+    search_fields = ["internal_name", "translations__name"]
     ordering = ["display_order"]
     inlines = [ModifierInline]
 
@@ -402,7 +403,16 @@ class ModifierGroupTenantAdmin(TenantTranslatableAdmin):
     # produces a form with no name at all (the language tabs only switch which
     # translation those fields edit).
     fieldsets = (
-        (None, {"fields": ("name", "description")}),
+        (
+            None,
+            {
+                "fields": ("internal_name", "name", "description"),
+                "description": (
+                    "Internal name is only for staff -- use it to tell similar groups apart "
+                    "(e.g. 'ქათმის ხვეულა - ექსტრა'). Name is what customers see."
+                ),
+            },
+        ),
         (
             "Selection Rules",
             {

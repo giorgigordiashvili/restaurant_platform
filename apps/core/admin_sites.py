@@ -7,6 +7,8 @@ Restaurant staff access their admin at {restaurant-slug}.admin.aimenu.ge/admin/
 
 from unfold.sites import UnfoldAdminSite
 
+from apps.menu.admin_autocomplete import PickerAutocompleteJsonView
+
 
 class TenantAdminSite(UnfoldAdminSite):
     """
@@ -56,6 +58,10 @@ class TenantAdminSite(UnfoldAdminSite):
         "loyaltycounter": "menu",
         "loyaltyredemption": "menu",
     }
+
+    def autocomplete_view(self, request):
+        # Richer picker text (e.g. modifier groups show their internal name).
+        return PickerAutocompleteJsonView.as_view(admin_site=self)(request)
 
     def has_permission(self, request):
         """
