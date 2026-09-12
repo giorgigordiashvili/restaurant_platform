@@ -43,8 +43,10 @@ class FakeSession:
         self.calls = []
         self.queue = list(responses)
 
-    def request(self, method, url, json=None, headers=None, timeout=None, data=None):
-        self.calls.append({"method": method, "url": url, "json": json, "headers": headers, "data": data})
+    def request(self, method, url, json=None, headers=None, timeout=None, data=None, auth=None, **kwargs):
+        self.calls.append(
+            {"method": method, "url": url, "json": json, "headers": headers, "data": data, "auth": auth, **kwargs}
+        )
         status, body = self.queue.pop(0) if self.queue else (202, {"transactionId": "tx-auto"})
         return FakeResponse(status, body)
 

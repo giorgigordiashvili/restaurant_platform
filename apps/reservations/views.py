@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 
 from apps.core.middleware.tenant import get_current_restaurant, require_restaurant
 from apps.core.permissions import IsTenantStaff, ModuleRequired
+from apps.notifications import hooks as notification_hooks
 
 from .models import (
     Reservation,
@@ -197,6 +198,7 @@ class PublicReservationCreateView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         reservation = serializer.save()
+        notification_hooks.on_reservation_created(reservation)
         return Response(
             {
                 "success": True,
@@ -487,6 +489,7 @@ class DashboardReservationCreateView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         reservation = serializer.save()
+        notification_hooks.on_reservation_created(reservation)
         return Response(
             {
                 "success": True,

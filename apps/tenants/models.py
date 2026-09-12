@@ -334,6 +334,10 @@ class Restaurant(TimeStampedModel):
         default=True,
         help_text="Reviews module: customer reviews on the restaurant page.",
     )
+    notifications_enabled = models.BooleanField(
+        default=True,
+        help_text="Notifications module: staff push / in-app alerts, guest SMS and email.",
+    )
     delivery_enabled = models.BooleanField(
         default=False,
         help_text="Delivery platforms module: Glovo orders straight into the kitchen, menu push, sold-out sync.",

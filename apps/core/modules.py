@@ -199,6 +199,16 @@ MODULES: tuple[Module, ...] = (
         hooks=("apps.fiscal.hooks.on_module_toggled",),
     ),
     Module(
+        "notifications",
+        "Notifications",
+        "Staff push and in-app alerts (new orders, reservations, sold-out, printer failures, Z-reports); guest SMS / email for reservations.",
+        "notifications_active",
+        "notifications_enabled",
+        app_labels=("notifications",),
+        model_names=(("notifications", "notificationsettingspage"), ("notifications", "outboundmessage")),
+        hooks=("apps.notifications.hooks.on_module_toggled",),
+    ),
+    Module(
         "payments",
         "Online payments",
         "Card payments via Bank of Georgia and/or Flitt. Without them customers pay cash at the table.",

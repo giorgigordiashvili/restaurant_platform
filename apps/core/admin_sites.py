@@ -69,6 +69,9 @@ class TenantAdminSite(UnfoldAdminSite):
         "fiscalsettingspage": "fiscal",
         "fiscaldocument": "fiscal",
         "fiscalprofile": "fiscal",
+        # Notifications
+        "notificationsettingspage": "settings",
+        "outboundmessage": "settings",
         # Printing
         "printer": "settings",
         "printjob": "orders",

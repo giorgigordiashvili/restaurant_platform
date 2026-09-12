@@ -734,6 +734,9 @@ def open_alert(restaurant_id, kind, message, *, payload=None, **target) -> tuple
                 dedupe_key=key,
                 **fields,
             )
+        from apps.notifications import hooks as notification_hooks
+
+        notification_hooks.on_inventory_alert(alert)
         return alert, True
     except IntegrityError:
         return InventoryAlert.objects.get(restaurant_id=restaurant_id, dedupe_key=key, status="open"), False

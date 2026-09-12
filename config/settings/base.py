@@ -85,6 +85,7 @@ LOCAL_APPS = [
     "apps.printing",
     "apps.fiscal",
     "apps.delivery",
+    "apps.notifications",
 ]
 
 INSTALLED_APPS = UNFOLD_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -628,6 +629,17 @@ WOLT_BASE_URL_DEV = config("WOLT_BASE_URL_DEV", default="https://pos-integration
 WOLT_AUTH_URL_PROD = config(
     "WOLT_AUTH_URL_PROD", default="https://integrations-authentication-service.wolt.com/oauth2/token"
 )
+# Notifications: SMS provider (none | console | http | twilio) and Expo push.
+SMS_PROVIDER = config("SMS_PROVIDER", default="none")
+SMS_FROM = config("SMS_FROM", default="")
+SMS_HTTP_URL = config("SMS_HTTP_URL", default="")  # placeholders {to} {text} {from}
+SMS_HTTP_METHOD = config("SMS_HTTP_METHOD", default="GET")
+SMS_HTTP_HEADERS = config("SMS_HTTP_HEADERS", default="")  # JSON object
+SMS_HTTP_BODY = config("SMS_HTTP_BODY", default="")  # JSON template; empty = query-string GET
+TWILIO_ACCOUNT_SID = config("TWILIO_ACCOUNT_SID", default="")
+TWILIO_AUTH_TOKEN = config("TWILIO_AUTH_TOKEN", default="")
+TWILIO_FROM = config("TWILIO_FROM", default="")
+EXPO_ACCESS_TOKEN = config("EXPO_ACCESS_TOKEN", default="")
 # Embed URLs (YouTube / Vimeo "embed" links) for the onboarding videos shown in the tenant admin guide.
 DELIVERY_GUIDE_VIDEO_WOLT = config("DELIVERY_GUIDE_VIDEO_WOLT", default="")
 DELIVERY_GUIDE_VIDEO_GLOVO = config("DELIVERY_GUIDE_VIDEO_GLOVO", default="")

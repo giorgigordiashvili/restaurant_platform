@@ -17,6 +17,7 @@ from drf_spectacular.utils import extend_schema
 from apps.core.middleware.tenant import require_restaurant
 from apps.core.permissions import HasStaffPermission, IsTenantStaff, ModuleRequired, staff_can
 from apps.inventory import hooks as inventory_hooks
+from apps.notifications import hooks as notification_hooks
 from apps.tables.models import Table, TableSession
 
 from . import services
@@ -236,6 +237,7 @@ class OrderCreateView(APIView):
             _add_items(order, data["items"])
             order.calculate_totals()
             inventory_hooks.on_order_created(order)
+            notification_hooks.on_order_created(order, by=request.user)
 
             OrderStatusHistory.objects.create(
                 order=order,
@@ -883,6 +885,7 @@ class CustomerOrderCreateView(APIView):
             # Reserves ingredients; raises InsufficientStock (409) and rolls
             # the order back when the warehouse cannot cover it.
             inventory_hooks.on_order_created(order)
+            notification_hooks.on_order_created(order, by=request.user)
 
             OrderStatusHistory.objects.create(
                 order=order,

@@ -284,6 +284,9 @@ def close_shift(shift: CashShift, *, by, counted_cash, notes: str = "") -> CashS
         shift,
         {"counted": str(shift.counted_cash), "expected": str(shift.expected_cash), "difference": str(shift.difference)},
     )
+    from apps.notifications import hooks as notification_hooks
+
+    notification_hooks.on_shift_closed(shift, by=by)
     return shift
 
 

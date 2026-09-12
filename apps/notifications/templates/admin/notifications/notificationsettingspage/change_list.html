@@ -1,0 +1,53 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-3 py-1.5 text-sm w-full" %}
+<div class="mb-6 flex flex-col gap-4" data-testid="notification-settings">
+  <div class="grid gap-3 md:grid-cols-3">
+    <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Staff push" %}</p><p class="text-sm mt-1">{% translate "Staff get in-app and phone notifications from the POS app. Each person chooses what to hear about in POS → Settings." %}</p></div>
+    <div class="{{ base }} {% if not sms_ok %}border-amber-300{% endif %}"><p class="text-xs uppercase text-base-500">{% translate "Guest SMS" %}</p><p class="text-sm mt-1">{% if sms_ok %}{% translate "Provider" %}: {{ sms_provider }}{% else %}{% translate "No SMS provider is connected yet (SMS_PROVIDER). Messages are recorded as skipped." %}{% endif %}</p></div>
+    <div class="{{ base }} {% if not email_ok %}border-amber-300{% endif %}"><p class="text-xs uppercase text-base-500">{% translate "Guest email" %}</p><p class="text-sm mt-1">{% if email_ok %}{% translate "Email is configured." %}{% else %}{% translate "No outgoing email server is configured yet (EMAIL_HOST)." %}{% endif %}</p></div>
+  </div>
+
+  <form method="post" action="{{ save_url }}" class="{{ base }} grid gap-4 md:grid-cols-2">
+    {% csrf_token %}
+    <div class="md:col-span-2"><h3 class="font-semibold">{% translate "Guest messages" %}</h3><p class="text-xs text-base-500">{% translate "Confirmations and reminders for reservations; review prompts and campaigns once CRM is on. Placeholders: {name} {restaurant} {date} {time} {guests} {code} {link}" %}</p></div>
+    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="guest_sms" value="1" {% if cfg.guest_sms %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "Send SMS to guests" %}</label>
+    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="guest_email" value="1" {% if cfg.guest_email %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "Send email to guests" %}</label>
+    <label class="text-sm md:col-span-2">{% translate "Sender name" %}<input type="text" name="sender_name" value="{{ cfg.sender_name }}" class="{{ input }}" maxlength="60" placeholder="{{ request.restaurant.name }}" {% if not can_manage %}disabled{% endif %}></label>
+    {% for t in templates %}
+    <div class="md:col-span-2 border-t border-base-200 dark:border-base-800 pt-3"><h4 class="font-medium text-sm">{{ t.label }}</h4></div>
+    <label class="text-sm">ქართული<textarea name="{{ t.key }}_ka" rows="2" class="{{ input }}" {% if not can_manage %}disabled{% endif %}>{{ t.ka }}</textarea></label>
+    <label class="text-sm">English<textarea name="{{ t.key }}_en" rows="2" class="{{ input }}" {% if not can_manage %}disabled{% endif %}>{{ t.en }}</textarea></label>
+    {% endfor %}
+    {% if can_manage %}<div class="md:col-span-2"><button type="submit" class="{{ btn }}">{% translate "Save" %}</button></div>{% endif %}
+  </form>
+
+  {% if can_manage %}
+  <form method="post" action="{{ test_url }}" class="{{ base }} flex flex-wrap items-end gap-3" data-testid="test-message">
+    {% csrf_token %}
+    <label class="text-sm">{% translate "Channel" %}<select name="channel" class="{{ input }}"><option value="sms">SMS</option><option value="email">Email</option></select></label>
+    <label class="text-sm flex-1">{% translate "Send a test to" %}<input type="text" name="to" class="{{ input }}" placeholder="+995 5xx xxx xxx / name@example.com"></label>
+    <button type="submit" class="{{ btn2 }}">{% translate "Send test" %}</button>
+  </form>
+  {% endif %}
+
+  <div class="{{ base }}">
+    <h3 class="font-semibold">{% translate "Who hears what" %}</h3>
+    <p class="text-xs text-base-500 mb-2">{% translate "Defaults follow permissions (orders, reservations, warehouse, cash…). Devices = phones with the POS app signed in." %}</p>
+    <table class="w-full text-sm"><thead><tr class="text-left text-xs uppercase text-base-500"><th>{% translate "Person" %}</th><th>{% translate "Role" %}</th><th>{% translate "Push" %}</th><th>{% translate "Email" %}</th><th>{% translate "Muted events" %}</th><th>{% translate "Devices" %}</th></tr></thead>
+    <tbody>{% for p in people %}<tr class="border-t border-base-100 dark:border-base-800"><td class="py-1">{{ p.user.get_full_name|default:p.user.email }}</td><td>{{ p.role }}</td><td>{% if p.push %}✓{% else %}–{% endif %}</td><td>{% if p.email %}✓{% else %}–{% endif %}</td><td>{{ p.muted }}</td><td>{{ p.devices }}</td></tr>{% endfor %}</tbody></table>
+  </div>
+
+  <div class="{{ base }}">
+    <h3 class="font-semibold">{% translate "Events" %}</h3>
+    <div class="grid gap-3 md:grid-cols-2 mt-2 text-sm">{% for group, items in events %}<div><p class="text-xs uppercase text-base-500">{{ group }}</p><ul>{% for e in items %}<li><b>{{ e.title }}</b> <span class="text-base-500">— {{ e.description }}</span></li>{% endfor %}</ul></div>{% endfor %}</div>
+  </div>
+
+  <div class="{{ base }}">
+    <div class="flex items-center justify-between"><h3 class="font-semibold">{% translate "Recent guest messages" %}</h3><a href="{{ messages_url }}" class="text-sm underline">{% translate "All messages" %}</a></div>
+    {% if recent %}<ul class="text-xs mt-2">{% for m in recent %}<li>{{ m.created_at|date:"d.m H:i" }} · {{ m.channel }} · {{ m.to }} · {{ m.get_kind_display }} · <b>{{ m.get_status_display }}</b>{% if m.error %} · <span class="text-amber-600">{{ m.error }}</span>{% endif %}</li>{% endfor %}</ul>{% else %}<p class="text-sm text-base-500 mt-1">{% translate "Nothing sent yet." %}</p>{% endif %}
+  </div>
+</div>
+{% endwith %}
+{% endblock %}

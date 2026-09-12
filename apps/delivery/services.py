@@ -332,11 +332,15 @@ def _record_cancel_request(order) -> None:
     link = link_for(order.restaurant, order.source)
     if link is None:
         return
-    DeliveryPlatformEvent.objects.get_or_create(
+    _, created = DeliveryPlatformEvent.objects.get_or_create(
         link=link,
         event_id=f"{order.source}:{order.external_id}:cancel_requested",
         defaults={"kind": "cancel_requested", "order": order, "payload": {"reason": order.cancellation_reason}},
     )
+    if created:
+        from apps.notifications import hooks as notification_hooks
+
+        notification_hooks.on_delivery_cancel_requested(order)
 
 
 def _send_status(link, order, action: str, *, session=None) -> dict:

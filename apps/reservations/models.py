@@ -289,6 +289,9 @@ class Reservation(TimeStampedModel):
         self.confirmed_at = timezone.now()
         self.confirmed_by = confirmed_by
         self.save(update_fields=["status", "confirmed_at", "confirmed_by", "updated_at"])
+        from apps.notifications import hooks as notification_hooks
+
+        notification_hooks.on_reservation_confirmed(self)
 
     def cancel(self, cancelled_by=None, reason=""):
         """Cancel the reservation."""
@@ -305,6 +308,9 @@ class Reservation(TimeStampedModel):
                 "updated_at",
             ]
         )
+        from apps.notifications import hooks as notification_hooks
+
+        notification_hooks.on_reservation_cancelled(self, by=cancelled_by)
 
     def mark_seated(self):
         """Mark the customer as seated."""

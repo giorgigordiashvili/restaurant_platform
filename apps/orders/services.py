@@ -84,6 +84,10 @@ def transition_order(
         from apps.delivery import hooks as delivery_hooks
 
         delivery_hooks.on_order_status_changed(order, old_status, new_status, by=by)
+        if new_status == "cancelled":
+            from apps.notifications import hooks as notification_hooks
+
+            notification_hooks.on_order_cancelled(order, by=by)
     return order
 
 

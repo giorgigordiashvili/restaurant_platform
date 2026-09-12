@@ -35,6 +35,10 @@ def review_saved(sender, instance, created, **kwargs):
     # recompute on every save. The query is indexed on (restaurant, is_hidden).
     restaurant_id = instance.restaurant_id
     transaction.on_commit(lambda: _recompute_for_restaurant(restaurant_id))
+    if created:
+        from apps.notifications import hooks as notification_hooks
+
+        transaction.on_commit(lambda: notification_hooks.on_review_created(instance))
 
 
 @receiver(post_delete, sender=Review)

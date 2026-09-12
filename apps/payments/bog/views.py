@@ -35,6 +35,7 @@ from drf_spectacular.utils import extend_schema
 
 from apps.inventory import hooks as inventory_hooks
 from apps.menu.models import MenuItem
+from apps.notifications import hooks as notification_hooks
 from apps.orders.models import Order, OrderItem, OrderItemModifier, OrderStatusHistory
 from apps.orders.services import transition_order
 from apps.reservations.models import Reservation
@@ -334,6 +335,7 @@ class InitiatePaymentView(APIView):
         order.calculate_totals()
         # Hold the ingredients now (InsufficientStock -> 409, order rolls back).
         inventory_hooks.on_order_created(order)
+        notification_hooks.on_order_created(order)
 
         # Apply a platform-loyalty tier discount when the customer is
         # authenticated, carries a tier with non-zero discount, and the

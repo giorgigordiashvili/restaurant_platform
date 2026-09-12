@@ -179,6 +179,10 @@ def mark_failed(job, error: str = "") -> PrintJob:
     job.claimed_at = None
     job.save(update_fields=["status", "error", "claimed_at", "updated_at"])
     Printer.objects.filter(pk=job.printer_id).update(last_error=job.error, last_seen_at=timezone.now())
+    if job.status == "failed":
+        from apps.notifications import hooks as notification_hooks
+
+        notification_hooks.on_print_failed(job)
     return job
 
 

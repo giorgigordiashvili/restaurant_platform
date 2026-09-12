@@ -115,6 +115,7 @@ urlpatterns = [
     path("api/v1/dashboard/printing/", include("apps.printing.urls_dashboard")),
     path("api/v1/dashboard/fiscal/", include("apps.fiscal.urls_dashboard")),
     path("api/v1/dashboard/delivery/", include("apps.delivery.urls_dashboard")),
+    path("api/v1/dashboard/notifications/", include("apps.notifications.urls_dashboard")),
     path("api/v1/delivery/", include("apps.delivery.urls")),
     path("api/v1/print-bridge/", include("apps.printing.urls_bridge")),
     # Admin API (platform-wide, staff only)
