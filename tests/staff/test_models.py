@@ -43,10 +43,11 @@ class TestStaffRoleModel:
     def test_create_default_roles(self, restaurant):
         """Test creating default roles for a restaurant."""
         roles = StaffRole.create_default_roles(restaurant)
-        assert len(roles) == 5
+        assert len(roles) == 6
         role_names = [r.name for r in roles]
         assert "owner" in role_names
         assert "manager" in role_names
+        assert "warehouse_manager" in role_names
         assert "kitchen" in role_names
         assert "bar" in role_names
         assert "waiter" in role_names

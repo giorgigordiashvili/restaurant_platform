@@ -4,7 +4,7 @@ Serializers for orders app.
 
 from rest_framework import serializers
 
-from apps.menu.models import MenuItem, Modifier
+from apps.menu.models import SELLABLE, MenuItem, Modifier
 
 from .models import Order, OrderItem, OrderItemModifier, OrderStatusHistory
 
@@ -60,11 +60,7 @@ class OrderItemCreateSerializer(serializers.Serializer):
     def validate_menu_item_id(self, value):
         restaurant = self.context.get("restaurant")
         try:
-            item = MenuItem.objects.get(
-                id=value,
-                restaurant=restaurant,
-                is_available=True,
-            )
+            item = MenuItem.objects.filter(SELLABLE).get(id=value, restaurant=restaurant)
             return item
         except MenuItem.DoesNotExist:
             raise serializers.ValidationError("Menu item not found or unavailable.")
@@ -74,9 +70,7 @@ class OrderItemCreateSerializer(serializers.Serializer):
             return []
         # Scoped to the restaurant: a combined venue menu makes other tenants'
         # modifier ids visible to honest clients, never mind hostile ones.
-        modifiers = Modifier.objects.filter(
-            id__in=value, is_available=True, group__restaurant=self.context.get("restaurant")
-        )
+        modifiers = Modifier.objects.filter(SELLABLE, id__in=value, group__restaurant=self.context.get("restaurant"))
         if len(modifiers) != len(value):
             raise serializers.ValidationError("One or more modifiers not found or unavailable.")
         return list(modifiers)

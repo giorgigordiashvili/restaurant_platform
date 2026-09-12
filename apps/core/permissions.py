@@ -111,12 +111,17 @@ class HasStaffPermission(BasePermission):
 
         resource, action = required
 
-        try:
-            staff = request.user.staff_memberships.get(restaurant=restaurant, is_active=True)
-            permissions = staff.role.permissions.get(resource, [])
-            return action in permissions
-        except Exception:
-            return False
+        return _member_can(request.user, restaurant, resource, action)
+
+
+def _member_can(user, restaurant, resource, action):
+    """Effective (role + per-member override) permission check for an active staff member."""
+    try:
+        staff = user.staff_memberships.get(restaurant=restaurant, is_active=True)
+    except Exception:
+        return False
+    allowed = staff.get_effective_permissions().get(resource, [])
+    return action in allowed or "*" in allowed
 
 
 class IsRestaurantActive(BasePermission):
@@ -153,8 +158,4 @@ def staff_can(request, resource, action):
         return False
     if restaurant.owner_id == user.pk:
         return True
-    try:
-        staff = user.staff_memberships.get(restaurant=restaurant, is_active=True)
-        return action in staff.role.permissions.get(resource, [])
-    except Exception:
-        return False
+    return _member_can(user, restaurant, resource, action)

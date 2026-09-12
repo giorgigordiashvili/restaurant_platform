@@ -29,6 +29,12 @@ class AuditLog(TimeStampedModel):
         ("payment_collect", "Payment Collected"),
         ("settings_update", "Settings Updated"),
         ("data_export", "Data Exported"),
+        ("stock_receive", "Stock Received"),
+        ("stock_adjust", "Stock Adjusted"),
+        ("stock_waste", "Stock Written Off"),
+        ("employee_meal", "Employee Meal Recorded"),
+        ("recipe_update", "Recipe Updated"),
+        ("warehouse_toggle", "Warehouse Toggled"),
     ]
 
     # Actor

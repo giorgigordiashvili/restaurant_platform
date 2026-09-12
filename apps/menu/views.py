@@ -14,7 +14,7 @@ from apps.core.middleware.tenant import require_restaurant
 from apps.core.permissions import IsTenantManager
 from apps.tenants.models import Restaurant
 
-from .models import MenuCategory, MenuItem, ModifierGroup
+from .models import SELLABLE, MenuCategory, MenuItem, ModifierGroup
 from .serializers import (
     CategoryReorderSerializer,
     FullMenuSerializer,
@@ -67,9 +67,9 @@ class PublicMenuItemDetailView(generics.RetrieveAPIView):
     def get_queryset(self):
         slug = self.kwargs.get("slug")
         return MenuItem.objects.filter(
+            SELLABLE,
             restaurant__slug=slug,
             restaurant__is_active=True,
-            is_available=True,
         ).select_related("category", "restaurant")
 
 
@@ -100,9 +100,9 @@ class PublicMenuItemListView(generics.ListAPIView):
         slug = self.kwargs.get("slug")
         queryset = (
             MenuItem.objects.filter(
+                SELLABLE,
                 restaurant__slug=slug,
                 restaurant__is_active=True,
-                is_available=True,
             )
             .select_related("category")
             .prefetch_related("modifier_groups_link__modifier_group__modifiers")

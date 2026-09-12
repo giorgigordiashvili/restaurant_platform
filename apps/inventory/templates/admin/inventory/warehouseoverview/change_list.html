@@ -1,0 +1,144 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% comment %}
+Warehouse overview for restaurant staff. Every button posts to the views on
+WarehouseOverviewTenantAdmin, which call apps.inventory.services. The stock
+changelist underneath is the alert history.
+{% endcomment %}
+
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4 mb-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-3 py-1.5 text-sm" %}
+
+<div class="mb-6" data-testid="warehouse-overview">
+
+  {# ------------------------------------------------ stats #}
+  <div class="grid gap-3 md:grid-cols-5 mb-4">
+    <a href="{% url 'tenant_admin:inventory_stockitem_changelist' %}" class="{{ base }} mb-0"><p class="text-xs uppercase text-base-500">{% translate "Stock items" %}</p><p class="text-2xl font-semibold">{{ counts.items }}</p></a>
+    <div class="{{ base }} mb-0 {% if counts.out %}border-red-300{% endif %}"><p class="text-xs uppercase text-base-500">{% translate "Out of stock" %}</p><p class="text-2xl font-semibold {% if counts.out %}text-red-600{% endif %}">{{ counts.out }}</p></div>
+    <div class="{{ base }} mb-0 {% if counts.low %}border-amber-300{% endif %}"><p class="text-xs uppercase text-base-500">{% translate "Low stock" %}</p><p class="text-2xl font-semibold {% if counts.low %}text-amber-600{% endif %}">{{ counts.low }}</p></div>
+    <div class="{{ base }} mb-0"><p class="text-xs uppercase text-base-500">{% translate "Expiring soon" %}</p><p class="text-2xl font-semibold">{{ counts.expiring }}</p></div>
+    <div class="{{ base }} mb-0"><p class="text-xs uppercase text-base-500">{% translate "Dishes sold out" %}</p><p class="text-2xl font-semibold">{{ counts.auto_disabled }}</p></div>
+  </div>
+
+  {# ------------------------------------------------ quick actions #}
+  <div class="flex flex-wrap gap-2 mb-4" data-testid="quick-actions">
+    {% if can_receive %}<a href="{% url 'tenant_admin:inventory_stocklot_add' %}" class="{{ btn }}">{% translate "Receive stock" %}</a>{% endif %}
+    {% if can_log %}<a href="{% url 'tenant_admin:inventory_wasteentry_add' %}" class="{{ btn2 }}">{% translate "Record waste / mistake" %}</a>
+    <a href="{% url 'tenant_admin:inventory_employeemeal_add' %}" class="{{ btn2 }}">{% translate "Employee meal" %}</a>{% endif %}
+    {% if can_manage %}<a href="{% url 'tenant_admin:inventory_stockadjustment_add' %}" class="{{ btn2 }}">{% translate "Stock count" %}</a>
+    <form method="post" action="{% url 'tenant_admin:inventory_warehouseoverview_recompute' %}" class="inline">{% csrf_token %}<button type="submit" class="{{ btn2 }}">{% translate "Re-check availability" %}</button></form>{% endif %}
+  </div>
+
+  <div class="grid gap-4 lg:grid-cols-2">
+
+    {# ------------------------------------------------ alerts #}
+    <div class="{{ base }}" data-testid="alerts">
+      <h3 class="text-sm font-semibold uppercase text-base-500 mb-2">{% translate "Alerts" %} ({{ counts.alerts }})</h3>
+      {% for alert in open_alerts %}
+        <div class="border-t border-base-200 dark:border-base-800 py-3 first:border-t-0" data-testid="alert-{{ alert.kind }}">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <span class="text-xs uppercase px-1.5 py-0.5 rounded {% if alert.kind == 'out_of_stock' or alert.kind == 'negative_stock' or alert.kind == 'expired' %}bg-red-100 text-red-700{% elif alert.kind == 'back_in_stock' %}bg-green-100 text-green-700{% else %}bg-amber-100 text-amber-700{% endif %}">{{ alert.get_kind_display }}</span>
+              <span class="text-xs text-base-500 ml-1">{{ alert.created_at|date:"Y-m-d H:i" }}</span>
+              <p class="mt-1">{{ alert.message }}</p>
+            </div>
+            {% if can_manage %}
+            <form method="post" action="{% url 'tenant_admin:inventory_warehouseoverview_alert_done' alert.pk %}">{% csrf_token %}<button type="submit" class="text-xs text-base-500 hover:underline">{% translate "Done" %}</button></form>
+            {% endif %}
+          </div>
+          {% if alert.platform_tasks.all %}
+          <ul class="mt-2 flex flex-wrap gap-3">
+            {% for task in alert.platform_tasks.all %}
+              <li>
+                <form method="post" action="{% url 'tenant_admin:inventory_warehouseoverview_task_toggle' task.pk %}" class="inline">{% csrf_token %}
+                  <button type="submit" class="inline-flex items-center gap-1 text-sm {% if task.is_done %}text-green-700{% endif %}" {% if not can_log %}disabled{% endif %} title="{% if task.done_by %}{{ task.done_by.email }} · {{ task.done_at|date:'H:i' }}{% endif %}">
+                    <span class="inline-block w-4 h-4 border rounded {% if task.is_done %}bg-green-600 border-green-600{% else %}border-base-400{% endif %}"></span>
+                    {{ task.get_action_display }} {% translate "on" %} {{ task.platform }}
+                  </button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+      {% empty %}
+        <p class="text-sm text-base-500">{% translate "All clear -- no open alerts." %}</p>
+      {% endfor %}
+      {% if not platforms %}<p class="mt-3 text-xs text-base-500">{% translate "Tip: add Glovo / Wolt / Bolt Food under Settings to get a checklist whenever a dish sells out." %}</p>{% endif %}
+    </div>
+
+    {# ------------------------------------------------ buy list #}
+    <div class="{{ base }}" data-testid="buy-list">
+      <div class="flex items-center justify-between gap-2 mb-2">
+        <h3 class="text-sm font-semibold uppercase text-base-500">{% translate "What to buy for" %} {{ for_date }}</h3>
+        <form method="get" class="flex items-center gap-2"><input type="date" name="for_date" value="{{ for_date|date:'Y-m-d' }}" class="{{ input }}"><button type="submit" class="{{ btn2 }}">{% translate "Show" %}</button></form>
+      </div>
+      <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="text-left text-base-500"><th class="py-1 pr-3">{% translate "Item" %}</th><th class="py-1 pr-3">{% translate "Available" %}</th><th class="py-1 pr-3">{% translate "Buy" %}</th><th class="py-1 pr-3">{% translate "Est. cost" %}</th><th class="py-1 pr-3">{% translate "Why" %}</th></tr></thead>
+        <tbody>
+        {% for line in buy_lines %}
+          <tr class="border-t border-base-200 dark:border-base-800">
+            <td class="py-1 pr-3 font-medium">{{ line.stock_item.name }}{% if line.stock_item.supplier_name %}<span class="block text-xs text-base-500">{{ line.stock_item.supplier_name }}</span>{% endif %}</td>
+            <td class="py-1 pr-3">{{ line.available|floatformat:"-2" }} {{ line.stock_item.base_unit.code }}</td>
+            <td class="py-1 pr-3 font-semibold">{{ line.suggested_purchase|floatformat:"-2" }} {{ line.purchase_unit.code }}{% if line.packs %} <span class="text-xs text-base-500">({{ line.packs }} × {{ line.stock_item.purchase_pack_qty|floatformat:"-2" }})</span>{% endif %}</td>
+            <td class="py-1 pr-3">{{ line.estimated_cost }}</td>
+            <td class="py-1 pr-3 text-xs text-base-500">{{ line.reasons|join:", " }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="py-2 text-base-500">{% translate "Everything is at par -- nothing to buy." %}</td></tr>
+        {% endfor %}
+        </tbody>
+        {% if buy_lines %}<tfoot><tr class="border-t border-base-200 dark:border-base-800"><td colspan="3" class="py-1 pr-3 text-right text-base-500">{% translate "Estimated total" %}</td><td class="py-1 pr-3 font-semibold">{{ buy_total }} {{ currency }}</td><td></td></tr></tfoot>{% endif %}
+      </table>
+      </div>
+    </div>
+
+    {# ------------------------------------------------ low stock #}
+    <div class="{{ base }}" data-testid="low-stock">
+      <h3 class="text-sm font-semibold uppercase text-base-500 mb-2">{% translate "Out of stock & low" %}</h3>
+      <table class="w-full text-sm">
+        <thead><tr class="text-left text-base-500"><th class="py-1 pr-3">{% translate "Item" %}</th><th class="py-1 pr-3">{% translate "Available" %}</th><th class="py-1 pr-3">{% translate "Min" %}</th><th class="py-1 pr-3">{% translate "Par" %}</th><th></th></tr></thead>
+        <tbody>
+        {% for item in low_items %}
+          <tr class="border-t border-base-200 dark:border-base-800">
+            <td class="py-1 pr-3"><a href="{% url 'tenant_admin:inventory_stockitem_change' item.pk %}" class="text-primary-600 hover:underline">{{ item.name }}</a></td>
+            <td class="py-1 pr-3 {% if item.level == 'out' %}text-red-600 font-semibold{% endif %}">{{ item.available_qty|floatformat:"-2" }} {{ item.base_unit.code }}</td>
+            <td class="py-1 pr-3">{{ item.min_level|floatformat:"-2" }}</td>
+            <td class="py-1 pr-3">{{ item.par_level|floatformat:"-2" }}</td>
+            <td class="py-1">{% if can_receive %}<a href="{% url 'tenant_admin:inventory_stocklot_add' %}?stock_item={{ item.pk }}" class="text-xs text-primary-600 hover:underline">{% translate "Receive" %}</a>{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="py-2 text-base-500">{% translate "Every item is above its minimum." %}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {# ------------------------------------------------ expiring #}
+    <div class="{{ base }}" data-testid="expiring">
+      <h3 class="text-sm font-semibold uppercase text-base-500 mb-2">{% translate "Expiring soon" %}</h3>
+      <table class="w-full text-sm">
+        <thead><tr class="text-left text-base-500"><th class="py-1 pr-3">{% translate "Item" %}</th><th class="py-1 pr-3">{% translate "Left" %}</th><th class="py-1 pr-3">{% translate "Expires" %}</th><th></th></tr></thead>
+        <tbody>
+        {% for lot in expiring_lots %}
+          <tr class="border-t border-base-200 dark:border-base-800">
+            <td class="py-1 pr-3">{{ lot.stock_item.name }}{% if lot.reference %}<span class="block text-xs text-base-500">{{ lot.reference }}</span>{% endif %}</td>
+            <td class="py-1 pr-3">{{ lot.remaining_qty|floatformat:"-2" }} {{ lot.stock_item.base_unit.code }}</td>
+            <td class="py-1 pr-3 {% if lot.days_to_expiry < 0 %}text-red-600{% elif lot.days_to_expiry == 0 %}text-amber-600{% endif %}">{{ lot.expiry_date }}{% if lot.days_to_expiry < 0 %} ({% translate "expired" %}){% elif lot.days_to_expiry == 0 %} ({% translate "today" %}){% else %} ({{ lot.days_to_expiry }} {% translate "d" %}){% endif %}</td>
+            <td class="py-1">{% if can_log %}<form method="post" action="{% url 'tenant_admin:inventory_warehouseoverview_lot_write_off' lot.pk %}" onsubmit="return confirm('{% translate "Write off what is left of this lot?" %}')">{% csrf_token %}<button type="submit" class="text-xs text-red-600 hover:underline">{% translate "Write off" %}</button></form>{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="py-2 text-base-500">{% translate "Nothing expiring within the warning window." %}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<h3 class="text-sm font-semibold uppercase text-base-500 mb-2">{% translate "Alert history" %}</h3>
+{{ block.super }}
+{% endwith %}
+{% endblock %}

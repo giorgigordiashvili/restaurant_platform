@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.menu.models import MenuItem
+from apps.menu.models import SELLABLE, MenuItem
 from apps.tenants.models import Restaurant
 
 from .models import FavoriteMenuItem, FavoriteRestaurant
@@ -191,8 +191,8 @@ class FavoriteMenuItemToggleView(APIView):
     def post(self, request, menu_item_id):
         try:
             menu_item = MenuItem.objects.select_related("restaurant").get(
+                SELLABLE,
                 id=menu_item_id,
-                is_available=True,
                 restaurant__is_active=True,
             )
         except MenuItem.DoesNotExist:

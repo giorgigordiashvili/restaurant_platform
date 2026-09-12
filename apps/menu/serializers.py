@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from parler_rest.serializers import TranslatableModelSerializer, TranslatedFieldsField
 
-from .models import MenuCategory, MenuItem, MenuItemModifierGroup, Modifier, ModifierGroup
+from .models import SELLABLE, MenuCategory, MenuItem, MenuItemModifierGroup, Modifier, ModifierGroup
 
 
 class ModifierSerializer(TranslatableModelSerializer):
@@ -349,7 +349,7 @@ class FullMenuSerializer(serializers.Serializer):
             .prefetch_related(
                 Prefetch(
                     "items",
-                    queryset=MenuItem.objects.filter(is_available=True)
+                    queryset=MenuItem.objects.filter(SELLABLE)
                     .prefetch_related("modifier_groups_link__modifier_group__modifiers")
                     .order_by("display_order"),
                 )
@@ -370,9 +370,9 @@ class FullMenuSerializer(serializers.Serializer):
     def get_uncategorized_items(self, obj):
         items = (
             MenuItem.objects.filter(
+                SELLABLE,
                 restaurant=self.restaurant,
                 category__isnull=True,
-                is_available=True,
             )
             .prefetch_related("modifier_groups_link__modifier_group__modifiers")
             .order_by("display_order")

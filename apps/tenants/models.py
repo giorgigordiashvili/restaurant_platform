@@ -309,6 +309,15 @@ class Restaurant(TimeStampedModel):
             "applied to their subtotal. Restaurant absorbs the discount."
         ),
     )
+    warehouse_enabled = models.BooleanField(
+        default=False,
+        help_text=(
+            "Warehouse management: track stock in lots, give dishes recipes, "
+            "reserve ingredients when customers order and hide dishes whose "
+            "ingredients have run out. Off by default; nothing changes for the "
+            "menu until it is on."
+        ),
+    )
 
     # Payment provider activation + payout identifiers. Each provider is
     # independently opt-in; when the flag is on, the corresponding payout

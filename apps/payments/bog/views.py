@@ -33,8 +33,10 @@ from rest_framework.views import APIView
 
 from drf_spectacular.utils import extend_schema
 
+from apps.inventory import hooks as inventory_hooks
 from apps.menu.models import MenuItem
 from apps.orders.models import Order, OrderItem, OrderItemModifier, OrderStatusHistory
+from apps.orders.services import transition_order
 from apps.reservations.models import Reservation
 from apps.reservations.serializers import ReservationDetailSerializer
 from apps.tables.models import Table
@@ -328,6 +330,8 @@ class InitiatePaymentView(APIView):
             order_item.recalculate_total()
 
         order.calculate_totals()
+        # Hold the ingredients now (InsufficientStock -> 409, order rolls back).
+        inventory_hooks.on_order_created(order)
 
         # Apply a platform-loyalty tier discount when the customer is
         # authenticated, carries a tier with non-zero discount, and the
@@ -613,6 +617,7 @@ class InitiatePaymentView(APIView):
                     )
                 order_item.recalculate_total()
             pre_order.calculate_totals()
+            inventory_hooks.on_order_created(pre_order)
             OrderStatusHistory.objects.create(
                 order=pre_order,
                 from_status="",
@@ -899,14 +904,18 @@ class BogWebhookView(APIView):
             logger.warning("BOG webhook missing body.order_id")
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            txn = BogTransaction.objects.select_for_update().get(bog_order_id=bog_order_id)
-        except BogTransaction.DoesNotExist:
-            logger.warning("BOG webhook for unknown bog_order_id=%s", bog_order_id)
-            # Still return 200 — BOG shouldn't retry for unknown orders.
-            return Response(status=status.HTTP_200_OK)
+        # select_for_update needs a transaction (it raised
+        # TransactionManagementError outside one); the whole fan-out runs in
+        # it so a retry never sees a half-applied receipt.
+        with transaction.atomic():
+            try:
+                txn = BogTransaction.objects.select_for_update().get(bog_order_id=bog_order_id)
+            except BogTransaction.DoesNotExist:
+                logger.warning("BOG webhook for unknown bog_order_id=%s", bog_order_id)
+                # Still return 200 — BOG shouldn't retry for unknown orders.
+                return Response(status=status.HTTP_200_OK)
 
-        _apply_receipt(txn, body, source="webhook")
+            _apply_receipt(txn, body, source="webhook")
         return Response(status=status.HTTP_200_OK)
 
 
@@ -1038,14 +1047,8 @@ def _apply_order_status(txn: BogTransaction) -> None:
     if order is None:
         return
     if txn.is_successful and order.status == "pending_payment":
-        order.status = "pending"  # Payment confirmed → enter the kitchen queue.
-        order.save(update_fields=["status", "updated_at"])
-        OrderStatusHistory.objects.create(
-            order=order,
-            from_status="pending_payment",
-            to_status="pending",
-            notes="Payment confirmed via BOG.",
-        )
+        # Payment confirmed → enter the kitchen queue.
+        transition_order(order, "pending", notes="Payment confirmed via BOG.")
         # Mirror the successful charge into a Payment row so the standard admin /
         # reporting surfaces work for BOG-paid orders (receipt numbers, refund
         # accounting, customer payment history). Idempotent: skip if we already
@@ -1084,12 +1087,11 @@ def _apply_order_status(txn: BogTransaction) -> None:
         except Exception:  # pragma: no cover
             logger.exception("Referral / wallet side-effects failed for order %s", order.id)
     elif txn.status == BogTransaction.STATUS_REJECTED and order.status == "pending_payment":
-        order.cancel(reason=f"BOG payment rejected ({txn.code or 'unknown'}): {txn.code_description}")
-        OrderStatusHistory.objects.create(
-            order=order,
-            from_status="pending_payment",
-            to_status="cancelled",
+        transition_order(
+            order,
+            "cancelled",
             notes=f"Payment rejected: {txn.reject_reason or txn.code_description}",
+            cancellation_reason=f"BOG payment rejected ({txn.code or 'unknown'}): {txn.code_description}",
         )
 
 

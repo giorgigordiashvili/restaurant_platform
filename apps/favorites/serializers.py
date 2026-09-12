@@ -4,7 +4,7 @@ Serializers for favorites app.
 
 from rest_framework import serializers
 
-from apps.menu.models import MenuItem
+from apps.menu.models import SELLABLE, MenuItem
 from apps.tenants.models import Restaurant
 
 from .models import FavoriteMenuItem, FavoriteRestaurant
@@ -166,7 +166,7 @@ class BulkFavoriteMenuItemSerializer(serializers.Serializer):
 
     def validate_menu_item_ids(self, value):
         """Validate all menu items exist and are available."""
-        items = MenuItem.objects.filter(id__in=value, is_available=True, restaurant__is_active=True)
+        items = MenuItem.objects.filter(SELLABLE, id__in=value, restaurant__is_active=True)
         if len(items) != len(value):
             raise serializers.ValidationError("Some menu items do not exist or are unavailable.")
         return value

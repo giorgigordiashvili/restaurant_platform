@@ -18,6 +18,7 @@ from typing import Any
 
 from django.conf import settings
 
+from apps.inventory import hooks as inventory_hooks
 from apps.menu.models import MenuItem
 from apps.orders.models import Order, OrderItem, OrderItemModifier, OrderStatusHistory
 from apps.reservations.models import Reservation
@@ -174,6 +175,8 @@ def create_pending_order(request, payload: dict[str, Any]) -> OrderInitiateResul
         order_item.recalculate_total()
 
     order.calculate_totals()
+    # Hold the ingredients now (InsufficientStock -> 409, order rolls back).
+    inventory_hooks.on_order_created(order)
 
     # Apply a platform-loyalty tier discount when the customer is
     # authenticated, carries a tier with non-zero discount, and the
@@ -314,6 +317,7 @@ def create_pending_reservation(request, payload: dict[str, Any]) -> ReservationI
                 )
             order_item.recalculate_total()
         pre_order.calculate_totals()
+        inventory_hooks.on_order_created(pre_order)
         # Wallet credit applies only to the pre-order portion, not the deposit.
         _apply_wallet_to_order(request, pre_order, wallet_amount_request)
         OrderStatusHistory.objects.create(

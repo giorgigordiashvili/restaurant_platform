@@ -39,7 +39,8 @@ from rest_framework.views import APIView
 
 from drf_spectacular.utils import extend_schema
 
-from apps.orders.models import Order, OrderStatusHistory
+from apps.orders.models import Order
+from apps.orders.services import transition_order
 from apps.payments.initiate_helpers import (
     OrderInitiateResult,
     ReservationInitiateResult,
@@ -428,14 +429,7 @@ def _apply_success_side_effects(txn: FlittTransaction) -> None:
     if txn.order_id and txn.order:
         order: Order = txn.order
         if order.status == "pending_payment":
-            order.status = "pending"
-            order.save(update_fields=["status", "updated_at"])
-            OrderStatusHistory.objects.create(
-                order=order,
-                from_status="pending_payment",
-                to_status="pending",
-                notes="Payment confirmed via Flitt.",
-            )
+            transition_order(order, "pending", notes="Payment confirmed via Flitt.")
         # Wallet + referral side-effects. Idempotent per (user, order, kind);
         # safe under Flitt's webhook retry policy.
         try:

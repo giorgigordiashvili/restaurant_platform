@@ -80,6 +80,7 @@ LOCAL_APPS = [
     "apps.reviews",
     "apps.referrals",
     "apps.venues",
+    "apps.inventory",
 ]
 
 INSTALLED_APPS = UNFOLD_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -312,6 +313,7 @@ SPECTACULAR_SETTINGS = {
         {"name": "Reservations", "description": "Table reservations"},
         {"name": "Payments", "description": "Payment processing"},
         {"name": "Venues", "description": "Shared venues: several restaurants serving the same tables"},
+        {"name": "Dashboard - Warehouse", "description": "Stock, recipes, waste and buy lists"},
         {"name": "Dashboard", "description": "Restaurant dashboard endpoints"},
     ],
 }

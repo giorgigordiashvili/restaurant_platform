@@ -202,6 +202,10 @@ def test_every_tenant_admin_page_renders(admin_user, client, restaurant):
     """
     from apps.core.admin_sites import tenant_admin_site
 
+    # Warehouse pages only exist once the feature is on; render those too.
+    restaurant.warehouse_enabled = True
+    restaurant.save(update_fields=["warehouse_enabled"])
+
     client.force_login(admin_user)
     client.defaults["HTTP_HOST"] = f"{restaurant.slug}.localhost"
 

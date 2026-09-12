@@ -4,11 +4,19 @@ Menu models with multi-language support via django-parler.
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from parler.models import TranslatableModel, TranslatedFields
 
 from apps.core.models import TimeStampedModel
+
+# What customers may see and order. ``is_available`` is the manual switch;
+# ``auto_disabled_by_stock`` is flipped only by the warehouse when a recipe
+# ingredient runs out (apps.inventory.services.recompute_availability). Both
+# MenuItem and Modifier carry the pair, so one filter serves every public
+# queryset and every order validator.
+SELLABLE = Q(is_available=True, auto_disabled_by_stock=False)
 
 
 class MenuCategory(TranslatableModel, TimeStampedModel):
@@ -52,7 +60,7 @@ class MenuCategory(TranslatableModel, TimeStampedModel):
     @property
     def items_count(self) -> int:
         """Return count of active items in this category."""
-        return self.items.filter(is_available=True).count()
+        return self.items.filter(SELLABLE).count()
 
 
 class MenuItem(TranslatableModel, TimeStampedModel):
@@ -112,6 +120,11 @@ class MenuItem(TranslatableModel, TimeStampedModel):
         help_text="BlurHash string for the image — used as an inline LQIP.",
     )
     is_available = models.BooleanField(default=True)
+    auto_disabled_by_stock = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="Set by the warehouse when a recipe ingredient has run out; cleared when it is restocked.",
+    )
     is_featured = models.BooleanField(
         default=False,
         help_text="Featured items appear prominently in the menu",
@@ -149,9 +162,10 @@ class MenuItem(TranslatableModel, TimeStampedModel):
         help_text="Spicy level 0-5 (0 = not spicy)",
     )
 
-    # Inventory (optional)
-    track_inventory = models.BooleanField(default=False)
-    stock_quantity = models.PositiveIntegerField(default=0)
+    # Deprecated per-item counters -- superseded by warehouse recipes
+    # (apps.inventory). Kept so nothing referencing them breaks.
+    track_inventory = models.BooleanField(default=False, help_text="Deprecated: see Warehouse recipes.")
+    stock_quantity = models.PositiveIntegerField(default=0, help_text="Deprecated: see Warehouse recipes.")
 
     class Meta:
         db_table = "menu_items"
@@ -272,6 +286,11 @@ class Modifier(TranslatableModel, TimeStampedModel):
         help_text="Price adjustment (can be positive or negative)",
     )
     is_available = models.BooleanField(default=True)
+    auto_disabled_by_stock = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="Set by the warehouse when a recipe ingredient has run out; cleared when it is restocked.",
+    )
     is_default = models.BooleanField(
         default=False,
         help_text="Pre-selected by default",

@@ -2,6 +2,7 @@
 Views for orders app.
 """
 
+from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
@@ -14,6 +15,7 @@ from drf_spectacular.utils import extend_schema
 
 from apps.core.middleware.tenant import require_restaurant
 from apps.core.permissions import IsTenantManager
+from apps.inventory import hooks as inventory_hooks
 from apps.tables.models import Table, TableSession
 
 from .models import Order, OrderItem, OrderItemModifier, OrderStatusHistory
@@ -27,6 +29,7 @@ from .serializers import (
     OrderStatusHistorySerializer,
     OrderStatusUpdateSerializer,
 )
+from .services import transition_order
 
 # ============== Dashboard Views ==============
 
@@ -103,6 +106,35 @@ class OrderDetailView(generics.RetrieveAPIView):
         )
 
 
+def _add_items(order, items_data):
+    """Create OrderItem rows (+ modifiers) from validated item payloads; returns them."""
+    created = []
+    for item_data in items_data:
+        menu_item = item_data["menu_item_id"]  # already validated as a MenuItem
+        quantity = item_data.get("quantity", 1)
+        order_item = OrderItem.objects.create(
+            order=order,
+            menu_item=menu_item,
+            item_name=menu_item.safe_translation_getter("name", default=f"Item {menu_item.pk}"),
+            item_description=menu_item.safe_translation_getter("description", default=""),
+            unit_price=menu_item.price,
+            quantity=quantity,
+            total_price=menu_item.price * quantity,
+            preparation_station=menu_item.preparation_station,
+            special_instructions=item_data.get("special_instructions", ""),
+        )
+        for modifier in item_data.get("modifier_ids", []):
+            OrderItemModifier.objects.create(
+                order_item=order_item,
+                modifier=modifier,
+                modifier_name=modifier.safe_translation_getter("name", default=f"Modifier {modifier.pk}"),
+                price_adjustment=modifier.price_adjustment,
+            )
+        order_item.recalculate_total()
+        created.append(order_item)
+    return created
+
+
 @extend_schema(tags=["Dashboard - Orders"])
 class OrderCreateView(APIView):
     """Create a new order."""
@@ -148,61 +180,34 @@ class OrderCreateView(APIView):
                     status=status.HTTP_404_NOT_FOUND,
                 )
 
-        # Create order
-        order = Order.objects.create(
-            restaurant=request.restaurant,
-            table=table,
-            table_session=session,
-            customer=request.user if request.user.is_authenticated else None,
-            order_type=data.get("order_type", "dine_in"),
-            customer_name=data.get("customer_name", ""),
-            customer_phone=data.get("customer_phone", ""),
-            customer_email=data.get("customer_email", ""),
-            customer_notes=data.get("customer_notes", ""),
-            delivery_address=data.get("delivery_address", ""),
-            tip_amount=data.get("tip_amount", 0),
-            handled_by=request.user,
-        )
-
-        # Add items
-        for item_data in data["items"]:
-            menu_item = item_data["menu_item_id"]  # Already validated as MenuItem
-
-            order_item = OrderItem.objects.create(
-                order=order,
-                menu_item=menu_item,
-                item_name=menu_item.safe_translation_getter("name", default=f"Item {menu_item.pk}"),
-                item_description=menu_item.safe_translation_getter("description", default=""),
-                unit_price=menu_item.price,
-                quantity=item_data.get("quantity", 1),
-                total_price=menu_item.price * item_data.get("quantity", 1),
-                preparation_station=menu_item.preparation_station,
-                special_instructions=item_data.get("special_instructions", ""),
+        # One transaction: a stock shortage (InsufficientStock -> 409) or any
+        # other failure part-way through must not leave a half-built order.
+        with transaction.atomic():
+            order = Order.objects.create(
+                restaurant=request.restaurant,
+                table=table,
+                table_session=session,
+                customer=request.user if request.user.is_authenticated else None,
+                order_type=data.get("order_type", "dine_in"),
+                customer_name=data.get("customer_name", ""),
+                customer_phone=data.get("customer_phone", ""),
+                customer_email=data.get("customer_email", ""),
+                customer_notes=data.get("customer_notes", ""),
+                delivery_address=data.get("delivery_address", ""),
+                tip_amount=data.get("tip_amount", 0),
+                handled_by=request.user,
             )
+            _add_items(order, data["items"])
+            order.calculate_totals()
+            inventory_hooks.on_order_created(order)
 
-            # Add modifiers
-            for modifier in item_data.get("modifier_ids", []):
-                OrderItemModifier.objects.create(
-                    order_item=order_item,
-                    modifier=modifier,
-                    modifier_name=modifier.safe_translation_getter("name", default=f"Modifier {modifier.pk}"),
-                    price_adjustment=modifier.price_adjustment,
-                )
-
-            # Recalculate item total with modifiers
-            order_item.recalculate_total()
-
-        # Calculate order totals
-        order.calculate_totals()
-
-        # Record status history
-        OrderStatusHistory.objects.create(
-            order=order,
-            from_status="",
-            to_status="pending",
-            changed_by=request.user,
-            notes="Order created",
-        )
+            OrderStatusHistory.objects.create(
+                order=order,
+                from_status="",
+                to_status="pending",
+                changed_by=request.user,
+                notes="Order created",
+            )
 
         return Response(
             {
@@ -235,26 +240,14 @@ class OrderStatusUpdateView(APIView):
 
         data = serializer.validated_data
         new_status = data["status"]
-        old_status = order.status
 
-        # Update status based on type
-        if new_status == "confirmed":
-            order.confirm(data.get("estimated_minutes"))
-        elif new_status == "cancelled":
-            order.cancel(data.get("cancellation_reason", ""))
-        elif new_status == "completed":
-            order.complete()
-        else:
-            order.status = new_status
-            order.save(update_fields=["status", "updated_at"])
-
-        # Record status history
-        OrderStatusHistory.objects.create(
-            order=order,
-            from_status=old_status,
-            to_status=new_status,
-            changed_by=request.user,
+        transition_order(
+            order,
+            new_status,
+            by=request.user,
             notes=data.get("notes", ""),
+            estimated_minutes=data.get("estimated_minutes"),
+            cancellation_reason=data.get("cancellation_reason", ""),
         )
 
         return Response(
@@ -295,32 +288,11 @@ class OrderAddItemView(APIView):
         serializer.is_valid(raise_exception=True)
 
         data = serializer.validated_data
-        menu_item = data["menu_item_id"]
 
-        order_item = OrderItem.objects.create(
-            order=order,
-            menu_item=menu_item,
-            item_name=menu_item.safe_translation_getter("name", default=f"Item {menu_item.pk}"),
-            item_description=menu_item.safe_translation_getter("description", default=""),
-            unit_price=menu_item.price,
-            quantity=data.get("quantity", 1),
-            total_price=menu_item.price * data.get("quantity", 1),
-            preparation_station=menu_item.preparation_station,
-            special_instructions=data.get("special_instructions", ""),
-        )
-
-        # Add modifiers
-        for modifier in data.get("modifier_ids", []):
-            OrderItemModifier.objects.create(
-                order_item=order_item,
-                modifier=modifier,
-                modifier_name=modifier.safe_translation_getter("name", default=f"Modifier {modifier.pk}"),
-                price_adjustment=modifier.price_adjustment,
-            )
-
-        # Recalculate
-        order_item.recalculate_total()
-        order.calculate_totals()
+        with transaction.atomic():
+            order_item = _add_items(order, [data])[0]
+            order.calculate_totals()
+            inventory_hooks.on_order_items_added(order, [order_item])
 
         return Response(
             {
@@ -358,8 +330,11 @@ class OrderItemStatusUpdateView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        was_cancelled = item.status == "cancelled"
         item.status = new_status
         item.save(update_fields=["status", "updated_at"])
+        if new_status == "cancelled" and not was_cancelled:
+            inventory_hooks.on_order_item_cancelled(item, by=request.user)
 
         return Response(
             {
@@ -622,56 +597,32 @@ class CustomerOrderCreateView(APIView):
                     status=status.HTTP_404_NOT_FOUND,
                 )
 
-        # Create order
-        order = Order.objects.create(
-            restaurant=restaurant,
-            table=table,
-            table_session=session,
-            customer=request.user if request.user.is_authenticated else None,
-            order_type=data.get("order_type", "dine_in"),
-            customer_name=data.get("customer_name", ""),
-            customer_phone=data.get("customer_phone", ""),
-            customer_email=data.get("customer_email", ""),
-            customer_notes=data.get("customer_notes", ""),
-            delivery_address=data.get("delivery_address", ""),
-            tip_amount=data.get("tip_amount", 0),
-        )
-
-        # Add items
-        for item_data in data["items"]:
-            menu_item = item_data["menu_item_id"]
-
-            order_item = OrderItem.objects.create(
-                order=order,
-                menu_item=menu_item,
-                item_name=menu_item.safe_translation_getter("name", default=f"Item {menu_item.pk}"),
-                item_description=menu_item.safe_translation_getter("description", default=""),
-                unit_price=menu_item.price,
-                quantity=item_data.get("quantity", 1),
-                total_price=menu_item.price * item_data.get("quantity", 1),
-                preparation_station=menu_item.preparation_station,
-                special_instructions=item_data.get("special_instructions", ""),
+        with transaction.atomic():
+            order = Order.objects.create(
+                restaurant=restaurant,
+                table=table,
+                table_session=session,
+                customer=request.user if request.user.is_authenticated else None,
+                order_type=data.get("order_type", "dine_in"),
+                customer_name=data.get("customer_name", ""),
+                customer_phone=data.get("customer_phone", ""),
+                customer_email=data.get("customer_email", ""),
+                customer_notes=data.get("customer_notes", ""),
+                delivery_address=data.get("delivery_address", ""),
+                tip_amount=data.get("tip_amount", 0),
             )
+            _add_items(order, data["items"])
+            order.calculate_totals()
+            # Reserves ingredients; raises InsufficientStock (409) and rolls
+            # the order back when the warehouse cannot cover it.
+            inventory_hooks.on_order_created(order)
 
-            # Add modifiers
-            for modifier in item_data.get("modifier_ids", []):
-                OrderItemModifier.objects.create(
-                    order_item=order_item,
-                    modifier=modifier,
-                    modifier_name=modifier.safe_translation_getter("name", default=f"Modifier {modifier.pk}"),
-                    price_adjustment=modifier.price_adjustment,
-                )
-
-            order_item.recalculate_total()
-
-        order.calculate_totals()
-
-        OrderStatusHistory.objects.create(
-            order=order,
-            from_status="",
-            to_status="pending",
-            notes="Order created by customer",
-        )
+            OrderStatusHistory.objects.create(
+                order=order,
+                from_status="",
+                to_status="pending",
+                notes="Order created by customer",
+            )
 
         return Response(
             {

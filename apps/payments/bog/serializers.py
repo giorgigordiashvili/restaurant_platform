@@ -11,7 +11,7 @@ from decimal import Decimal
 
 from rest_framework import serializers
 
-from apps.menu.models import MenuItem, Modifier
+from apps.menu.models import SELLABLE, MenuItem, Modifier
 
 ZERO = Decimal("0")
 
@@ -39,14 +39,14 @@ class BogOrderItemSerializer(serializers.Serializer):
 
     def validate_menu_item_id(self, value):
         try:
-            return MenuItem.objects.get(id=value, is_available=True)
+            return MenuItem.objects.filter(SELLABLE).get(id=value)
         except MenuItem.DoesNotExist as exc:
             raise serializers.ValidationError("Menu item not found or unavailable.") from exc
 
     def validate_modifier_ids(self, value):
         if not value:
             return []
-        modifiers = list(Modifier.objects.filter(id__in=value, is_available=True))
+        modifiers = list(Modifier.objects.filter(SELLABLE, id__in=value))
         if len(modifiers) != len(value):
             raise serializers.ValidationError("One or more modifiers not found or unavailable.")
         return modifiers

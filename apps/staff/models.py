@@ -18,6 +18,10 @@ class StaffRole(TimeStampedModel):
     """
 
     # Default role permissions
+    # Warehouse: "warehouse" is the catalogue side (stock items, lots and
+    # receiving, counts, recipes, alerts, platform settings); "warehouse_logs"
+    # is what any employee may record themselves (waste, employee meals,
+    # ticking a delivery-platform checklist).
     DEFAULT_PERMISSIONS = {
         "owner": {
             "menu": ["create", "read", "update", "delete"],
@@ -27,6 +31,8 @@ class StaffRole(TimeStampedModel):
             "settings": ["read", "update"],
             "analytics": ["read"],
             "reservations": ["create", "read", "update", "delete"],
+            "warehouse": ["create", "read", "update", "delete"],
+            "warehouse_logs": ["create", "read", "update", "delete"],
         },
         "manager": {
             "menu": ["create", "read", "update", "delete"],
@@ -36,26 +42,42 @@ class StaffRole(TimeStampedModel):
             "settings": ["read"],
             "analytics": ["read"],
             "reservations": ["create", "read", "update", "delete"],
+            "warehouse": ["create", "read", "update", "delete"],
+            "warehouse_logs": ["create", "read", "update", "delete"],
+        },
+        "warehouse_manager": {
+            "menu": ["read", "update"],
+            "orders": ["read"],
+            "warehouse": ["create", "read", "update", "delete"],
+            "warehouse_logs": ["create", "read", "update", "delete"],
         },
         "kitchen": {
             "menu": ["read"],
             "orders": ["read", "update"],
+            "warehouse": ["read"],
+            "warehouse_logs": ["create", "read", "update"],
         },
         "bar": {
             "menu": ["read"],
             "orders": ["read", "update"],
+            "warehouse": ["read"],
+            "warehouse_logs": ["create", "read", "update"],
         },
         "waiter": {
             "menu": ["read"],
             "orders": ["create", "read", "update"],
             "tables": ["read", "update"],
             "reservations": ["read"],
+            "warehouse_logs": ["create", "read", "update"],
         },
     }
+
+    SYSTEM_ROLES = ["owner", "manager", "warehouse_manager", "kitchen", "bar", "waiter"]
 
     ROLE_CHOICES = [
         ("owner", "Owner"),
         ("manager", "Manager"),
+        ("warehouse_manager", "Warehouse Manager"),
         ("kitchen", "Kitchen Staff"),
         ("bar", "Bar Staff"),
         ("waiter", "Waiter"),
@@ -111,7 +133,7 @@ class StaffRole(TimeStampedModel):
     def create_default_roles(cls, restaurant):
         """Create default roles for a new restaurant."""
         roles = []
-        for role_name in ["owner", "manager", "kitchen", "bar", "waiter"]:
+        for role_name in cls.SYSTEM_ROLES:
             role, created = cls.objects.get_or_create(
                 restaurant=restaurant,
                 name=role_name,

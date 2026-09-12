@@ -62,6 +62,17 @@ class TenantAdminSite(UnfoldAdminSite):
         "loyaltyprogram": "menu",
         "loyaltycounter": "menu",
         "loyaltyredemption": "menu",
+        # Warehouse (hidden entirely until Restaurant.warehouse_enabled).
+        "warehouseoverview": "warehouse",
+        "stockitem": "warehouse",
+        "stocklot": "warehouse",
+        "stockmovement": "warehouse",
+        "stockadjustment": "warehouse",
+        "inventoryalert": "warehouse",
+        "recipeline": "warehouse",
+        "wasteentry": "warehouse_logs",
+        "employeemeal": "warehouse_logs",
+        "restaurantdeliveryplatform": "settings",
     }
 
     def autocomplete_view(self, request):
@@ -98,6 +109,12 @@ class TenantAdminSite(UnfoldAdminSite):
         Only shows models that the user's role has 'read' permission for.
         """
         app_list = super().get_app_list(request, app_label)
+
+        # The warehouse is opt-in per restaurant: keep it out of the sidebar
+        # (for everyone, superusers included) until it is switched on.
+        restaurant = getattr(request, "restaurant", None)
+        if not (restaurant and restaurant.warehouse_enabled):
+            app_list = [app for app in app_list if app.get("app_label") != "inventory"]
 
         # Superusers see everything
         if request.user.is_superuser:

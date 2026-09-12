@@ -121,6 +121,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
             "accepts_platform_loyalty",
             "accepts_bog_payments",
             "accepts_flitt_payments",
+            "warehouse_enabled",
         ]
 
     def get_is_open_now(self, obj):
@@ -199,6 +200,7 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
             "accepts_takeaway",
             "accepts_bog_payments",
             "accepts_flitt_payments",
+            "warehouse_enabled",
             # Stats
             "average_rating",
             "total_reviews",
@@ -323,9 +325,19 @@ class RestaurantUpdateSerializer(serializers.ModelSerializer):
             "accepts_remote_orders",
             "accepts_reservations",
             "accepts_takeaway",
+            "warehouse_enabled",
             "minimum_order_amount",
             "average_preparation_time",
         ]
+
+    def update(self, instance, validated_data):
+        was_enabled = instance.warehouse_enabled
+        instance = super().update(instance, validated_data)
+        if "warehouse_enabled" in validated_data and validated_data["warehouse_enabled"] != was_enabled:
+            from apps.inventory import hooks
+
+            hooks.on_feature_toggled(instance, validated_data["warehouse_enabled"])
+        return instance
 
 
 class RestaurantHoursUpdateSerializer(serializers.Serializer):
