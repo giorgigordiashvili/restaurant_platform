@@ -277,6 +277,7 @@ def module_cards(request):
             ],
             [
                 _link("Platforms", "delivery_deliveryplatformspage_changelist"),
+                _link("Setup guide", "delivery_deliveryplatformspage_guide"),
                 _link("Orders", "orders_order_changelist"),
             ],
             "orders",

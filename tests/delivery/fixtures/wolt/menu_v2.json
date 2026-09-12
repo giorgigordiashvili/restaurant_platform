@@ -1,0 +1,26 @@
+{
+  "menu": {
+    "id": "menu-1", "currency": "GEL", "primary_language": "ka",
+    "categories": [
+      {"id": "cat-1", "name": [{"lang": "ka", "value": "ცხელი კერძები"}, {"lang": "en", "value": "Hot dishes"}], "description": [],
+       "item_bindings": [{"id": "b1", "item_id": "it-1"}, {"id": "b2", "item_id": "it-2"}], "subcategory_ids": []},
+      {"id": "cat-2", "name": [{"lang": "ka", "value": "დესერტი"}, {"lang": "en", "value": "Desserts"}], "description": [],
+       "item_bindings": [{"id": "b3", "item_id": "it-3"}], "subcategory_ids": []}
+    ],
+    "items": [
+      {"id": "it-1", "product": {"name": [{"lang": "ka", "value": "ხინკალი"}, {"lang": "en", "value": "Khinkali"}], "description": [{"lang": "en", "value": "Juicy dumplings"}], "image_url": "https://img.example/khinkali.jpg", "external_id": "p-old"},
+       "price": 1250, "enabled": {"enabled": true}, "option_bindings": [{"option_id": "opt-1", "selection_range": {"min": 0, "max": 2}}], "vat_percentage": 18},
+      {"id": "it-2", "product": {"name": [{"lang": "ka", "value": "ოჯახური"}, {"lang": "en", "value": "Ojakhuri"}], "description": []},
+       "price": 2400, "enabled": {"enabled": false}, "option_bindings": []},
+      {"id": "it-3", "product": {"name": [{"lang": "en", "value": "Test Dish"}], "description": [], "image_url": "https://img.example/cake.png"},
+       "price": 900, "enabled": {"enabled": true}, "option_bindings": []}
+    ],
+    "options": [
+      {"id": "opt-1", "name": [{"lang": "ka", "value": "დამატება"}, {"lang": "en", "value": "Extras"}], "type": "MultiChoice", "selection_range": {"min": 0, "max": 2},
+       "values": [
+         {"id": "v1", "product": {"name": [{"lang": "en", "value": "Cheese"}]}, "price": 150, "enabled": true, "default": false},
+         {"id": "v2", "product": {"name": [{"lang": "en", "value": "Butter"}]}, "price": 0, "enabled": true, "default": true}
+       ]}
+    ]
+  }
+}

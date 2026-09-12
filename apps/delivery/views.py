@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from rest_framework import status
@@ -14,9 +15,12 @@ from drf_spectacular.utils import extend_schema
 
 from apps.core.middleware.tenant import require_restaurant
 from apps.core.permissions import HasStaffPermission, IsTenantStaff, ModuleRequired
-from apps.delivery import services
-from apps.delivery.models import RestaurantDeliveryPlatform
+from apps.delivery import menu_import, services
+from apps.delivery.models import MenuImport, RestaurantDeliveryPlatform
 from apps.delivery.serializers import (
+    MenuImportApplySerializer,
+    MenuImportRequestSerializer,
+    MenuImportSerializer,
     MenuSyncRequestSerializer,
     MenuSyncSerializer,
     PauseSerializer,
@@ -179,3 +183,72 @@ class MenuSyncView(_LinkView):
             ).data,
             status=status.HTTP_202_ACCEPTED,
         )
+
+
+def _import_payload(row):
+    return MenuImportSerializer(
+        {
+            "id": row.pk,
+            "source": row.source,
+            "status": row.status,
+            "preview": row.preview,
+            "stats": row.stats,
+            "error": row.error,
+            "created_at": row.created_at,
+            "applied_at": row.applied_at,
+        }
+    ).data
+
+
+def _import_error(exc):
+    code = status.HTTP_502_BAD_GATEWAY if exc.code == "platform_error" else status.HTTP_400_BAD_REQUEST
+    return Response({"success": False, "error": {"code": exc.code, "message": exc.message}}, status=code)
+
+
+@extend_schema(tags=[TAG], request=MenuImportRequestSerializer, responses=MenuImportSerializer)
+class MenuImportPreviewView(_LinkView):
+    """Fetch the platform's menu (Wolt) and return a preview; nothing is written to the menu yet."""
+
+    required_permission = ("menu", "create")
+
+    @require_restaurant
+    def post(self, request, code):
+        link = self._link(request, code)
+        if link is None:
+            return self._not_found()
+        ser = MenuImportRequestSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        try:
+            row = menu_import.fetch_preview(link, by=request.user, price_units=ser.validated_data["price_units"])
+        except menu_import.ImportError_ as exc:
+            return _import_error(exc)
+        return Response(_import_payload(row))
+
+
+@extend_schema(tags=[TAG], responses=MenuImportSerializer)
+class MenuImportDetailView(APIView):
+    permission_classes = PERMS
+    required_permission = ("menu", "read")
+
+    @require_restaurant
+    def get(self, request, import_id):
+        row = get_object_or_404(MenuImport, pk=import_id, restaurant=request.restaurant)
+        return Response(_import_payload(row))
+
+
+@extend_schema(tags=[TAG], request=MenuImportApplySerializer, responses=MenuImportSerializer)
+class MenuImportApplyView(APIView):
+    permission_classes = PERMS
+    required_permission = ("menu", "create")
+
+    @require_restaurant
+    def post(self, request, import_id):
+        row = get_object_or_404(MenuImport, pk=import_id, restaurant=request.restaurant)
+        ser = MenuImportApplySerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        try:
+            menu_import.apply(row, by=request.user, **ser.validated_data)
+        except menu_import.ImportError_ as exc:
+            return _import_error(exc)
+        row.refresh_from_db()
+        return Response(_import_payload(row))

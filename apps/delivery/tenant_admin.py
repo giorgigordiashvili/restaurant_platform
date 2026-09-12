@@ -7,14 +7,14 @@ import secrets
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import path, reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from apps.core.tenant_admin_base import ModuleEnabledMixin, TenantModelAdmin, has_resource_permission
-from apps.delivery import services
-from apps.delivery.models import DeliveryPlatformsPage, RestaurantDeliveryPlatform
+from apps.delivery import menu_import, services
+from apps.delivery.models import DeliveryPlatformsPage, MenuImport, RestaurantDeliveryPlatform
 
 IMPLEMENTED = set(services.IMPLEMENTED)
 
@@ -113,10 +113,17 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
                         "pause": reverse(f"{n}pause", args=[code]),
                         "resume": reverse(f"{n}resume", args=[code]),
                         "check": reverse(f"{n}check", args=[code]),
+                        "import_menu": reverse(f"{n}import_menu", args=[code]),
                     },
+                    "can_import": code == "wolt",
+                    "last_import": link.menu_imports.first(),
                 }
             )
-        return {"cards": cards, "can_manage": has_resource_permission(request, "settings", "update")}
+        return {
+            "cards": cards,
+            "can_manage": has_resource_permission(request, "settings", "update"),
+            "guide_url": reverse("tenant_admin:delivery_deliveryplatformspage_guide"),
+        }
 
     def get_urls(self):
         wrap = self.admin_site.admin_view
@@ -134,6 +141,12 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             path("<slug:code>/pause/", wrap(require_POST(self.pause_view)), name=f"{n}_pause"),
             path("<slug:code>/resume/", wrap(require_POST(self.resume_view)), name=f"{n}_resume"),
             path("<slug:code>/check/", wrap(require_POST(self.check_view)), name=f"{n}_check"),
+            path("<slug:code>/import-menu/", wrap(require_POST(self.import_menu_view)), name=f"{n}_import_menu"),
+            path("imports/<uuid:import_id>/", wrap(self.import_preview_view), name=f"{n}_import_preview"),
+            path(
+                "imports/<uuid:import_id>/apply/", wrap(require_POST(self.import_apply_view)), name=f"{n}_import_apply"
+            ),
+            path("guide/", wrap(self.guide_view), name=f"{n}_guide"),
         ]
         return custom + super().get_urls()
 
@@ -276,6 +289,84 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
                 + ("paused until " + status["paused_until"] if status["paused_until"] else "not paused by us"),
             )
         return self._back()
+
+    # -- menu import ----------------------------------------------------------
+
+    def import_menu_view(self, request, code):
+        """Step 1: pull the menu from the platform and show a preview."""
+        link = self._link(request, code, implemented=True)
+        if not has_resource_permission(request, "menu", "create"):
+            raise PermissionDenied
+        units = request.POST.get("price_units") or "auto"
+        try:
+            row = menu_import.fetch_preview(
+                link, by=request.user, price_units=units if units in ("auto", "major", "minor") else "auto"
+            )
+        except menu_import.ImportError_ as exc:
+            messages.error(request, f"Could not fetch the menu: {exc.message}")
+            return self._back()
+        return redirect("tenant_admin:delivery_deliveryplatformspage_import_preview", import_id=row.pk)
+
+    def _import(self, request, import_id):
+        if not getattr(request, "restaurant", None) or not has_resource_permission(request, "menu", "create"):
+            raise PermissionDenied
+        return get_object_or_404(MenuImport, pk=import_id, restaurant=request.restaurant)
+
+    def import_preview_view(self, request, import_id):
+        row = self._import(request, import_id)
+        context = {
+            **self.admin_site.each_context(request),
+            "title": f"Import menu from {row.get_source_display()}",
+            "row": row,
+            "preview": row.preview,
+            "back_url": reverse("tenant_admin:delivery_deliveryplatformspage_changelist"),
+            "apply_url": reverse("tenant_admin:delivery_deliveryplatformspage_import_apply", args=[row.pk]),
+            "refetch_url": reverse("tenant_admin:delivery_deliveryplatformspage_import_menu", args=[row.source]),
+            "menu_url": reverse("tenant_admin:menu_menuitem_changelist"),
+        }
+        request.current_app = self.admin_site.name
+        return render(request, "admin/delivery/deliveryplatformspage/menu_import.html", context)
+
+    def import_apply_view(self, request, import_id):
+        """Step 2: create the categories / dishes / options that are missing; images download in the background."""
+        row = self._import(request, import_id)
+        try:
+            stats = menu_import.apply(
+                row,
+                by=request.user,
+                update_prices=bool(request.POST.get("update_prices")),
+                download_images=bool(request.POST.get("download_images", "1")),
+            )
+        except menu_import.ImportError_ as exc:
+            messages.error(request, exc.message)
+            return redirect("tenant_admin:delivery_deliveryplatformspage_import_preview", import_id=row.pk)
+        messages.success(
+            request,
+            f"Imported: {stats['categories_created']} categories, {stats['items_created']} dishes, "
+            f"{stats['groups_created']} option groups; {stats['items_skipped']} already existed"
+            + (f", {stats['items_updated']} prices updated" if stats["items_updated"] else "")
+            + (f". {stats['images_queued']} images are downloading." if stats["images_queued"] else "."),
+        )
+        return redirect("tenant_admin:menu_menuitem_changelist")
+
+    def guide_view(self, request):
+        """Step-by-step onboarding for Wolt / Glovo with the guide videos (set the URLs in settings)."""
+        if not getattr(request, "restaurant", None) or not self.has_view_permission(request):
+            raise PermissionDenied
+        base = getattr(settings, "PUBLIC_API_BASE_URL", "").rstrip("/")
+        context = {
+            **self.admin_site.each_context(request),
+            "title": "Connecting Wolt and Glovo",
+            "videos": {
+                "wolt": getattr(settings, "DELIVERY_GUIDE_VIDEO_WOLT", ""),
+                "glovo": getattr(settings, "DELIVERY_GUIDE_VIDEO_GLOVO", ""),
+            },
+            "wolt_webhook": f"{base}{reverse('delivery:wolt-orders')}",
+            "glovo_webhook": f"{base}{reverse('delivery:glovo-orders')}",
+            "platforms_url": reverse("tenant_admin:delivery_deliveryplatformspage_changelist"),
+        }
+        request.current_app = self.admin_site.name
+        return render(request, "admin/delivery/deliveryplatformspage/guide.html", context)
 
 
 def _audit(request, description, changes):

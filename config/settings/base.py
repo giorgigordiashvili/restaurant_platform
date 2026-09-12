@@ -628,6 +628,9 @@ WOLT_BASE_URL_DEV = config("WOLT_BASE_URL_DEV", default="https://pos-integration
 WOLT_AUTH_URL_PROD = config(
     "WOLT_AUTH_URL_PROD", default="https://integrations-authentication-service.wolt.com/oauth2/token"
 )
+# Embed URLs (YouTube / Vimeo "embed" links) for the onboarding videos shown in the tenant admin guide.
+DELIVERY_GUIDE_VIDEO_WOLT = config("DELIVERY_GUIDE_VIDEO_WOLT", default="")
+DELIVERY_GUIDE_VIDEO_GLOVO = config("DELIVERY_GUIDE_VIDEO_GLOVO", default="")
 WOLT_AUTH_URL_DEV = config(
     "WOLT_AUTH_URL_DEV", default="https://integrations-authentication-service.development.dev.woltapi.com/oauth2/token"
 )

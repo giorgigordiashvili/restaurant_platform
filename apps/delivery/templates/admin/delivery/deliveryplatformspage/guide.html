@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" %}
+<div class="flex flex-col gap-4 max-w-4xl" data-testid="delivery-guide">
+  <div class="{{ base }}">
+    <h2 class="font-semibold text-lg">{{ title }}</h2>
+    <p class="text-sm text-base-500 mt-1">{% translate "Two things are needed per platform: API access (so orders reach the kitchen and your menu stays in sync) and, for Wolt, one click to import your existing menu. Follow the video, then paste what you receive into the" %} <a class="underline text-primary-600" href="{{ platforms_url }}">{% translate "Delivery platforms" %}</a> {% translate "page." %}</p>
+  </div>
+
+  <div class="{{ base }}" data-testid="guide-wolt">
+    <h3 class="font-semibold text-base">Wolt</h3>
+    {% if videos.wolt %}
+      <div class="mt-2 aspect-video"><iframe class="w-full h-full rounded-default" src="{{ videos.wolt }}" title="Wolt guide" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>
+    {% else %}
+      <p class="mt-2 text-sm text-base-500 border border-dashed border-base-300 rounded-default p-3">{% translate "Video guide coming soon (set DELIVERY_GUIDE_VIDEO_WOLT)." %}</p>
+    {% endif %}
+    <ol class="list-decimal ml-5 mt-3 text-sm flex flex-col gap-1">
+      <li>{% translate "Ask your Wolt account manager for POS integration access: you receive a venue id, an OAuth client id, a client secret and a one-time authorization code (or, for older venues, an API key)." %}</li>
+      <li>{% translate "On the Delivery platforms page, open the Wolt card, paste the venue id and the credentials, tick Enabled and Save. Keep Sandbox on until Wolt confirms the test order." %}</li>
+      <li>{% translate "Press “Import menu from Wolt”: your categories, dishes, options and photos are copied into this dashboard. Review the preview, then Import. Dishes you already have are matched by name and left untouched." %}</li>
+      <li>{% translate "Press “Rotate signing secret” and send Wolt the secret together with this webhook address:" %} <code class="text-xs">{{ wolt_webhook }}</code></li>
+      <li>{% translate "Press “Push menu” once you have edited prices or photos here; from then on sold-out dishes sync automatically." %}</li>
+      <li>{% translate "Place a test order with Wolt; it must appear on the kitchen screen and be accepted automatically. Then switch Sandbox off." %}</li>
+    </ol>
+  </div>
+
+  <div class="{{ base }}" data-testid="guide-glovo">
+    <h3 class="font-semibold text-base">Glovo</h3>
+    {% if videos.glovo %}
+      <div class="mt-2 aspect-video"><iframe class="w-full h-full rounded-default" src="{{ videos.glovo }}" title="Glovo guide" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>
+    {% else %}
+      <p class="mt-2 text-sm text-base-500 border border-dashed border-base-300 rounded-default p-3">{% translate "Video guide coming soon (set DELIVERY_GUIDE_VIDEO_GLOVO)." %}</p>
+    {% endif %}
+    <ol class="list-decimal ml-5 mt-3 text-sm flex flex-col gap-1">
+      <li>{% translate "Ask your Glovo partner manager for the integration: you receive a store id and an integration token (stage first, then production)." %}</li>
+      <li>{% translate "On the Delivery platforms page, open the Glovo card, paste the store id and the token, tick Enabled and Save." %}</li>
+      <li>{% translate "Glovo cannot send your menu back through its API. Import it from Wolt (one click) or enter it once in Menu, then press “Push menu” so Glovo fetches it from us." %}</li>
+      <li>{% translate "Press “Rotate webhook token” and send Glovo the token together with these addresses:" %} <code class="text-xs">{{ glovo_webhook }}</code> {% translate "and the cancel address shown on the card." %}</li>
+      <li>{% translate "Place a stage test order; it must reach the kitchen. Then untick Sandbox and swap in the production token." %}</li>
+    </ol>
+  </div>
+</div>
+{% endwith %}
+{% endblock %}

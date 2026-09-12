@@ -41,3 +41,23 @@ class MenuSyncSerializer(serializers.Serializer):
 
 class MenuSyncRequestSerializer(serializers.Serializer):
     kind = serializers.ChoiceField(choices=["full", "updates"], default="full")
+
+
+class MenuImportRequestSerializer(serializers.Serializer):
+    price_units = serializers.ChoiceField(choices=["auto", "major", "minor"], default="auto")
+
+
+class MenuImportApplySerializer(serializers.Serializer):
+    update_prices = serializers.BooleanField(default=False)
+    download_images = serializers.BooleanField(default=True)
+
+
+class MenuImportSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    source = serializers.CharField()
+    status = serializers.CharField()
+    preview = serializers.JSONField()
+    stats = serializers.JSONField()
+    error = serializers.CharField(allow_blank=True)
+    created_at = serializers.DateTimeField()
+    applied_at = serializers.DateTimeField(allow_null=True)

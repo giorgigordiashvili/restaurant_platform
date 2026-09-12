@@ -60,6 +60,23 @@ def refund_items(self, order_id, items, ref):
         logger.error("Giving up refunding %s on order %s: %s", items, order_id, exc)
 
 
+@shared_task(name="delivery.import_images", bind=True, max_retries=2, ignore_result=True)
+def import_images(self, import_id):
+    from apps.delivery import menu_import
+    from apps.delivery.models import MenuImport
+
+    row = MenuImport.objects.select_related("restaurant").filter(pk=import_id).first()
+    if row is None or row.status != "images":
+        return
+    try:
+        menu_import.download_images(row)
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("Image import failed for %s", import_id)
+        row.error = str(exc)[:1000]
+        row.status = "imported"
+        row.save(update_fields=["error", "status", "updated_at"])
+
+
 @shared_task(name="delivery.push_menu", bind=True, max_retries=3, ignore_result=True)
 def push_menu(self, link_id, sync_id):
     link = RestaurantDeliveryPlatform.objects.select_related("restaurant").filter(pk=link_id).first()

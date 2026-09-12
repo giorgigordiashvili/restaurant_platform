@@ -17,10 +17,17 @@ class FakeResponse:
     def __init__(self, status_code, body):
         self.status_code = status_code
         self._body = body
-        self.text = json.dumps(body) if body is not None else ""
+        if isinstance(body, bytes):  # binary (image) response
+            self.text = ""
+            self.content = body
+            self.headers = {"Content-Type": "image/jpeg"}
+        else:
+            self.text = json.dumps(body) if body is not None else ""
+            self.content = self.text.encode()
+            self.headers = {"Content-Type": "application/json"}
 
     def json(self):
-        if self._body is None:
+        if self._body is None or isinstance(self._body, bytes):
             raise ValueError("no body")
         return self._body
 
@@ -138,4 +145,5 @@ def fake_wolt(monkeypatch):
     _build.session = session
     monkeypatch.setattr("apps.delivery.wolt.client.build_client", _build)
     monkeypatch.setattr("apps.delivery.wolt.adapter.build_client", _build)
+    monkeypatch.setattr("apps.delivery.menu_import.new_session", lambda: _build.session)
     return session

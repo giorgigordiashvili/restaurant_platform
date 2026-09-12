@@ -5,7 +5,7 @@
 {% block content %}
 {% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-3 py-1.5 text-sm w-full" %}
 <div class="mb-6" data-testid="delivery-platforms">
-  <p class="text-sm text-base-500 mb-4">{% translate "Orders from delivery apps land in the kitchen like any other; sold-out dishes and price changes are pushed back to the platform; pause the store when the kitchen is swamped." %}</p>
+  <p class="text-sm text-base-500 mb-4">{% translate "Orders from delivery apps land in the kitchen like any other; sold-out dishes and price changes are pushed back to the platform; pause the store when the kitchen is swamped." %} <a href="{{ guide_url }}" class="text-primary-600 underline" data-testid="guide-link">{% translate "Setup guide with videos" %}</a></p>
   <div class="grid gap-4 xl:grid-cols-2">
     {% for card in cards %}
     <div class="{{ base }} flex flex-col gap-3 {% if not card.implemented %}opacity-80{% endif %}" data-testid="platform-{{ card.code }}">
@@ -57,7 +57,9 @@
           <form method="post" action="{{ card.urls.push_menu }}">{% csrf_token %}<button type="submit" class="{{ btn }}" {% if not card.configured %}disabled{% endif %}>{% translate "Push menu" %}</button></form>
           <form method="post" action="{{ card.urls.sync_updates }}">{% csrf_token %}<button type="submit" class="{{ btn2 }}" {% if not card.configured %}disabled{% endif %}>{% translate "Sync prices & stock" %}</button></form>
           <form method="post" action="{{ card.urls.check }}">{% csrf_token %}<button type="submit" class="{{ btn2 }}" {% if not card.configured %}disabled{% endif %}>{% translate "Check status" %}</button></form>
+          {% if card.can_import %}<form method="post" action="{{ card.urls.import_menu }}">{% csrf_token %}<input type="hidden" name="price_units" value="auto"><button type="submit" class="{{ btn2 }}" {% if not card.configured %}disabled{% endif %} data-testid="import-menu">{% translate "Import menu from" %} {{ card.label }}</button></form>{% endif %}
         </div>
+        {% if card.last_import %}<p class="text-base-500">{% translate "Last menu import" %}: {{ card.last_import.get_status_display }} · {{ card.last_import.created_at|date:"d.m.Y H:i" }}{% if card.last_import.stats.items_created is not None %} · {{ card.last_import.stats.items_created }} {% translate "dishes added" %}{% endif %}{% if card.last_import.error %} · <span class="text-red-600">{{ card.last_import.error|truncatechars:120 }}</span>{% endif %}</p>{% endif %}
         <div class="flex flex-wrap items-center gap-2" data-testid="store-pause">
           {% if card.paused_until %}
           <form method="post" action="{{ card.urls.resume }}">{% csrf_token %}<button type="submit" class="{{ btn }}">{% translate "Resume orders" %}</button></form>

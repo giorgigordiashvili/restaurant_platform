@@ -21,6 +21,7 @@ __all__ = [
     "RestaurantDeliveryPlatform",
     "DeliveryPlatformEvent",
     "PlatformMenuSync",
+    "MenuImport",
     "DeliveryPlatformsPage",
     "PLATFORM_SOURCES",
 ]
@@ -91,6 +92,46 @@ class PlatformMenuSync(TimeStampedModel):
 
     def __str__(self):
         return f"{self.link.platform} menu sync {self.status}"
+
+
+class MenuImport(TimeStampedModel):
+    """One 'fetch the menu from the platform, preview, import' run."""
+
+    STATUS_CHOICES = [
+        ("fetching", "Fetching"),
+        ("previewed", "Previewed"),
+        ("images", "Importing images"),
+        ("imported", "Imported"),
+        ("failed", "Failed"),
+        ("failed_apply", "Import failed"),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="menu_imports")
+    link = models.ForeignKey(
+        RestaurantDeliveryPlatform, on_delete=models.SET_NULL, null=True, blank=True, related_name="menu_imports"
+    )
+    source = models.CharField(max_length=20, choices=RestaurantDeliveryPlatform.PLATFORM_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="fetching")
+    options = models.JSONField(default=dict, blank=True)
+    raw = models.JSONField(default=dict, blank=True, help_text="The platform's menu payload as received.")
+    preview = models.JSONField(default=dict, blank=True)
+    stats = models.JSONField(default=dict, blank=True)
+    images = models.JSONField(default=list, blank=True, help_text="[[menu_item_id, url], ...] still to download.")
+    error = models.TextField(blank=True, default="")
+    applied_at = models.DateTimeField(null=True, blank=True)
+    triggered_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
+
+    class Meta:
+        db_table = "delivery_menu_imports"
+        ordering = ["-created_at"]
+        verbose_name = _("Menu import")
+        verbose_name_plural = _("Menu imports")
+
+    def __str__(self):
+        return f"{self.source} menu import {self.status}"
 
 
 class DeliveryPlatformsPage(RestaurantDeliveryPlatform):

@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from apps.core.admin import TenantAwareModelAdmin
 
-from .models import DeliveryPlatformEvent, PlatformMenuSync
+from .models import DeliveryPlatformEvent, MenuImport, PlatformMenuSync
 
 
 @admin.register(DeliveryPlatformEvent)
@@ -20,3 +20,11 @@ class PlatformMenuSyncAdmin(TenantAwareModelAdmin):
     list_display = ["link", "status", "product_count", "transaction_id", "started_at", "finished_at", "error"]
     list_filter = ["status", "link__platform"]
     readonly_fields = [f.name for f in PlatformMenuSync._meta.fields if f.name != "id"]
+
+
+@admin.register(MenuImport)
+class MenuImportAdmin(TenantAwareModelAdmin):
+    tenant_field = "restaurant"
+    list_display = ["restaurant", "source", "status", "applied_at", "error", "created_at"]
+    list_filter = ["status", "source"]
+    readonly_fields = [f.name for f in MenuImport._meta.fields if f.name != "id"]
