@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-03 00:00+0000\n"
+"POT-Creation-Date: 2026-09-12 21:45+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Georgian\n"
@@ -16,301 +16,2158 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-# Admin site
-msgid "Django administration"
-msgstr "ადმინისტრირება"
-
-msgid "Site administration"
-msgstr "საიტის ადმინისტრირება"
-
-msgid "Log in"
-msgstr "შესვლა"
-
-msgid "Log out"
-msgstr "გასვლა"
-
-msgid "Welcome,"
-msgstr "გამარჯობა,"
-
-msgid "Change password"
-msgstr "პაროლის შეცვლა"
-
-msgid "View site"
-msgstr "საიტის ნახვა"
-
-msgid "Home"
-msgstr "მთავარი"
-
-msgid "History"
-msgstr "ისტორია"
-
-msgid "View on site"
-msgstr "საიტზე ნახვა"
-
-# Common actions
-msgid "Add"
-msgstr "დამატება"
-
-msgid "Change"
-msgstr "შეცვლა"
-
-msgid "Delete"
-msgstr "წაშლა"
-
-msgid "Save"
-msgstr "შენახვა"
-
-msgid "Save and add another"
-msgstr "შენახვა და ახლის დამატება"
-
-msgid "Save and continue editing"
-msgstr "შენახვა და რედაქტირების გაგრძელება"
-
-msgid "Save and view"
-msgstr "შენახვა და ნახვა"
-
-msgid "Delete selected"
-msgstr "მონიშნულის წაშლა"
-
-msgid "Search"
-msgstr "ძებნა"
-
-msgid "Filter"
-msgstr "ფილტრი"
-
-msgid "Clear all filters"
-msgstr "ფილტრების გასუფთავება"
-
-msgid "Remove from sorting"
-msgstr "დალაგებიდან ამოღება"
-
-msgid "Toggle sorting"
-msgstr "დალაგების გადართვა"
-
-msgid "Select all"
-msgstr "ყველას მონიშვნა"
-
-msgid "Select"
-msgstr "მონიშვნა"
-
-msgid "Action"
-msgstr "მოქმედება"
-
-msgid "Go"
-msgstr "შესრულება"
-
-msgid "Run the selected action"
-msgstr "მონიშნული მოქმედების შესრულება"
-
-msgid "Select all objects on this page for an action"
-msgstr "ყველა ობიექტის მონიშვნა ამ გვერდზე"
-
-msgid "Click here to select all objects across all pages"
-msgstr "ყველა ობიექტის მონიშვნა ყველა გვერდზე"
-
-# Dashboard
-msgid "Dashboard"
-msgstr "მთავარი პანელი"
-
-msgid "Recent actions"
-msgstr "ბოლო მოქმედებები"
-
-msgid "My actions"
-msgstr "ჩემი მოქმედებები"
-
-msgid "None available"
-msgstr "არ არის ხელმისაწვდომი"
-
-msgid "Unknown content"
-msgstr "უცნობი კონტენტი"
-
 # Models - Accounts
 msgid "Accounts"
 msgstr "ანგარიშები"
-
-msgid "Users"
-msgstr "მომხმარებლები"
-
-msgid "User"
-msgstr "მომხმარებელი"
-
-msgid "User Profiles"
-msgstr "მომხმარებლის პროფილები"
-
-msgid "User Profile"
-msgstr "მომხმარებლის პროფილი"
-
-# Models - Tenants
-msgid "Tenants"
-msgstr "მოიჯარეები"
-
-msgid "Restaurants"
-msgstr "რესტორნები"
-
-msgid "Restaurant"
-msgstr "რესტორანი"
-
-msgid "Restaurant Hours"
-msgstr "რესტორნის სამუშაო საათები"
-
-# Models - Menu
-msgid "Menu"
-msgstr "მენიუ"
-
-msgid "Menu Categories"
-msgstr "მენიუს კატეგორიები"
-
-msgid "Menu Category"
-msgstr "მენიუს კატეგორია"
-
-msgid "Menu Items"
-msgstr "მენიუს ერთეულები"
-
-msgid "Menu Item"
-msgstr "მენიუს ერთეული"
-
-msgid "Modifier Groups"
-msgstr "მოდიფიკატორების ჯგუფები"
-
-msgid "Modifier Group"
-msgstr "მოდიფიკატორის ჯგუფი"
-
-msgid "Modifiers"
-msgstr "მოდიფიკატორები"
-
-msgid "Modifier"
-msgstr "მოდიფიკატორი"
-
-# Models - Orders
-msgid "Orders"
-msgstr "შეკვეთები"
-
-msgid "Order"
-msgstr "შეკვეთა"
-
-msgid "Order Items"
-msgstr "შეკვეთის ერთეულები"
-
-msgid "Order Item"
-msgstr "შეკვეთის ერთეული"
-
-msgid "Order Status History"
-msgstr "შეკვეთის სტატუსის ისტორია"
-
-msgid "Group Orders"
-msgstr "ჯგუფური შეკვეთები"
-
-msgid "Group Order"
-msgstr "ჯგუფური შეკვეთა"
-
-# Models - Tables
-msgid "Tables"
-msgstr "მაგიდები"
-
-msgid "Table"
-msgstr "მაგიდა"
-
-msgid "Table Sections"
-msgstr "მაგიდების სექციები"
-
-msgid "Table Section"
-msgstr "მაგიდის სექცია"
-
-msgid "Table QR Codes"
-msgstr "მაგიდის QR კოდები"
-
-msgid "Table QR Code"
-msgstr "მაგიდის QR კოდი"
-
-msgid "Table Sessions"
-msgstr "მაგიდის სესიები"
-
-msgid "Table Session"
-msgstr "მაგიდის სესია"
-
-msgid "Table Session Guests"
-msgstr "მაგიდის სტუმრები"
-
-msgid "Table Session Guest"
-msgstr "მაგიდის სტუმარი"
-
-# Models - Staff
-msgid "Staff"
-msgstr "პერსონალი"
-
-msgid "Staff Members"
-msgstr "პერსონალის წევრები"
-
-msgid "Staff Member"
-msgstr "პერსონალის წევრი"
-
-msgid "Staff Roles"
-msgstr "პერსონალის როლები"
-
-msgid "Staff Role"
-msgstr "პერსონალის როლი"
-
-msgid "Staff Invitations"
-msgstr "პერსონალის მოწვევები"
-
-msgid "Staff Invitation"
-msgstr "პერსონალის მოწვევა"
-
-# Models - Reservations
-msgid "Reservations"
-msgstr "დაჯავშნები"
-
-msgid "Reservation"
-msgstr "დაჯავშნა"
-
-msgid "Reservation Settings"
-msgstr "დაჯავშნის პარამეტრები"
-
-msgid "Blocked Times"
-msgstr "დაბლოკილი დრო"
-
-msgid "Blocked Time"
-msgstr "დაბლოკილი დრო"
-
-msgid "Reservation History"
-msgstr "დაჯავშნის ისტორია"
-
-# Models - Payments
-msgid "Payments"
-msgstr "გადახდები"
-
-msgid "Payment"
-msgstr "გადახდა"
-
-msgid "Refunds"
-msgstr "თანხის დაბრუნებები"
-
-msgid "Refund"
-msgstr "თანხის დაბრუნება"
-
-# Models - Favorites
-msgid "Favorites"
-msgstr "რჩეულები"
-
-msgid "Favorite"
-msgstr "რჩეული"
 
 # Models - Audit
 msgid "Audit"
 msgstr "აუდიტი"
 
-msgid "Audit Logs"
-msgstr "აუდიტის ჟურნალი"
+#| msgid "User Profile"
+msgid "User Login"
+msgstr "მომხმარებლის შესვლა"
+
+msgid "User Logout"
+msgstr "მომხმარებლის გასვლა"
+
+msgid "Failed Login"
+msgstr "წარუმატებელი შესვლა"
+
+#| msgid "Password"
+msgid "Password Change"
+msgstr "პაროლის შეცვლა"
+
+#| msgid "Password"
+msgid "Password Reset"
+msgstr "პაროლის აღდგენა"
+
+#| msgid "Created"
+msgid "User Created"
+msgstr "მომხმარებელი შეიქმნა"
+
+#| msgid "Updated"
+msgid "User Updated"
+msgstr "მომხმარებელი განახლდა"
+
+#| msgid "Delete"
+msgid "User Deleted"
+msgstr "მომხმარებელი წაიშალა"
+
+#| msgid "Staff Role"
+msgid "Staff Added"
+msgstr "თანამშრომელი დაემატა"
+
+#| msgid "Staff Role"
+msgid "Staff Removed"
+msgstr "თანამშრომელი წაიშალა"
+
+#| msgid "Created"
+msgid "Order Created"
+msgstr "შეკვეთა შეიქმნა"
+
+#| msgid "Updated"
+msgid "Order Updated"
+msgstr "შეკვეთა განახლდა"
+
+#| msgid "Cancelled"
+msgid "Order Cancelled"
+msgstr "შეკვეთა გაუქმდა"
+
+#| msgid "Payment Method"
+msgid "Payment Collected"
+msgstr "გადახდა მიღებულია"
+
+#| msgid "Settings"
+msgid "Settings Updated"
+msgstr "პარამეტრები განახლდა"
+
+#| msgid "Export"
+msgid "Data Exported"
+msgstr "მონაცემები ექსპორტირებულია"
+
+msgid "Stock Received"
+msgstr "მარაგი მიღებულია"
+
+msgid "Stock Adjusted"
+msgstr "მარაგი შესწორებულია"
+
+msgid "Stock Written Off"
+msgstr "მარაგი ჩამოწერილია"
+
+msgid "Employee Meal Recorded"
+msgstr "თანამშრომლის კვება ჩაწერილია"
+
+#| msgid "Updated"
+msgid "Recipe Updated"
+msgstr "რეცეპტი განახლდა"
+
+msgid "Warehouse Toggled"
+msgstr "საწყობი ჩაირთო/გამოირთო"
+
+msgid "Cash Shift Opened"
+msgstr "სალაროს ცვლა გაიხსნა"
+
+msgid "Cash Shift Closed"
+msgstr "სალაროს ცვლა დაიხურა"
+
+msgid "Cash Paid In / Out"
+msgstr "ნაღდი ფულის შეტანა / გატანა"
+
+#| msgid "Refunds"
+msgid "Refund Issued"
+msgstr "თანხა დაბრუნებულია"
+
+# Models - Orders
+#| msgid "Orders"
+msgid "Order Discount"
+msgstr "შეკვეთის ფასდაკლება"
+
+#| msgid "Completed"
+msgid "Item Comped"
+msgstr "კერძი უფასოდ"
+
+msgid "Item Voided"
+msgstr "კერძი ანულირებულია"
+
+#| msgid "Order Item"
+msgid "Order Split"
+msgstr "შეკვეთა გაიყო"
+
+#| msgid "Order Item"
+msgid "Order Moved"
+msgstr "შეკვეთა გადატანილია"
 
 msgid "Audit Log"
 msgstr "აუდიტის ჩანაწერი"
 
-# Status choices - Order
-msgid "Pending"
-msgstr "მოლოდინში"
+msgid "Audit Logs"
+msgstr "აუდიტის ჟურნალი"
+
+# Models - Orders
+msgid "Orders"
+msgstr "შეკვეთები"
+
+# Dates and times
+msgid "Today"
+msgstr "დღეს"
+
+msgid "Open now"
+msgstr "ახლა ღია"
+
+# Models - Orders
+#| msgid "Orders"
+msgid "All orders"
+msgstr "ყველა შეკვეთა"
+
+# Models - Reservations
+msgid "Reservations"
+msgstr "დაჯავშნები"
+
+#| msgid "Password confirmation"
+msgid "Awaiting confirmation"
+msgstr "დადასტურების მოლოდინში"
+
+#| msgid "Blocked Times"
+msgid "Blocked times"
+msgstr "დაბლოკილი დრო"
+
+# Models - Tables
+#| msgid "Tables"
+msgid "Tables & QR"
+msgstr "მაგიდები და QR"
+
+#| msgid "Table Sessions"
+msgid "Active sessions"
+msgstr "აქტიური სესიები"
+
+# Models - Tables
+msgid "Tables"
+msgstr "მაგიდები"
+
+#| msgid "Table QR Codes"
+msgid "QR codes"
+msgstr "QR კოდები"
+
+msgid "Open shift"
+msgstr "ღია ცვლა"
+
+# Dates and times
+#| msgid "Today"
+msgid "Taken today"
+msgstr "დღეს მიღებული"
+
+msgid "Cash in drawer"
+msgstr "ნაღდი სალაროში"
+
+# Models - Payments
+#| msgid "Payments"
+msgid "Cash & payments"
+msgstr "სალარო და გადახდები"
+
+msgid "Shifts"
+msgstr "ცვლები"
+
+# Models - Payments
+msgid "Payments"
+msgstr "გადახდები"
+
+msgid "Reasons"
+msgstr "მიზეზები"
+
+msgid "Warehouse"
+msgstr "საწყობი"
+
+#| msgid "Log out"
+msgid "Low / out"
+msgstr "მცირე / ამოწურული"
+
+msgid "Open alerts"
+msgstr "ღია შეტყობინებები"
+
+msgid "Overview"
+msgstr "მიმოხილვა"
+
+msgid "Receive stock"
+msgstr "მარაგის მიღება"
+
+msgid "Dishes"
+msgstr "კერძები"
+
+#| msgid "Log out"
+msgid "Sold out"
+msgstr "ამოწურულია"
+
+# Models - Menu
+msgid "Menu"
+msgstr "მენიუ"
+
+#| msgid "items"
+msgid "Items"
+msgstr "პოზიციები"
+
+#| msgid "Menu Categories"
+msgid "Categories"
+msgstr "კატეგორიები"
+
+msgid "Loyalty"
+msgstr "ლოიალობა"
+
+msgid "Active programs"
+msgstr "აქტიური პროგრამები"
+
+msgid "Programs"
+msgstr "პროგრამები"
+
+msgid "Reviews"
+msgstr "შეფასებები"
+
+#| msgid "Past 7 days"
+msgid "Last 7 days"
+msgstr "ბოლო 7 დღე"
+
+msgid "Delivery platforms"
+msgstr "მიწოდების პლატფორმები"
+
+msgid "Platform orders today"
+msgstr "პლატფორმის შეკვეთები დღეს"
+
+msgid "Awaiting accept"
+msgstr "მიღების მოლოდინში"
+
+msgid "Platforms"
+msgstr "პლატფორმები"
+
+msgid "Setup guide"
+msgstr "დაყენების გზამკვლევი"
+
+msgid "Fiscal & VAT"
+msgstr "ფისკალური და დღგ"
+
+msgid "Receipts today"
+msgstr "ჩეკები დღეს"
+
+msgid "Failed"
+msgstr "წარუმატებელი"
+
+msgid "Documents"
+msgstr "დოკუმენტები"
+
+# Profile Settings
+#| msgid "Profile Settings"
+msgid "Fiscal settings"
+msgstr "ფისკალური პარამეტრები"
+
+#| msgid "Print"
+msgid "Printing"
+msgstr "ბეჭდვა"
+
+msgid "Printers offline"
+msgstr "პრინტერები ოფლაინ"
+
+msgid "Failed jobs"
+msgstr "წარუმატებელი დავალებები"
+
+#| msgid "Print"
+msgid "Printers"
+msgstr "პრინტერები"
+
+#| msgid "Print"
+msgid "Print jobs"
+msgstr "ბეჭდვის დავალებები"
+
+msgid "Sales today"
+msgstr "გაყიდვები დღეს"
+
+# Models - Orders
+#| msgid "Orders"
+msgid "Orders today"
+msgstr "შეკვეთები დღეს"
+
+msgid "Sales"
+msgstr "გაყიდვები"
+
+# Models - Staff
+msgid "Staff"
+msgstr "პერსონალი"
+
+#| msgid "Staff Members"
+msgid "Members"
+msgstr "წევრები"
+
+#| msgid "Staff Invitations"
+msgid "Pending invitations"
+msgstr "მოლოდინში მოწვევები"
+
+msgid "Invite"
+msgstr "მოწვევა"
+
+#| msgid "Staff Roles"
+msgid "Roles"
+msgstr "როლები"
+
+msgid "Modules on"
+msgstr "ჩართული მოდულები"
+
+#| msgid "Restaurants"
+msgid "Restaurant settings"
+msgstr "რესტორნის პარამეტრები"
+
+msgid "Modules"
+msgstr "მოდულები"
+
+msgid "Categories, dishes and modifiers. The QR menu customers browse."
+msgstr ""
+"კატეგორიები, კერძები და მოდიფიკატორები. QR მენიუ, რომელსაც სტუმრები "
+"ათვალიერებენ."
+
+#| msgid "Order"
+msgid "Ordering"
+msgstr "შეკვეთები"
+
+msgid "Customers order from the menu: QR dine-in, takeaway. Off = menu only."
+msgstr ""
+"სტუმრები უკვეთავენ მენიუდან: QR მაგიდასთან, წასაღები. გამორთვისას — მხოლოდ "
+"მენიუ."
+
+msgid "Sections, tables, QR codes, table sessions and shared venues."
+msgstr "სექციები, მაგიდები, QR კოდები, მაგიდის სესიები და საერთო სივრცეები."
+
+msgid "Online booking with deposits, blocked times and reservation rules."
+msgstr "ონლაინ ჯავშანი დეპოზიტით, დაბლოკილი დრო და ჯავშნის წესები."
+
+msgid "Kitchen display"
+msgstr "სამზარეულოს ეკრანი"
+
+msgid ""
+"The Kitchen screen in the POS app: cooks accept, cook and bump tickets."
+msgstr ""
+"სამზარეულოს ეკრანი POS აპში: მზარეულები იღებენ, ამზადებენ და ხურავენ "
+"შეკვეთებს."
+
+msgid ""
+"Stock in lots, recipes on dishes, automatic sold-out, buy lists, delivery-"
+"platform checklists."
+msgstr ""
+"მარაგი პარტიებით, რეცეპტები კერძებზე, ავტომატური „ამოწურულია“, შესყიდვის "
+"სია, მიწოდების პლატფორმების ჩეკლისტები."
+
+msgid ""
+"Punch-card programs redeemed in the POS; optionally the platform-wide tier "
+"discounts."
+msgstr ""
+"დაგროვებითი ბარათები, რომლებიც POS-ში იხურება; სურვილისამებრ პლატფორმის "
+"დონეების ფასდაკლებები."
+
+msgid ""
+"Customer reviews on your page, with reporting to the platform moderators."
+msgstr ""
+"სტუმრების შეფასებები თქვენს გვერდზე, პლატფორმის მოდერატორებთან შეტყობინებით."
+
+msgid ""
+"Kitchen and bar ticket printers, receipt printers and cash drawer through "
+"the print bridge (any cheap ESC/POS printer)."
+msgstr ""
+"სამზარეულოსა და ბარის პრინტერები, ჩეკის პრინტერები და სალაროს უჯრა print "
+"bridge-ის მეშვეობით (ნებისმიერი იაფი ESC/POS პრინტერი)."
+
+msgid ""
+"Cash shifts with X/Z reports, taking payments in the POS, discounts, comps, "
+"voids and refunds."
+msgstr ""
+"სალაროს ცვლები X/Z ანგარიშებით, გადახდების მიღება POS-ში, ფასდაკლებები, "
+"უფასო კერძები, ანულირება და დაბრუნება."
+
+msgid ""
+"Glovo and Wolt orders straight into the kitchen, menu push, sold-out sync, "
+"store pause; Bolt Food coming soon."
+msgstr ""
+"Glovo-სა და Wolt-ის შეკვეთები პირდაპირ სამზარეულოში, მენიუს გაგზავნა, "
+"„ამოწურულის“ სინქრონიზაცია, მაღაზიის შეჩერება; Bolt Food მალე."
+
+msgid ""
+"VAT profile, sequential receipts and refund receipts, RS.ge waybill export. "
+"A live fiscal provider plugs in later."
+msgstr ""
+"დღგ პროფილი, თანმიმდევრული ჩეკები და დაბრუნების ჩეკები, RS.ge ზედნადებების "
+"ექსპორტი. ფისკალური პროვაიდერი მოგვიანებით დაემატება."
+
+#| msgid "Staff Invitations"
+msgid "Notifications"
+msgstr "შეტყობინებები"
+
+msgid ""
+"Staff push and in-app alerts (new orders, reservations, sold-out, printer "
+"failures, Z-reports); guest SMS / email for reservations."
+msgstr ""
+"Push და აპ-შიდა შეტყობინებები პერსონალისთვის (ახალი შეკვეთები, ჯავშნები, "
+"ამოწურული, პრინტერის შეცდომები, Z ანგარიშები); SMS / ელფოსტა სტუმრებს "
+"ჯავშნებზე."
+
+# Models - Payments
+#| msgid "Payments"
+msgid "Online payments"
+msgstr "ონლაინ გადახდები"
+
+msgid ""
+"Card payments via Bank of Georgia and/or Flitt. Without them customers pay "
+"cash at the table."
+msgstr ""
+"ბარათით გადახდა საქართველოს ბანკის და/ან Flitt-ის მეშვეობით. მათ გარეშე "
+"სტუმრები ნაღდით იხდიან მაგიდასთან."
+
+msgid "View"
+msgstr "ნახვა"
+
+#| msgid "Created"
+msgid "Create"
+msgstr "შექმნა"
+
+msgid "Edit"
+msgstr "რედაქტირება"
+
+msgid "Delete"
+msgstr "წაშლა"
+
+msgid "Warehouse logs (waste, meals)"
+msgstr "საწყობის ჩანაწერები (ნარჩენი, კვება)"
+
+msgid "Settings"
+msgstr "პარამეტრები"
+
+msgid "Analytics"
+msgstr "ანალიტიკა"
+
+#| msgid "Updated"
+msgid "update"
+msgstr "რედაქტირება"
+
+msgid "See the open shift, X report and payments"
+msgstr "ღია ცვლის, X ანგარიშისა და გადახდების ნახვა"
+
+msgid "Take payments, open a shift, cash paid in / out"
+msgstr "გადახდების მიღება, ცვლის გახსნა, ნაღდის შეტანა / გატანა"
+
+msgid "Discounts, comps, close a shift"
+msgstr "ფასდაკლებები, უფასო კერძები, ცვლის დახურვა"
+
+msgid "Refunds"
+msgstr "თანხის დაბრუნებები"
+
+msgid "Change status, add items, void items"
+msgstr "სტატუსის შეცვლა, პოზიციების დამატება, ანულირება"
+
+# Dashboard
+msgid "Dashboard"
+msgstr "მთავარი პანელი"
+
+msgid "Kitchen screen (POS)"
+msgstr "სამზარეულოს ეკრანი (POS)"
+
+#| msgid "Export"
+msgid "Reports"
+msgstr "ანგარიშები"
+
+#| msgid "Staff Invitations"
+msgid "Invitations"
+msgstr "მოწვევები"
+
+msgid ""
+"Fill in this language, save, then pick the next tab. Option rows left blank "
+"keep showing their existing text."
+msgstr ""
+"შეავსეთ ეს ენა, შეინახეთ და გადადით შემდეგ ჩანართზე. ცარიელი ველები არსებულ "
+"ტექსტს ინარჩუნებენ."
+
+msgid "Remove this translation"
+msgstr "ამ თარგმანის წაშლა"
+
+msgid ""
+"Nothing to show yet -- ask a manager to give your role access to a module."
+msgstr ""
+"ჯერ არაფერია საჩვენებელი — სთხოვეთ მენეჯერს თქვენს როლს მოდულზე წვდომა "
+"მისცეს."
+
+msgid ""
+"Switch on what your restaurant uses. Everything else disappears from this "
+"dashboard, the customer page and the POS app."
+msgstr ""
+"ჩართეთ ის, რასაც თქვენი რესტორანი იყენებს. დანარჩენი გაქრება ამ პანელიდან, "
+"სტუმრის გვერდიდან და POS აპიდან."
+
+msgid "On"
+msgstr "ჩართული"
+
+msgid "Off"
+msgstr "გამორთული"
+
+msgid "Switch this module off?"
+msgstr "გამოვრთოთ ეს მოდული?"
+
+msgid "Switch off"
+msgstr "გამორთვა"
+
+msgid "Switch on"
+msgstr "ჩართვა"
+
+msgid "Always on."
+msgstr "ყოველთვის ჩართულია."
+
+#| msgid "Table Sections"
+msgid "Save options"
+msgstr "პარამეტრების შენახვა"
+
+msgid "Shared venue"
+msgstr "საერთო სივრცე"
+
+msgid "shared tables"
+msgstr "საერთო მაგიდები"
+
+msgid "Leave this venue? Your tables stay, but stop being shared."
+msgstr "დავტოვოთ სივრცე? თქვენი მაგიდები რჩება, მაგრამ აღარ იქნება საერთო."
+
+msgid "Leave venue"
+msgstr "სივრცის დატოვება"
+
+#| msgid "Restaurants"
+msgid "Restaurants at this venue"
+msgstr "რესტორნები ამ სივრცეში"
+
+msgid "you"
+msgstr "თქვენ"
+
+msgid "layout seed"
+msgstr "განლაგების წყარო"
+
+msgid "Shared tables"
+msgstr "საერთო მაგიდები"
+
+msgid "Number"
+msgstr "ნომერი"
+
+# Common fields
+msgid "Name"
+msgstr "სახელი"
+
+#| msgid "Action"
+msgid "Section"
+msgstr "სექცია"
+
+msgid "Seats"
+msgstr "ადგილები"
+
+msgid "Venue QR"
+msgstr "სივრცის QR"
+
+msgid "Your table"
+msgstr "თქვენი მაგიდა"
+
+msgid "Download"
+msgstr "ჩამოტვირთვა"
+
+msgid "legacy image"
+msgstr "ძველი სურათი"
+
+msgid "Regenerate"
+msgstr "ხელახლა გენერირება"
+
+msgid "Retire this table at every restaurant?"
+msgstr "ამოვიღოთ ეს მაგიდა ყველა რესტორანში?"
+
+msgid "Retire"
+msgstr "ამოღება"
+
+msgid "No shared tables yet."
+msgstr "საერთო მაგიდები ჯერ არ არის."
+
+msgid "Min"
+msgstr "მინ"
+
+msgid "Add shared table"
+msgstr "საერთო მაგიდის დამატება"
+
+msgid ""
+"A new shared table appears in every restaurant's table list. Tables only you"
+" use can still be added under Tables."
+msgstr ""
+"ახალი საერთო მაგიდა ყველა რესტორნის სიაში გამოჩნდება. მხოლოდ თქვენი მაგიდები"
+" კვლავ „მაგიდებში“ დაემატება."
+
+msgid "Not part of a shared venue"
+msgstr "არ არის საერთო სივრცის ნაწილი"
+
+msgid ""
+"If other restaurants serve the same tables as you (a food hall), invite one "
+"below. Your menus, orders and staff stay private; only the table layout is "
+"shared."
+msgstr ""
+"თუ სხვა რესტორნებიც იმავე მაგიდებს ემსახურებიან (ფუდ-ჰოლი), მოიწვიეთ ქვემოთ."
+" მენიუ, შეკვეთები და პერსონალი პირადი რჩება; მხოლოდ მაგიდების განლაგებაა "
+"საერთო."
+
+msgid "Requests to share tables with you"
+msgstr "მოთხოვნები მაგიდების გაზიარებაზე"
+
+msgid "Use our sections & tables"
+msgstr "ჩვენი სექციებისა და მაგიდების გამოყენება"
+
+msgid "Use theirs"
+msgstr "მათი გამოყენება"
+
+msgid "Venue name"
+msgstr "სივრცის სახელი"
+
+msgid "You will adopt the venue's existing table layout."
+msgstr "თქვენ აიღებთ სივრცის არსებულ მაგიდების განლაგებას."
+
+msgid "Accept"
+msgstr "მიღება"
+
+msgid "Decline"
+msgstr "უარყოფა"
+
+#| msgid "None"
+msgid "None."
+msgstr "არაფერი."
+
+msgid "Your pending invitations"
+msgstr "თქვენი მოლოდინში მოწვევები"
+
+msgid "expires"
+msgstr "ვადა იწურება"
+
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#| msgid "Restaurants"
+msgid "Restaurant slug"
+msgstr "რესტორნის slug"
+
+msgid "the part before .admin.aimenu.ge"
+msgstr "ნაწილი .admin.aimenu.ge-მდე"
+
+msgid "Message"
+msgstr "შეტყობინება"
+
+msgid "Invite to share tables"
+msgstr "მოწვევა მაგიდების გასაზიარებლად"
+
+# Misc
+#| msgid "Optional"
+msgid "Options"
+msgstr "ოფციები"
+
+#| msgid "Description"
+msgid "Direction"
+msgstr "მიმართულება"
+
+msgid "Restaurant"
+msgstr "რესტორანი"
+
+msgid "; "
+msgstr "; "
+
+#, python-brace-format
+msgid "Request sent to {p0}."
+msgstr "მოთხოვნა გაეგზავნა {p0}-ს."
+
+#, python-brace-format
+msgid "You now share tables at {p0}: {p1} table(s) added, {p2} linked."
+msgstr ""
+"ახლა თქვენ იზიარებთ მაგიდებს {p0}-ში: {p1} მაგიდა დაემატა, {p2} დაუკავშირდა."
+
+msgid "Request declined."
+msgstr "მოთხოვნა უარყოფილია."
+
+msgid "Request cancelled."
+msgstr "მოთხოვნა გაუქმებულია."
+
+msgid "You left the shared venue. Your tables are now your own again."
+msgstr "თქვენ დატოვეთ საერთო სივრცე. თქვენი მაგიდები ისევ მხოლოდ თქვენია."
+
+#, python-brace-format
+msgid "Table {p0} added to every restaurant at {p1}."
+msgstr "მაგიდა {p0} დაემატა ყველა რესტორანს {p1}-ში."
+
+#, python-brace-format
+msgid "Table {p0} retired{p1}."
+msgstr "მაგიდა {p0} ამოღებულია{p1}."
+
+#, python-brace-format
+msgid ""
+"QR image for table {p0} regenerated (short link). Download and reprint it."
+msgstr ""
+"მაგიდა {p0}-ის QR სურათი ხელახლა შეიქმნა (მოკლე ბმული). ჩამოტვირთეთ და "
+"ხელახლა დაბეჭდეთ."
+
+msgid "Shared"
+msgstr "საერთო"
+
+msgid "Currently goes to"
+msgstr "ამჟამად მიდის"
+
+msgid "Image"
+msgstr "სურათი"
+
+msgid "Regenerate QR image (short link)"
+msgstr "QR სურათის ხელახლა გენერირება (მოკლე ბმული)"
+
+#, python-brace-format
+msgid ""
+"Regenerated {p0} QR image(s). Download and reprint them to make the codes "
+"dynamic."
+msgstr ""
+"ხელახლა შეიქმნა {p0} QR სურათი. ჩამოტვირთეთ და დაბეჭდეთ, რომ კოდები "
+"დინამიური გახდეს."
+
+#| msgid "Table QR Code"
+msgid "QR Code"
+msgstr "QR კოდი"
+
+msgid "QR URL"
+msgstr "QR ბმული"
+
+#| msgid "Previous"
+msgid "Preview"
+msgstr "გადახედვა"
+
+msgid "Role"
+msgstr "როლი"
+
+msgid "The owner and your own account cannot be deactivated here."
+msgstr "მფლობელისა და თქვენი ანგარიშის დეაქტივაცია აქ შეუძლებელია."
+
+msgid "Email"
+msgstr "ელ. ფოსტა"
+
+msgid "Last login"
+msgstr "ბოლო შესვლა"
+
+msgid "Person"
+msgstr "პიროვნება"
+
+#, python-brace-format
+msgid "Invitation emailed to {p0}."
+msgstr "მოწვევა გაიგზავნა {p0}-ზე."
+
+msgid "Status"
+msgstr "სტატუსი"
+
+#| msgid "Reservation Settings"
+msgid "Resend invitation email"
+msgstr "მოწვევის ხელახლა გაგზავნა"
+
+#| msgid "Staff Invitations"
+msgid "Cancel invitations"
+msgstr "მოწვევების გაუქმება"
+
+#| msgid "Confirmed"
+msgid "Confirm"
+msgstr "დადასტურება"
+
+#| msgid "Created"
+msgid "Mark seated"
+msgstr "დასხდნენ"
+
+#| msgid "Completed"
+msgid "Mark completed"
+msgstr "დასრულებულად მონიშვნა"
+
+msgid "Mark no-show"
+msgstr "არ მოვიდა"
+
+msgid " "
+msgstr " "
+
+#, python-brace-format
+msgid "{p0} options saved."
+msgstr "{p0}: პარამეტრები შენახულია."
+
+msgid "Report selected reviews to platform moderators"
+msgstr "არჩეული შეფასებების გაგზავნა მოდერატორებთან"
+
+msgid "Order received"
+msgstr "შეკვეთა მიღებულია"
+
+msgid "Order cancelled by platform"
+msgstr "შეკვეთა გააუქმა პლატფორმამ"
+
+#| msgid "Status"
+msgid "Status pushed"
+msgstr "სტატუსი გაგზავნილია"
+
+msgid "Menu sync status"
+msgstr "მენიუს სინქრონიზაციის სტატუსი"
+
+msgid "Cancellation requested by restaurant"
+msgstr "გაუქმება მოითხოვა რესტორანმა"
+
+#| msgid "Order Status History"
+msgid "Order status notification"
+msgstr "შეკვეთის სტატუსის შეტყობინება"
+
+#| msgid "Refunds"
+msgid "Refund pushed"
+msgstr "დაბრუნება გაგზავნილია"
+
+msgid "Store paused / resumed"
+msgstr "მაღაზია შეჩერდა / განახლდა"
+
+msgid "platform:order_id:kind -- deduplicates retries."
+msgstr "platform:order_id:kind — გამეორებების დედუპლიკაცია."
+
+msgid "Platform event"
+msgstr "პლატფორმის მოვლენა"
+
+# Models - Payments
+#| msgid "Payments"
+msgid "Platform events"
+msgstr "პლატფორმის მოვლენები"
+
+msgid "Queued"
+msgstr "რიგშია"
+
+msgid "Sent"
+msgstr "გაგზავნილია"
+
+msgid "Processing"
+msgstr "მუშავდება"
+
+msgid "Success"
+msgstr "წარმატება"
+
+#| msgid "Menu Items"
+msgid "Menu sync"
+msgstr "მენიუს სინქრონიზაცია"
+
+#| msgid "Menu Items"
+msgid "Menu syncs"
+msgstr "მენიუს სინქრონიზაციები"
+
+msgid "Fetching"
+msgstr "იტვირთება"
+
+msgid "Previewed"
+msgstr "გადახედილია"
+
+msgid "Importing images"
+msgstr "სურათების იმპორტი"
+
+#| msgid "Import"
+msgid "Imported"
+msgstr "იმპორტირებულია"
+
+#| msgid "Import"
+msgid "Import failed"
+msgstr "იმპორტი ვერ მოხერხდა"
+
+msgid "The platform's menu payload as received."
+msgstr "პლატფორმის მენიუ, როგორც მივიღეთ."
+
+msgid "[[menu_item_id, url], ...] still to download."
+msgstr "[[menu_item_id, url], ...] ჩამოსატვირთი."
+
+#| msgid "Menu Item"
+msgid "Menu import"
+msgstr "მენიუს იმპორტი"
+
+#| msgid "Menu Items"
+msgid "Menu imports"
+msgstr "მენიუს იმპორტები"
+
+msgid ""
+"Orders from delivery apps land in the kitchen like any other; sold-out "
+"dishes and price changes are pushed back to the platform; pause the store "
+"when the kitchen is swamped."
+msgstr ""
+"მიწოდების აპების შეკვეთები სამზარეულოში სხვებივით ხვდება; ამოწურული კერძები "
+"და ფასების ცვლილება პლატფორმას ეგზავნება; შეაჩერეთ მაღაზია, როცა სამზარეულო "
+"გადატვირთულია."
+
+msgid "Setup guide with videos"
+msgstr "გზამკვლევი ვიდეოებით"
+
+msgid "Paused until"
+msgstr "შეჩერებულია"
+
+msgid "Coming soon"
+msgstr "მალე"
+
+msgid "Preparation time (min)"
+msgstr "მომზადების დრო (წთ)"
+
+msgid "set"
+msgstr "დაყენებულია"
+
+msgid "not set"
+msgstr "არ არის დაყენებული"
+
+#| msgid "Table"
+msgid "Enabled"
+msgstr "ჩართული"
+
+msgid "Auto-accept orders into the kitchen"
+msgstr "შეკვეთების ავტომატური მიღება სამზარეულოში"
+
+msgid "Sandbox (stage / development environment)"
+msgstr "სატესტო გარემო (stage / development)"
+
+msgid "Clear stored credentials"
+msgstr "შენახული მონაცემების წაშლა"
+
+msgid "Save"
+msgstr "შენახვა"
+
+msgid "Not configured yet: store id and credentials are required."
+msgstr "ჯერ არ არის დაყენებული: საჭიროა მაღაზიის ID და მონაცემები."
+
+msgid "Give these to the platform's onboarding team"
+msgstr "გადაეცით ეს პლატფორმის ინტეგრაციის გუნდს"
+
+#| msgid "Order Item"
+msgid "Order webhook"
+msgstr "შეკვეთის webhook"
+
+#| msgid "Cancelled"
+msgid "Cancel webhook"
+msgstr "გაუქმების webhook"
+
+msgid "Webhook signing secret (shown once)"
+msgstr "Webhook-ის ხელმოწერის საიდუმლო (ერთხელ ჩანს)"
+
+msgid "Webhook token (shown once)"
+msgstr "Webhook-ის ტოკენი (ერთხელ ჩანს)"
+
+msgid "Webhook signing secret set."
+msgstr "Webhook-ის საიდუმლო დაყენებულია."
+
+msgid "Webhook token set."
+msgstr "Webhook-ის ტოკენი დაყენებულია."
+
+msgid "No signing secret yet: rotate to create one and give it to Wolt."
+msgstr "საიდუმლო ჯერ არ არის: შექმენით და გადაეცით Wolt-ს."
+
+msgid "No per-store webhook token: the platform-wide token is used."
+msgstr "მაღაზიის ტოკენი არ არის: გამოიყენება საერთო ტოკენი."
+
+#| msgid "Menu Item"
+msgid "Menu feed"
+msgstr "მენიუს ბმული"
+
+msgid "Rotate signing secret"
+msgstr "საიდუმლოს განახლება"
+
+msgid "Rotate webhook token"
+msgstr "Webhook ტოკენის განახლება"
+
+msgid "Rotate menu URL"
+msgstr "მენიუს ბმულის განახლება"
+
+msgid "Push menu"
+msgstr "მენიუს გაგზავნა"
+
+msgid "Sync prices & stock"
+msgstr "ფასებისა და მარაგის სინქრონიზაცია"
+
+msgid "Check status"
+msgstr "სტატუსის შემოწმება"
+
+msgid "Import menu from"
+msgstr "მენიუს იმპორტი:"
+
+msgid "Last menu import"
+msgstr "ბოლო მენიუს იმპორტი"
+
+msgid "dishes added"
+msgstr "კერძი დაემატა"
+
+msgid "Resume orders"
+msgstr "შეკვეთების განახლება"
+
+msgid "min"
+msgstr "წთ"
+
+msgid "h"
+msgstr "სთ"
+
+msgid "Rest of the day"
+msgstr "დღის ბოლომდე"
+
+msgid "Pause orders"
+msgstr "შეკვეთების შეჩერება"
+
+msgid "Last menu push"
+msgstr "ბოლო მენიუს გაგზავნა"
+
+msgid "products"
+msgstr "პროდუქტი"
+
+#| msgid "Recent actions"
+msgid "Recent events"
+msgstr "ბოლო მოვლენები"
+
+msgid ""
+"Two things are needed per platform: API access (so orders reach the kitchen "
+"and your menu stays in sync) and, for Wolt, one click to import your "
+"existing menu. Follow the video, then paste what you receive into the"
+msgstr ""
+"თითოეულ პლატფორმას ორი რამ სჭირდება: API წვდომა (რომ შეკვეთები სამზარეულოში "
+"მოვიდეს და მენიუ სინქრონში იყოს) და, Wolt-ისთვის, ერთი დაჭერით არსებული "
+"მენიუს იმპორტი. მიჰყევით ვიდეოს და ჩასვით მიღებული მონაცემები გვერდზე"
+
+msgid "page."
+msgstr "."
+
+msgid "Video guide coming soon (set DELIVERY_GUIDE_VIDEO_WOLT)."
+msgstr "ვიდეო გზამკვლევი მალე (დააყენეთ DELIVERY_GUIDE_VIDEO_WOLT)."
+
+msgid ""
+"Ask your Wolt account manager for POS integration access: you receive a "
+"venue id, an OAuth client id, a client secret and a one-time authorization "
+"code (or, for older venues, an API key)."
+msgstr ""
+"სთხოვეთ Wolt-ის მენეჯერს POS ინტეგრაციის წვდომა: მიიღებთ venue id-ს, OAuth "
+"client id-ს, client secret-ს და ერთჯერად ავტორიზაციის კოდს (ან ძველი "
+"ობიექტებისთვის API გასაღებს)."
+
+msgid ""
+"On the Delivery platforms page, open the Wolt card, paste the venue id and "
+"the credentials, tick Enabled and Save. Keep Sandbox on until Wolt confirms "
+"the test order."
+msgstr ""
+"„მიწოდების პლატფორმების“ გვერდზე გახსენით Wolt-ის ბარათი, ჩასვით venue id და"
+" მონაცემები, მონიშნეთ „ჩართული“ და შეინახეთ. სატესტო გარემო ჩართული დატოვეთ,"
+" სანამ Wolt სატესტო შეკვეთას დაადასტურებს."
+
+msgid ""
+"Press “Import menu from Wolt”: your categories, dishes, options and photos "
+"are copied into this dashboard. Review the preview, then Import. Dishes you "
+"already have are matched by name and left untouched."
+msgstr ""
+"დააჭირეთ „მენიუს იმპორტი: Wolt“ — კატეგორიები, კერძები, ოფციები და ფოტოები "
+"ამ პანელში გადმოვა. გადახედეთ და დაადასტურეთ იმპორტი. უკვე არსებული კერძები "
+"სახელით მოიძებნება და უცვლელი რჩება."
+
+msgid ""
+"Press “Rotate signing secret” and send Wolt the secret together with this "
+"webhook address:"
+msgstr ""
+"დააჭირეთ „საიდუმლოს განახლება“ და გაუგზავნეთ Wolt-ს საიდუმლო ამ webhook "
+"მისამართთან ერთად:"
+
+msgid ""
+"Press “Push menu” once you have edited prices or photos here; from then on "
+"sold-out dishes sync automatically."
+msgstr ""
+"ფასების ან ფოტოების რედაქტირების შემდეგ დააჭირეთ „მენიუს გაგზავნა“; ამის "
+"შემდეგ ამოწურული კერძები ავტომატურად სინქრონდება."
+
+msgid ""
+"Place a test order with Wolt; it must appear on the kitchen screen and be "
+"accepted automatically. Then switch Sandbox off."
+msgstr ""
+"გააკეთეთ სატესტო შეკვეთა Wolt-ში; ის სამზარეულოს ეკრანზე უნდა გამოჩნდეს და "
+"ავტომატურად მიიღოს. შემდეგ გამორთეთ სატესტო გარემო."
+
+msgid "Video guide coming soon (set DELIVERY_GUIDE_VIDEO_GLOVO)."
+msgstr "ვიდეო გზამკვლევი მალე (დააყენეთ DELIVERY_GUIDE_VIDEO_GLOVO)."
+
+msgid ""
+"Ask your Glovo partner manager for the integration: you receive a store id "
+"and an integration token (stage first, then production)."
+msgstr ""
+"სთხოვეთ Glovo-ს პარტნიორთა მენეჯერს ინტეგრაცია: მიიღებთ მაღაზიის ID-ს და "
+"ინტეგრაციის ტოკენს (ჯერ stage, შემდეგ production)."
+
+msgid ""
+"On the Delivery platforms page, open the Glovo card, paste the store id and "
+"the token, tick Enabled and Save."
+msgstr ""
+"„მიწოდების პლატფორმების“ გვერდზე გახსენით Glovo-ს ბარათი, ჩასვით მაღაზიის ID"
+" და ტოკენი, მონიშნეთ „ჩართული“ და შეინახეთ."
+
+msgid ""
+"Glovo cannot send your menu back through its API. Import it from Wolt (one "
+"click) or enter it once in Menu, then press “Push menu” so Glovo fetches it "
+"from us."
+msgstr ""
+"Glovo თავისი API-ით მენიუს ვერ აბრუნებს. მოახდინეთ იმპორტი Wolt-იდან (ერთი "
+"დაჭერით) ან შეიყვანეთ ერთხელ „მენიუში“, შემდეგ დააჭირეთ „მენიუს გაგზავნა“, "
+"რომ Glovo-მ ჩვენგან წამოიღოს."
+
+msgid ""
+"Press “Rotate webhook token” and send Glovo the token together with these "
+"addresses:"
+msgstr ""
+"დააჭირეთ „Webhook ტოკენის განახლება“ და გაუგზავნეთ Glovo-ს ტოკენი ამ "
+"მისამართებთან ერთად:"
+
+msgid "and the cancel address shown on the card."
+msgstr "და ბარათზე ნაჩვენები გაუქმების მისამართი."
+
+msgid ""
+"Place a stage test order; it must reach the kitchen. Then untick Sandbox and"
+" swap in the production token."
+msgstr ""
+"გააკეთეთ სატესტო შეკვეთა stage-ზე; ის სამზარეულომდე უნდა მივიდეს. შემდეგ "
+"მოხსენით სატესტო გარემო და ჩასვით production ტოკენი."
+
+msgid "Found"
+msgstr "ნაპოვნია"
+
+msgid "dishes in"
+msgstr "კერძი"
+
+#| msgid "Menu Categories"
+msgid "categories"
+msgstr "კატეგორიაში"
+
+msgid "new"
+msgstr "ახალი"
+
+msgid "already in your menu (matched by name, left untouched)"
+msgstr "უკვე თქვენს მენიუშია (სახელით ემთხვევა, უცვლელი რჩება)"
+
+msgid "Currency"
+msgstr "ვალუტა"
+
+msgid "prices read as"
+msgstr "ფასები წაკითხულია როგორც"
+
+msgid "units"
+msgstr "ერთეული"
+
+msgid ""
+"Nothing is deleted or overwritten. Check a few prices below; if they look "
+"100× off, re-fetch with the other unit."
+msgstr ""
+"არაფერი იშლება და არ გადაიწერება. შეამოწმეთ რამდენიმე ფასი ქვემოთ; თუ "
+"100-ჯერ სცდება, ხელახლა წამოიღეთ სხვა ერთეულით."
+
+msgid "Update prices of dishes that already exist"
+msgstr "არსებული კერძების ფასების განახლება"
+
+#| msgid "Download"
+msgid "Download photos"
+msgstr "ფოტოების ჩამოტვირთვა"
+
+msgid "Import"
+msgstr "იმპორტი"
+
+msgid "dishes"
+msgstr "კერძი"
+
+msgid "Prices look wrong? Re-fetch reading them as"
+msgstr "ფასები არასწორია? ხელახლა წამოიღეთ როგორც"
+
+msgid "major units (12.50)"
+msgstr "ძირითადი ერთეული (12.50)"
+
+msgid "minor units (1250 = 12.50)"
+msgstr "წვრილი ერთეული (1250 = 12.50)"
+
+msgid "Open the menu"
+msgstr "მენიუს გახსნა"
+
+msgid "Back"
+msgstr "უკან"
+
+#| msgid "Menu Category"
+msgid "existing category"
+msgstr "არსებული კატეგორია"
+
+msgid "Dish"
+msgstr "კერძი"
+
+msgid "Price"
+msgstr "ფასი"
+
+msgid "Photo"
+msgstr "ფოტო"
+
+#| msgid "Language"
+msgid "Languages"
+msgstr "ენები"
+
+msgid "yours"
+msgstr "თქვენი"
+
+msgid "exists"
+msgstr "არსებობს"
+
+#, python-brace-format
+msgid "{p0} saved."
+msgstr "{p0} შენახულია."
+
+msgid "Webhook token rotated. Copy it now; it is shown once."
+msgstr "Webhook ტოკენი განახლდა. დააკოპირეთ ახლა; ის ერთხელ ჩანს."
+
+msgid ""
+"Menu feed URL rotated. Push the menu again so the platform learns the new "
+"URL."
+msgstr ""
+"მენიუს ბმული განახლდა. ხელახლა გაგზავნეთ მენიუ, რომ პლატფორმამ ახალი ბმული "
+"გაიგოს."
+
+msgid "This platform's API integration is not available yet."
+msgstr "ამ პლატფორმის API ინტეგრაცია ჯერ არ არის ხელმისაწვდომი."
+
+msgid "Menu push queued."
+msgstr "მენიუს გაგზავნა რიგშია."
+
+msgid "Prices and availability sync queued."
+msgstr "ფასებისა და ხელმისაწვდომობის სინქრონიზაცია რიგშია."
+
+#, python-brace-format
+msgid "Could not pause: {p0}"
+msgstr "შეჩერება ვერ მოხერხდა: {p0}"
+
+#, python-brace-format
+msgid "{p0} paused for {p1} minutes."
+msgstr "{p0} შეჩერდა {p1} წუთით."
+
+#, python-brace-format
+msgid "Could not resume: {p0}"
+msgstr "განახლება ვერ მოხერხდა: {p0}"
+
+#, python-brace-format
+msgid "{p0} is taking orders again."
+msgstr "{p0} ისევ იღებს შეკვეთებს."
+
+#, python-brace-format
+msgid "Status check failed: {p0}"
+msgstr "სტატუსის შემოწმება ვერ მოხერხდა: {p0}"
+
+#, python-brace-format
+msgid "{p0}: "
+msgstr "{p0}: "
+
+#, python-brace-format
+msgid "Could not fetch the menu: {p0}"
+msgstr "მენიუს წამოღება ვერ მოხერხდა: {p0}"
+
+# Models - Favorites
+msgid "Favorites"
+msgstr "რჩეულები"
+
+msgid "Not fiscalised (internal numbering)"
+msgstr "არაფისკალური (შიდა ნუმერაცია)"
+
+msgid "RS.ge (waybills only, stub)"
+msgstr "RS.ge (მხოლოდ ზედნადებები, სატესტო)"
+
+msgid "Registered VAT payer (turnover above the threshold)."
+msgstr "რეგისტრირებული დღგ გადამხდელი (ბრუნვა ზღვარს ზემოთ)."
+
+msgid "Menu prices are gross (VAT included)."
+msgstr "მენიუს ფასები დღგ-ს შეიცავს."
+
+msgid "As registered with RS."
+msgstr "როგორც RS-შია რეგისტრირებული."
+
+msgid "ს/კ — 9 digits (company) or 11 (individual)."
+msgstr "ს/კ — 9 ციფრი (კომპანია) ან 11 (ფიზიკური პირი)."
+
+#| msgid "User Profile"
+msgid "Fiscal profile"
+msgstr "ფისკალური პროფილი"
+
+#| msgid "User Profiles"
+msgid "Fiscal profiles"
+msgstr "ფისკალური პროფილები"
+
+msgid "Receipt"
+msgstr "ჩეკი"
+
+#| msgid "Refund"
+msgid "Refund receipt"
+msgstr "დაბრუნების ჩეკი"
+
+msgid "Inbound waybill"
+msgstr "შემოსული ზედნადები"
+
+msgid "Outbound waybill"
+msgstr "გასული ზედნადები"
+
+msgid "E-invoice"
+msgstr "ელ. ინვოისი"
+
+msgid "Draft"
+msgstr "მონახაზი"
 
 msgid "Confirmed"
 msgstr "დადასტურებული"
+
+msgid "Cancelled"
+msgstr "გაუქმებული"
+
+msgid "Refund -> receipt"
+msgstr "დაბრუნება -> ჩეკი"
+
+msgid "False = recorded locally only (non-fiscal watermark)."
+msgstr "False = მხოლოდ ლოკალურად ჩაწერილი (არაფისკალური ნიშანი)."
+
+msgid "Fiscal document"
+msgstr "ფისკალური დოკუმენტი"
+
+msgid "Fiscal documents"
+msgstr "ფისკალური დოკუმენტები"
+
+#| msgid "Confirmed"
+msgid "Confirmed documents"
+msgstr "დადასტურებული დოკუმენტები"
+
+msgid "Draft waybills"
+msgstr "ზედნადებების მონახაზები"
+
+#| msgid "Quantity"
+msgid "Legal entity"
+msgstr "იურიდიული პირი"
+
+msgid "Printed on every receipt and used for RS.ge documents."
+msgstr "იბეჭდება ყველა ჩეკზე და გამოიყენება RS.ge დოკუმენტებში."
+
+msgid "Legal name"
+msgstr "იურიდიული სახელი"
+
+msgid "Tax id (ს/კ)"
+msgstr "საიდენტიფიკაციო კოდი (ს/კ)"
+
+#| msgid "Address"
+msgid "Legal address"
+msgstr "იურიდიული მისამართი"
+
+msgid "VAT"
+msgstr "დღგ"
+
+msgid "Registered VAT payer"
+msgstr "რეგისტრირებული დღგ გადამხდელი"
+
+msgid ""
+"Off for small businesses under the registration threshold: receipts say 'not"
+" a VAT payer'."
+msgstr ""
+"გამორთეთ მცირე ბიზნესისთვის ზღვარს ქვემოთ: ჩეკზე ეწერება „არ არის დღგ "
+"გადამხდელი“."
+
+#, python-format
+msgid "VAT rate %%"
+msgstr "დღგ განაკვეთი %%"
+
+msgid "Menu prices include VAT"
+msgstr "მენიუს ფასები დღგ-ს შეიცავს"
+
+msgid ""
+"Georgian menus are gross: VAT is shown on the receipt but not added on top. "
+"Untick to add VAT to the bill."
+msgstr ""
+"ქართული მენიუები დღგ-ს შეიცავს: დღგ ჩეკზე ჩანს, მაგრამ ზემოდან არ ემატება. "
+"მოხსენით, რომ დღგ ანგარიშს დაემატოს."
+
+msgid "Provider"
+msgstr "პროვაიდერი"
+
+msgid ""
+"No live fiscal provider is connected yet: receipts are numbered locally "
+"(non-fiscal); RS.ge waybills can be exported as XML and, with a service "
+"user, sent."
+msgstr ""
+"ფისკალური პროვაიდერი ჯერ არ არის დაკავშირებული: ჩეკები ლოკალურად ინომრება "
+"(არაფისკალური); RS.ge ზედნადებები XML-ად ექსპორტირდება და სერვის-"
+"მომხმარებლით იგზავნება."
+
+msgid "Receipt prefix"
+msgstr "ჩეკის პრეფიქსი"
+
+msgid "RS.ge service user"
+msgstr "RS.ge სერვის-მომხმარებელი"
+
+msgid "RS.ge service password"
+msgstr "RS.ge სერვის-პაროლი"
+
+msgid "kept"
+msgstr "შენახულია"
+
+msgid "Receipt footer"
+msgstr "ჩეკის ბოლო ტექსტი"
+
+msgid "Test provider connection"
+msgstr "პროვაიდერთან კავშირის შემოწმება"
+
+msgid "Fiscal settings saved."
+msgstr "ფისკალური პარამეტრები შენახულია."
+
+msgid "Provider connection OK."
+msgstr "პროვაიდერთან კავშირი წესრიგშია."
+
+#, python-brace-format
+msgid "Provider check failed: {p0}"
+msgstr "პროვაიდერის შემოწმება ვერ მოხერხდა: {p0}"
+
+msgid "XML"
+msgstr "XML"
+
+msgid "Retry / send"
+msgstr "ხელახლა / გაგზავნა"
+
+#| msgid "Cancelled"
+msgid "Cancel draft"
+msgstr "მონახაზის გაუქმება"
+
+#, python-brace-format
+msgid "{p0} queued again."
+msgstr "{p0} ხელახლა რიგშია."
+
+#, python-brace-format
+#| msgid "Cancelled"
+msgid "{p0} cancelled."
+msgstr "{p0} გაუქმებულია."
+
+msgid "Unit"
+msgstr "ერთეული"
+
+msgid "Units"
+msgstr "ერთეულები"
+
+msgid "Free text, e.g. Dairy, Meat, Dry."
+msgstr "თავისუფალი ტექსტი, მაგ. რძის, ხორცი, მშრალი."
+
+msgid "Unit recipes and counts are kept in (g, ml, pcs)."
+msgstr "ერთეული, რომელშიც რეცეპტები და აღრიცხვა ინახება (გ, მლ, ც)."
+
+msgid "Unit you buy it in (e.g. kg). Same dimension as the base unit."
+msgstr ""
+"ერთეული, რომლითაც ყიდულობთ (მაგ. კგ). იმავე განზომილების, რაც ძირითადი."
+
+msgid "Size of one purchase pack in the purchase unit (a 10 kg bag = 10)."
+msgstr "ერთი შესყიდვის შეფუთვის ზომა შესყიდვის ერთეულში (10 კგ ტომარა = 10)."
+
+msgid "Alert when available stock drops to this (base unit)."
+msgstr "გაფრთხილება, როცა მარაგი ამ დონემდე დაეცემა (ძირითადი ერთეული)."
+
+msgid "Target stock level the buy list tops up to (base unit)."
+msgstr "სამიზნე მარაგი, რომლამდეც შესყიდვის სია ავსებს (ძირითადი ერთეული)."
+
+msgid "Cost per base unit used when no lot cost is known."
+msgstr "ძირითადი ერთეულის ღირებულება, როცა პარტიის ფასი უცნობია."
+
+msgid "Stock item"
+msgstr "საწყობის პოზიცია"
+
+#| msgid "items"
+msgid "Stock items"
+msgstr "საწყობის პოზიციები"
+
+#| msgid "Please wait..."
+msgid "Per base unit."
+msgstr "ძირითად ერთეულზე."
+
+msgid "Invoice / delivery note number."
+msgstr "ინვოისის / ზედნადების ნომერი."
+
+msgid "Stock lot"
+msgstr "პარტია"
+
+msgid "Stock lots (receiving)"
+msgstr "პარტიები (მიღება)"
+
+msgid "Received"
+msgstr "მიღებულია"
+
+msgid "Consumed by order"
+msgstr "შეკვეთამ მოიხმარა"
+
+msgid "Restored (order cancelled)"
+msgstr "აღდგენილია (შეკვეთა გაუქმდა)"
+
+msgid "Waste / write-off"
+msgstr "ნარჩენი / ჩამოწერა"
+
+msgid "Employee meal"
+msgstr "თანამშრომლის კვება"
+
+msgid "Adjustment / count"
+msgstr "კორექცია / აღრიცხვა"
+
+msgid "Spoiled"
+msgstr "გაფუჭდა"
+
+msgid "Expired"
+msgstr "ვადაგასული"
+
+msgid "Kitchen mistake"
+msgstr "სამზარეულოს შეცდომა"
+
+# Models - Accounts
+#| msgid "Accounts"
+msgid "Stock count"
+msgstr "აღრიცხვა"
+
+#| msgid "Action"
+msgid "Correction"
+msgstr "კორექცია"
+
+msgid "Other"
+msgstr "სხვა"
+
+msgid "Stock movement"
+msgstr "მარაგის მოძრაობა"
+
+msgid "Stock movements"
+msgstr "მარაგის მოძრაობები"
+
+msgid "False when a paid order was forced through short stock."
+msgstr "False, როცა გადახდილი შეკვეთა ნაკლები მარაგით გატარდა."
+
+msgid "Recipe line"
+msgstr "რეცეპტის ხაზი"
+
+msgid "Recipe lines"
+msgstr "რეცეპტის ხაზები"
+
+msgid "Spoiled / went bad"
+msgstr "გაფუჭდა"
+
+msgid "Kitchen mistake (burnt, dropped, wrong dish)"
+msgstr "სამზარეულოს შეცდომა (დაიწვა, დაეცა, არასწორი კერძი)"
+
+msgid ""
+"Optional: the exact lot that was thrown away. Otherwise the oldest stock is "
+"written off first."
+msgstr ""
+"არასავალდებულო: კონკრეტული პარტია, რომელიც გადაიყარა. სხვაგვარად ჯერ "
+"უძველესი მარაგი ჩამოიწერება."
+
+msgid "Waste / spoilage"
+msgstr "ნარჩენი / გაფუჭება"
+
+msgid "Waste / spoilage / mistakes"
+msgstr "ნარჩენი / გაფუჭება / შეცდომები"
+
+msgid "Who ate."
+msgstr "ვინ ჭამა."
+
+msgid "For raw ingredients eaten as-is (fruit, bread...)."
+msgstr "ნედლი ინგრედიენტებისთვის, რომლებიც ისე იჭმება (ხილი, პური...)."
+
+msgid "Employee meals"
+msgstr "თანამშრომლების კვება"
+
+msgid "Counted amount, or the +/- correction."
+msgstr "დათვლილი რაოდენობა ან +/- კორექცია."
+
+msgid "Resulting change in base units (filled on save)."
+msgstr "ცვლილება ძირითად ერთეულებში (ივსება შენახვისას)."
+
+msgid "Stock count / adjustment"
+msgstr "აღრიცხვა / კორექცია"
+
+msgid "Stock counts & adjustments"
+msgstr "აღრიცხვები და კორექციები"
+
+msgid "Your store id there."
+msgstr "თქვენი მაღაზიის ID იქ."
+
+msgid "Unguessable part of the public menu URL."
+msgstr "საჯარო მენიუს ბმულის საიდუმლო ნაწილი."
+
+msgid "Platform orders go straight to the kitchen."
+msgstr "პლატფორმის შეკვეთები პირდაპირ სამზარეულოში მიდის."
+
+msgid "Use the platform's stage environment."
+msgstr "პლატფორმის სატესტო გარემოს გამოყენება."
+
+msgid "We asked the platform to hide the store until then."
+msgstr "პლატფორმას ვთხოვეთ მაღაზიის დამალვა ამ დრომდე."
+
+msgid "Delivery platform"
+msgstr "მიწოდების პლატფორმა"
+
+msgid "Delivery platforms (Glovo / Wolt / Bolt Food)"
+msgstr "მიწოდების პლატფორმები (Glovo / Wolt / Bolt Food)"
+
+msgid "Dish sold out"
+msgstr "კერძი ამოწურულია"
+
+msgid "Dish back in stock"
+msgstr "კერძი ისევ ხელმისაწვდომია"
+
+msgid "Low stock"
+msgstr "მცირე მარაგი"
+
+msgid "Expiring soon"
+msgstr "ვადა მალე იწურება"
+
+msgid "Negative stock"
+msgstr "უარყოფითი მარაგი"
+
+msgid "Buy list ready"
+msgstr "შესყიდვის სია მზადაა"
+
+msgid "auto / manual"
+msgstr "ავტო / ხელით"
+
+msgid "Alert"
+msgstr "შეტყობინება"
+
+msgid "Alerts"
+msgstr "შეტყობინებები"
+
+msgid "Warehouse overview"
+msgstr "საწყობის მიმოხილვა"
+
+msgid "Out of stock"
+msgstr "ამოწურულია"
+
+msgid "Dishes sold out"
+msgstr "ამოწურული კერძები"
+
+msgid "Record waste / mistake"
+msgstr "ნარჩენის / შეცდომის ჩაწერა"
+
+msgid "Re-check availability"
+msgstr "ხელმისაწვდომობის გადამოწმება"
+
+msgid "Done"
+msgstr "შესრულებულია"
+
+#| msgid "None"
+msgid "on"
+msgstr "—"
+
+msgid "All clear -- no open alerts."
+msgstr "ყველაფერი წესრიგშია — ღია შეტყობინებები არ არის."
+
+msgid ""
+"Tip: add Glovo / Wolt / Bolt Food under Settings to get a checklist whenever"
+" a dish sells out."
+msgstr ""
+"რჩევა: დაამატეთ Glovo / Wolt / Bolt Food პარამეტრებში, რომ კერძის "
+"ამოწურვისას ჩეკლისტი მიიღოთ."
+
+msgid "What to buy for"
+msgstr "რა ვიყიდოთ"
+
+msgid "Show"
+msgstr "ჩვენება"
+
+#| msgid "Menu Item"
+msgid "Item"
+msgstr "პოზიცია"
+
+# Table status
+msgid "Available"
+msgstr "თავისუფალი"
+
+# Filter labels
+#| msgid "By"
+msgid "Buy"
+msgstr "ყიდვა"
+
+msgid "Est. cost"
+msgstr "სავარ. ღირებ."
+
+msgid "Why"
+msgstr "რატომ"
+
+msgid "Everything is at par -- nothing to buy."
+msgstr "ყველაფერი ნორმაშია — არაფერია საყიდელი."
+
+msgid "Estimated total"
+msgstr "სავარაუდო ჯამი"
+
+msgid "Out of stock & low"
+msgstr "ამოწურული და მცირე"
+
+msgid "Par"
+msgstr "ნორმა"
+
+msgid "Receive"
+msgstr "მიღება"
+
+msgid "Every item is above its minimum."
+msgstr "ყველა პოზიცია მინიმუმზე მეტია."
+
+msgid "Left"
+msgstr "დარჩა"
+
+msgid "Expires"
+msgstr "ვადა"
+
+#| msgid "Required"
+msgid "expired"
+msgstr "ვადაგასული"
+
+# Dates and times
+#| msgid "Today"
+msgid "today"
+msgstr "დღეს"
+
+msgid "d"
+msgstr "დ"
+
+msgid "Write off what is left of this lot?"
+msgstr "ჩამოვწეროთ ამ პარტიის ნაშთი?"
+
+msgid "Write off"
+msgstr "ჩამოწერა"
+
+msgid "Nothing expiring within the warning window."
+msgstr "გაფრთხილების პერიოდში ვადა არაფერს ეწურება."
+
+#| msgid "Reservation History"
+msgid "Alert history"
+msgstr "შეტყობინებების ისტორია"
+
+msgid "On hand"
+msgstr "მარაგში"
+
+msgid "Reserved"
+msgstr "დაჯავშნილი"
+
+msgid "Cost per unit"
+msgstr "ერთეულის ღირებულება"
+
+msgid "Level"
+msgstr "დონე"
+
+msgid "Used in"
+msgstr "გამოიყენება"
+
+#| msgid "Warning"
+msgid "Remaining"
+msgstr "ნაშთი"
+
+msgid "Expiry"
+msgstr "ვადა"
+
+msgid "Quantity"
+msgstr "რაოდენობა"
+
+#| msgid "Active"
+msgid "Ate"
+msgstr "ჭამა"
+
+msgid "Entered"
+msgstr "შეიყვანა"
+
+msgid "Change"
+msgstr "შეცვლა"
+
+msgid "Order"
+msgstr "შეკვეთა"
+
+msgid "Mark selected alerts done"
+msgstr "არჩეული შეტყობინებების დახურვა"
+
+msgid "Alert marked done."
+msgstr "შეტყობინება დახურულია."
+
+#, python-brace-format
+msgid "All platforms updated -- '{p0}' closed."
+msgstr "ყველა პლატფორმა განახლდა — „{p0}“ დახურულია."
+
+msgid "Nothing left in that lot."
+msgstr "ამ პარტიაში არაფერი დარჩა."
+
+#, python-brace-format
+msgid "Wrote off {p0} of {p1}."
+msgstr "ჩამოიწერა {p0} — {p1}."
+
+msgid "Availability re-checked against current stock."
+msgstr "ხელმისაწვდომობა გადამოწმდა მიმდინარე მარაგით."
+
+msgid "Cost"
+msgstr "ღირებულება"
+
+msgid "Ingredient cost"
+msgstr "ინგრედიენტების ღირებულება"
+
+msgid "Buying this item earns punches."
+msgstr "ამ პოზიციის ყიდვა ქულებს აგროვებს."
+
+msgid "Punches required to unlock the reward."
+msgstr "ჯილდოსთვის საჭირო ქულების რაოდენობა."
+
+msgid "Item the customer gets free when the threshold is hit."
+msgstr "პოზიცია, რომელსაც სტუმარი უფასოდ იღებს ზღვარზე."
+
+msgid "How long a generated redemption code is valid."
+msgstr "რამდენ ხანს მოქმედებს გენერირებული კოდი."
+
+msgid "Inclusive lower bound of points-in-window for this tier."
+msgstr "ამ დონის ქულების ქვედა ზღვარი (ჩათვლით)."
+
+msgid "Integer 0–100. Applied to subtotal at checkout."
+msgstr "მთელი რიცხვი 0–100. ვრცელდება ქვეჯამზე გადახდისას."
+
+msgid "Platform loyalty tier"
+msgstr "პლატფორმის ლოიალობის დონე"
+
+msgid "Platform loyalty tiers"
+msgstr "პლატფორმის ლოიალობის დონეები"
+
+msgid "Platform loyalty ledger entry"
+msgstr "პლატფორმის ლოიალობის ჩანაწერი"
+
+msgid "Platform loyalty ledger"
+msgstr "პლატფორმის ლოიალობის რეესტრი"
+
+msgid "BlurHash string for the image — used as an inline LQIP."
+msgstr "სურათის BlurHash — გამოიყენება ჩაშენებულ LQIP-ად."
+
+msgid "Menu Category"
+msgstr "მენიუს კატეგორია"
+
+msgid "Menu Categories"
+msgstr "მენიუს კატეგორიები"
+
+msgid "Kitchen"
+msgstr "სამზარეულო"
+
+msgid "Bar"
+msgstr "ბარი"
+
+msgid "Both"
+msgstr "ორივე"
+
+msgid "Gluten"
+msgstr "გლუტენი"
+
+msgid "Dairy"
+msgstr "რძის პროდუქტი"
+
+msgid "Eggs"
+msgstr "კვერცხი"
+
+msgid "Fish"
+msgstr "თევზი"
+
+msgid "Shellfish"
+msgstr "ზღვის პროდუქტები"
+
+msgid "Tree Nuts"
+msgstr "თხილეული"
+
+msgid "Peanuts"
+msgstr "არაქისი"
+
+msgid "Soy"
+msgstr "სოია"
+
+msgid "Sesame"
+msgstr "სეზამი"
+
+msgid ""
+"Set by the warehouse when a recipe ingredient has run out; cleared when it "
+"is restocked."
+msgstr ""
+"საწყობი აყენებს, როცა რეცეპტის ინგრედიენტი ამოიწურება; იხსნება მარაგის "
+"შევსებისას."
+
+msgid "Featured items appear prominently in the menu"
+msgstr "გამორჩეული პოზიციები მენიუში თვალსაჩინოდ ჩანს"
+
+msgid "Estimated preparation time in minutes"
+msgstr "სავარაუდო მომზადების დრო წუთებში"
+
+msgid "Calorie count per serving"
+msgstr "კალორიები ულუფაზე"
+
+msgid "List of allergen codes (e.g., ['gluten', 'dairy'])"
+msgstr "ალერგენების კოდები (მაგ. ['gluten', 'dairy'])"
+
+msgid "Spicy level 0-5 (0 = not spicy)"
+msgstr "სიცხარე 0-5 (0 = არ არის ცხარე)"
+
+msgid "Deprecated: see Warehouse recipes."
+msgstr "მოძველებულია: იხ. საწყობის რეცეპტები."
+
+msgid "Menu Item"
+msgstr "მენიუს ერთეული"
+
+msgid "Menu Items"
+msgstr "მენიუს ერთეულები"
+
+#| msgid "Table Section"
+msgid "Single Selection"
+msgstr "ერთი არჩევანი"
+
+#| msgid "Table Section"
+msgid "Multiple Selection"
+msgstr "რამდენიმე არჩევანი"
+
+msgid "Minimum number of selections required"
+msgstr "არჩევანის მინიმალური რაოდენობა"
+
+msgid "Maximum number of selections allowed"
+msgstr "არჩევანის მაქსიმალური რაოდენობა"
+
+msgid "Customer must make a selection from this group"
+msgstr "სტუმარმა ამ ჯგუფიდან უნდა აირჩიოს"
+
+msgid ""
+"Only staff see this. Use it to tell similar groups apart, e.g. 'ქათმის "
+"ხვეულა - ექსტრა'."
+msgstr ""
+"მხოლოდ პერსონალი ხედავს. მსგავსი ჯგუფების გასარჩევად, მაგ. „ქათმის ხვეულა - "
+"ექსტრა“."
+
+msgid "Modifier Group"
+msgstr "მოდიფიკატორის ჯგუფი"
+
+msgid "Modifier Groups"
+msgstr "მოდიფიკატორების ჯგუფები"
+
+msgid "Price adjustment (can be positive or negative)"
+msgstr "ფასის ცვლილება (დადებითი ან უარყოფითი)"
+
+msgid "Pre-selected by default"
+msgstr "ნაგულისხმევად არჩეული"
+
+msgid "Modifier"
+msgstr "მოდიფიკატორი"
+
+msgid "Modifiers"
+msgstr "მოდიფიკატორები"
+
+msgid "Push device"
+msgstr "Push მოწყობილობა"
+
+msgid "Push devices"
+msgstr "Push მოწყობილობები"
+
+msgid "Deep-link payload for the POS (kind, id)."
+msgstr "ბმულის მონაცემები POS-ისთვის (kind, id)."
+
+msgid "Admin page to open."
+msgstr "გასახსნელი ადმინ გვერდი."
+
+#| msgid "Position"
+msgid "Notification"
+msgstr "შეტყობინება"
+
+msgid "No push between these hours (in-app still)."
+msgstr "ამ საათებში push არ იგზავნება (აპში მაინც ჩანს)."
+
+msgid "Staff notification preferences"
+msgstr "პერსონალის შეტყობინებების პარამეტრები"
+
+msgid "Send SMS to guests (needs an SMS provider)."
+msgstr "SMS სტუმრებს (საჭიროა SMS პროვაიდერი)."
+
+msgid "Send email to guests when they gave an address."
+msgstr "ელფოსტა სტუმრებს, თუ მისამართი მიუთითეს."
+
+msgid "Shown as the restaurant name."
+msgstr "ჩანს რესტორნის სახელად."
+
+#| msgid "Reservation Settings"
+msgid "Notification settings"
+msgstr "შეტყობინებების პარამეტრები"
+
+msgid "Skipped"
+msgstr "გამოტოვებულია"
+
+#| msgid "Reservation History"
+msgid "Reservation confirmation"
+msgstr "ჯავშნის დადასტურება"
+
+#| msgid "Reservation Settings"
+msgid "Reservation reminder"
+msgstr "ჯავშნის შეხსენება"
+
+msgid "Review prompt"
+msgstr "შეფასების მოწვევა"
+
+msgid "Marketing campaign"
+msgstr "მარკეტინგული კამპანია"
+
+msgid "Marketing automation"
+msgstr "მარკეტინგული ავტომატიზაცია"
+
+msgid "Purchase order"
+msgstr "შესყიდვის შეკვეთა"
+
+msgid "Test message"
+msgstr "სატესტო შეტყობინება"
+
+msgid "Outbound message"
+msgstr "გასული შეტყობინება"
+
+msgid "Outbound messages"
+msgstr "გასული შეტყობინებები"
+
+#| msgid "Staff Roles"
+msgid "Staff push"
+msgstr "პერსონალის push"
+
+msgid ""
+"Staff get in-app and phone notifications from the POS app. Each person "
+"chooses what to hear about in POS → Settings."
+msgstr ""
+"პერსონალი შეტყობინებებს POS აპში და ტელეფონზე იღებს. თითოეული თავად ირჩევს, "
+"რაზე მიიღოს POS → პარამეტრებში."
+
+msgid "Guest SMS"
+msgstr "SMS სტუმრებს"
+
+msgid ""
+"No SMS provider is connected yet (SMS_PROVIDER). Messages are recorded as "
+"skipped."
+msgstr ""
+"SMS პროვაიდერი ჯერ არ არის დაკავშირებული (SMS_PROVIDER). შეტყობინებები "
+"გამოტოვებულად იწერება."
+
+msgid "Guest email"
+msgstr "ელფოსტა სტუმრებს"
+
+msgid "Email is configured."
+msgstr "ელფოსტა დაყენებულია."
+
+msgid "No outgoing email server is configured yet (EMAIL_HOST)."
+msgstr "გამავალი ელფოსტის სერვერი ჯერ არ არის დაყენებული (EMAIL_HOST)."
+
+msgid "Guest messages"
+msgstr "შეტყობინებები სტუმრებს"
+
+#, python-brace-format
+msgid ""
+"Confirmations and reminders for reservations; review prompts and campaigns "
+"once CRM is on. Placeholders: {name} {restaurant} {date} {time} {guests} "
+"{code} {link}"
+msgstr ""
+"ჯავშნის დადასტურებები და შეხსენებები; შეფასების მოწვევები და კამპანიები CRM-"
+"ის ჩართვისას. ჩანაცვლებები: {name} {restaurant} {date} {time} {guests} "
+"{code} {link}"
+
+msgid "Send SMS to guests"
+msgstr "SMS-ის გაგზავნა სტუმრებს"
+
+msgid "Send email to guests"
+msgstr "ელფოსტის გაგზავნა სტუმრებს"
+
+# Login
+#| msgid "Username"
+msgid "Sender name"
+msgstr "გამგზავნის სახელი"
+
+#| msgid "Change"
+msgid "Channel"
+msgstr "არხი"
+
+msgid "Send a test to"
+msgstr "ტესტის გაგზავნა"
+
+msgid "Send test"
+msgstr "ტესტის გაგზავნა"
+
+msgid "Who hears what"
+msgstr "ვინ რას იგებს"
+
+msgid ""
+"Defaults follow permissions (orders, reservations, warehouse, cash…). "
+"Devices = phones with the POS app signed in."
+msgstr ""
+"ნაგულისხმევი უფლებებს მიჰყვება (შეკვეთები, ჯავშნები, საწყობი, სალარო…). "
+"მოწყობილობები = ტელეფონები POS აპით."
+
+msgid "Push"
+msgstr "Push"
+
+msgid "Muted events"
+msgstr "გაჩუმებული მოვლენები"
+
+msgid "Devices"
+msgstr "მოწყობილობები"
+
+msgid "Events"
+msgstr "მოვლენები"
+
+msgid "Recent guest messages"
+msgstr "ბოლო შეტყობინებები სტუმრებს"
+
+msgid "All messages"
+msgstr "ყველა შეტყობინება"
+
+msgid "Nothing sent yet."
+msgstr "ჯერ არაფერი გაგზავნილა."
+
+msgid "Notification settings saved."
+msgstr "შეტყობინებების პარამეტრები შენახულია."
+
+msgid "Choose SMS or email and enter a destination."
+msgstr "აირჩიეთ SMS ან ელფოსტა და მიუთითეთ მიმღები."
+
+#, python-brace-format
+msgid "Test {p0} sent to {p1}."
+msgstr "სატესტო {p0} გაიგზავნა {p1}-ზე."
+
+#| msgid "Reserved"
+msgid "Resend"
+msgstr "ხელახლა გაგზავნა"
+
+#, python-brace-format
+msgid "Message to {p0} queued again."
+msgstr "შეტყობინება {p0}-ზე ხელახლა რიგშია."
+
+msgid "Manual"
+msgstr "ხელით"
+
+msgid "Loyalty tier"
+msgstr "ლოიალობის დონე"
+
+#| msgid "Position"
+msgid "Promotion"
+msgstr "აქცია"
+
+#| msgid "Payment"
+msgid "Pending Payment"
+msgstr "გადახდის მოლოდინში"
+
+# Status choices - Order
+msgid "Pending"
+msgstr "მოლოდინში"
 
 msgid "Preparing"
 msgstr "მზადდება"
@@ -324,502 +2181,1468 @@ msgstr "მიწოდებული"
 msgid "Completed"
 msgstr "დასრულებული"
 
-msgid "Cancelled"
-msgstr "გაუქმებული"
+msgid "Dine In"
+msgstr "ადგილზე"
 
-msgid "Paid"
-msgstr "გადახდილი"
+msgid "Takeaway"
+msgstr "წასაღები"
 
-msgid "Partially Paid"
-msgstr "ნაწილობრივ გადახდილი"
+msgid "Delivery"
+msgstr "მიწოდება"
 
-msgid "Unpaid"
-msgstr "გადაუხდელი"
+#| msgid "View site"
+msgid "Website"
+msgstr "ვებსაიტი"
 
-# Table status
-msgid "Available"
-msgstr "თავისუფალი"
+#| msgid "Table"
+msgid "QR table"
+msgstr "QR მაგიდა"
 
-msgid "Occupied"
-msgstr "დაკავებული"
+msgid "POS"
+msgstr "POS"
 
-msgid "Reserved"
-msgstr "დაჯავშნილი"
+msgid "Glovo"
+msgstr "Glovo"
 
-msgid "Unavailable"
-msgstr "მიუწვდომელი"
+msgid "Wolt"
+msgstr "Wolt"
 
-# Days of week
-msgid "Monday"
-msgstr "ორშაბათი"
+msgid "Bolt Food"
+msgstr "Bolt Food"
 
-msgid "Tuesday"
-msgstr "სამშაბათი"
+msgid "Human-readable order number (e.g., ORD-001)"
+msgstr "წაკითხვადი შეკვეთის ნომერი (მაგ. ORD-001)"
 
-msgid "Wednesday"
-msgstr "ოთხშაბათი"
+msgid "The guest at the table who placed this order"
+msgstr "სტუმარი მაგიდასთან, რომელმაც ეს შეკვეთა გააკეთა"
 
-msgid "Thursday"
-msgstr "ხუთშაბათი"
+msgid "Optional — set when this order was placed as part of a reservation."
+msgstr "არასავალდებულო — ივსება, თუ შეკვეთა ჯავშნის ნაწილია."
 
-msgid "Friday"
-msgstr "პარასკევი"
+msgid "Optional gratuity paid on top of subtotal/tax/service."
+msgstr "არასავალდებულო ჩაი ქვეჯამის/გადასახადის/მომსახურების ზემოთ."
 
-msgid "Saturday"
-msgstr "შაბათი"
+msgid "Staff member credited with serving this order (for tip distribution)."
+msgstr "თანამშრომელი, რომელსაც ეს შეკვეთა ეთვლება (ჩაის განაწილებისთვის)."
 
-msgid "Sunday"
-msgstr "კვირა"
+msgid "Special requests or notes from customer"
+msgstr "სტუმრის სპეციალური მოთხოვნები ან შენიშვნები"
 
-# Common fields
-msgid "Name"
-msgstr "სახელი"
+msgid "Staff member who handled this order"
+msgstr "თანამშრომელი, რომელმაც შეკვეთა დაამუშავა"
 
-msgid "Description"
-msgstr "აღწერა"
+#| msgid "Order Status Histories"
+msgid "Order status histories"
+msgstr "შეკვეთის სტატუსის ისტორია"
 
-msgid "Price"
-msgstr "ფასი"
+msgid "Sequential per restaurant."
+msgstr "თანმიმდევრული რესტორნის მიხედვით."
 
-msgid "Status"
-msgstr "სტატუსი"
+msgid "counted - expected"
+msgstr "დათვლილი - მოსალოდნელი"
 
-msgid "Active"
-msgstr "აქტიური"
+msgid "Z report frozen at close."
+msgstr "Z ანგარიში დაფიქსირებულია დახურვისას."
 
-msgid "Created at"
-msgstr "შექმნის თარიღი"
+msgid "Cash shift"
+msgstr "სალაროს ცვლა"
 
-msgid "Updated at"
-msgstr "განახლების თარიღი"
+msgid "Cash shifts"
+msgstr "სალაროს ცვლები"
 
-msgid "Created"
-msgstr "შექმნილი"
+# Models - Accounts
+#| msgid "Accounts"
+msgid "Discount"
+msgstr "ფასდაკლება"
 
-msgid "Updated"
-msgstr "განახლებული"
+msgid "Comp (on the house)"
+msgstr "უფასოდ (რესტორნისგან)"
 
-msgid "Is active"
-msgstr "აქტიურია"
+msgid "Void"
+msgstr "ანულირება"
 
-msgid "Is available"
-msgstr "ხელმისაწვდომია"
+msgid "Refund"
+msgstr "თანხის დაბრუნება"
 
-msgid "Email"
-msgstr "ელ. ფოსტა"
+msgid "Only roles with 'Cash & payments: edit' may use it."
+msgstr "მხოლოდ როლებს „სალარო და გადახდები: რედაქტირება“ უფლებით."
 
-msgid "Phone"
-msgstr "ტელეფონი"
+msgid "Discount / void reason"
+msgstr "ფასდაკლების / ანულირების მიზეზი"
 
-msgid "Phone number"
-msgstr "ტელეფონის ნომერი"
+msgid "Discount / void reasons"
+msgstr "ფასდაკლების / ანულირების მიზეზები"
 
-msgid "Address"
-msgstr "მისამართი"
+#| msgid "Refund"
+msgid "Refunded"
+msgstr "დაბრუნებულია"
 
-msgid "Image"
-msgstr "სურათი"
+#| msgid "Partially Paid"
+msgid "Partially Refunded"
+msgstr "ნაწილობრივ დაბრუნებულია"
 
-msgid "Note"
-msgstr "შენიშვნა"
+msgid "Cash"
+msgstr "ნაღდი"
 
-msgid "Notes"
-msgstr "შენიშვნები"
+msgid "Card (terminal)"
+msgstr "ბარათი (ტერმინალი)"
 
-msgid "Date"
-msgstr "თარიღი"
+msgid "Online (Bank of Georgia)"
+msgstr "ონლაინ (საქართველოს ბანკი)"
 
-msgid "Time"
-msgstr "დრო"
+msgid "Online (Flitt)"
+msgstr "ონლაინ (Flitt)"
 
-msgid "Amount"
-msgstr "თანხა"
+msgid "Voucher"
+msgstr "ვაუჩერი"
 
-msgid "Total"
-msgstr "ჯამი"
+msgid "Card"
+msgstr "ბარათი"
 
-msgid "Subtotal"
-msgstr "ქვეჯამი"
+#| msgid "Payment"
+msgid "Mobile Payment"
+msgstr "მობილური გადახდა"
 
-msgid "Quantity"
-msgstr "რაოდენობა"
+msgid ""
+"The (first) order this payment settles; the full split is in the "
+"allocations."
+msgstr ""
+"(პირველი) შეკვეთა, რომელსაც ეს გადახდა ფარავს; სრული განაწილება "
+"ალოკაციებშია."
 
-msgid "Number"
-msgstr "ნომერი"
+msgid "Staff member who processed this payment"
+msgstr "თანამშრომელი, რომელმაც გადახდა მიიღო"
 
-msgid "Capacity"
-msgstr "ტევადობა"
+#| msgid "Amount"
+msgid "Amount + tip"
+msgstr "თანხა + ჩაი"
 
-msgid "Position"
-msgstr "პოზიცია"
+msgid "Payment ID from external provider (Stripe, etc.)"
+msgstr "გადახდის ID გარე პროვაიდერისგან (Stripe და ა.შ.)"
 
-msgid "Sort order"
-msgstr "დალაგების რიგი"
+msgid "Payment method ID from external provider"
+msgstr "გადახდის მეთოდის ID გარე პროვაიდერისგან"
 
-msgid "Slug"
-msgstr "სლაგი"
+msgid "Stripe PaymentIntent ID"
+msgstr "Stripe PaymentIntent ID"
 
-# Yes/No
-msgid "Yes"
-msgstr "დიახ"
+msgid "Cash handed over by the customer (cash payments)."
+msgstr "სტუმრის მიერ გადმოცემული ნაღდი ფული."
 
-msgid "No"
-msgstr "არა"
+msgid "Payment"
+msgstr "გადახდა"
 
-msgid "All"
-msgstr "ყველა"
+msgid "Customer Request"
+msgstr "სტუმრის მოთხოვნა"
 
-msgid "Any"
-msgstr "ნებისმიერი"
+#| msgid "Unavailable"
+msgid "Item Unavailable"
+msgstr "პოზიცია მიუწვდომელია"
 
-msgid "None"
+msgid "Quality Issue"
+msgstr "ხარისხის პრობლემა"
+
+#| msgid "Group Order"
+msgid "Wrong Order"
+msgstr "არასწორი შეკვეთა"
+
+msgid "Online provider"
+msgstr "ონლაინ პროვაიდერი"
+
+msgid "Order the refunded amount is taken off (for paid/balance figures)."
+msgstr "შეკვეთა, რომელსაც დაბრუნებული თანხა აკლდება (გადახდილი/ბალანსისთვის)."
+
+msgid "Refund ID from external provider"
+msgstr "დაბრუნების ID გარე პროვაიდერისგან"
+
+# Models - Accounts
+#| msgid "Accounts"
+msgid "Bank Account"
+msgstr "საბანკო ანგარიში"
+
+msgid "Customer ID from external provider"
+msgstr "კლიენტის ID გარე პროვაიდერისგან"
+
+msgid "UUID returned by BOG when the order was created."
+msgstr "BOG-ის მიერ დაბრუნებული UUID შეკვეთის შექმნისას."
+
+msgid ""
+"Our reference (Order.order_number, Reservation.confirmation_code, or "
+"method_intent_id)."
+msgstr ""
+"ჩვენი მითითება (Order.order_number, Reservation.confirmation_code ან "
+"method_intent_id)."
+
+msgid "Populated when this transaction tokenised a card (add_card flow)."
+msgstr "ივსება, როცა ტრანზაქციამ ბარათი დაატოკენა (add_card)."
+
+msgid ""
+"Populated when this transaction settles a whole table (session_settle flow)."
+msgstr "ივსება, როცა ტრანზაქცია მთელ მაგიდას ხურავს (session_settle)."
+
+msgid ""
+"BOG payment_detail.code (e.g. 100 = success, 107 = insufficient funds)."
+msgstr ""
+"BOG payment_detail.code (მაგ. 100 = წარმატება, 107 = არასაკმარისი თანხა)."
+
+msgid "BOG Transaction"
+msgstr "BOG ტრანზაქცია"
+
+#| msgid "My actions"
+msgid "BOG Transactions"
+msgstr "BOG ტრანზაქციები"
+
+#| msgid "Site administration"
+msgid "Flitt Transaction"
+msgstr "Flitt ტრანზაქცია"
+
+msgid "Flitt Transactions"
+msgstr "Flitt ტრანზაქციები"
+
+#| msgid "Restaurant"
+msgid "Restaurant Debit"
+msgstr "რესტორნის დებეტი"
+
+#| msgid "Restaurants"
+msgid "Restaurant Debits"
+msgstr "რესტორნის დებეტები"
+
+msgid "Difference"
+msgstr "სხვაობა"
+
+msgid "Z report"
+msgstr "Z ანგარიში"
+
+msgid "E.g. 'Kitchen pass', 'Bar', 'Till'."
+msgstr "მაგ. „სამზარეულო“, „ბარი“, „სალარო“."
+
+msgid "Which items go on this printer's tickets (kitchen printers only)."
+msgstr ""
+"რომელი პოზიციები იბეჭდება ამ პრინტერზე (მხოლოდ სამზარეულოს პრინტერები)."
+
+msgid ""
+"Kitchen/bar: print a ticket when an order is accepted. Receipt: print when a"
+" payment is taken."
+msgstr ""
+"სამზარეულო/ბარი: ბილეთი იბეჭდება შეკვეთის მიღებისას. ჩეკი: გადახდისას."
+
+msgid "Receipt printers: kick the cash drawer on cash payments."
+msgstr "ჩეკის პრინტერები: ნაღდი გადახდისას სალაროს უჯრის გახსნა."
+
+msgid "Last poll from the bridge."
+msgstr "ბოლო კავშირი bridge-დან."
+
+#| msgid "Print"
+msgid "Printer"
+msgstr "პრინტერი"
+
+msgid "What was rendered (for reprints / audit)."
+msgstr "რა დაიბეჭდა (ხელახლა ბეჭდვისთვის / აუდიტისთვის)."
+
+msgid "Rendered ESC/POS bytes the bridge writes to the device."
+msgstr "ESC/POS ბაიტები, რომლებსაც bridge მოწყობილობაზე წერს."
+
+#| msgid "Print"
+msgid "Print job"
+msgstr "ბეჭდვის დავალება"
+
+msgid "Bridge"
+msgstr "Bridge"
+
+msgid "Print bridge setup"
+msgstr "Print bridge-ის დაყენება"
+
+msgid "Print a test page"
+msgstr "სატესტო გვერდის ბეჭდვა"
+
+#, python-brace-format
+msgid "{p0} test page(s) queued."
+msgstr "{p0} სატესტო გვერდი რიგშია."
+
+msgid "Print test page"
+msgstr "სატესტო გვერდი"
+
+msgid "Not allowed."
+msgstr "დაუშვებელია."
+
+#, python-brace-format
+msgid "Test page queued on {p0}."
+msgstr "სატესტო გვერდი რიგშია: {p0}."
+
+msgid "Rotate bridge key (old key stops working)"
+msgstr "Bridge გასაღების განახლება (ძველი აღარ იმუშავებს)"
+
+msgid "Bridge key rotated. Update bridge.toml on the printer's computer."
+msgstr ""
+"Bridge გასაღები განახლდა. განაახლეთ bridge.toml პრინტერის კომპიუტერზე."
+
+msgid "Retry (queue again)"
+msgstr "ხელახლა (რიგში დაბრუნება)"
+
+#, python-brace-format
+msgid "{p0} job(s) queued again."
+msgstr "{p0} დავალება ხელახლა რიგშია."
+
+msgid "Referrals"
+msgstr "რეფერალები"
+
+msgid "Apply"
+msgstr "გამოყენება"
+
+msgid "vs previous period"
+msgstr "წინა პერიოდთან"
+
+#| msgid "Export"
+msgid "Export CSV"
+msgstr "CSV ექსპორტი"
+
+msgid "Nothing in this period."
+msgstr "ამ პერიოდში არაფერია."
+
+msgid "Menu engineering"
+msgstr "მენიუს ინჟინერია"
+
+msgid "Popularity threshold"
+msgstr "პოპულარობის ზღვარი"
+
+msgid "margin threshold"
+msgstr "მარჟის ზღვარი"
+
+#| msgid "Position"
+msgid "portion"
+msgstr "ულუფა"
+
+msgid "Stars"
+msgstr "ვარსკვლავები"
+
+msgid "popular & profitable"
+msgstr "პოპულარული და მომგებიანი"
+
+msgid "Plowhorses"
+msgstr "სამუშაო ცხენები"
+
+msgid "popular, thin margin"
+msgstr "პოპულარული, დაბალი მარჟა"
+
+msgid "Puzzles"
+msgstr "თავსატეხები"
+
+msgid "profitable, rarely ordered"
+msgstr "მომგებიანი, იშვიათად უკვეთავენ"
+
+msgid "Dogs"
+msgstr "ძაღლები"
+
+msgid "neither"
 msgstr "არცერთი"
 
-# Pagination
-msgid "Show all"
-msgstr "ყველას ჩვენება"
-
-msgid "items"
-msgstr "ერთეული"
-
-msgid "of"
-msgstr "-დან"
-
-msgid "results"
-msgstr "შედეგი"
-
-# Confirmation
-msgid "Are you sure?"
-msgstr "დარწმუნებული ხართ?"
-
-msgid "Are you sure you want to delete"
-msgstr "დარწმუნებული ხართ, რომ გსურთ წაშლა"
-
-msgid "Successfully deleted"
-msgstr "წარმატებით წაიშალა"
-
-msgid "Successfully saved"
-msgstr "წარმატებით შეინახა"
-
-msgid "Successfully added"
-msgstr "წარმატებით დაემატა"
-
-msgid "Successfully updated"
-msgstr "წარმატებით განახლდა"
-
-msgid "Error"
-msgstr "შეცდომა"
-
-msgid "Warning"
-msgstr "გაფრთხილება"
-
-msgid "Success"
-msgstr "წარმატება"
-
-msgid "Info"
-msgstr "ინფორმაცია"
-
-# Profile Settings
-msgid "Profile Settings"
-msgstr "პროფილის პარამეტრები"
-
-msgid "Account Information"
-msgstr "ანგარიშის ინფორმაცია"
-
-msgid "Language"
-msgstr "ენა"
-
-msgid "Save Language"
-msgstr "ენის შენახვა"
-
-msgid "Security"
-msgstr "უსაფრთხოება"
-
-msgid "Change Password"
-msgstr "პაროლის შეცვლა"
-
-# Form validation
-msgid "This field is required."
-msgstr "ეს ველი სავალდებულოა."
-
-msgid "Enter a valid email address."
-msgstr "შეიყვანეთ სწორი ელ. ფოსტა."
-
-msgid "Enter a valid value."
-msgstr "შეიყვანეთ სწორი მნიშვნელობა."
-
-msgid "Enter a valid number."
-msgstr "შეიყვანეთ სწორი რიცხვი."
-
-msgid "Enter a valid date."
-msgstr "შეიყვანეთ სწორი თარიღი."
-
-msgid "Enter a valid time."
-msgstr "შეიყვანეთ სწორი დრო."
-
-msgid "This field cannot be blank."
-msgstr "ეს ველი არ შეიძლება იყოს ცარიელი."
-
-msgid "Please correct the error below."
-msgstr "გთხოვთ, გაასწოროთ ქვემოთ მოცემული შეცდომა."
-
-msgid "Please correct the errors below."
-msgstr "გთხოვთ, გაასწოროთ ქვემოთ მოცემული შეცდომები."
-
-# Login
-msgid "Username"
-msgstr "მომხმარებლის სახელი"
-
-msgid "Password"
-msgstr "პაროლი"
-
-msgid "Forgot your password?"
-msgstr "დაგავიწყდათ პაროლი?"
-
-msgid "Remember me"
-msgstr "დამიმახსოვრე"
-
-msgid "Sign in"
-msgstr "შესვლა"
-
-msgid "Sign up"
-msgstr "რეგისტრაცია"
-
-msgid "Sign out"
-msgstr "გასვლა"
-
-# Password
-msgid "Old password"
-msgstr "ძველი პაროლი"
-
-msgid "New password"
-msgstr "ახალი პაროლი"
-
-msgid "Confirm password"
-msgstr "პაროლის დადასტურება"
-
-msgid "Password confirmation"
-msgstr "პაროლის დადასტურება"
-
-msgid "The two password fields didn't match."
-msgstr "პაროლის ორი ველი არ ემთხვევა."
-
-msgid "Your password was changed."
-msgstr "თქვენი პაროლი შეიცვალა."
-
-# Dates and times
-msgid "Today"
-msgstr "დღეს"
+msgid "Without a recipe (not classified):"
+msgstr "რეცეპტის გარეშე (არ არის კლასიფიცირებული):"
 
 msgid "Yesterday"
 msgstr "გუშინ"
 
-msgid "Tomorrow"
-msgstr "ხვალ"
-
-msgid "Now"
-msgstr "ახლა"
+#| msgid "This year"
+msgid "This week"
+msgstr "ეს კვირა"
 
 msgid "This month"
 msgstr "ამ თვეში"
 
-msgid "This year"
-msgstr "ამ წელს"
+#| msgid "Menu Items"
+msgid "Menu & dishes"
+msgstr "მენიუ და კერძები"
 
-msgid "Past 7 days"
-msgstr "ბოლო 7 დღე"
+msgid "Food cost"
+msgstr "პროდუქტების ღირებულება"
+
+msgid "Net sales"
+msgstr "წმინდა გაყიდვები"
+
+msgid "Average ticket"
+msgstr "საშუალო ჩეკი"
+
+msgid "Gross total"
+msgstr "მთლიანი ჯამი"
+
+# Models - Accounts
+#| msgid "Accounts"
+msgid "Discounts"
+msgstr "ფასდაკლებები"
+
+msgid "Tips"
+msgstr "ჩაი"
+
+msgid "Service charge"
+msgstr "მომსახურების საფასური"
+
+msgid "Tax"
+msgstr "გადასახადი"
+
+#| msgid "Cancelled"
+msgid "Cancelled orders"
+msgstr "გაუქმებული შეკვეთები"
+
+#| msgid "Order Items"
+msgid "Voided items"
+msgstr "ანულირებული პოზიციები"
+
+#| msgid "Past 7 days"
+msgid "Sales by day"
+msgstr "გაყიდვები დღეების მიხედვით"
+
+# Models - Orders
+#| msgid "Orders"
+msgid "Orders by hour"
+msgstr "შეკვეთები საათების მიხედვით"
+
+msgid "Day"
+msgstr "დღე"
+
+msgid "Gross"
+msgstr "მთლიანი"
+
+msgid "Type"
+msgstr "ტიპი"
+
+#| msgid "Payment Method"
+msgid "Method"
+msgstr "მეთოდი"
+
+msgid "Amount"
+msgstr "თანხა"
+
+msgid "Hour"
+msgstr "საათი"
+
+msgid "Dishes sold"
+msgstr "გაყიდული კერძები"
+
+msgid "Distinct dishes"
+msgstr "სხვადასხვა კერძი"
+
+msgid "Top dish"
+msgstr "ტოპ კერძი"
+
+msgid "Comped lines"
+msgstr "უფასო პოზიციები"
+
+msgid "Top 10 dishes by revenue"
+msgstr "ტოპ 10 კერძი შემოსავლით"
+
+#| msgid "Menu Category"
+msgid "Category"
+msgstr "კატეგორია"
+
+msgid "Qty"
+msgstr "რაოდ."
+
+msgid "Share of qty"
+msgstr "წილი რაოდენობით"
+
+msgid "Net revenue"
+msgstr "წმინდა შემოსავალი"
+
+msgid "Share of revenue"
+msgstr "წილი შემოსავალში"
+
+msgid "Avg price"
+msgstr "საშ. ფასი"
+
+#| msgid "Modifiers"
+msgid "Modifiers / line"
+msgstr "მოდიფიკატორი / ხაზზე"
+
+msgid "Comps"
+msgstr "უფასო"
+
+msgid "Share"
+msgstr "წილი"
+
+msgid "Quadrant"
+msgstr "კვადრანტი"
+
+msgid "Popularity"
+msgstr "პოპულარობა"
+
+msgid "COGS"
+msgstr "თვითღირებულება"
+
+msgid "Margin / portion"
+msgstr "მარჟა / ულუფა"
+
+msgid "Food cost %"
+msgstr "პროდუქტების ღირებულება %"
+
+msgid "Cost of sales (COGS)"
+msgstr "გაყიდვების თვითღირებულება"
+
+msgid "Gross margin"
+msgstr "მთლიანი მარჟა"
+
+msgid "Gross margin %"
+msgstr "მთლიანი მარჟა %"
+
+msgid "Waste"
+msgstr "ნარჩენი"
+
+msgid "Waste % of sales"
+msgstr "ნარჩენი % გაყიდვებიდან"
+
+msgid "Purchases received"
+msgstr "მიღებული შესყიდვები"
+
+msgid "Cost breakdown"
+msgstr "ღირებულების განაწილება"
+
+msgid "Margin"
+msgstr "მარჟა"
+
+msgid "Servers with sales"
+msgstr "მიმტანები გაყიდვებით"
+
+msgid "Tips (assigned)"
+msgstr "ჩაი (მინიჭებული)"
+
+msgid "Top server"
+msgstr "ტოპ მიმტანი"
+
+msgid "Sales by server"
+msgstr "გაყიდვები მიმტანების მიხედვით"
+
+#| msgid "Served"
+msgid "Server"
+msgstr "მიმტანი"
+
+msgid "Avg ticket"
+msgstr "საშ. ჩეკი"
+
+#| msgid "Order Item"
+msgid "Orders entered"
+msgstr "შეყვანილი შეკვეთები"
+
+msgid "Discount ₾"
+msgstr "ფასდაკლება ₾"
+
+msgid "Voids"
+msgstr "ანულირებები"
+
+msgid "Void ₾"
+msgstr "ანულირება ₾"
+
+msgid "Sales (closed shifts)"
+msgstr "გაყიდვები (დახურული ცვლები)"
+
+msgid "Cash difference"
+msgstr "ნაღდის სხვაობა"
+
+msgid "Opened by"
+msgstr "გახსნა"
+
+msgid "Opened"
+msgstr "გახსნილია"
+
+#| msgid "Close"
+msgid "Closed"
+msgstr "დახურულია"
+
+msgid "Expected"
+msgstr "მოსალოდნელი"
+
+#| msgid "Amount"
+msgid "Counted"
+msgstr "დათვლილი"
+
+msgid "Covers"
+msgstr "სტუმრები"
+
+msgid "No-shows"
+msgstr "არ მოვიდნენ"
+
+msgid "No-show rate"
+msgstr "არმოსვლის წილი"
+
+#| msgid "Reservation History"
+msgid "Reservations & covers by day"
+msgstr "ჯავშნები და სტუმრები დღეების მიხედვით"
+
+#| msgid "Amount"
+msgid "Count"
+msgstr "რაოდენობა"
+
+msgid "Source"
+msgstr "წყარო"
+
+msgid "Average rating"
+msgstr "საშუალო შეფასება"
+
+msgid "5 stars"
+msgstr "5 ვარსკვლავი"
+
+msgid "1–2 stars"
+msgstr "1–2 ვარსკვლავი"
+
+msgid "Average rating by day"
+msgstr "საშუალო შეფასება დღეების მიხედვით"
+
+# Admin site
+#| msgid "Django administration"
+msgid "Rating distribution"
+msgstr "შეფასებების განაწილება"
+
+msgid "Average"
+msgstr "საშუალო"
+
+msgid "Default duration for a reservation"
+msgstr "ჯავშნის ნაგულისხმევი ხანგრძლივობა"
+
+msgid "How many days in advance can guests book"
+msgstr "რამდენი დღით ადრე შეუძლიათ სტუმრებს დაჯავშნა"
+
+msgid "Minimum hours in advance required for booking"
+msgstr "მინიმუმ რამდენი საათით ადრე უნდა დაჯავშნონ"
+
+msgid "Buffer time between reservations on same table"
+msgstr "შუალედი ერთი მაგიდის ჯავშნებს შორის"
+
+msgid "Time slot intervals (e.g., every 30 minutes)"
+msgstr "დროის სლოტების ინტერვალი (მაგ. ყოველ 30 წუთში)"
+
+msgid "Hours before reservation when cancellation is allowed"
+msgstr "რამდენი საათით ადრეა გაუქმება დასაშვები"
+
+msgid "Require restaurant confirmation for reservations"
+msgstr "ჯავშნებს რესტორნის დადასტურება სჭირდება"
+
+msgid "Auto-confirm reservations for parties up to this size"
+msgstr "ავტოდადასტურება ამ ზომამდე ჯგუფებისთვის"
+
+msgid "Maximum reservations per day (0 = unlimited)"
+msgstr "მაქსიმუმ ჯავშანი დღეში (0 = ულიმიტო)"
+
+msgid "Maximum reservations per hour (0 = unlimited)"
+msgstr "მაქსიმუმ ჯავშანი საათში (0 = ულიმიტო)"
+
+msgid "Reservation Settings"
+msgstr "დაჯავშნის პარამეტრები"
+
+#| msgid "Password confirmation"
+msgid "Pending Confirmation"
+msgstr "დადასტურების მოლოდინში"
+
+msgid "Waitlisted"
+msgstr "მოლოდინის სიაში"
+
+#| msgid "Created"
+msgid "Seated"
+msgstr "დასხდნენ"
+
+#| msgid "Show"
+msgid "No Show"
+msgstr "არ მოვიდა"
+
+msgid "Phone"
+msgstr "ტელეფონი"
+
+msgid "Walk-in"
+msgstr "უჯავშნოდ"
+
+msgid "Third-party Platform"
+msgstr "გარე პლატფორმა"
+
+msgid "Mobile App"
+msgstr "მობილური აპი"
+
+msgid "Registered user making the reservation"
+msgstr "რეგისტრირებული მომხმარებელი, რომელიც ჯავშნის"
+
+msgid "Expected duration of the reservation"
+msgstr "ჯავშნის სავარაუდო ხანგრძლივობა"
+
+msgid "Private notes visible only to staff"
+msgstr "პირადი შენიშვნები მხოლოდ პერსონალისთვის"
+
+msgid "Reservation"
+msgstr "დაჯავშნა"
+
+msgid "Leave empty to block all tables"
+msgstr "დატოვეთ ცარიელი ყველა მაგიდის დასაბლოკად"
+
+#| msgid "Friday"
+msgid "Holiday"
+msgstr "დღესასწაული"
+
+msgid "Private Event"
+msgstr "კერძო ღონისძიება"
+
+msgid "Maintenance"
+msgstr "ტექნიკური სამუშაოები"
+
+#| msgid "Staff Role"
+msgid "Staff Shortage"
+msgstr "პერსონალის ნაკლებობა"
+
+msgid "Recurrence pattern (e.g., weekly, monthly)"
+msgstr "გამეორების წესი (მაგ. ყოველკვირეული, ყოველთვიური)"
+
+msgid "Blocked Time"
+msgstr "დაბლოკილი დრო"
+
+msgid "Blocked Times"
+msgstr "დაბლოკილი დრო"
+
+msgid "Reservation History"
+msgstr "დაჯავშნის ისტორია"
+
+msgid "Review"
+msgstr "შეფასება"
+
+msgid "Review Media"
+msgstr "შეფასების მედია"
+
+msgid "Review Report"
+msgstr "შეფასების საჩივარი"
+
+msgid "Review Reports"
+msgstr "შეფასების საჩივრები"
+
+msgid "Owner"
+msgstr "მფლობელი"
+
+msgid "Manager"
+msgstr "მენეჯერი"
+
+msgid "Warehouse Manager"
+msgstr "საწყობის მენეჯერი"
+
+msgid "Kitchen Staff"
+msgstr "სამზარეულოს პერსონალი"
+
+# Models - Staff
+#| msgid "Staff"
+msgid "Bar Staff"
+msgstr "ბარის პერსონალი"
+
+msgid "Waiter"
+msgstr "მიმტანი"
+
+msgid "Custom Role"
+msgstr "მორგებული როლი"
+
+msgid "JSON object mapping resources to allowed actions"
+msgstr "JSON: რესურსები → დაშვებული მოქმედებები"
+
+msgid "System roles cannot be deleted"
+msgstr "სისტემური როლების წაშლა შეუძლებელია"
+
+msgid "Staff Role"
+msgstr "პერსონალის როლი"
+
+msgid "Staff Roles"
+msgstr "პერსონალის როლები"
+
+msgid "Individual permission overrides (additive)"
+msgstr "ინდივიდუალური უფლებები (დამატებითი)"
+
+msgid "Internal notes about this staff member"
+msgstr "შიდა შენიშვნები თანამშრომელზე"
+
+msgid "Staff Member"
+msgstr "პერსონალის წევრი"
+
+msgid "Staff Members"
+msgstr "პერსონალის წევრები"
+
+msgid "Accepted"
+msgstr "მიღებულია"
+
+msgid "Optional message to include in invitation"
+msgstr "არასავალდებულო შეტყობინება მოწვევაში"
+
+msgid "Staff Invitation"
+msgstr "პერსონალის მოწვევა"
+
+msgid "Staff Invitations"
+msgstr "პერსონალის მოწვევები"
+
+msgid "Floor-plan canvas width (logical px)."
+msgstr "დარბაზის გეგმის სიგანე (ლოგიკური px)."
+
+msgid "Floor-plan canvas height (logical px)."
+msgstr "დარბაზის გეგმის სიმაღლე (ლოგიკური px)."
+
+msgid "Shown under the section name on the POS floor plan."
+msgstr "ჩანს სექციის სახელის ქვეშ POS-ის დარბაზის გეგმაზე."
+
+msgid "Table Section"
+msgstr "მაგიდის სექცია"
+
+msgid "Table Sections"
+msgstr "მაგიდების სექციები"
+
+msgid "Occupied"
+msgstr "დაკავებული"
+
+msgid "Unavailable"
+msgstr "მიუწვდომელი"
+
+msgid "Table number or identifier (e.g., '1', 'A1', 'VIP-1')"
+msgstr "მაგიდის ნომერი ან იდენტიფიკატორი (მაგ. '1', 'A1', 'VIP-1')"
+
+msgid "Optional friendly name (e.g., 'Window Table', 'Corner Booth')"
+msgstr "არასავალდებულო სახელი (მაგ. „ფანჯარასთან“, „კუთხის“)"
+
+msgid "Maximum number of guests"
+msgstr "სტუმრების მაქსიმალური რაოდენობა"
+
+msgid "Minimum number of guests for reservation"
+msgstr "სტუმრების მინიმალური რაოდენობა ჯავშნისთვის"
+
+msgid "X coordinate on floor plan"
+msgstr "X კოორდინატი დარბაზის გეგმაზე"
+
+msgid "Y coordinate on floor plan"
+msgstr "Y კოორდინატი დარბაზის გეგმაზე"
+
+msgid "Degrees, 0-359, on the floor plan."
+msgstr "გრადუსი, 0-359, დარბაზის გეგმაზე."
+
+msgid "Floor-plan width (logical px on a 1000-wide canvas)."
+msgstr "სიგანე გეგმაზე (ლოგიკური px 1000 სიგანის ტილოზე)."
+
+msgid "Floor-plan height (logical px)."
+msgstr "სიმაღლე გეგმაზე (ლოგიკური px)."
+
+msgid "Square"
+msgstr "კვადრატი"
+
+msgid "Round"
+msgstr "მრგვალი"
+
+msgid "Rectangle"
+msgstr "მართკუთხედი"
+
+msgid "Table"
+msgstr "მაგიდა"
+
+msgid "Optional name (e.g., 'Main QR', 'Tent Card')"
+msgstr "არასავალდებულო სახელი (მაგ. „მთავარი QR“, „მაგიდის ბარათი“)"
+
+msgid "Generated QR code image"
+msgstr "გენერირებული QR სურათი"
+
+msgid "Only used when destination is 'Custom URL'."
+msgstr "გამოიყენება მხოლოდ „მორგებული URL“-ის შემთხვევაში."
+
+msgid "Table QR Code"
+msgstr "მაგიდის QR კოდი"
+
+msgid "Table QR Codes"
+msgstr "მაგიდის QR კოდები"
+
+msgid "Active"
+msgstr "აქტიური"
+
+#| msgid "Payment Method"
+msgid "Payment Pending"
+msgstr "გადახდის მოლოდინში"
+
+msgid "QR code used to start this session"
+msgstr "QR კოდი, რომლითაც სესია დაიწყო"
+
+msgid "User who started this session"
+msgstr "მომხმარებელი, რომელმაც სესია დაიწყო"
+
+msgid "Shareable code to invite others to this session"
+msgstr "კოდი სხვების სესიაში მოსაწვევად"
+
+msgid "Everyone pays their own"
+msgstr "თითოეული თავისას იხდის"
+
+msgid "Host covers the whole table"
+msgstr "მასპინძელი მთელ მაგიდას იხდის"
+
+msgid "Name for anonymous guests"
+msgstr "ანონიმური სტუმრის სახელი"
+
+msgid "Phone or email for anonymous guests so the host can reach them."
+msgstr ""
+"ტელეფონი ან ელფოსტა ანონიმური სტუმრისთვის, რომ მასპინძელმა დაუკავშირდეს."
+
+msgid "Whether this guest is the session host"
+msgstr "არის თუ არა ეს სტუმარი სესიის მასპინძელი"
+
+# Models - Tenants
+msgid "Tenants"
+msgstr "მოიჯარეები"
+
+msgid "City"
+msgstr "ქალაქი"
+
+msgid "Cities"
+msgstr "ქალაქები"
+
+msgid "Material icon name (e.g., 'restaurant', 'local_cafe', 'fastfood')"
+msgstr "Material ხატულის სახელი (მაგ. 'restaurant', 'local_cafe', 'fastfood')"
+
+#| msgid "Restaurant Hours"
+msgid "Restaurant Category"
+msgstr "რესტორნის კატეგორია"
+
+#| msgid "Restaurant Hours"
+msgid "Restaurant Categories"
+msgstr "რესტორნის კატეგორიები"
+
+msgid "Material icon name (e.g., 'deck', 'music_note', 'wifi')"
+msgstr "Material ხატულის სახელი (მაგ. 'deck', 'music_note', 'wifi')"
+
+msgid "Amenity"
+msgstr "კომფორტი"
+
+msgid "Amenities"
+msgstr "კომფორტი"
+
+msgid "Restaurant category (e.g., Italian, Fast Food)"
+msgstr "რესტორნის კატეგორია (მაგ. იტალიური, ფასტფუდი)"
+
+msgid "Amenities available at the restaurant"
+msgstr "რესტორანში ხელმისაწვდომი კომფორტი"
+
+msgid "BlurHash string for the logo — used as an inline LQIP."
+msgstr "ლოგოს BlurHash — ჩაშენებული LQIP."
+
+msgid "BlurHash string for the cover image — used as an inline LQIP."
+msgstr "ქავერის BlurHash — ჩაშენებული LQIP."
+
+msgid "Allow customers to make reservations"
+msgstr "სტუმრებს შეუძლიათ დაჯავშნა"
+
+msgid "Allow takeaway orders"
+msgstr "წასაღები შეკვეთების დაშვება"
+
+msgid ""
+"Tables & QR module: sections, tables, QR codes, table sessions, shared "
+"venues."
+msgstr ""
+"მაგიდებისა და QR-ის მოდული: სექციები, მაგიდები, QR კოდები, სესიები, საერთო "
+"სივრცეები."
+
+msgid "Kitchen display in the POS app. Needs Ordering."
+msgstr "სამზარეულოს ეკრანი POS აპში. სჭირდება „შეკვეთები“."
+
+msgid ""
+"Loyalty module: punch-card programs; platform tier discounts are an option "
+"inside it."
+msgstr ""
+"ლოიალობის მოდული: დაგროვებითი ბარათები; პლატფორმის დონეების ფასდაკლება — "
+"ოფცია მის შიგნით."
+
+msgid "Reviews module: customer reviews on the restaurant page."
+msgstr "შეფასებების მოდული: სტუმრების შეფასებები რესტორნის გვერდზე."
+
+msgid "Notifications module: staff push / in-app alerts, guest SMS and email."
+msgstr ""
+"შეტყობინებების მოდული: push / აპ-შიდა შეტყობინებები პერსონალს, SMS და "
+"ელფოსტა სტუმრებს."
+
+msgid ""
+"Delivery platforms module: Glovo orders straight into the kitchen, menu "
+"push, sold-out sync."
+msgstr ""
+"მიწოდების პლატფორმების მოდული: Glovo-ს შეკვეთები პირდაპირ სამზარეულოში, "
+"მენიუს გაგზავნა, „ამოწურულის“ სინქრონიზაცია."
+
+msgid ""
+"Fiscal module: VAT profile, numbered receipts and refund receipts, RS.ge "
+"waybill export."
+msgstr ""
+"ფისკალური მოდული: დღგ პროფილი, დანომრილი ჩეკები და დაბრუნების ჩეკები, RS.ge "
+"ზედნადებების ექსპორტი."
+
+msgid ""
+"Georgian IBAN (GE## + bank code + 16 digits) that receives the restaurant's "
+"share."
+msgstr ""
+"ქართული IBAN (GE## + ბანკის კოდი + 16 ციფრი), რომელზეც რესტორნის წილი "
+"ირიცხება."
+
+msgid "Flitt sub-merchant id provided by Flitt after onboarding."
+msgstr "Flitt-ის sub-merchant id, რომელსაც Flitt ონბორდინგის შემდეგ იძლევა."
+
+msgid "Superuser-only. Percentage the platform keeps on every paid order."
+msgstr ""
+"მხოლოდ სუპერმომხმარებელი. პროცენტი, რომელსაც პლატფორმა ყოველი გადახდილი "
+"შეკვეთიდან იტოვებს."
+
+msgid "Tax percentage to apply to orders"
+msgstr "შეკვეთებზე გამოსაყენებელი გადასახადის პროცენტი"
+
+msgid "Service charge percentage"
+msgstr "მომსახურების საფასურის პროცენტი"
+
+msgid "Minimum order amount for remote orders"
+msgstr "მინიმალური თანხა დისტანციური შეკვეთისთვის"
+
+msgid "Average order preparation time in minutes"
+msgstr "შეკვეთის მომზადების საშუალო დრო წუთებში"
+
+msgid "Mark as closed for this day (overrides open/close times)"
+msgstr "ამ დღეს დახურულად მონიშვნა (გადაფარავს გახსნა/დახურვის დროს)"
+
+msgid "Venues"
+msgstr "სივრცეები"
+
+msgid "Venue"
+msgstr "სივრცე"
+
+msgid "This restaurant's tables seeded the venue layout (historical)."
+msgstr "ამ რესტორნის მაგიდებმა შექმნა სივრცის განლაგება (ისტორიული)."
+
+#| msgid "Remember me"
+msgid "Venue member"
+msgstr "სივრცის წევრი"
+
+msgid "Venue members"
+msgstr "სივრცის წევრები"
+
+#| msgid "Table Section"
+msgid "Venue section"
+msgstr "სივრცის სექცია"
+
+#| msgid "Table Sections"
+msgid "Venue sections"
+msgstr "სივრცის სექციები"
+
+msgid "Venue table"
+msgstr "სივრცის მაგიდა"
+
+msgid "Venue tables"
+msgstr "სივრცის მაგიდები"
+
+msgid "Name for the venue if this request creates it"
+msgstr "სივრცის სახელი, თუ ეს მოთხოვნა მას ქმნის"
+
+msgid "Shared venue request"
+msgstr "საერთო სივრცის მოთხოვნა"
+
+#~ msgid "Log in"
+#~ msgstr "შესვლა"
+
+#~ msgid "Welcome,"
+#~ msgstr "გამარჯობა,"
+
+#~ msgid "Change password"
+#~ msgstr "პაროლის შეცვლა"
+
+#~ msgid "Home"
+#~ msgstr "მთავარი"
+
+#~ msgid "History"
+#~ msgstr "ისტორია"
+
+#~ msgid "View on site"
+#~ msgstr "საიტზე ნახვა"
+
+# Common actions
+#~ msgid "Add"
+#~ msgstr "დამატება"
+
+#~ msgid "Save and add another"
+#~ msgstr "შენახვა და ახლის დამატება"
+
+#~ msgid "Save and continue editing"
+#~ msgstr "შენახვა და რედაქტირების გაგრძელება"
+
+#~ msgid "Save and view"
+#~ msgstr "შენახვა და ნახვა"
+
+#~ msgid "Delete selected"
+#~ msgstr "მონიშნულის წაშლა"
+
+#~ msgid "Search"
+#~ msgstr "ძებნა"
+
+#~ msgid "Filter"
+#~ msgstr "ფილტრი"
+
+#~ msgid "Clear all filters"
+#~ msgstr "ფილტრების გასუფთავება"
+
+#~ msgid "Remove from sorting"
+#~ msgstr "დალაგებიდან ამოღება"
+
+#~ msgid "Toggle sorting"
+#~ msgstr "დალაგების გადართვა"
+
+#~ msgid "Select all"
+#~ msgstr "ყველას მონიშვნა"
+
+#~ msgid "Select"
+#~ msgstr "მონიშვნა"
+
+#~ msgid "Go"
+#~ msgstr "შესრულება"
+
+#~ msgid "Run the selected action"
+#~ msgstr "მონიშნული მოქმედების შესრულება"
+
+#~ msgid "Select all objects on this page for an action"
+#~ msgstr "ყველა ობიექტის მონიშვნა ამ გვერდზე"
+
+#~ msgid "Click here to select all objects across all pages"
+#~ msgstr "ყველა ობიექტის მონიშვნა ყველა გვერდზე"
+
+#~ msgid "None available"
+#~ msgstr "არ არის ხელმისაწვდომი"
+
+#~ msgid "Unknown content"
+#~ msgstr "უცნობი კონტენტი"
+
+#~ msgid "Users"
+#~ msgstr "მომხმარებლები"
+
+#~ msgid "User"
+#~ msgstr "მომხმარებელი"
+
+#~ msgid "Group Orders"
+#~ msgstr "ჯგუფური შეკვეთები"
+
+#~ msgid "Table Session"
+#~ msgstr "მაგიდის სესია"
+
+#~ msgid "Table Session Guests"
+#~ msgstr "მაგიდის სტუმრები"
+
+#~ msgid "Table Session Guest"
+#~ msgstr "მაგიდის სტუმარი"
+
+#~ msgid "Favorite"
+#~ msgstr "რჩეული"
+
+#~ msgid "Paid"
+#~ msgstr "გადახდილი"
+
+#~ msgid "Unpaid"
+#~ msgstr "გადაუხდელი"
+
+# Days of week
+#~ msgid "Monday"
+#~ msgstr "ორშაბათი"
+
+#~ msgid "Tuesday"
+#~ msgstr "სამშაბათი"
+
+#~ msgid "Wednesday"
+#~ msgstr "ოთხშაბათი"
+
+#~ msgid "Thursday"
+#~ msgstr "ხუთშაბათი"
+
+#~ msgid "Saturday"
+#~ msgstr "შაბათი"
+
+#~ msgid "Sunday"
+#~ msgstr "კვირა"
+
+#~ msgid "Created at"
+#~ msgstr "შექმნის თარიღი"
+
+#~ msgid "Updated at"
+#~ msgstr "განახლების თარიღი"
+
+#~ msgid "Is active"
+#~ msgstr "აქტიურია"
+
+#~ msgid "Is available"
+#~ msgstr "ხელმისაწვდომია"
+
+#~ msgid "Phone number"
+#~ msgstr "ტელეფონის ნომერი"
+
+#~ msgid "Note"
+#~ msgstr "შენიშვნა"
+
+#~ msgid "Notes"
+#~ msgstr "შენიშვნები"
+
+#~ msgid "Date"
+#~ msgstr "თარიღი"
+
+#~ msgid "Time"
+#~ msgstr "დრო"
+
+#~ msgid "Total"
+#~ msgstr "ჯამი"
+
+#~ msgid "Subtotal"
+#~ msgstr "ქვეჯამი"
+
+#~ msgid "Capacity"
+#~ msgstr "ტევადობა"
+
+#~ msgid "Sort order"
+#~ msgstr "დალაგების რიგი"
+
+#~ msgid "Slug"
+#~ msgstr "სლაგი"
+
+# Yes/No
+#~ msgid "Yes"
+#~ msgstr "დიახ"
+
+#~ msgid "No"
+#~ msgstr "არა"
+
+#~ msgid "All"
+#~ msgstr "ყველა"
+
+#~ msgid "Any"
+#~ msgstr "ნებისმიერი"
+
+# Pagination
+#~ msgid "Show all"
+#~ msgstr "ყველას ჩვენება"
+
+#~ msgid "of"
+#~ msgstr "-დან"
+
+#~ msgid "results"
+#~ msgstr "შედეგი"
+
+# Confirmation
+#~ msgid "Are you sure?"
+#~ msgstr "დარწმუნებული ხართ?"
+
+#~ msgid "Are you sure you want to delete"
+#~ msgstr "დარწმუნებული ხართ, რომ გსურთ წაშლა"
+
+#~ msgid "Successfully deleted"
+#~ msgstr "წარმატებით წაიშალა"
+
+#~ msgid "Successfully saved"
+#~ msgstr "წარმატებით შეინახა"
+
+#~ msgid "Successfully added"
+#~ msgstr "წარმატებით დაემატა"
+
+#~ msgid "Successfully updated"
+#~ msgstr "წარმატებით განახლდა"
+
+#~ msgid "Error"
+#~ msgstr "შეცდომა"
+
+#~ msgid "Info"
+#~ msgstr "ინფორმაცია"
+
+#~ msgid "Account Information"
+#~ msgstr "ანგარიშის ინფორმაცია"
+
+#~ msgid "Save Language"
+#~ msgstr "ენის შენახვა"
+
+#~ msgid "Security"
+#~ msgstr "უსაფრთხოება"
+
+#~ msgid "Change Password"
+#~ msgstr "პაროლის შეცვლა"
+
+# Form validation
+#~ msgid "This field is required."
+#~ msgstr "ეს ველი სავალდებულოა."
+
+#~ msgid "Enter a valid email address."
+#~ msgstr "შეიყვანეთ სწორი ელ. ფოსტა."
+
+#~ msgid "Enter a valid value."
+#~ msgstr "შეიყვანეთ სწორი მნიშვნელობა."
+
+#~ msgid "Enter a valid number."
+#~ msgstr "შეიყვანეთ სწორი რიცხვი."
+
+#~ msgid "Enter a valid date."
+#~ msgstr "შეიყვანეთ სწორი თარიღი."
+
+#~ msgid "Enter a valid time."
+#~ msgstr "შეიყვანეთ სწორი დრო."
+
+#~ msgid "This field cannot be blank."
+#~ msgstr "ეს ველი არ შეიძლება იყოს ცარიელი."
+
+#~ msgid "Please correct the error below."
+#~ msgstr "გთხოვთ, გაასწოროთ ქვემოთ მოცემული შეცდომა."
+
+#~ msgid "Please correct the errors below."
+#~ msgstr "გთხოვთ, გაასწოროთ ქვემოთ მოცემული შეცდომები."
+
+#~ msgid "Forgot your password?"
+#~ msgstr "დაგავიწყდათ პაროლი?"
+
+#~ msgid "Sign in"
+#~ msgstr "შესვლა"
+
+#~ msgid "Sign up"
+#~ msgstr "რეგისტრაცია"
+
+#~ msgid "Sign out"
+#~ msgstr "გასვლა"
+
+# Password
+#~ msgid "Old password"
+#~ msgstr "ძველი პაროლი"
+
+#~ msgid "New password"
+#~ msgstr "ახალი პაროლი"
+
+#~ msgid "Confirm password"
+#~ msgstr "პაროლის დადასტურება"
+
+#~ msgid "The two password fields didn't match."
+#~ msgstr "პაროლის ორი ველი არ ემთხვევა."
+
+#~ msgid "Your password was changed."
+#~ msgstr "თქვენი პაროლი შეიცვალა."
+
+#~ msgid "Tomorrow"
+#~ msgstr "ხვალ"
+
+#~ msgid "Now"
+#~ msgstr "ახლა"
 
 # Boolean field display
-msgid "true"
-msgstr "კი"
+#~ msgid "true"
+#~ msgstr "კი"
 
-msgid "false"
-msgstr "არა"
+#~ msgid "false"
+#~ msgstr "არა"
 
 # Permissions
-msgid "Permission"
-msgstr "უფლება"
+#~ msgid "Permission"
+#~ msgstr "უფლება"
 
-msgid "Permissions"
-msgstr "უფლებები"
+#~ msgid "Permissions"
+#~ msgstr "უფლებები"
 
-msgid "Add permission"
-msgstr "უფლების დამატება"
+#~ msgid "Add permission"
+#~ msgstr "უფლების დამატება"
 
-msgid "Change permission"
-msgstr "უფლების შეცვლა"
+#~ msgid "Change permission"
+#~ msgstr "უფლების შეცვლა"
 
-msgid "Delete permission"
-msgstr "უფლების წაშლა"
+#~ msgid "Delete permission"
+#~ msgstr "უფლების წაშლა"
 
-msgid "View permission"
-msgstr "უფლების ნახვა"
+#~ msgid "View permission"
+#~ msgstr "უფლების ნახვა"
 
-msgid "Can add"
-msgstr "შეუძლია დამატება"
+#~ msgid "Can add"
+#~ msgstr "შეუძლია დამატება"
 
-msgid "Can change"
-msgstr "შეუძლია შეცვლა"
+#~ msgid "Can change"
+#~ msgstr "შეუძლია შეცვლა"
 
-msgid "Can delete"
-msgstr "შეუძლია წაშლა"
+#~ msgid "Can delete"
+#~ msgstr "შეუძლია წაშლა"
 
-msgid "Can view"
-msgstr "შეუძლია ნახვა"
+#~ msgid "Can view"
+#~ msgstr "შეუძლია ნახვა"
 
-# Filter labels
-msgid "By"
-msgstr "-ით"
+#~ msgid "Any date"
+#~ msgstr "ნებისმიერი თარიღი"
 
-msgid "Any date"
-msgstr "ნებისმიერი თარიღი"
+#~ msgid "Has date"
+#~ msgstr "აქვს თარიღი"
 
-msgid "Has date"
-msgstr "აქვს თარიღი"
-
-msgid "No date"
-msgstr "თარიღის გარეშე"
+#~ msgid "No date"
+#~ msgstr "თარიღის გარეშე"
 
 # Empty states
-msgid "No results found."
-msgstr "შედეგები ვერ მოიძებნა."
+#~ msgid "No results found."
+#~ msgstr "შედეგები ვერ მოიძებნა."
 
-msgid "No data available"
-msgstr "მონაცემები არ არის ხელმისაწვდომი"
+#~ msgid "No data available"
+#~ msgstr "მონაცემები არ არის ხელმისაწვდომი"
 
-msgid "There are no items yet."
-msgstr "ჯერ არ არის ერთეულები."
+#~ msgid "There are no items yet."
+#~ msgstr "ჯერ არ არის ერთეულები."
 
-# Misc
-msgid "Optional"
-msgstr "არასავალდებულო"
+#~ msgid "Next"
+#~ msgstr "შემდეგი"
 
-msgid "Required"
-msgstr "სავალდებულო"
+#~ msgid "First"
+#~ msgstr "პირველი"
 
-msgid "Cancel"
-msgstr "გაუქმება"
+#~ msgid "Last"
+#~ msgstr "ბოლო"
 
-msgid "Close"
-msgstr "დახურვა"
+#~ msgid "Loading..."
+#~ msgstr "იტვირთება..."
 
-msgid "Back"
-msgstr "უკან"
+#~ msgid "Refresh"
+#~ msgstr "განახლება"
 
-msgid "Next"
-msgstr "შემდეგი"
+#~ msgid "Upload"
+#~ msgstr "ატვირთვა"
 
-msgid "Previous"
-msgstr "წინა"
+#~ msgid "Copy"
+#~ msgstr "კოპირება"
 
-msgid "First"
-msgstr "პირველი"
+#~ msgid "Details"
+#~ msgstr "დეტალები"
 
-msgid "Last"
-msgstr "ბოლო"
+#~ msgid "More"
+#~ msgstr "მეტი"
 
-msgid "Loading..."
-msgstr "იტვირთება..."
+#~ msgid "Less"
+#~ msgstr "ნაკლები"
 
-msgid "Please wait..."
-msgstr "გთხოვთ მოიცადოთ..."
+#~ msgid "Hide"
+#~ msgstr "დამალვა"
 
-msgid "Refresh"
-msgstr "განახლება"
+#~ msgid "Expand"
+#~ msgstr "გაფართოება"
 
-msgid "Export"
-msgstr "ექსპორტი"
+#~ msgid "Collapse"
+#~ msgstr "ჩაკეცვა"
 
-msgid "Import"
-msgstr "იმპორტი"
+#~ msgid "Help"
+#~ msgstr "დახმარება"
 
-msgid "Download"
-msgstr "ჩამოტვირთვა"
+#~ msgid "About"
+#~ msgstr "შესახებ"
 
-msgid "Upload"
-msgstr "ატვირთვა"
-
-msgid "Print"
-msgstr "ბეჭდვა"
-
-msgid "Copy"
-msgstr "კოპირება"
-
-msgid "Edit"
-msgstr "რედაქტირება"
-
-msgid "View"
-msgstr "ნახვა"
-
-msgid "Details"
-msgstr "დეტალები"
-
-msgid "More"
-msgstr "მეტი"
-
-msgid "Less"
-msgstr "ნაკლები"
-
-msgid "Show"
-msgstr "ჩვენება"
-
-msgid "Hide"
-msgstr "დამალვა"
-
-msgid "Expand"
-msgstr "გაფართოება"
-
-msgid "Collapse"
-msgstr "ჩაკეცვა"
-
-msgid "Settings"
-msgstr "პარამეტრები"
-
-msgid "Help"
-msgstr "დახმარება"
-
-msgid "About"
-msgstr "შესახებ"
-
-msgid "Contact"
-msgstr "კონტაქტი"
+#~ msgid "Contact"
+#~ msgstr "კონტაქტი"
 
 # Additional model names
-msgid "Order Item Modifiers"
-msgstr "შეკვეთის ერთეულის მოდიფიკატორები"
+#~ msgid "Order Item Modifiers"
+#~ msgstr "შეკვეთის ერთეულის მოდიფიკატორები"
 
-msgid "Order Item Modifier"
-msgstr "შეკვეთის ერთეულის მოდიფიკატორი"
+#~ msgid "Order Item Modifier"
+#~ msgstr "შეკვეთის ერთეულის მოდიფიკატორი"
 
-msgid "Order Status Histories"
-msgstr "შეკვეთის სტატუსის ისტორია"
+#~ msgid "Payment Methods"
+#~ msgstr "გადახდის მეთოდები"
 
-msgid "Payment Methods"
-msgstr "გადახდის მეთოდები"
+#~ msgid "Favorite Menu Items"
+#~ msgstr "რჩეული მენიუს ერთეულები"
 
-msgid "Payment Method"
-msgstr "გადახდის მეთოდი"
+#~ msgid "Favorite Menu Item"
+#~ msgstr "რჩეული მენიუს ერთეული"
 
-msgid "Favorite Menu Items"
-msgstr "რჩეული მენიუს ერთეულები"
+#~ msgid "Favorite Restaurants"
+#~ msgstr "რჩეული რესტორნები"
 
-msgid "Favorite Menu Item"
-msgstr "რჩეული მენიუს ერთეული"
+#~ msgid "Favorite Restaurant"
+#~ msgstr "რჩეული რესტორანი"
 
-msgid "Favorite Restaurants"
-msgstr "რჩეული რესტორნები"
+#~ msgid "Menu Item Modifier Groups"
+#~ msgstr "მენიუს ერთეულის მოდიფიკატორების ჯგუფები"
 
-msgid "Favorite Restaurant"
-msgstr "რჩეული რესტორანი"
+#~ msgid "Authentication and Authorization"
+#~ msgstr "იდენტიფიკაცია და ავტორიზაცია"
 
-msgid "Menu Item Modifier Groups"
-msgstr "მენიუს ერთეულის მოდიფიკატორების ჯგუფები"
+#~ msgid "Groups"
+#~ msgstr "ჯგუფები"
 
-msgid "Authentication and Authorization"
-msgstr "იდენტიფიკაცია და ავტორიზაცია"
-
-msgid "Groups"
-msgstr "ჯგუფები"
-
-msgid "Group"
-msgstr "ჯგუფი"
+#~ msgid "Group"
+#~ msgstr "ჯგუფი"

@@ -32,13 +32,13 @@ class Printer(TimeStampedModel):
     CONNECTION_CHOICES = [("bridge", "Print bridge (USB / LAN / Bluetooth)"), ("browser", "Browser print (no bridge)")]
 
     restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="printers")
-    name = models.CharField(max_length=100, help_text="E.g. 'Kitchen pass', 'Bar', 'Till'.")
+    name = models.CharField(max_length=100, help_text=_("E.g. 'Kitchen pass', 'Bar', 'Till'."))
     kind = models.CharField(max_length=10, choices=KIND_CHOICES, default="kitchen")
     stations = models.CharField(
         max_length=10,
         choices=STATION_CHOICES,
         default="kitchen",
-        help_text="Which items go on this printer's tickets (kitchen printers only).",
+        help_text=_("Which items go on this printer's tickets (kitchen printers only)."),
     )
     paper = models.CharField(max_length=2, choices=PAPER_CHOICES, default="80")
     connection = models.CharField(max_length=10, choices=CONNECTION_CHOICES, default="bridge")
@@ -46,13 +46,13 @@ class Printer(TimeStampedModel):
     copies = models.PositiveSmallIntegerField(default=1)
     auto_print = models.BooleanField(
         default=True,
-        help_text="Kitchen/bar: print a ticket when an order is accepted. Receipt: print when a payment is taken.",
+        help_text=_("Kitchen/bar: print a ticket when an order is accepted. Receipt: print when a payment is taken."),
     )
     open_drawer = models.BooleanField(
-        default=False, help_text="Receipt printers: kick the cash drawer on cash payments."
+        default=False, help_text=_("Receipt printers: kick the cash drawer on cash payments.")
     )
     is_active = models.BooleanField(default=True)
-    last_seen_at = models.DateTimeField(null=True, blank=True, help_text="Last poll from the bridge.")
+    last_seen_at = models.DateTimeField(null=True, blank=True, help_text=_("Last poll from the bridge."))
     last_error = models.CharField(max_length=300, blank=True, default="")
 
     class Meta:
@@ -96,8 +96,8 @@ class PrintJob(TimeStampedModel):
         "payments.Payment", on_delete=models.SET_NULL, null=True, blank=True, related_name="print_jobs"
     )
     title = models.CharField(max_length=120, blank=True, default="")
-    payload = models.JSONField(default=dict, blank=True, help_text="What was rendered (for reprints / audit).")
-    escpos = models.BinaryField(help_text="Rendered ESC/POS bytes the bridge writes to the device.")
+    payload = models.JSONField(default=dict, blank=True, help_text=_("What was rendered (for reprints / audit)."))
+    escpos = models.BinaryField(help_text=_("Rendered ESC/POS bytes the bridge writes to the device."))
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="queued", db_index=True)
     attempts = models.PositiveSmallIntegerField(default=0)
     error = models.CharField(max_length=300, blank=True, default="")

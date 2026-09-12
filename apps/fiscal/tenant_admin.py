@@ -12,6 +12,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.urls import path, reverse
 from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
 from unfold.decorators import action, display
@@ -131,7 +132,7 @@ class FiscalSettingsTenantAdmin(FiscalEnabledMixin, TenantModelAdmin):
             "Fiscal settings updated",
             {k: str(v) for k, v in form.cleaned_data.items() if k != "service_password"},
         )
-        messages.success(request, "Fiscal settings saved.")
+        messages.success(request, _("Fiscal settings saved."))
         return redirect("tenant_admin:fiscal_fiscalsettingspage_changelist")
 
     def test_view(self, request):
@@ -139,9 +140,9 @@ class FiscalSettingsTenantAdmin(FiscalEnabledMixin, TenantModelAdmin):
         profile = services.profile_for(request.restaurant)
         result = get_provider(profile).health()
         if result.ok:
-            messages.success(request, "Provider connection OK.")
+            messages.success(request, _("Provider connection OK."))
         else:
-            messages.error(request, f"Provider check failed: {result.error}")
+            messages.error(request, _("Provider check failed: {p0}").format(p0=result.error))
         return redirect("tenant_admin:fiscal_fiscalsettingspage_changelist")
 
 
@@ -162,15 +163,15 @@ class FiscalDocumentTenantAdmin(FiscalEnabledMixin, TenantModelAdmin):
     ordering = ["-created_at"]
     actions_row = ["download_xml", "retry_document", "cancel_document"]
 
-    @action(description="XML", url_path="xml", attrs={"target": "_blank"})
+    @action(description=_("XML"), url_path="xml", attrs={"target": "_blank"})
     def download_xml(self, request, object_id):
         return self.xml_view(request, object_id)
 
-    @action(description="Retry / send", url_path="retry")
+    @action(description=_("Retry / send"), url_path="retry")
     def retry_document(self, request, object_id):
         return self.retry_view(request, object_id)
 
-    @action(description="Cancel draft", url_path="cancel")
+    @action(description=_("Cancel draft"), url_path="cancel")
     def cancel_document(self, request, object_id):
         return self.cancel_view(request, object_id)
 
@@ -186,7 +187,7 @@ class FiscalDocumentTenantAdmin(FiscalEnabledMixin, TenantModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    @display(description="Status")
+    @display(description=_("Status"))
     def status_chip(self, obj):
         colours = {
             "confirmed": "bg-green-100 text-green-700",
@@ -221,14 +222,14 @@ class FiscalDocumentTenantAdmin(FiscalEnabledMixin, TenantModelAdmin):
     def retry_view(self, request, pk):
         doc = self._doc(request, pk, "update")
         services.retry(doc)
-        messages.success(request, f"{doc.fiscal_number} queued again.")
+        messages.success(request, _("{p0} queued again.").format(p0=doc.fiscal_number))
         return redirect("tenant_admin:fiscal_fiscaldocument_changelist")
 
     def cancel_view(self, request, pk):
         doc = self._doc(request, pk, "update")
         try:
             services.cancel(doc)
-            messages.success(request, f"{doc.fiscal_number} cancelled.")
+            messages.success(request, _("{p0} cancelled.").format(p0=doc.fiscal_number))
         except ValueError as exc:
             messages.error(request, str(exc))
         return redirect("tenant_admin:fiscal_fiscaldocument_changelist")

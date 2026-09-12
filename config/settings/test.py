@@ -68,3 +68,7 @@ SESSION_COOKIE_SECURE = False
 # Celery - use synchronous execution for tests
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
+
+# Tests assert the English source strings: keep the ka / ru catalogs out of
+# the test run (tests/core/test_i18n.py loads them explicitly).
+LOCALE_PATHS = []

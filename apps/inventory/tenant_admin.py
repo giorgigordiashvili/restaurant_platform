@@ -20,6 +20,7 @@ from django.shortcuts import redirect
 from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
 from unfold.admin import TabularInline as UnfoldTabularInline
@@ -161,28 +162,28 @@ class StockItemTenantAdmin(WarehouseEnabledMixin, TenantModelAdmin):
         # Ledger rows point at items (PROTECT); deactivate instead.
         return False
 
-    @display(description="On hand")
+    @display(description=_("On hand"))
     def on_hand_display(self, obj):
         return _fmt(obj.on_hand_qty, obj.base_unit)
 
-    @display(description="Reserved")
+    @display(description=_("Reserved"))
     def reserved_display(self, obj):
         return _fmt(obj.reserved_qty, obj.base_unit)
 
-    @display(description="Available")
+    @display(description=_("Available"))
     def available_display(self, obj):
         return _fmt(obj.available_qty, obj.base_unit)
 
-    @display(description="Cost per unit")
+    @display(description=_("Cost per unit"))
     def cost_display(self, obj):
         cost = obj.current_unit_cost()
         return f"{cost:.4f} / {obj.base_unit.code}" if cost is not None else "—"
 
-    @display(description="Level", label={"out": "danger", "low": "warning", "ok": "success"})
+    @display(description=_("Level"), label={"out": "danger", "low": "warning", "ok": "success"})
     def level_badge(self, obj):
         return obj.level
 
-    @display(description="Used in")
+    @display(description=_("Used in"))
     def used_in(self, obj):
         lines = RecipeLine.objects.filter(stock_item=obj).select_related("menu_item", "modifier", "unit")
         parts = []
@@ -335,15 +336,15 @@ class StockLotTenantAdmin(WarehouseEnabledMixin, TenantModelAdmin):
         )
         messages.success(request, f"Received {_fmt(data['quantity'], data['unit'])} of {data['stock_item'].name}.")
 
-    @display(description="Received")
+    @display(description=_("Received"))
     def received_display(self, obj):
         return _fmt(obj.received_qty, obj.stock_item.base_unit)
 
-    @display(description="Remaining")
+    @display(description=_("Remaining"))
     def remaining_display(self, obj):
         return _fmt(obj.remaining_qty, obj.stock_item.base_unit)
 
-    @display(description="Expiry", label={"expired": "danger", "soon": "warning", "ok": "success", "none": "info"})
+    @display(description=_("Expiry"), label={"expired": "danger", "soon": "warning", "ok": "success", "none": "info"})
     def expiry_badge(self, obj):
         days = obj.days_to_expiry
         if days is None:
@@ -394,7 +395,7 @@ class _DocumentAdmin(WarehouseEnabledMixin, ReadOnlyAfterSaveMixin, TenantModelA
         except (InventoryError, UnitMismatch, DjangoValidationError) as exc:
             # Model clean() already ran, so this is a service rule (no recipe,
             # inactive item...). Surface it and leave nothing behind.
-            messages.error(request, "; ".join(getattr(exc, "messages", [str(exc)])))
+            messages.error(request, _("; ").join(getattr(exc, "messages", [str(exc)])))
             obj.pk = None
             raise PermissionDenied("Could not record this entry.")
 
@@ -415,7 +416,7 @@ class WasteEntryTenantAdmin(_DocumentAdmin):
         obj.reported_by = _membership(request)
         super().save_model(request, obj, form, change)
 
-    @display(description="Quantity")
+    @display(description=_("Quantity"))
     def quantity_display(self, obj):
         return _fmt(obj.quantity, obj.unit)
 
@@ -450,7 +451,7 @@ class EmployeeMealTenantAdmin(_DocumentAdmin):
             initial.setdefault("staff_member", me.pk)
         return initial
 
-    @display(description="Ate")
+    @display(description=_("Ate"))
     def what(self, obj):
         return str(obj.menu_item or obj.stock_item)
 
@@ -466,11 +467,11 @@ class StockAdjustmentTenantAdmin(_DocumentAdmin):
     def get_readonly_fields(self, request, obj=None):
         return ["made_by", "delta_base"] if obj else []
 
-    @display(description="Entered")
+    @display(description=_("Entered"))
     def quantity_display(self, obj):
         return _fmt(obj.quantity, obj.unit)
 
-    @display(description="Change")
+    @display(description=_("Change"))
     def delta_display(self, obj):
         sign = "+" if obj.delta_base > 0 else ""
         return f"{sign}{_fmt(obj.delta_base, obj.stock_item.base_unit)}"
@@ -506,12 +507,12 @@ class StockMovementTenantAdmin(WarehouseEnabledMixin, TenantModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    @display(description="Quantity")
+    @display(description=_("Quantity"))
     def quantity_display(self, obj):
         sign = "+" if obj.quantity > 0 else ""
         return f"{sign}{_fmt(obj.quantity, obj.stock_item.base_unit)}"
 
-    @display(description="Order")
+    @display(description=_("Order"))
     def order_link(self, obj):
         return obj.order.order_number if obj.order_id else "—"
 
@@ -533,14 +534,14 @@ class InventoryAlertTenantAdmin(WarehouseEnabledMixin, TenantModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    @display(description="Platforms")
+    @display(description=_("Platforms"))
     def tasks_summary(self, obj):
         tasks = list(obj.platform_tasks.select_related("platform"))
         if not tasks:
             return "—"
         return ", ".join(f"{t.platform}: {'✓' if t.is_done else t.get_action_display()}" for t in tasks)
 
-    @admin.action(description="Mark selected alerts done")
+    @admin.action(description=_("Mark selected alerts done"))
     def mark_done(self, request, queryset):
         if not has_resource_permission(request, "warehouse", "update"):
             raise PermissionDenied
@@ -658,7 +659,7 @@ class WarehouseOverviewTenantAdmin(WarehouseEnabledMixin, TenantModelAdmin):
         if alert is None:
             raise PermissionDenied
         alert.resolve(by=request.user)
-        messages.success(request, "Alert marked done.")
+        messages.success(request, _("Alert marked done."))
         return self._back()
 
     def task_toggle_view(self, request, task_id):
@@ -674,7 +675,7 @@ class WarehouseOverviewTenantAdmin(WarehouseEnabledMixin, TenantModelAdmin):
         alert = task.alert
         if alert.is_open and not alert.platform_tasks.filter(is_done=False).exists():
             alert.resolve(by=request.user, reason="tasks")
-            messages.success(request, f"All platforms updated -- '{alert.message}' closed.")
+            messages.success(request, _("All platforms updated -- '{p0}' closed.").format(p0=alert.message))
         else:
             messages.success(request, f"{task.platform}: {'done' if task.is_done else 'reopened'}.")
         return self._back()
@@ -686,15 +687,18 @@ class WarehouseOverviewTenantAdmin(WarehouseEnabledMixin, TenantModelAdmin):
             raise PermissionDenied
         entry = services.record_expired_lot(lot, by=request.user, staff_member=_membership(request))
         if entry is None:
-            messages.info(request, "Nothing left in that lot.")
+            messages.info(request, _("Nothing left in that lot."))
         else:
-            messages.success(request, f"Wrote off {_fmt(entry.quantity, entry.unit)} of {lot.stock_item.name}.")
+            messages.success(
+                request,
+                _("Wrote off {p0} of {p1}.").format(p0=_fmt(entry.quantity, entry.unit), p1=lot.stock_item.name),
+            )
         return self._back()
 
     def recompute_view(self, request):
         self._guard(request, "warehouse", "update")
         services.recompute_availability(request.restaurant.pk)
-        messages.success(request, "Availability re-checked against current stock.")
+        messages.success(request, _("Availability re-checked against current stock."))
         return self._back()
 
 
@@ -716,7 +720,7 @@ class _RecipeLineInline(TenantInlineMixin, TenantForeignKeyScopingMixin, UnfoldT
             kwargs["queryset"] = StockItem.objects.filter(restaurant=request.restaurant, is_active=True)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-    @display(description="Cost")
+    @display(description=_("Cost"))
     def line_cost(self, obj):
         if not obj.pk or not obj.stock_item_id:
             return "—"
@@ -752,7 +756,7 @@ class RecipeAdminMixin:
         if touched:
             hooks.on_recipe_changed(form.instance, by=request.user)
 
-    @display(description="Ingredient cost")
+    @display(description=_("Ingredient cost"))
     def ingredient_cost(self, obj):
         cost = services.recipe_cost(obj)
         return "—" if cost is None else f"{cost}"

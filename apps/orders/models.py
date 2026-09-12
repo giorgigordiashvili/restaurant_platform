@@ -24,9 +24,9 @@ class OrderDiscount(TimeStampedModel):
     """
 
     KIND_CHOICES = [
-        ("manual", "Manual"),
-        ("loyalty_tier", "Loyalty tier"),
-        ("promo", "Promotion"),
+        ("manual", _("Manual")),
+        ("loyalty_tier", _("Loyalty tier")),
+        ("promo", _("Promotion")),
     ]
     MODE_CHOICES = [("percent", "Percent"), ("fixed", "Fixed amount")]
 
@@ -65,29 +65,29 @@ class Order(TimeStampedModel):
 
     STATUS_CHOICES = [
         # Created but awaiting a successful payment callback before going to the kitchen.
-        ("pending_payment", "Pending Payment"),
-        ("pending", "Pending"),
-        ("confirmed", "Confirmed"),
-        ("preparing", "Preparing"),
-        ("ready", "Ready"),
-        ("served", "Served"),
-        ("completed", "Completed"),
-        ("cancelled", "Cancelled"),
+        ("pending_payment", _("Pending Payment")),
+        ("pending", _("Pending")),
+        ("confirmed", _("Confirmed")),
+        ("preparing", _("Preparing")),
+        ("ready", _("Ready")),
+        ("served", _("Served")),
+        ("completed", _("Completed")),
+        ("cancelled", _("Cancelled")),
     ]
 
     ORDER_TYPE_CHOICES = [
-        ("dine_in", "Dine In"),
-        ("takeaway", "Takeaway"),
-        ("delivery", "Delivery"),
+        ("dine_in", _("Dine In")),
+        ("takeaway", _("Takeaway")),
+        ("delivery", _("Delivery")),
     ]
 
     SOURCE_CHOICES = [
-        ("web", "Website"),
-        ("qr", "QR table"),
-        ("pos", "POS"),
-        ("glovo", "Glovo"),
-        ("wolt", "Wolt"),
-        ("bolt_food", "Bolt Food"),
+        ("web", _("Website")),
+        ("qr", _("QR table")),
+        ("pos", _("POS")),
+        ("glovo", _("Glovo")),
+        ("wolt", _("Wolt")),
+        ("bolt_food", _("Bolt Food")),
     ]
 
     # Order identification
@@ -95,7 +95,7 @@ class Order(TimeStampedModel):
         max_length=20,
         unique=True,
         db_index=True,
-        help_text="Human-readable order number (e.g., ORD-001)",
+        help_text=_("Human-readable order number (e.g., ORD-001)"),
     )
 
     # Relationships
@@ -124,7 +124,7 @@ class Order(TimeStampedModel):
         null=True,
         blank=True,
         related_name="orders",
-        help_text="The guest at the table who placed this order",
+        help_text=_("The guest at the table who placed this order"),
     )
     reservation = models.ForeignKey(
         "reservations.Reservation",
@@ -132,7 +132,7 @@ class Order(TimeStampedModel):
         null=True,
         blank=True,
         related_name="orders",
-        help_text="Optional — set when this order was placed as part of a reservation.",
+        help_text=_("Optional — set when this order was placed as part of a reservation."),
     )
     customer = models.ForeignKey(
         "accounts.User",
@@ -194,7 +194,7 @@ class Order(TimeStampedModel):
         decimal_places=2,
         default=0,
         validators=[MinValueValidator(0)],
-        help_text="Optional gratuity paid on top of subtotal/tax/service.",
+        help_text=_("Optional gratuity paid on top of subtotal/tax/service."),
     )
     tip_distribution = models.JSONField(
         default=dict,
@@ -210,7 +210,7 @@ class Order(TimeStampedModel):
         null=True,
         blank=True,
         related_name="served_orders",
-        help_text="Staff member credited with serving this order (for tip distribution).",
+        help_text=_("Staff member credited with serving this order (for tip distribution)."),
     )
     total = models.DecimalField(
         max_digits=10,
@@ -233,7 +233,7 @@ class Order(TimeStampedModel):
     customer_email = models.EmailField(blank=True)
     customer_notes = models.TextField(
         blank=True,
-        help_text="Special requests or notes from customer",
+        help_text=_("Special requests or notes from customer"),
     )
 
     # Delivery info (for delivery orders)
@@ -254,7 +254,7 @@ class Order(TimeStampedModel):
         null=True,
         blank=True,
         related_name="handled_orders",
-        help_text="Staff member who handled this order",
+        help_text=_("Staff member who handled this order"),
     )
 
     class Meta:
@@ -444,11 +444,11 @@ class OrderItem(TimeStampedModel):
     """
 
     STATUS_CHOICES = [
-        ("pending", "Pending"),
-        ("preparing", "Preparing"),
-        ("ready", "Ready"),
-        ("served", "Served"),
-        ("cancelled", "Cancelled"),
+        ("pending", _("Pending")),
+        ("preparing", _("Preparing")),
+        ("ready", _("Ready")),
+        ("served", _("Served")),
+        ("cancelled", _("Cancelled")),
     ]
 
     order = models.ForeignKey(
@@ -487,9 +487,9 @@ class OrderItem(TimeStampedModel):
     preparation_station = models.CharField(
         max_length=20,
         choices=[
-            ("kitchen", "Kitchen"),
-            ("bar", "Bar"),
-            ("both", "Both"),
+            ("kitchen", _("Kitchen")),
+            ("bar", _("Bar")),
+            ("both", _("Both")),
         ],
         default="kitchen",
     )
@@ -612,7 +612,7 @@ class OrderStatusHistory(TimeStampedModel):
     class Meta:
         db_table = "order_status_history"
         ordering = ["-created_at"]
-        verbose_name_plural = "Order status histories"
+        verbose_name_plural = _("Order status histories")
 
     def __str__(self):
         return f"{self.order} {self.from_status} → {self.to_status}"

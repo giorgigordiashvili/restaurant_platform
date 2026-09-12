@@ -11,6 +11,7 @@ from datetime import timedelta
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
 
@@ -61,8 +62,8 @@ class Review(TimeStampedModel):
     class Meta:
         db_table = "reviews"
         ordering = ["-created_at"]
-        verbose_name = "Review"
-        verbose_name_plural = "Reviews"
+        verbose_name = _("Review")
+        verbose_name_plural = _("Reviews")
         indexes = [
             models.Index(fields=["restaurant", "is_hidden", "-created_at"]),
             models.Index(fields=["user", "-created_at"]),
@@ -111,8 +112,8 @@ class ReviewMedia(TimeStampedModel):
     class Meta:
         db_table = "review_media"
         ordering = ["position", "created_at"]
-        verbose_name = "Review Media"
-        verbose_name_plural = "Review Media"
+        verbose_name = _("Review Media")
+        verbose_name_plural = _("Review Media")
         indexes = [models.Index(fields=["review", "position"])]
 
     def __str__(self):
@@ -176,8 +177,8 @@ class ReviewReport(TimeStampedModel):
     class Meta:
         db_table = "review_reports"
         ordering = ["-created_at"]
-        verbose_name = "Review Report"
-        verbose_name_plural = "Review Reports"
+        verbose_name = _("Review Report")
+        verbose_name_plural = _("Review Reports")
         constraints = [
             models.UniqueConstraint(
                 fields=["review", "reporter"],

@@ -8,6 +8,7 @@ from __future__ import annotations
 from django.db.models import F
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from apps.core import modules
 from apps.core.tenant_admin_base import has_resource_permission
@@ -52,21 +53,21 @@ def module_cards(request):
         qs = Order.objects.filter(restaurant=restaurant)
         card(
             "ordering",
-            "Orders",
+            _("Orders"),
             "receipt_long",
             [
                 {
-                    "label": "Today",
+                    "label": _("Today"),
                     "value": qs.filter(created_at__date=today).count(),
                     "url": _url("orders_order_changelist"),
                 },
                 {
-                    "label": "Open now",
+                    "label": _("Open now"),
                     "value": qs.filter(status__in=("pending", "confirmed", "preparing", "ready")).count(),
                     "url": _url("orders_order_changelist"),
                 },
             ],
-            [_link("All orders", "orders_order_changelist")],
+            [_link(_("All orders"), "orders_order_changelist")],
             "orders",
         )
 
@@ -76,23 +77,23 @@ def module_cards(request):
         qs = Reservation.objects.filter(restaurant=restaurant)
         card(
             "reservations",
-            "Reservations",
+            _("Reservations"),
             "event_seat",
             [
                 {
-                    "label": "Today",
+                    "label": _("Today"),
                     "value": qs.filter(reservation_date=today, status__in=("pending", "confirmed", "seated")).count(),
                     "url": _url("reservations_reservation_changelist"),
                 },
                 {
-                    "label": "Awaiting confirmation",
+                    "label": _("Awaiting confirmation"),
                     "value": qs.filter(status="pending", reservation_date__gte=today).count(),
                     "url": _url("reservations_reservation_changelist"),
                 },
             ],
             [
-                _link("Reservations", "reservations_reservation_changelist"),
-                _link("Blocked times", "reservations_reservationblockedtime_changelist"),
+                _link(_("Reservations"), "reservations_reservation_changelist"),
+                _link(_("Blocked times"), "reservations_reservationblockedtime_changelist"),
             ],
             "reservations",
         )
@@ -102,21 +103,21 @@ def module_cards(request):
 
         card(
             "tables",
-            "Tables & QR",
+            _("Tables & QR"),
             "table_restaurant",
             [
                 {
-                    "label": "Active sessions",
+                    "label": _("Active sessions"),
                     "value": TableSession.objects.filter(table__restaurant=restaurant, status="active").count(),
                     "url": _url("tables_tablesession_changelist"),
                 },
                 {
-                    "label": "Tables",
+                    "label": _("Tables"),
                     "value": Table.objects.filter(restaurant=restaurant, is_active=True).count(),
                     "url": _url("tables_table_changelist"),
                 },
             ],
-            [_link("Tables", "tables_table_changelist"), _link("QR codes", "tables_tableqrcode_changelist")],
+            [_link(_("Tables"), "tables_table_changelist"), _link(_("QR codes"), "tables_tableqrcode_changelist")],
             "tables",
         )
 
@@ -132,7 +133,7 @@ def module_cards(request):
         )
         stats = [
             {
-                "label": "Open shift" if shift else "Shift",
+                "label": _("Open shift") if shift else "Shift",
                 "value": f"#{shift.number}" if shift else "closed",
                 "url": (
                     _url("payments_cashshift_change", object_id=shift.pk)
@@ -141,7 +142,7 @@ def module_cards(request):
                 ),
             },
             {
-                "label": "Taken today",
+                "label": _("Taken today"),
                 "value": today_qs.aggregate(s=Sum("total_amount"))["s"] or 0,
                 "url": _url("payments_payment_changelist"),
             },
@@ -149,20 +150,20 @@ def module_cards(request):
         if shift:
             stats.append(
                 {
-                    "label": "Cash in drawer",
+                    "label": _("Cash in drawer"),
                     "value": ledger.x_report(shift)["expected_cash"],
                     "url": _url("payments_cashshift_change", object_id=shift.pk),
                 }
             )
         card(
             "cash",
-            "Cash & payments",
+            _("Cash & payments"),
             "point_of_sale",
             stats,
             [
-                _link("Shifts", "payments_cashshift_changelist"),
-                _link("Payments", "payments_payment_changelist"),
-                _link("Reasons", "payments_discountreason_changelist"),
+                _link(_("Shifts"), "payments_cashshift_changelist"),
+                _link(_("Payments"), "payments_payment_changelist"),
+                _link(_("Reasons"), "payments_discountreason_changelist"),
             ],
             "cash",
         )
@@ -172,25 +173,25 @@ def module_cards(request):
 
         card(
             "warehouse",
-            "Warehouse",
+            _("Warehouse"),
             "inventory_2",
             [
                 {
-                    "label": "Low / out",
+                    "label": _("Low / out"),
                     "value": StockItem.objects.filter(restaurant=restaurant, is_active=True)
                     .filter(on_hand_qty__lte=F("reserved_qty") + F("min_level"))
                     .count(),
                     "url": _url("inventory_warehouseoverview_changelist"),
                 },
                 {
-                    "label": "Open alerts",
+                    "label": _("Open alerts"),
                     "value": InventoryAlert.objects.filter(restaurant=restaurant, status="open").count(),
                     "url": _url("inventory_warehouseoverview_changelist"),
                 },
             ],
             [
-                _link("Overview", "inventory_warehouseoverview_changelist"),
-                _link("Receive stock", "inventory_stocklot_add"),
+                _link(_("Overview"), "inventory_warehouseoverview_changelist"),
+                _link(_("Receive stock"), "inventory_stocklot_add"),
             ],
             "warehouse",
         )
@@ -199,21 +200,21 @@ def module_cards(request):
         from apps.menu.models import MenuItem
 
         qs = MenuItem.objects.filter(restaurant=restaurant)
-        stats = [{"label": "Dishes", "value": qs.count(), "url": _url("menu_menuitem_changelist")}]
+        stats = [{"label": _("Dishes"), "value": qs.count(), "url": _url("menu_menuitem_changelist")}]
         if "warehouse" in on:
             stats.append(
                 {
-                    "label": "Sold out",
+                    "label": _("Sold out"),
                     "value": qs.filter(auto_disabled_by_stock=True).count(),
                     "url": _url("menu_menuitem_changelist") + "?auto_disabled_by_stock__exact=1",
                 }
             )
         card(
             "menu",
-            "Menu",
+            _("Menu"),
             "restaurant_menu",
             stats,
-            [_link("Items", "menu_menuitem_changelist"), _link("Categories", "menu_menucategory_changelist")],
+            [_link(_("Items"), "menu_menuitem_changelist"), _link(_("Categories"), "menu_menucategory_changelist")],
             "menu",
         )
 
@@ -222,16 +223,16 @@ def module_cards(request):
 
         card(
             "loyalty",
-            "Loyalty",
+            _("Loyalty"),
             "loyalty",
             [
                 {
-                    "label": "Active programs",
+                    "label": _("Active programs"),
                     "value": LoyaltyProgram.objects.filter(restaurant=restaurant, is_active=True).count(),
                     "url": _url("loyalty_loyaltyprogram_changelist"),
                 }
             ],
-            [_link("Programs", "loyalty_loyaltyprogram_changelist")],
+            [_link(_("Programs"), "loyalty_loyaltyprogram_changelist")],
             "menu",
         )
 
@@ -240,18 +241,18 @@ def module_cards(request):
 
         card(
             "reviews",
-            "Reviews",
+            _("Reviews"),
             "reviews",
             [
                 {
-                    "label": "Last 7 days",
+                    "label": _("Last 7 days"),
                     "value": Review.objects.filter(
                         restaurant=restaurant, created_at__gte=timezone.now() - timezone.timedelta(days=7)
                     ).count(),
                     "url": _url("reviews_review_changelist"),
                 }
             ],
-            [_link("Reviews", "reviews_review_changelist")],
+            [_link(_("Reviews"), "reviews_review_changelist")],
             "menu",
         )
 
@@ -261,24 +262,24 @@ def module_cards(request):
         qs = Order.objects.filter(restaurant=restaurant, source__in=("glovo", "wolt", "bolt_food"))
         card(
             "delivery",
-            "Delivery platforms",
+            _("Delivery platforms"),
             "delivery_dining",
             [
                 {
-                    "label": "Platform orders today",
+                    "label": _("Platform orders today"),
                     "value": qs.filter(created_at__date=today).count(),
                     "url": _url("orders_order_changelist") + "?source__exact=glovo",
                 },
                 {
-                    "label": "Awaiting accept",
+                    "label": _("Awaiting accept"),
                     "value": qs.filter(status="pending").count(),
                     "url": _url("orders_order_changelist") + "?status__exact=pending",
                 },
             ],
             [
-                _link("Platforms", "delivery_deliveryplatformspage_changelist"),
-                _link("Setup guide", "delivery_deliveryplatformspage_guide"),
-                _link("Orders", "orders_order_changelist"),
+                _link(_("Platforms"), "delivery_deliveryplatformspage_changelist"),
+                _link(_("Setup guide"), "delivery_deliveryplatformspage_guide"),
+                _link(_("Orders"), "orders_order_changelist"),
             ],
             "orders",
         )
@@ -289,23 +290,23 @@ def module_cards(request):
         qs = FiscalDocument.objects.filter(restaurant=restaurant)
         card(
             "fiscal",
-            "Fiscal & VAT",
+            _("Fiscal & VAT"),
             "receipt",
             [
                 {
-                    "label": "Receipts today",
+                    "label": _("Receipts today"),
                     "value": qs.filter(kind="receipt", created_at__date=today).count(),
                     "url": _url("fiscal_fiscaldocument_changelist"),
                 },
                 {
-                    "label": "Failed",
+                    "label": _("Failed"),
                     "value": qs.filter(status="failed").count(),
                     "url": _url("fiscal_fiscaldocument_changelist") + "?status__exact=failed",
                 },
             ],
             [
-                _link("Documents", "fiscal_fiscaldocument_changelist"),
-                _link("Fiscal settings", "fiscal_fiscalsettingspage_changelist"),
+                _link(_("Documents"), "fiscal_fiscaldocument_changelist"),
+                _link(_("Fiscal settings"), "fiscal_fiscalsettingspage_changelist"),
             ],
             "fiscal",
         )
@@ -316,21 +317,24 @@ def module_cards(request):
         st = printing.printer_status(restaurant)
         card(
             "printing",
-            "Printing",
+            _("Printing"),
             "print",
             [
                 {
-                    "label": "Printers offline",
+                    "label": _("Printers offline"),
                     "value": len(st["offline"]),
                     "url": _url("printing_printer_changelist"),
                 },
                 {
-                    "label": "Failed jobs",
+                    "label": _("Failed jobs"),
                     "value": st["failed_jobs"],
                     "url": _url("printing_printjob_changelist") + "?status__exact=failed",
                 },
             ],
-            [_link("Printers", "printing_printer_changelist"), _link("Print jobs", "printing_printjob_changelist")],
+            [
+                _link(_("Printers"), "printing_printer_changelist"),
+                _link(_("Print jobs"), "printing_printjob_changelist"),
+            ],
             "settings",
         )
 
@@ -346,16 +350,16 @@ def module_cards(request):
             "monitoring",
             [
                 {
-                    "label": "Sales today",
+                    "label": _("Sales today"),
                     "value": f"{summary['net_sales']} ₾",
                     "url": _url("reports_salesreport_changelist"),
                 },
-                {"label": "Orders today", "value": summary["orders"], "url": _url("reports_salesreport_changelist")},
+                {"label": _("Orders today"), "value": summary["orders"], "url": _url("reports_salesreport_changelist")},
             ],
             [
-                _link("Sales", "reports_salesreport_changelist"),
-                _link("Menu", "reports_menureport_changelist"),
-                _link("Staff", "reports_staffreport_changelist"),
+                _link(_("Sales"), "reports_salesreport_changelist"),
+                _link(_("Menu"), "reports_menureport_changelist"),
+                _link(_("Staff"), "reports_staffreport_changelist"),
             ],
             "analytics",
         )
@@ -369,20 +373,20 @@ def module_cards(request):
             "badge",
             [
                 {
-                    "label": "Members",
+                    "label": _("Members"),
                     "value": StaffMember.objects.filter(restaurant=restaurant, is_active=True).count(),
                     "url": _url("staff_staffmember_changelist"),
                 },
                 {
-                    "label": "Pending invitations",
+                    "label": _("Pending invitations"),
                     "value": StaffInvitation.objects.filter(restaurant=restaurant, status="pending").count(),
                     "url": _url("staff_staffinvitation_changelist"),
                 },
             ],
             [
-                _link("Members", "staff_staffmember_changelist"),
-                _link("Invite", "staff_staffinvitation_add"),
-                _link("Roles", "staff_staffrole_changelist"),
+                _link(_("Members"), "staff_staffmember_changelist"),
+                _link(_("Invite"), "staff_staffinvitation_add"),
+                _link(_("Roles"), "staff_staffrole_changelist"),
             ],
             "staff",
         )
@@ -392,10 +396,10 @@ def module_cards(request):
             None,
             "Settings",
             "settings",
-            [{"label": "Modules on", "value": len(on), "url": _url("tenants_restaurantmodules_changelist")}],
+            [{"label": _("Modules on"), "value": len(on), "url": _url("tenants_restaurantmodules_changelist")}],
             [
-                _link("Restaurant settings", "tenants_restaurant_changelist"),
-                _link("Modules", "tenants_restaurantmodules_changelist"),
+                _link(_("Restaurant settings"), "tenants_restaurant_changelist"),
+                _link(_("Modules"), "tenants_restaurantmodules_changelist"),
             ],
             "settings",
         )

@@ -18,6 +18,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
 
@@ -38,14 +39,14 @@ class LoyaltyProgram(TimeStampedModel):
         "menu.MenuItem",
         on_delete=models.PROTECT,
         related_name="loyalty_trigger_programs",
-        help_text="Buying this item earns punches.",
+        help_text=_("Buying this item earns punches."),
     )
-    threshold = models.PositiveIntegerField(default=5, help_text="Punches required to unlock the reward.")
+    threshold = models.PositiveIntegerField(default=5, help_text=_("Punches required to unlock the reward."))
     reward_item = models.ForeignKey(
         "menu.MenuItem",
         on_delete=models.PROTECT,
         related_name="loyalty_reward_programs",
-        help_text="Item the customer gets free when the threshold is hit.",
+        help_text=_("Item the customer gets free when the threshold is hit."),
     )
     reward_quantity = models.PositiveIntegerField(default=1)
 
@@ -54,7 +55,7 @@ class LoyaltyProgram(TimeStampedModel):
 
     code_ttl_seconds = models.PositiveIntegerField(
         default=86_400,
-        help_text="How long a generated redemption code is valid.",
+        help_text=_("How long a generated redemption code is valid."),
     )
 
     class Meta:
@@ -228,18 +229,18 @@ class PlatformLoyaltyTier(models.Model):
     name_ka = models.CharField(max_length=80)
     name_en = models.CharField(max_length=80)
     name_ru = models.CharField(max_length=80)
-    min_points = models.PositiveIntegerField(help_text="Inclusive lower bound of points-in-window for this tier.")
+    min_points = models.PositiveIntegerField(help_text=_("Inclusive lower bound of points-in-window for this tier."))
     discount_percent = models.PositiveSmallIntegerField(
         default=0,
-        help_text="Integer 0–100. Applied to subtotal at checkout.",
+        help_text=_("Integer 0–100. Applied to subtotal at checkout."),
     )
     is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = "platform_loyalty_tiers"
         ordering = ["min_points"]
-        verbose_name = "Platform loyalty tier"
-        verbose_name_plural = "Platform loyalty tiers"
+        verbose_name = _("Platform loyalty tier")
+        verbose_name_plural = _("Platform loyalty tiers")
 
     def __str__(self) -> str:
         return f"{self.name_en} (≥{self.min_points})"
@@ -296,8 +297,8 @@ class PlatformLoyaltyLedger(models.Model):
             # Single-shot range scan for "last 365 days sum per user".
             models.Index(fields=["user", "earned_at"]),
         ]
-        verbose_name = "Platform loyalty ledger entry"
-        verbose_name_plural = "Platform loyalty ledger"
+        verbose_name = _("Platform loyalty ledger entry")
+        verbose_name_plural = _("Platform loyalty ledger")
 
     def __str__(self) -> str:
         return f"{self.user_id} +{self.points} pts ({self.source})"

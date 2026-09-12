@@ -16,6 +16,7 @@ from dataclasses import dataclass
 
 from django.core.exceptions import ValidationError
 from django.utils.module_loading import import_string
+from django.utils.translation import gettext_lazy as _
 
 logger = logging.getLogger(__name__)
 
@@ -49,8 +50,8 @@ class Module:
 MODULES: tuple[Module, ...] = (
     Module(
         "menu",
-        "Menu",
-        "Categories, dishes and modifiers. The QR menu customers browse.",
+        _("Menu"),
+        _("Categories, dishes and modifiers. The QR menu customers browse."),
         "restaurant_menu",
         None,
         always_on=True,
@@ -60,8 +61,8 @@ MODULES: tuple[Module, ...] = (
     ),
     Module(
         "ordering",
-        "Ordering",
-        "Customers order from the menu: QR dine-in, takeaway. Off = menu only.",
+        _("Ordering"),
+        _("Customers order from the menu: QR dine-in, takeaway. Off = menu only."),
         "receipt_long",
         "accepts_remote_orders",
         sub_flags=("accepts_takeaway",),
@@ -71,8 +72,8 @@ MODULES: tuple[Module, ...] = (
     ),
     Module(
         "tables",
-        "Tables & QR",
-        "Sections, tables, QR codes, table sessions and shared venues.",
+        _("Tables & QR"),
+        _("Sections, tables, QR codes, table sessions and shared venues."),
         "table_restaurant",
         "tables_enabled",
         app_labels=("tables", "venues"),
@@ -87,8 +88,8 @@ MODULES: tuple[Module, ...] = (
     ),
     Module(
         "reservations",
-        "Reservations",
-        "Online booking with deposits, blocked times and reservation rules.",
+        _("Reservations"),
+        _("Online booking with deposits, blocked times and reservation rules."),
         "event_seat",
         "accepts_reservations",
         app_labels=("reservations",),
@@ -102,16 +103,16 @@ MODULES: tuple[Module, ...] = (
     ),
     Module(
         "kitchen",
-        "Kitchen display",
-        "The Kitchen screen in the POS app: cooks accept, cook and bump tickets.",
+        _("Kitchen display"),
+        _("The Kitchen screen in the POS app: cooks accept, cook and bump tickets."),
         "skillet",
         "kitchen_enabled",
         requires=("ordering",),
     ),
     Module(
         "warehouse",
-        "Warehouse",
-        "Stock in lots, recipes on dishes, automatic sold-out, buy lists, delivery-platform checklists.",
+        _("Warehouse"),
+        _("Stock in lots, recipes on dishes, automatic sold-out, buy lists, delivery-platform checklists."),
         "inventory_2",
         "warehouse_enabled",
         recommends=("ordering",),
@@ -131,8 +132,8 @@ MODULES: tuple[Module, ...] = (
     ),
     Module(
         "loyalty",
-        "Loyalty",
-        "Punch-card programs redeemed in the POS; optionally the platform-wide tier discounts.",
+        _("Loyalty"),
+        _("Punch-card programs redeemed in the POS; optionally the platform-wide tier discounts."),
         "loyalty",
         "loyalty_enabled",
         sub_flags=("accepts_platform_loyalty",),
@@ -142,8 +143,8 @@ MODULES: tuple[Module, ...] = (
     ),
     Module(
         "reviews",
-        "Reviews",
-        "Customer reviews on your page, with reporting to the platform moderators.",
+        _("Reviews"),
+        _("Customer reviews on your page, with reporting to the platform moderators."),
         "reviews",
         "reviews_enabled",
         app_labels=("reviews",),
@@ -152,8 +153,10 @@ MODULES: tuple[Module, ...] = (
     ),
     Module(
         "printing",
-        "Printing",
-        "Kitchen and bar ticket printers, receipt printers and cash drawer through the print bridge (any cheap ESC/POS printer).",
+        _("Printing"),
+        _(
+            "Kitchen and bar ticket printers, receipt printers and cash drawer through the print bridge (any cheap ESC/POS printer)."
+        ),
         "print",
         "printing_enabled",
         recommends=("ordering",),
@@ -164,8 +167,8 @@ MODULES: tuple[Module, ...] = (
     ),
     Module(
         "cash",
-        "Cash & payments",
-        "Cash shifts with X/Z reports, taking payments in the POS, discounts, comps, voids and refunds.",
+        _("Cash & payments"),
+        _("Cash shifts with X/Z reports, taking payments in the POS, discounts, comps, voids and refunds."),
         "point_of_sale",
         "cash_enabled",
         requires=("ordering",),
@@ -175,8 +178,10 @@ MODULES: tuple[Module, ...] = (
     ),
     Module(
         "delivery",
-        "Delivery platforms",
-        "Glovo and Wolt orders straight into the kitchen, menu push, sold-out sync, store pause; Bolt Food coming soon.",
+        _("Delivery platforms"),
+        _(
+            "Glovo and Wolt orders straight into the kitchen, menu push, sold-out sync, store pause; Bolt Food coming soon."
+        ),
         "delivery_dining",
         "delivery_enabled",
         requires=("ordering",),
@@ -188,8 +193,10 @@ MODULES: tuple[Module, ...] = (
     ),
     Module(
         "fiscal",
-        "Fiscal & VAT",
-        "VAT profile, sequential receipts and refund receipts, RS.ge waybill export. A live fiscal provider plugs in later.",
+        _("Fiscal & VAT"),
+        _(
+            "VAT profile, sequential receipts and refund receipts, RS.ge waybill export. A live fiscal provider plugs in later."
+        ),
         "receipt",
         "fiscal_enabled",
         recommends=("ordering",),
@@ -200,8 +207,10 @@ MODULES: tuple[Module, ...] = (
     ),
     Module(
         "notifications",
-        "Notifications",
-        "Staff push and in-app alerts (new orders, reservations, sold-out, printer failures, Z-reports); guest SMS / email for reservations.",
+        _("Notifications"),
+        _(
+            "Staff push and in-app alerts (new orders, reservations, sold-out, printer failures, Z-reports); guest SMS / email for reservations."
+        ),
         "notifications_active",
         "notifications_enabled",
         app_labels=("notifications",),
@@ -210,8 +219,8 @@ MODULES: tuple[Module, ...] = (
     ),
     Module(
         "payments",
-        "Online payments",
-        "Card payments via Bank of Georgia and/or Flitt. Without them customers pay cash at the table.",
+        _("Online payments"),
+        _("Card payments via Bank of Georgia and/or Flitt. Without them customers pay cash at the table."),
         "credit_card",
         None,
         sub_flags=("accepts_bog_payments", "accepts_flitt_payments"),

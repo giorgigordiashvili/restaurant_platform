@@ -13,6 +13,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
+from django.utils.translation import gettext_lazy as _
 
 from apps.core import modules
 from apps.core.tenant_admin_base import ModuleEnabledMixin, TenantModelAdmin, has_resource_permission
@@ -32,23 +33,23 @@ from apps.reports.periods import parse_period
 from apps.reports.tables import Table
 
 RANGES = (
-    ("today", "Today"),
-    ("yesterday", "Yesterday"),
-    ("week", "This week"),
-    ("month", "This month"),
+    ("today", _("Today")),
+    ("yesterday", _("Yesterday")),
+    ("week", _("This week")),
+    ("month", _("This month")),
     ("last7", "Last 7 days"),
     ("last30", "Last 30 days"),
 )
 
 # (key, title, model, module) in sidebar order.
 REPORTS = (
-    ("sales", "Sales", SalesReport, None),
-    ("menu", "Menu & dishes", MenuReport, None),
-    ("food_cost", "Food cost", FoodCostReport, "warehouse"),
-    ("staff", "Staff", StaffReport, None),
-    ("shifts", "Cash shifts", ShiftsReport, "cash"),
-    ("reservations", "Reservations", ReservationsReport, "reservations"),
-    ("reviews", "Reviews", ReviewsReport, "reviews"),
+    ("sales", _("Sales"), SalesReport, None),
+    ("menu", _("Menu & dishes"), MenuReport, None),
+    ("food_cost", _("Food cost"), FoodCostReport, "warehouse"),
+    ("staff", _("Staff"), StaffReport, None),
+    ("shifts", _("Cash shifts"), ShiftsReport, "cash"),
+    ("reservations", _("Reservations"), ReservationsReport, "reservations"),
+    ("reviews", _("Reviews"), ReviewsReport, "reviews"),
 )
 
 
@@ -186,23 +187,25 @@ class SalesReportAdmin(ReportAdminBase):
         cur = data["summary"]["current"]
         delta = data["summary"]["delta"]
         kpis = [
-            kpi("Net sales", cur["net_sales"], delta=delta["net_sales"]),
-            kpi("Orders", cur["orders"], delta=delta["orders"], kind="int"),
-            kpi("Average ticket", cur["avg_ticket"], delta=delta["avg_ticket"]),
-            kpi("Gross total", cur["gross_total"], delta=delta["gross_total"]),
-            kpi("Discounts", cur["discounts"]),
-            kpi("Tips", cur["tips"]),
-            kpi("Service charge", cur["service_charge"]),
-            kpi("Tax", cur["tax"]),
-            kpi("Cancelled orders", f"{cur['cancellations']['count']} · {cur['cancellations']['value']}", kind="text"),
-            kpi("Voided items", f"{cur['voids']['count']} · {cur['voids']['value']}", kind="text"),
-            kpi("Refunds", f"{cur['refunds']['count']} · {cur['refunds']['value']}", kind="text"),
+            kpi(_("Net sales"), cur["net_sales"], delta=delta["net_sales"]),
+            kpi(_("Orders"), cur["orders"], delta=delta["orders"], kind="int"),
+            kpi(_("Average ticket"), cur["avg_ticket"], delta=delta["avg_ticket"]),
+            kpi(_("Gross total"), cur["gross_total"], delta=delta["gross_total"]),
+            kpi(_("Discounts"), cur["discounts"]),
+            kpi(_("Tips"), cur["tips"]),
+            kpi(_("Service charge"), cur["service_charge"]),
+            kpi(_("Tax"), cur["tax"]),
+            kpi(
+                _("Cancelled orders"), f"{cur['cancellations']['count']} · {cur['cancellations']['value']}", kind="text"
+            ),
+            kpi(_("Voided items"), f"{cur['voids']['count']} · {cur['voids']['value']}", kind="text"),
+            kpi(_("Refunds"), f"{cur['refunds']['count']} · {cur['refunds']['value']}", kind="text"),
         ]
         by_day = data["by_day"]
         by_hour = data["by_hour"]
         chart_list = [
             {
-                "title": "Sales by day",
+                "title": _("Sales by day"),
                 "type": "line",
                 "data": charts.line(
                     [d["day"].strftime("%d %b") for d in by_day],
@@ -210,7 +213,7 @@ class SalesReportAdmin(ReportAdminBase):
                 ),
             },
             {
-                "title": "Orders by hour",
+                "title": _("Orders by hour"),
                 "type": "bar",
                 "data": charts.bar([f"{h['hour']:02d}" for h in by_hour], [("Orders", [h["orders"] for h in by_hour])]),
             },
@@ -219,21 +222,21 @@ class SalesReportAdmin(ReportAdminBase):
             Table(
                 "by_day",
                 "By day",
-                [("day", "Day"), ("orders", "Orders"), ("net", "Net sales"), ("gross", "Gross")],
+                [("day", _("Day")), ("orders", _("Orders")), ("net", _("Net sales")), ("gross", _("Gross"))],
                 by_day,
                 money=("net", "gross"),
             ),
             Table(
                 "by_type",
                 "By order type",
-                [("label", "Type"), ("orders", "Orders"), ("net", "Net sales"), ("gross", "Gross")],
+                [("label", _("Type")), ("orders", _("Orders")), ("net", _("Net sales")), ("gross", _("Gross"))],
                 data["by_type"],
                 money=("net", "gross"),
             ),
             Table(
                 "by_method",
                 "By payment method",
-                [("label", "Method"), ("count", "Payments"), ("amount", "Amount"), ("tips", "Tips")],
+                [("label", _("Method")), ("count", _("Payments")), ("amount", _("Amount")), ("tips", _("Tips"))],
                 data["by_method"],
                 money=("amount", "tips"),
                 note="'Unrecorded' is the part of gross sales with no payment in the ledger yet.",
@@ -241,7 +244,7 @@ class SalesReportAdmin(ReportAdminBase):
             Table(
                 "by_hour",
                 "By hour",
-                [("hour", "Hour"), ("orders", "Orders"), ("net", "Net sales")],
+                [("hour", _("Hour")), ("orders", _("Orders")), ("net", _("Net sales"))],
                 by_hour,
                 money=("net",),
             ),
@@ -274,14 +277,14 @@ class MenuReportAdmin(ReportAdminBase):
         top = items[:10]
         sold = sum(i["qty"] for i in items)
         kpis = [
-            kpi("Dishes sold", sold, kind="int"),
-            kpi("Distinct dishes", len(items), kind="int"),
-            kpi("Top dish", f"{items[0]['name']} · {items[0]['qty']}" if items else "—", kind="text"),
-            kpi("Comped lines", sum(i["comps"] for i in items), kind="int"),
+            kpi(_("Dishes sold"), sold, kind="int"),
+            kpi(_("Distinct dishes"), len(items), kind="int"),
+            kpi(_("Top dish"), f"{items[0]['name']} · {items[0]['qty']}" if items else "—", kind="text"),
+            kpi(_("Comped lines"), sum(i["comps"] for i in items), kind="int"),
         ]
         chart_list = [
             {
-                "title": "Top 10 dishes by revenue",
+                "title": _("Top 10 dishes by revenue"),
                 "type": "bar",
                 "data": charts.bar([i["name"] for i in top], [("Net revenue", [i["revenue"] for i in top])]),
             }
@@ -291,15 +294,15 @@ class MenuReportAdmin(ReportAdminBase):
                 "items",
                 "Dishes",
                 [
-                    ("name", "Dish"),
-                    ("category", "Category"),
-                    ("qty", "Qty"),
-                    ("share_qty", "Share of qty"),
-                    ("revenue", "Net revenue"),
-                    ("share_revenue", "Share of revenue"),
-                    ("avg_price", "Avg price"),
-                    ("modifiers_per_line", "Modifiers / line"),
-                    ("comps", "Comps"),
+                    ("name", _("Dish")),
+                    ("category", _("Category")),
+                    ("qty", _("Qty")),
+                    ("share_qty", _("Share of qty")),
+                    ("revenue", _("Net revenue")),
+                    ("share_revenue", _("Share of revenue")),
+                    ("avg_price", _("Avg price")),
+                    ("modifiers_per_line", _("Modifiers / line")),
+                    ("comps", _("Comps")),
                 ],
                 items,
                 money=("revenue", "avg_price"),
@@ -309,11 +312,11 @@ class MenuReportAdmin(ReportAdminBase):
                 "categories",
                 "Categories",
                 [
-                    ("category", "Category"),
-                    ("dishes", "Dishes"),
-                    ("qty", "Qty"),
-                    ("revenue", "Net revenue"),
-                    ("share", "Share"),
+                    ("category", _("Category")),
+                    ("dishes", _("Dishes")),
+                    ("qty", _("Qty")),
+                    ("revenue", _("Net revenue")),
+                    ("share", _("Share")),
                 ],
                 data["categories"],
                 money=("revenue",),
@@ -330,14 +333,14 @@ class MenuReportAdmin(ReportAdminBase):
                     "engineering",
                     "Menu engineering",
                     [
-                        ("name", "Dish"),
-                        ("quadrant", "Quadrant"),
-                        ("qty", "Qty"),
-                        ("share_qty", "Popularity"),
-                        ("revenue", "Net revenue"),
-                        ("cogs", "COGS"),
-                        ("margin_per_unit", "Margin / portion"),
-                        ("food_cost_pct", "Food cost %"),
+                        ("name", _("Dish")),
+                        ("quadrant", _("Quadrant")),
+                        ("qty", _("Qty")),
+                        ("share_qty", _("Popularity")),
+                        ("revenue", _("Net revenue")),
+                        ("cogs", _("COGS")),
+                        ("margin_per_unit", _("Margin / portion")),
+                        ("food_cost_pct", _("Food cost %")),
                     ],
                     eng["rows"],
                     money=("revenue", "cogs", "margin_per_unit"),
@@ -368,20 +371,20 @@ class FoodCostReportAdmin(ReportAdminBase):
     def page(self, request, period, data):
         fc = data["food_cost"]
         kpis = [
-            kpi("Net sales", fc["net_sales"]),
-            kpi("Cost of sales (COGS)", fc["cogs"]),
-            kpi("Food cost %", fc["food_cost_pct"], kind="percent"),
-            kpi("Gross margin", fc["gross_margin"]),
-            kpi("Gross margin %", fc["gross_margin_pct"], kind="percent"),
-            kpi("Waste", f"{fc['waste']} · {fc['waste_count']} entries", kind="text"),
-            kpi("Waste % of sales", fc["waste_pct"], kind="percent"),
-            kpi("Employee meals", fc["employee_meals"]),
-            kpi("Purchases received", fc["purchases"]),
+            kpi(_("Net sales"), fc["net_sales"]),
+            kpi(_("Cost of sales (COGS)"), fc["cogs"]),
+            kpi(_("Food cost %"), fc["food_cost_pct"], kind="percent"),
+            kpi(_("Gross margin"), fc["gross_margin"]),
+            kpi(_("Gross margin %"), fc["gross_margin_pct"], kind="percent"),
+            kpi(_("Waste"), f"{fc['waste']} · {fc['waste_count']} entries", kind="text"),
+            kpi(_("Waste % of sales"), fc["waste_pct"], kind="percent"),
+            kpi(_("Employee meals"), fc["employee_meals"]),
+            kpi(_("Purchases received"), fc["purchases"]),
         ]
         rows = sorted(data["engineering"]["rows"], key=lambda x: -x["cogs"])
         chart_list = [
             {
-                "title": "Cost breakdown",
+                "title": _("Cost breakdown"),
                 "type": "bar",
                 "data": charts.bar(
                     ["COGS", "Waste", "Employee meals", "Gross margin"],
@@ -394,12 +397,12 @@ class FoodCostReportAdmin(ReportAdminBase):
                 "dishes",
                 "Cost by dish",
                 [
-                    ("name", "Dish"),
-                    ("qty", "Qty"),
-                    ("revenue", "Net revenue"),
-                    ("cogs", "COGS"),
-                    ("margin", "Margin"),
-                    ("food_cost_pct", "Food cost %"),
+                    ("name", _("Dish")),
+                    ("qty", _("Qty")),
+                    ("revenue", _("Net revenue")),
+                    ("cogs", _("COGS")),
+                    ("margin", _("Margin")),
+                    ("food_cost_pct", _("Food cost %")),
                 ],
                 rows,
                 money=("revenue", "cogs", "margin"),
@@ -423,13 +426,13 @@ class StaffReportAdmin(ReportAdminBase):
     def page(self, request, period, data):
         servers = data["servers"]
         kpis = [
-            kpi("Servers with sales", len(servers), kind="int"),
-            kpi("Tips (assigned)", sum((s["tips"] for s in servers), queries.ZERO)),
-            kpi("Top server", f"{servers[0]['name']} · {servers[0]['sales']}" if servers else "—", kind="text"),
+            kpi(_("Servers with sales"), len(servers), kind="int"),
+            kpi(_("Tips (assigned)"), sum((s["tips"] for s in servers), queries.ZERO)),
+            kpi(_("Top server"), f"{servers[0]['name']} · {servers[0]['sales']}" if servers else "—", kind="text"),
         ]
         chart_list = [
             {
-                "title": "Sales by server",
+                "title": _("Sales by server"),
                 "type": "bar",
                 "data": charts.bar([s["name"] for s in servers[:12]], [("Sales", [s["sales"] for s in servers[:12]])]),
             }
@@ -439,11 +442,11 @@ class StaffReportAdmin(ReportAdminBase):
                 "servers",
                 "Servers",
                 [
-                    ("name", "Server"),
-                    ("orders", "Orders"),
-                    ("sales", "Sales"),
-                    ("avg_ticket", "Avg ticket"),
-                    ("tips", "Tips"),
+                    ("name", _("Server")),
+                    ("orders", _("Orders")),
+                    ("sales", _("Sales")),
+                    ("avg_ticket", _("Avg ticket")),
+                    ("tips", _("Tips")),
                 ],
                 servers,
                 money=("sales", "avg_ticket", "tips"),
@@ -452,14 +455,14 @@ class StaffReportAdmin(ReportAdminBase):
                 "handlers",
                 "Who handled what",
                 [
-                    ("name", "Staff"),
-                    ("orders", "Orders entered"),
-                    ("sales", "Sales"),
-                    ("cancelled", "Cancelled"),
-                    ("discounts", "Discounts"),
-                    ("discounts_amount", "Discount ₾"),
-                    ("voids", "Voids"),
-                    ("voids_amount", "Void ₾"),
+                    ("name", _("Staff")),
+                    ("orders", _("Orders entered")),
+                    ("sales", _("Sales")),
+                    ("cancelled", _("Cancelled")),
+                    ("discounts", _("Discounts")),
+                    ("discounts_amount", _("Discount ₾")),
+                    ("voids", _("Voids")),
+                    ("voids_amount", _("Void ₾")),
                 ],
                 data["handlers"],
                 money=("sales", "discounts_amount", "voids_amount"),
@@ -484,10 +487,10 @@ class ShiftsReportAdmin(ReportAdminBase):
         rows = data["shifts"]
         closed = [s for s in rows if s["status"] == "closed"]
         kpis = [
-            kpi("Shifts", len(rows), kind="int"),
-            kpi("Sales (closed shifts)", sum((s["sales"] for s in closed), queries.ZERO)),
-            kpi("Cash difference", sum((s["difference"] or 0 for s in closed), queries.ZERO)),
-            kpi("Refunds", sum((s["refunds"] for s in closed), queries.ZERO)),
+            kpi(_("Shifts"), len(rows), kind="int"),
+            kpi(_("Sales (closed shifts)"), sum((s["sales"] for s in closed), queries.ZERO)),
+            kpi(_("Cash difference"), sum((s["difference"] or 0 for s in closed), queries.ZERO)),
+            kpi(_("Refunds"), sum((s["refunds"] for s in closed), queries.ZERO)),
         ]
         for s in rows:
             s["url"] = reverse("tenant_admin:payments_cashshift_change", args=[s["id"]])
@@ -497,17 +500,17 @@ class ShiftsReportAdmin(ReportAdminBase):
                 "Shifts",
                 [
                     ("number", "#"),
-                    ("status", "Status"),
-                    ("opened_by", "Opened by"),
-                    ("opened_at", "Opened"),
-                    ("closed_at", "Closed"),
-                    ("payments", "Payments"),
-                    ("sales", "Sales"),
-                    ("tips", "Tips"),
-                    ("refunds", "Refunds"),
-                    ("expected_cash", "Expected"),
-                    ("counted_cash", "Counted"),
-                    ("difference", "Difference"),
+                    ("status", _("Status")),
+                    ("opened_by", _("Opened by")),
+                    ("opened_at", _("Opened")),
+                    ("closed_at", _("Closed")),
+                    ("payments", _("Payments")),
+                    ("sales", _("Sales")),
+                    ("tips", _("Tips")),
+                    ("refunds", _("Refunds")),
+                    ("expected_cash", _("Expected")),
+                    ("counted_cash", _("Counted")),
+                    ("difference", _("Difference")),
                 ],
                 rows,
                 money=("sales", "tips", "refunds", "expected_cash", "counted_cash", "difference"),
@@ -530,16 +533,16 @@ class ReservationsReportAdmin(ReportAdminBase):
 
     def page(self, request, period, data):
         kpis = [
-            kpi("Reservations", data["total"], kind="int"),
-            kpi("Covers", data["covers"], kind="int"),
-            kpi("No-shows", data["no_show"], kind="int"),
-            kpi("No-show rate", data["no_show_rate"], kind="percent"),
-            kpi("Cancelled", data["cancelled"], kind="int"),
+            kpi(_("Reservations"), data["total"], kind="int"),
+            kpi(_("Covers"), data["covers"], kind="int"),
+            kpi(_("No-shows"), data["no_show"], kind="int"),
+            kpi(_("No-show rate"), data["no_show_rate"], kind="percent"),
+            kpi(_("Cancelled"), data["cancelled"], kind="int"),
         ]
         by_day = data["by_day"]
         chart_list = [
             {
-                "title": "Reservations & covers by day",
+                "title": _("Reservations & covers by day"),
                 "type": "bar",
                 "data": charts.bar(
                     [d["day"].strftime("%d %b") for d in by_day],
@@ -548,14 +551,19 @@ class ReservationsReportAdmin(ReportAdminBase):
             }
         ]
         tables = [
-            Table("by_day", "By day", [("day", "Day"), ("reservations", "Reservations"), ("covers", "Covers")], by_day),
+            Table(
+                "by_day",
+                "By day",
+                [("day", _("Day")), ("reservations", _("Reservations")), ("covers", _("Covers"))],
+                by_day,
+            ),
             Table(
                 "by_status",
                 "By status",
-                [("status", "Status"), ("n", "Count")],
+                [("status", _("Status")), ("n", _("Count"))],
                 [{"status": k, "n": v} for k, v in data["by_status"].items()],
             ),
-            Table("by_source", "By source", [("source", "Source"), ("n", "Count")], data["by_source"]),
+            Table("by_source", "By source", [("source", _("Source")), ("n", _("Count"))], data["by_source"]),
         ]
         return {"kpis": kpis, "charts": chart_list, "tables": tables}
 
@@ -574,22 +582,22 @@ class ReviewsReportAdmin(ReportAdminBase):
 
     def page(self, request, period, data):
         kpis = [
-            kpi("Reviews", data["count"], kind="int"),
-            kpi("Average rating", data["average"], kind="text"),
-            kpi("5 stars", data["distribution"].get(5, 0), kind="int"),
-            kpi("1–2 stars", data["distribution"].get(1, 0) + data["distribution"].get(2, 0), kind="int"),
+            kpi(_("Reviews"), data["count"], kind="int"),
+            kpi(_("Average rating"), data["average"], kind="text"),
+            kpi(_("5 stars"), data["distribution"].get(5, 0), kind="int"),
+            kpi(_("1–2 stars"), data["distribution"].get(1, 0) + data["distribution"].get(2, 0), kind="int"),
         ]
         by_day = data["by_day"]
         chart_list = [
             {
-                "title": "Average rating by day",
+                "title": _("Average rating by day"),
                 "type": "line",
                 "data": charts.line(
                     [d["day"].strftime("%d %b") for d in by_day], [("Average", [d["average"] for d in by_day])]
                 ),
             },
             {
-                "title": "Rating distribution",
+                "title": _("Rating distribution"),
                 "type": "bar",
                 "data": charts.bar(
                     [f"{i} ★" for i in range(1, 6)], [("Reviews", [data["distribution"][i] for i in range(1, 6)])]
@@ -597,11 +605,13 @@ class ReviewsReportAdmin(ReportAdminBase):
             },
         ]
         tables = [
-            Table("by_day", "By day", [("day", "Day"), ("reviews", "Reviews"), ("average", "Average")], by_day),
+            Table(
+                "by_day", "By day", [("day", _("Day")), ("reviews", _("Reviews")), ("average", _("Average"))], by_day
+            ),
             Table(
                 "distribution",
                 "Distribution",
-                [("stars", "Stars"), ("n", "Reviews")],
+                [("stars", _("Stars")), ("n", _("Reviews"))],
                 [{"stars": i, "n": data["distribution"][i]} for i in range(5, 0, -1)],
             ),
         ]

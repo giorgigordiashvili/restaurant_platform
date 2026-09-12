@@ -59,8 +59,8 @@ class Notification(TimeStampedModel):
     event = models.CharField(max_length=40, db_index=True)
     title = models.CharField(max_length=200)
     body = models.TextField(blank=True, default="")
-    data = models.JSONField(default=dict, blank=True, help_text="Deep-link payload for the POS (kind, id).")
-    url = models.CharField(max_length=300, blank=True, default="", help_text="Admin page to open.")
+    data = models.JSONField(default=dict, blank=True, help_text=_("Deep-link payload for the POS (kind, id)."))
+    url = models.CharField(max_length=300, blank=True, default="", help_text=_("Admin page to open."))
     dedupe_key = models.CharField(max_length=150, blank=True, default="", db_index=True)
     read_at = models.DateTimeField(null=True, blank=True)
     pushed_at = models.DateTimeField(null=True, blank=True)
@@ -89,7 +89,7 @@ class StaffNotificationPrefs(TimeStampedModel):
     muted_events = models.JSONField(default=list, blank=True)
     push = models.BooleanField(default=True)
     email = models.BooleanField(default=False)
-    quiet_from = models.TimeField(null=True, blank=True, help_text="No push between these hours (in-app still).")
+    quiet_from = models.TimeField(null=True, blank=True, help_text=_("No push between these hours (in-app still)."))
     quiet_to = models.TimeField(null=True, blank=True)
 
     class Meta:
@@ -108,9 +108,9 @@ class RestaurantNotificationSettings(TimeStampedModel):
     restaurant = models.OneToOneField(
         "tenants.Restaurant", on_delete=models.CASCADE, related_name="notification_settings"
     )
-    guest_sms = models.BooleanField(default=False, help_text="Send SMS to guests (needs an SMS provider).")
-    guest_email = models.BooleanField(default=True, help_text="Send email to guests when they gave an address.")
-    sender_name = models.CharField(max_length=60, blank=True, default="", help_text="Shown as the restaurant name.")
+    guest_sms = models.BooleanField(default=False, help_text=_("Send SMS to guests (needs an SMS provider)."))
+    guest_email = models.BooleanField(default=True, help_text=_("Send email to guests when they gave an address."))
+    sender_name = models.CharField(max_length=60, blank=True, default="", help_text=_("Shown as the restaurant name."))
     reservation_confirmation_ka = models.TextField(default=DEFAULT_TEMPLATES["reservation_confirmation_ka"])
     reservation_confirmation_en = models.TextField(default=DEFAULT_TEMPLATES["reservation_confirmation_en"])
     reservation_reminder_ka = models.TextField(default=DEFAULT_TEMPLATES["reservation_reminder_ka"])
@@ -136,20 +136,20 @@ class OutboundMessage(TimeStampedModel):
 
     CHANNEL_CHOICES = [("sms", "SMS"), ("email", "Email")]
     STATUS_CHOICES = [
-        ("queued", "Queued"),
-        ("sent", "Sent"),
-        ("failed", "Failed"),
-        ("skipped", "Skipped"),
+        ("queued", _("Queued")),
+        ("sent", _("Sent")),
+        ("failed", _("Failed")),
+        ("skipped", _("Skipped")),
     ]
     KIND_CHOICES = [
-        ("reservation_confirmation", "Reservation confirmation"),
-        ("reservation_reminder", "Reservation reminder"),
-        ("review_prompt", "Review prompt"),
-        ("campaign", "Marketing campaign"),
-        ("automation", "Marketing automation"),
-        ("purchase_order", "Purchase order"),
-        ("test", "Test message"),
-        ("other", "Other"),
+        ("reservation_confirmation", _("Reservation confirmation")),
+        ("reservation_reminder", _("Reservation reminder")),
+        ("review_prompt", _("Review prompt")),
+        ("campaign", _("Marketing campaign")),
+        ("automation", _("Marketing automation")),
+        ("purchase_order", _("Purchase order")),
+        ("test", _("Test message")),
+        ("other", _("Other")),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -190,5 +190,5 @@ class NotificationSettingsPage(RestaurantNotificationSettings):
 
     class Meta:
         proxy = True
-        verbose_name = "Notification settings"
-        verbose_name_plural = "Notification settings"
+        verbose_name = _("Notification settings")
+        verbose_name_plural = _("Notification settings")

@@ -29,18 +29,18 @@ __all__ = [
 
 class DeliveryPlatformEvent(TimeStampedModel):
     KIND_CHOICES = [
-        ("order_created", "Order received"),
-        ("order_cancelled", "Order cancelled by platform"),
-        ("status_pushed", "Status pushed"),
-        ("menu_status", "Menu sync status"),
-        ("cancel_requested", "Cancellation requested by restaurant"),
-        ("order_status", "Order status notification"),
-        ("refund_pushed", "Refund pushed"),
-        ("store_status", "Store paused / resumed"),
+        ("order_created", _("Order received")),
+        ("order_cancelled", _("Order cancelled by platform")),
+        ("status_pushed", _("Status pushed")),
+        ("menu_status", _("Menu sync status")),
+        ("cancel_requested", _("Cancellation requested by restaurant")),
+        ("order_status", _("Order status notification")),
+        ("refund_pushed", _("Refund pushed")),
+        ("store_status", _("Store paused / resumed")),
     ]
 
     link = models.ForeignKey(RestaurantDeliveryPlatform, on_delete=models.CASCADE, related_name="events")
-    event_id = models.CharField(max_length=150, help_text="platform:order_id:kind -- deduplicates retries.")
+    event_id = models.CharField(max_length=150, help_text=_("platform:order_id:kind -- deduplicates retries."))
     kind = models.CharField(max_length=30, choices=KIND_CHOICES)
     payload = models.JSONField(default=dict, blank=True)
     processed_at = models.DateTimeField(null=True, blank=True)
@@ -63,11 +63,11 @@ class DeliveryPlatformEvent(TimeStampedModel):
 
 class PlatformMenuSync(TimeStampedModel):
     STATUS_CHOICES = [
-        ("queued", "Queued"),
-        ("sent", "Sent"),
-        ("processing", "Processing"),
-        ("success", "Success"),
-        ("failed", "Failed"),
+        ("queued", _("Queued")),
+        ("sent", _("Sent")),
+        ("processing", _("Processing")),
+        ("success", _("Success")),
+        ("failed", _("Failed")),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -98,12 +98,12 @@ class MenuImport(TimeStampedModel):
     """One 'fetch the menu from the platform, preview, import' run."""
 
     STATUS_CHOICES = [
-        ("fetching", "Fetching"),
-        ("previewed", "Previewed"),
-        ("images", "Importing images"),
-        ("imported", "Imported"),
-        ("failed", "Failed"),
-        ("failed_apply", "Import failed"),
+        ("fetching", _("Fetching")),
+        ("previewed", _("Previewed")),
+        ("images", _("Importing images")),
+        ("imported", _("Imported")),
+        ("failed", _("Failed")),
+        ("failed_apply", _("Import failed")),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -114,10 +114,10 @@ class MenuImport(TimeStampedModel):
     source = models.CharField(max_length=20, choices=RestaurantDeliveryPlatform.PLATFORM_CHOICES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="fetching")
     options = models.JSONField(default=dict, blank=True)
-    raw = models.JSONField(default=dict, blank=True, help_text="The platform's menu payload as received.")
+    raw = models.JSONField(default=dict, blank=True, help_text=_("The platform's menu payload as received."))
     preview = models.JSONField(default=dict, blank=True)
     stats = models.JSONField(default=dict, blank=True)
-    images = models.JSONField(default=list, blank=True, help_text="[[menu_item_id, url], ...] still to download.")
+    images = models.JSONField(default=list, blank=True, help_text=_("[[menu_item_id, url], ...] still to download."))
     error = models.TextField(blank=True, default="")
     applied_at = models.DateTimeField(null=True, blank=True)
     triggered_by = models.ForeignKey(
@@ -140,5 +140,5 @@ class DeliveryPlatformsPage(RestaurantDeliveryPlatform):
     class Meta:
         proxy = True
         app_label = "delivery"
-        verbose_name = "Delivery platforms"
-        verbose_name_plural = "Delivery platforms"
+        verbose_name = _("Delivery platforms")
+        verbose_name_plural = _("Delivery platforms")

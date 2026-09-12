@@ -8,6 +8,7 @@ from __future__ import annotations
 from django.conf import settings
 from django.contrib import messages
 from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 
 from unfold.decorators import action, display
 
@@ -53,11 +54,11 @@ class PrinterTenantAdmin(PrintingEnabledMixin, TenantModelAdmin):
     actions = ["print_test_page", "rotate_bridge_key"]
     actions_row = ["print_test_page_row"]
 
-    @display(description="Bridge", boolean=True)
+    @display(description=_("Bridge"), boolean=True)
     def online(self, obj):
         return obj.connection != "bridge" or obj.is_online
 
-    @display(description="Print bridge setup")
+    @display(description=_("Print bridge setup"))
     def setup(self, obj):
         if not obj.pk:
             return "Save the printer first; the bridge key appears here."
@@ -84,32 +85,32 @@ class PrinterTenantAdmin(PrintingEnabledMixin, TenantModelAdmin):
             return {}
         return actions_
 
-    @action(description="Print a test page")
+    @action(description=_("Print a test page"))
     def print_test_page(self, request, queryset):
         n = 0
         for printer in queryset:
             if printer.connection == "bridge":
                 services.enqueue_test(printer, by=request.user)
                 n += 1
-        messages.success(request, f"{n} test page(s) queued.")
+        messages.success(request, _("{p0} test page(s) queued.").format(p0=n))
 
-    @action(description="Print test page", url_path="print-test", attrs={"target": "_self"})
+    @action(description=_("Print test page"), url_path="print-test", attrs={"target": "_self"})
     def print_test_page_row(self, request, object_id):
         from django.shortcuts import redirect
 
         printer = self.get_queryset(request).filter(pk=object_id).first()
         if printer is None or not has_resource_permission(request, "settings", "update"):
-            messages.error(request, "Not allowed.")
+            messages.error(request, _("Not allowed."))
         else:
             services.enqueue_test(printer, by=request.user)
-            messages.success(request, f"Test page queued on {printer.name}.")
+            messages.success(request, _("Test page queued on {p0}.").format(p0=printer.name))
         return redirect("tenant_admin:printing_printer_changelist")
 
-    @action(description="Rotate bridge key (old key stops working)")
+    @action(description=_("Rotate bridge key (old key stops working)"))
     def rotate_bridge_key(self, request, queryset):
         for printer in queryset:
             printer.rotate_key()
-        messages.success(request, "Bridge key rotated. Update bridge.toml on the printer's computer.")
+        messages.success(request, _("Bridge key rotated. Update bridge.toml on the printer's computer."))
 
 
 class PrintJobTenantAdmin(PrintingEnabledMixin, TenantModelAdmin):
@@ -135,13 +136,13 @@ class PrintJobTenantAdmin(PrintingEnabledMixin, TenantModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return has_resource_permission(request, "orders", "delete")
 
-    @action(description="Retry (queue again)")
+    @action(description=_("Retry (queue again)"))
     def retry_jobs(self, request, queryset):
         n = 0
         for job in queryset:
             services.retry(job)
             n += 1
-        messages.success(request, f"{n} job(s) queued again.")
+        messages.success(request, _("{p0} job(s) queued again.").format(p0=n))
 
 
 def register_printing_admin(site):

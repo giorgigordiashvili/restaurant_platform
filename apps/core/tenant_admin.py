@@ -14,6 +14,7 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import path, reverse
 from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
 from parler.admin import TranslatableAdmin, TranslatableTabularInline
@@ -209,7 +210,7 @@ class ModifierGroupTenantAdmin(TenantTranslatableAdmin):
         ),
     )
 
-    @admin.display(description="Options")
+    @admin.display(description=_("Options"))
     def modifiers_count(self, obj):
         return obj.modifiers.count()
 
@@ -316,11 +317,11 @@ class VenueShareRequestTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
     def change_view(self, request, object_id, form_url="", extra_context=None):
         raise PermissionDenied
 
-    @admin.display(description="Direction")
+    @admin.display(description=_("Direction"))
     def direction_display(self, obj):
         return "Incoming" if obj.to_restaurant_id == self._restaurant_id else "Outgoing"
 
-    @admin.display(description="Restaurant")
+    @admin.display(description=_("Restaurant"))
     def other_restaurant(self, obj):
         return obj.from_restaurant if obj.to_restaurant_id == self._restaurant_id else obj.to_restaurant
 
@@ -414,7 +415,7 @@ class VenueShareRequestTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         self._guard(request)
         form = VenueInviteForm(request.POST)
         if not form.is_valid():
-            messages.error(request, "; ".join(f"{k}: {', '.join(v)}" for k, v in form.errors.items()))
+            messages.error(request, _("; ").join(f"{k}: {', '.join(v)}" for k, v in form.errors.items()))
             return self._back()
         try:
             req = venue_services.send_share_request(
@@ -426,7 +427,7 @@ class VenueShareRequestTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             )
         except venue_services.VenueError as exc:
             return self._fail(request, exc)
-        messages.success(request, f"Request sent to {req.to_restaurant.name}.")
+        messages.success(request, _("Request sent to {p0}.").format(p0=req.to_restaurant.name))
         return self._back()
 
     def accept_view(self, request, object_id):
@@ -445,7 +446,9 @@ class VenueShareRequestTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             return self._fail(request, exc)
         messages.success(
             request,
-            f"You now share tables at {venue.name}: {summary.created} table(s) added, {summary.linked} linked.",
+            _("You now share tables at {p0}: {p1} table(s) added, {p2} linked.").format(
+                p0=venue.name, p1=summary.created, p2=summary.linked
+            ),
         )
         return self._back()
 
@@ -455,7 +458,7 @@ class VenueShareRequestTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             venue_services.decline_share_request(object_id, request.restaurant, request.user)
         except venue_services.VenueError as exc:
             return self._fail(request, exc)
-        messages.success(request, "Request declined.")
+        messages.success(request, _("Request declined."))
         return self._back()
 
     def cancel_view(self, request, object_id):
@@ -464,7 +467,7 @@ class VenueShareRequestTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             venue_services.cancel_share_request(object_id, request.restaurant, request.user)
         except venue_services.VenueError as exc:
             return self._fail(request, exc)
-        messages.success(request, "Request cancelled.")
+        messages.success(request, _("Request cancelled."))
         return self._back()
 
     def leave_view(self, request):
@@ -473,7 +476,7 @@ class VenueShareRequestTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             venue_services.leave_venue(request.restaurant)
         except venue_services.VenueError as exc:
             return self._fail(request, exc)
-        messages.success(request, "You left the shared venue. Your tables are now your own again.")
+        messages.success(request, _("You left the shared venue. Your tables are now your own again."))
         return self._back()
 
     def table_add_view(self, request):
@@ -483,7 +486,7 @@ class VenueShareRequestTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             raise PermissionDenied
         form = VenueTableForm(request.POST)
         if not form.is_valid():
-            messages.error(request, "; ".join(f"{k}: {', '.join(v)}" for k, v in form.errors.items()))
+            messages.error(request, _("; ").join(f"{k}: {', '.join(v)}" for k, v in form.errors.items()))
             return self._back()
         fields = dict(form.cleaned_data)
         section_id = fields.pop("section", None)
@@ -492,7 +495,9 @@ class VenueShareRequestTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             vt, summary = venue_services.create_venue_table(membership.venue, **fields)
         except venue_services.VenueError as exc:
             return self._fail(request, exc)
-        messages.success(request, f"Table {vt.number} added to every restaurant at {membership.venue.name}.")
+        messages.success(
+            request, _("Table {p0} added to every restaurant at {p1}.").format(p0=vt.number, p1=membership.venue.name)
+        )
         return self._back()
 
     def table_deactivate_view(self, request, table_id):
@@ -503,7 +508,7 @@ class VenueShareRequestTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             raise PermissionDenied
         skipped = venue_services.deactivate_venue_table(vt)
         note = f" (kept active at {', '.join(skipped)}: session in progress)" if skipped else ""
-        messages.success(request, f"Table {vt.number} retired{note}.")
+        messages.success(request, _("Table {p0} retired{p1}.").format(p0=vt.number, p1=note))
         return self._back()
 
     def table_regenerate_qr_view(self, request, table_id):
@@ -513,7 +518,10 @@ class VenueShareRequestTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         if vt is None:
             raise PermissionDenied
         vt.regenerate_qr_image()
-        messages.success(request, f"QR image for table {vt.number} regenerated (short link). Download and reprint it.")
+        messages.success(
+            request,
+            _("QR image for table {p0} regenerated (short link). Download and reprint it.").format(p0=vt.number),
+        )
         return self._back()
 
 
@@ -612,7 +620,7 @@ class VenueManagedRowsMixin:
     locked_fields = ()
     link_field = ""
 
-    @admin.display(description="Shared")
+    @admin.display(description=_("Shared"))
     def shared_badge(self, obj):
         if getattr(obj, self.link_field + "_id", None):
             return format_html(
@@ -741,7 +749,7 @@ class TableQRCodeTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         ),
     )
 
-    @admin.display(description="Currently goes to")
+    @admin.display(description=_("Currently goes to"))
     def resolved_destination(self, obj):
         from apps.tables.qr_links import resolve
 
@@ -752,7 +760,7 @@ class TableQRCodeTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             '{} → <a href="{}" target="_blank">{}</a>', destination.kind, destination.url, destination.url
         )
 
-    @admin.display(description="Image")
+    @admin.display(description=_("Image"))
     def image_status(self, obj):
         if not obj.qr_image:
             return "No image yet"
@@ -763,14 +771,15 @@ class TableQRCodeTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             obj.qr_image_url or obj.direct_url(),
         )
 
-    @admin.action(description="Regenerate QR image (short link)")
+    @admin.action(description=_("Regenerate QR image (short link)"))
     def regenerate_qr_images(self, request, queryset):
         count = 0
         for qr in queryset.select_related("table__restaurant"):
             qr.regenerate_qr_image()
             count += 1
         messages.success(
-            request, f"Regenerated {count} QR image(s). Download and reprint them to make the codes dynamic."
+            request,
+            _("Regenerated {p0} QR image(s). Download and reprint them to make the codes dynamic.").format(p0=count),
         )
 
     regenerate_qr_images.allowed_permissions = ("change",)
@@ -783,7 +792,7 @@ class TableQRCodeTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             qs = qs.filter(table__restaurant=restaurant)
         return qs.select_related("table")
 
-    @admin.display(description="QR Code")
+    @admin.display(description=_("QR Code"))
     def qr_code_display(self, obj):
         """Display QR code image in detail view."""
         from django.utils.html import format_html
@@ -797,7 +806,7 @@ class TableQRCodeTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             )
         return "QR code will be generated after save"
 
-    @admin.display(description="QR URL")
+    @admin.display(description=_("QR URL"))
     def qr_url_display(self, obj):
         """Display the URL encoded in the QR code."""
         from django.utils.html import format_html
@@ -805,7 +814,7 @@ class TableQRCodeTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         url = obj.get_qr_url()
         return format_html('<a href="{}" target="_blank">{}</a>', url, url)
 
-    @admin.display(description="Preview")
+    @admin.display(description=_("Preview"))
     def qr_preview(self, obj):
         """Small QR preview for list view."""
         from django.utils.html import format_html
@@ -814,7 +823,7 @@ class TableQRCodeTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             return format_html('<img src="{}" style="width: 50px; height: 50px;" />', obj.qr_image.url)
         return "-"
 
-    @admin.display(description="Download")
+    @admin.display(description=_("Download"))
     def download_link(self, obj):
         """Download link for list view."""
         from django.utils.html import format_html
@@ -925,11 +934,11 @@ class StaffRoleTenantAdmin(TenantModelAdmin):
             obj.is_system_role = False
         super().save_model(request, obj, form, change)
 
-    @display(description="Role")
+    @display(description=_("Role"))
     def role_label(self, obj):
         return obj.get_display_name()
 
-    @display(description="Members")
+    @display(description=_("Members"))
     def members_count(self, obj):
         return obj.members.filter(is_active=True).count()
 
@@ -967,23 +976,23 @@ class StaffMemberTenantAdmin(TenantModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if not obj.is_active and obj.user_id in (request.restaurant.owner_id, request.user.pk):
-            messages.error(request, "The owner and your own account cannot be deactivated here.")
+            messages.error(request, _("The owner and your own account cannot be deactivated here."))
             obj.is_active = True
         super().save_model(request, obj, form, change)
 
-    @display(description="Email")
+    @display(description=_("Email"))
     def email(self, obj):
         return obj.user.email
 
-    @display(description="Name")
+    @display(description=_("Name"))
     def full_name(self, obj):
         return obj.user.full_name
 
-    @display(description="Last login")
+    @display(description=_("Last login"))
     def last_login(self, obj):
         return obj.user.last_login
 
-    @display(description="Person")
+    @display(description=_("Person"))
     def user_display(self, obj):
         return f"{obj.user.full_name} <{obj.user.email}>"
 
@@ -1041,17 +1050,17 @@ class StaffInvitationTenantAdmin(TenantModelAdmin):
             raise PermissionDenied(str(exc))
 
     def response_add(self, request, obj, post_url_continue=None):
-        messages.success(request, f"Invitation emailed to {obj.email}.")
+        messages.success(request, _("Invitation emailed to {p0}.").format(p0=obj.email))
         return redirect("tenant_admin:staff_staffinvitation_changelist")
 
     @display(
-        description="Status",
+        description=_("Status"),
         label={"pending": "info", "accepted": "success", "expired": "warning", "cancelled": "danger"},
     )
     def status_badge(self, obj):
         return "expired" if obj.status == "pending" and obj.is_expired else obj.status
 
-    @admin.action(description="Resend invitation email")
+    @admin.action(description=_("Resend invitation email"))
     def resend_invitations(self, request, queryset):
         if not has_resource_permission(request, "staff", "create"):
             raise PermissionDenied
@@ -1061,7 +1070,7 @@ class StaffInvitationTenantAdmin(TenantModelAdmin):
             n += 1
         self.message_user(request, f"{n} invitation(s) resent.")
 
-    @admin.action(description="Cancel invitations")
+    @admin.action(description=_("Cancel invitations"))
     def cancel_invitations(self, request, queryset):
         if not has_resource_permission(request, "staff", "delete"):
             raise PermissionDenied
@@ -1119,23 +1128,23 @@ class ReservationTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             n += 1
         self.message_user(request, f"{n} reservation(s) {label}.")
 
-    @admin.action(description="Confirm")
+    @admin.action(description=_("Confirm"))
     def confirm_reservations(self, request, queryset):
         self._transition(request, queryset, ["pending", "waitlist"], "confirm", "confirmed", confirmed_by=request.user)
 
-    @admin.action(description="Mark seated")
+    @admin.action(description=_("Mark seated"))
     def seat_reservations(self, request, queryset):
         self._transition(request, queryset, ["pending", "confirmed"], "mark_seated", "seated")
 
-    @admin.action(description="Mark completed")
+    @admin.action(description=_("Mark completed"))
     def complete_reservations(self, request, queryset):
         self._transition(request, queryset, ["seated", "confirmed"], "mark_completed", "completed")
 
-    @admin.action(description="Mark no-show")
+    @admin.action(description=_("Mark no-show"))
     def no_show_reservations(self, request, queryset):
         self._transition(request, queryset, ["pending", "confirmed"], "mark_no_show", "marked no-show")
 
-    @admin.action(description="Cancel")
+    @admin.action(description=_("Cancel"))
     def cancel_reservations(self, request, queryset):
         self._transition(
             request,
@@ -1384,7 +1393,7 @@ class ModulesTenantAdmin(TenantModelAdmin):
             modules.set_module(request.restaurant, code, enabled, by=request.user)
             messages.success(request, f"{title} {'switched on' if enabled else 'switched off'}.")
         except modules.ModuleError as exc:
-            messages.error(request, " ".join(exc.messages))
+            messages.error(request, _(" ").join(exc.messages))
         return self._back()
 
     def enable_view(self, request, code):
@@ -1400,9 +1409,9 @@ class ModulesTenantAdmin(TenantModelAdmin):
         data.update({name: request.POST.get(name, "").strip() for name in m.sub_fields})
         try:
             modules.set_options(request.restaurant, code, data, by=request.user)
-            messages.success(request, f"{m.title} options saved.")
+            messages.success(request, _("{p0} options saved.").format(p0=m.title))
         except DjangoValidationError as exc:
-            messages.error(request, "; ".join(exc.messages))
+            messages.error(request, _("; ").join(exc.messages))
         return self._back()
 
 
@@ -1599,7 +1608,7 @@ class ReviewTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         # The mixin must still win when the Reviews module is off.
         return self._module_on(request) and self._has_resource_permission(request, "read")
 
-    @admin.action(description="Report selected reviews to platform moderators")
+    @admin.action(description=_("Report selected reviews to platform moderators"))
     def report_reviews(self, request, queryset):
         from django.contrib import messages
 
@@ -1608,7 +1617,7 @@ class ReviewTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         made = 0
         skipped = 0
         for review in queryset:
-            _, created = ReviewReport.objects.get_or_create(
+            _report, created = ReviewReport.objects.get_or_create(
                 review=review,
                 reporter=request.user,
                 defaults={"reason": ReviewReport.REASON_OTHER, "notes": "Reported via tenant admin."},

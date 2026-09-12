@@ -9,35 +9,36 @@ row per resource the restaurant's modules offer and rebuilds the dict from
 from __future__ import annotations
 
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
-ACTIONS = (("read", "View"), ("create", "Create"), ("update", "Edit"), ("delete", "Delete"))
+ACTIONS = (("read", _("View")), ("create", _("Create")), ("update", _("Edit")), ("delete", _("Delete")))
 
 RESOURCE_LABELS = {
-    "menu": "Menu",
-    "orders": "Orders",
-    "tables": "Tables & QR",
-    "reservations": "Reservations",
-    "warehouse": "Warehouse",
-    "warehouse_logs": "Warehouse logs (waste, meals)",
-    "cash": "Cash & payments",
-    "fiscal": "Fiscal & VAT",
-    "staff": "Staff",
-    "settings": "Settings",
-    "analytics": "Analytics",
+    "menu": _("Menu"),
+    "orders": _("Orders"),
+    "tables": _("Tables & QR"),
+    "reservations": _("Reservations"),
+    "warehouse": _("Warehouse"),
+    "warehouse_logs": _("Warehouse logs (waste, meals)"),
+    "cash": _("Cash & payments"),
+    "fiscal": _("Fiscal & VAT"),
+    "staff": _("Staff"),
+    "settings": _("Settings"),
+    "analytics": _("Analytics"),
 }
 
 # Cells that make no sense for a resource are simply not offered.
-OFFERED = {"settings": ("read", "update"), "analytics": ("read",), "fiscal": ("read", "update")}
+OFFERED = {"settings": ("read", _("update")), "analytics": ("read",), "fiscal": ("read", _("update"))}
 
 # What each cell means, shown as a tooltip where the generic verb is unclear.
 HINTS = {
     "cash": {
-        "read": "See the open shift, X report and payments",
-        "create": "Take payments, open a shift, cash paid in / out",
-        "update": "Discounts, comps, close a shift",
-        "delete": "Refunds",
+        "read": _("See the open shift, X report and payments"),
+        "create": _("Take payments, open a shift, cash paid in / out"),
+        "update": _("Discounts, comps, close a shift"),
+        "delete": _("Refunds"),
     },
-    "orders": {"update": "Change status, add items, void items"},
+    "orders": {"update": _("Change status, add items, void items")},
 }
 
 

@@ -21,9 +21,9 @@ from django.utils.translation import gettext_lazy as _
 from apps.core.models import TimeStampedModel
 
 SHAPE_CHOICES = [
-    ("square", "Square"),
-    ("round", "Round"),
-    ("rectangle", "Rectangle"),
+    ("square", _("Square")),
+    ("round", _("Round")),
+    ("rectangle", _("Rectangle")),
 ]
 
 
@@ -77,7 +77,7 @@ class VenueMember(TimeStampedModel):
     joined_at = models.DateTimeField(auto_now_add=True)
     is_layout_seed = models.BooleanField(
         default=False,
-        help_text="This restaurant's tables seeded the venue layout (historical).",
+        help_text=_("This restaurant's tables seeded the venue layout (historical)."),
     )
 
     class Meta:
@@ -244,7 +244,9 @@ class VenueShareRequest(TimeStampedModel):
         "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
-    venue_name = models.CharField(max_length=150, blank=True, help_text="Name for the venue if this request creates it")
+    venue_name = models.CharField(
+        max_length=150, blank=True, help_text=_("Name for the venue if this request creates it")
+    )
     message = models.TextField(blank=True)
     expires_at = models.DateTimeField()
     responded_at = models.DateTimeField(null=True, blank=True)

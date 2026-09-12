@@ -47,7 +47,7 @@ class CashShift(TimeStampedModel):
     STATUS_CHOICES = [("open", "Open"), ("closed", "Closed")]
 
     restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="cash_shifts")
-    number = models.PositiveIntegerField(help_text="Sequential per restaurant.")
+    number = models.PositiveIntegerField(help_text=_("Sequential per restaurant."))
     register = models.CharField(max_length=50, blank=True, default="")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="open", db_index=True)
     opened_by = models.ForeignKey(
@@ -62,9 +62,9 @@ class CashShift(TimeStampedModel):
     counted_cash = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     expected_cash = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     difference = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True, help_text="counted - expected"
+        max_digits=10, decimal_places=2, null=True, blank=True, help_text=_("counted - expected")
     )
-    report = models.JSONField(default=dict, blank=True, help_text="Z report frozen at close.")
+    report = models.JSONField(default=dict, blank=True, help_text=_("Z report frozen at close."))
     notes = models.TextField(blank=True, default="")
 
     class Meta:
@@ -113,17 +113,17 @@ class DiscountReason(TimeStampedModel):
     """Reasons staff pick when discounting, comping, voiding or refunding."""
 
     KIND_CHOICES = [
-        ("discount", "Discount"),
-        ("comp", "Comp (on the house)"),
-        ("void", "Void"),
-        ("refund", "Refund"),
+        ("discount", _("Discount")),
+        ("comp", _("Comp (on the house)")),
+        ("void", _("Void")),
+        ("refund", _("Refund")),
     ]
 
     restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="discount_reasons")
     kind = models.CharField(max_length=10, choices=KIND_CHOICES, db_index=True)
     label = models.CharField(max_length=100)
     requires_manager = models.BooleanField(
-        default=False, help_text="Only roles with 'Cash & payments: edit' may use it."
+        default=False, help_text=_("Only roles with 'Cash & payments: edit' may use it.")
     )
     is_active = models.BooleanField(default=True)
     sort_order = models.PositiveSmallIntegerField(default=0)
@@ -160,25 +160,25 @@ class Payment(TimeStampedModel):
     """
 
     STATUS_CHOICES = [
-        ("pending", "Pending"),
-        ("processing", "Processing"),
-        ("completed", "Completed"),
-        ("failed", "Failed"),
-        ("refunded", "Refunded"),
-        ("partially_refunded", "Partially Refunded"),
-        ("cancelled", "Cancelled"),
+        ("pending", _("Pending")),
+        ("processing", _("Processing")),
+        ("completed", _("Completed")),
+        ("failed", _("Failed")),
+        ("refunded", _("Refunded")),
+        ("partially_refunded", _("Partially Refunded")),
+        ("cancelled", _("Cancelled")),
     ]
 
     PAYMENT_METHOD_CHOICES = [
-        ("cash", "Cash"),
-        ("card_terminal", "Card (terminal)"),
-        ("online_bog", "Online (Bank of Georgia)"),
-        ("online_flitt", "Online (Flitt)"),
-        ("voucher", "Voucher"),
-        ("other", "Other"),
+        ("cash", _("Cash")),
+        ("card_terminal", _("Card (terminal)")),
+        ("online_bog", _("Online (Bank of Georgia)")),
+        ("online_flitt", _("Online (Flitt)")),
+        ("voucher", _("Voucher")),
+        ("other", _("Other")),
         # Legacy values kept for rows written before the ledger existed.
-        ("card", "Card"),
-        ("mobile", "Mobile Payment"),
+        ("card", _("Card")),
+        ("mobile", _("Mobile Payment")),
     ]
     STAFF_METHODS = ("cash", "card_terminal", "voucher", "other")
     ONLINE_METHODS = ("online_bog", "online_flitt", "card", "mobile")
@@ -195,7 +195,7 @@ class Payment(TimeStampedModel):
         related_name="payments",
         null=True,
         blank=True,
-        help_text="The (first) order this payment settles; the full split is in the allocations.",
+        help_text=_("The (first) order this payment settles; the full split is in the allocations."),
     )
     session = models.ForeignKey(
         "tables.TableSession",
@@ -230,7 +230,7 @@ class Payment(TimeStampedModel):
         null=True,
         blank=True,
         related_name="processed_payments",
-        help_text="Staff member who processed this payment",
+        help_text=_("Staff member who processed this payment"),
     )
 
     # Payment details
@@ -249,7 +249,7 @@ class Payment(TimeStampedModel):
         max_digits=10,
         decimal_places=2,
         validators=[MinValueValidator(0)],
-        help_text="Amount + tip",
+        help_text=_("Amount + tip"),
     )
 
     # Payment method
@@ -269,18 +269,18 @@ class Payment(TimeStampedModel):
         max_length=255,
         blank=True,
         db_index=True,
-        help_text="Payment ID from external provider (Stripe, etc.)",
+        help_text=_("Payment ID from external provider (Stripe, etc.)"),
     )
     external_payment_method_id = models.CharField(
         max_length=255,
         blank=True,
-        help_text="Payment method ID from external provider",
+        help_text=_("Payment method ID from external provider"),
     )
     payment_intent_id = models.CharField(
         max_length=255,
         blank=True,
         db_index=True,
-        help_text="Stripe PaymentIntent ID",
+        help_text=_("Stripe PaymentIntent ID"),
     )
 
     tendered = models.DecimalField(
@@ -288,7 +288,7 @@ class Payment(TimeStampedModel):
         decimal_places=2,
         null=True,
         blank=True,
-        help_text="Cash handed over by the customer (cash payments).",
+        help_text=_("Cash handed over by the customer (cash payments)."),
     )
     change_given = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
@@ -393,27 +393,27 @@ class Refund(TimeStampedModel):
     """
 
     STATUS_CHOICES = [
-        ("pending", "Pending"),
-        ("processing", "Processing"),
-        ("completed", "Completed"),
-        ("failed", "Failed"),
+        ("pending", _("Pending")),
+        ("processing", _("Processing")),
+        ("completed", _("Completed")),
+        ("failed", _("Failed")),
     ]
 
     REASON_CHOICES = [
-        ("customer_request", "Customer Request"),
-        ("order_cancelled", "Order Cancelled"),
-        ("item_unavailable", "Item Unavailable"),
-        ("quality_issue", "Quality Issue"),
-        ("wrong_order", "Wrong Order"),
-        ("other", "Other"),
+        ("customer_request", _("Customer Request")),
+        ("order_cancelled", _("Order Cancelled")),
+        ("item_unavailable", _("Item Unavailable")),
+        ("quality_issue", _("Quality Issue")),
+        ("wrong_order", _("Wrong Order")),
+        ("other", _("Other")),
     ]
 
     METHOD_CHOICES = [
-        ("cash", "Cash"),
-        ("card_terminal", "Card (terminal)"),
-        ("online", "Online provider"),
-        ("voucher", "Voucher"),
-        ("other", "Other"),
+        ("cash", _("Cash")),
+        ("card_terminal", _("Card (terminal)")),
+        ("online", _("Online provider")),
+        ("voucher", _("Voucher")),
+        ("other", _("Other")),
     ]
 
     payment = models.ForeignKey(
@@ -434,7 +434,7 @@ class Refund(TimeStampedModel):
         null=True,
         blank=True,
         related_name="refunds",
-        help_text="Order the refunded amount is taken off (for paid/balance figures).",
+        help_text=_("Order the refunded amount is taken off (for paid/balance figures)."),
     )
     shift = models.ForeignKey(
         "payments.CashShift",
@@ -480,7 +480,7 @@ class Refund(TimeStampedModel):
     external_refund_id = models.CharField(
         max_length=255,
         blank=True,
-        help_text="Refund ID from external provider",
+        help_text=_("Refund ID from external provider"),
     )
 
     completed_at = models.DateTimeField(null=True, blank=True)
@@ -535,8 +535,8 @@ class PaymentMethod(TimeStampedModel):
     """
 
     TYPE_CHOICES = [
-        ("card", "Card"),
-        ("bank_account", "Bank Account"),
+        ("card", _("Card")),
+        ("bank_account", _("Bank Account")),
     ]
 
     customer = models.ForeignKey(
@@ -557,12 +557,12 @@ class PaymentMethod(TimeStampedModel):
     external_method_id = models.CharField(
         max_length=255,
         db_index=True,
-        help_text="Payment method ID from external provider",
+        help_text=_("Payment method ID from external provider"),
     )
     external_customer_id = models.CharField(
         max_length=255,
         blank=True,
-        help_text="Customer ID from external provider",
+        help_text=_("Customer ID from external provider"),
     )
 
     # Card details (masked)
@@ -657,13 +657,13 @@ class BogTransaction(TimeStampedModel):
         max_length=64,
         unique=True,
         db_index=True,
-        help_text="UUID returned by BOG when the order was created.",
+        help_text=_("UUID returned by BOG when the order was created."),
     )
     external_order_id = models.CharField(
         max_length=64,
         db_index=True,
         blank=True,
-        help_text="Our reference (Order.order_number, Reservation.confirmation_code, or method_intent_id).",
+        help_text=_("Our reference (Order.order_number, Reservation.confirmation_code, or method_intent_id)."),
     )
 
     flow_type = models.CharField(
@@ -693,7 +693,7 @@ class BogTransaction(TimeStampedModel):
         null=True,
         blank=True,
         related_name="bog_transactions",
-        help_text="Populated when this transaction tokenised a card (add_card flow).",
+        help_text=_("Populated when this transaction tokenised a card (add_card flow)."),
     )
     session = models.ForeignKey(
         "tables.TableSession",
@@ -701,7 +701,7 @@ class BogTransaction(TimeStampedModel):
         null=True,
         blank=True,
         related_name="bog_transactions",
-        help_text="Populated when this transaction settles a whole table (session_settle flow).",
+        help_text=_("Populated when this transaction settles a whole table (session_settle flow)."),
     )
     covered_orders = models.ManyToManyField(
         "orders.Order",
@@ -737,7 +737,7 @@ class BogTransaction(TimeStampedModel):
     code = models.IntegerField(
         null=True,
         blank=True,
-        help_text="BOG payment_detail.code (e.g. 100 = success, 107 = insufficient funds).",
+        help_text=_("BOG payment_detail.code (e.g. 100 = success, 107 = insufficient funds)."),
     )
     code_description = models.TextField(blank=True)
     reject_reason = models.TextField(blank=True)
@@ -758,8 +758,8 @@ class BogTransaction(TimeStampedModel):
     class Meta:
         db_table = "bog_transactions"
         ordering = ["-created_at"]
-        verbose_name = "BOG Transaction"
-        verbose_name_plural = "BOG Transactions"
+        verbose_name = _("BOG Transaction")
+        verbose_name_plural = _("BOG Transactions")
         indexes = [
             models.Index(fields=["flow_type", "status"]),
             models.Index(fields=["status", "created_at"]),
@@ -914,8 +914,8 @@ class FlittTransaction(TimeStampedModel):
     class Meta:
         db_table = "flitt_transactions"
         ordering = ["-created_at"]
-        verbose_name = "Flitt Transaction"
-        verbose_name_plural = "Flitt Transactions"
+        verbose_name = _("Flitt Transaction")
+        verbose_name_plural = _("Flitt Transactions")
         indexes = [
             models.Index(fields=["flow_type", "status"]),
             models.Index(fields=["status", "created_at"]),
@@ -1029,8 +1029,8 @@ class RestaurantDebit(TimeStampedModel):
     class Meta:
         db_table = "restaurant_debits"
         ordering = ["-created_at"]
-        verbose_name = "Restaurant Debit"
-        verbose_name_plural = "Restaurant Debits"
+        verbose_name = _("Restaurant Debit")
+        verbose_name_plural = _("Restaurant Debits")
         indexes = [
             models.Index(fields=["restaurant", "status"]),
             models.Index(fields=["source", "-created_at"]),

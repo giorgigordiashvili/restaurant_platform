@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.urls import path, reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
 from unfold.decorators import action
@@ -121,7 +122,7 @@ class NotificationSettingsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
                 value = request.POST.get(f"{key}_{lang}", "").strip()
                 setattr(cfg, f"{key}_{lang}", value or DEFAULT_TEMPLATES[f"{key}_{lang}"])
         cfg.save()
-        messages.success(request, "Notification settings saved.")
+        messages.success(request, _("Notification settings saved."))
         return redirect("tenant_admin:notifications_notificationsettingspage_changelist")
 
     def test_view(self, request):
@@ -129,7 +130,7 @@ class NotificationSettingsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         channel = request.POST.get("channel", "sms")
         to = request.POST.get("to", "").strip()
         if channel not in ("sms", "email") or not to:
-            messages.error(request, "Choose SMS or email and enter a destination.")
+            messages.error(request, _("Choose SMS or email and enter a destination."))
             return redirect("tenant_admin:notifications_notificationsettingspage_changelist")
         msg = services.send_message(
             request.restaurant,
@@ -143,7 +144,7 @@ class NotificationSettingsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         )
         msg.refresh_from_db()
         if msg.status == "sent":
-            messages.success(request, f"Test {channel} sent to {msg.to}.")
+            messages.success(request, _("Test {p0} sent to {p1}.").format(p0=channel, p1=msg.to))
         else:
             messages.warning(request, f"Test {channel} {msg.status}: {msg.error or 'queued'}")
         return redirect("tenant_admin:notifications_notificationsettingspage_changelist")
@@ -166,7 +167,7 @@ class OutboundMessageTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    @action(description="Resend", url_path="resend")
+    @action(description=_("Resend"), url_path="resend")
     def resend(self, request, object_id):
         msg = OutboundMessage.objects.filter(pk=object_id, restaurant=request.restaurant).first()
         if msg is None or not has_resource_permission(request, "settings", "update"):
@@ -178,7 +179,7 @@ class OutboundMessageTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         msg.error = ""
         msg.save(update_fields=["status", "error", "updated_at"])
         enqueue(tasks.deliver, str(msg.pk))
-        messages.success(request, f"Message to {msg.to} queued again.")
+        messages.success(request, _("Message to {p0} queued again.").format(p0=msg.to))
         return redirect("tenant_admin:notifications_outboundmessage_changelist")
 
 

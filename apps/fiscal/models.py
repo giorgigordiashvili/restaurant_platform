@@ -22,21 +22,21 @@ from apps.core.models import TimeStampedModel
 
 class FiscalProfile(TimeStampedModel):
     PROVIDER_CHOICES = [
-        ("none", "Not fiscalised (internal numbering)"),
-        ("rsge_stub", "RS.ge (waybills only, stub)"),
+        ("none", _("Not fiscalised (internal numbering)")),
+        ("rsge_stub", _("RS.ge (waybills only, stub)")),
     ]
 
     restaurant = models.OneToOneField("tenants.Restaurant", on_delete=models.CASCADE, related_name="fiscal_profile")
-    vat_payer = models.BooleanField(default=False, help_text="Registered VAT payer (turnover above the threshold).")
+    vat_payer = models.BooleanField(default=False, help_text=_("Registered VAT payer (turnover above the threshold)."))
     vat_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal("18.00"))
-    prices_include_vat = models.BooleanField(default=True, help_text="Menu prices are gross (VAT included).")
-    legal_name = models.CharField(max_length=200, blank=True, default="", help_text="As registered with RS.")
+    prices_include_vat = models.BooleanField(default=True, help_text=_("Menu prices are gross (VAT included)."))
+    legal_name = models.CharField(max_length=200, blank=True, default="", help_text=_("As registered with RS."))
     tax_id = models.CharField(
         max_length=11,
         blank=True,
         default="",
         validators=[RegexValidator(r"^(\d{9}(\d{2})?)?$", "Tax id is 9 or 11 digits.")],
-        help_text="ს/კ — 9 digits (company) or 11 (individual).",
+        help_text=_("ს/კ — 9 digits (company) or 11 (individual)."),
     )
     legal_address = models.CharField(max_length=300, blank=True, default="")
     provider = models.CharField(max_length=20, choices=PROVIDER_CHOICES, default="none")
@@ -78,19 +78,19 @@ class FiscalProfile(TimeStampedModel):
 
 class FiscalDocument(TimeStampedModel):
     KIND_CHOICES = [
-        ("receipt", "Receipt"),
-        ("refund", "Refund receipt"),
-        ("waybill_in", "Inbound waybill"),
-        ("waybill_out", "Outbound waybill"),
-        ("invoice", "E-invoice"),
+        ("receipt", _("Receipt")),
+        ("refund", _("Refund receipt")),
+        ("waybill_in", _("Inbound waybill")),
+        ("waybill_out", _("Outbound waybill")),
+        ("invoice", _("E-invoice")),
     ]
     STATUS_CHOICES = [
-        ("draft", "Draft"),
-        ("queued", "Queued"),
-        ("sent", "Sent"),
-        ("confirmed", "Confirmed"),
-        ("failed", "Failed"),
-        ("cancelled", "Cancelled"),
+        ("draft", _("Draft")),
+        ("queued", _("Queued")),
+        ("sent", _("Sent")),
+        ("confirmed", _("Confirmed")),
+        ("failed", _("Failed")),
+        ("cancelled", _("Cancelled")),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -116,11 +116,11 @@ class FiscalDocument(TimeStampedModel):
         null=True,
         blank=True,
         related_name="reversed_by",
-        help_text="Refund -> receipt",
+        help_text=_("Refund -> receipt"),
     )
     fiscal_number = models.CharField(max_length=40, blank=True, default="", db_index=True)
     external_id = models.CharField(max_length=100, blank=True, default="", db_index=True)
-    is_fiscal = models.BooleanField(default=False, help_text="False = recorded locally only (non-fiscal watermark).")
+    is_fiscal = models.BooleanField(default=False, help_text=_("False = recorded locally only (non-fiscal watermark)."))
     vat_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     prices_include_vat = models.BooleanField(default=True)
     net_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -166,5 +166,5 @@ class FiscalSettingsPage(FiscalProfile):
 
     class Meta:
         proxy = True
-        verbose_name = "Fiscal settings"
-        verbose_name_plural = "Fiscal settings"
+        verbose_name = _("Fiscal settings")
+        verbose_name_plural = _("Fiscal settings")

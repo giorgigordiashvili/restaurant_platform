@@ -7,6 +7,7 @@ staff pick for discounts / comps / voids / refunds.
 from __future__ import annotations
 
 from django.utils.html import format_html, format_html_join
+from django.utils.translation import gettext_lazy as _
 
 from unfold.admin import TabularInline as UnfoldTabularInline
 from unfold.decorators import display
@@ -97,7 +98,7 @@ class CashShiftTenantAdmin(CashEnabledMixin, TenantModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    @display(description="Difference")
+    @display(description=_("Difference"))
     def diff(self, obj):
         if obj.difference is None:
             return "—"
@@ -106,7 +107,7 @@ class CashShiftTenantAdmin(CashEnabledMixin, TenantModelAdmin):
         )
         return format_html('<span class="{}">{:+.2f}</span>', colour, obj.difference)
 
-    @display(description="Z report")
+    @display(description=_("Z report"))
     def z_report(self, obj):
         from apps.payments import services
 

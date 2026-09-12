@@ -32,10 +32,10 @@ class TableSection(TimeStampedModel):
     description = models.TextField(blank=True)
     display_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    floor_width = models.PositiveSmallIntegerField(default=1000, help_text="Floor-plan canvas width (logical px).")
-    floor_height = models.PositiveSmallIntegerField(default=700, help_text="Floor-plan canvas height (logical px).")
+    floor_width = models.PositiveSmallIntegerField(default=1000, help_text=_("Floor-plan canvas width (logical px)."))
+    floor_height = models.PositiveSmallIntegerField(default=700, help_text=_("Floor-plan canvas height (logical px)."))
     background_note = models.CharField(
-        max_length=200, blank=True, default="", help_text="Shown under the section name on the POS floor plan."
+        max_length=200, blank=True, default="", help_text=_("Shown under the section name on the POS floor plan.")
     )
 
     # Set when this section mirrors a shared venue section (see apps.venues).
@@ -75,10 +75,10 @@ class Table(TimeStampedModel):
     """
 
     STATUS_CHOICES = [
-        ("available", "Available"),
-        ("occupied", "Occupied"),
-        ("reserved", "Reserved"),
-        ("unavailable", "Unavailable"),
+        ("available", _("Available")),
+        ("occupied", _("Occupied")),
+        ("reserved", _("Reserved")),
+        ("unavailable", _("Unavailable")),
     ]
 
     restaurant = models.ForeignKey(
@@ -95,20 +95,20 @@ class Table(TimeStampedModel):
     )
     number = models.CharField(
         max_length=20,
-        help_text="Table number or identifier (e.g., '1', 'A1', 'VIP-1')",
+        help_text=_("Table number or identifier (e.g., '1', 'A1', 'VIP-1')"),
     )
     name = models.CharField(
         max_length=100,
         blank=True,
-        help_text="Optional friendly name (e.g., 'Window Table', 'Corner Booth')",
+        help_text=_("Optional friendly name (e.g., 'Window Table', 'Corner Booth')"),
     )
     capacity = models.PositiveSmallIntegerField(
         default=4,
-        help_text="Maximum number of guests",
+        help_text=_("Maximum number of guests"),
     )
     min_capacity = models.PositiveSmallIntegerField(
         default=1,
-        help_text="Minimum number of guests for reservation",
+        help_text=_("Minimum number of guests for reservation"),
     )
     status = models.CharField(
         max_length=20,
@@ -121,27 +121,27 @@ class Table(TimeStampedModel):
     position_x = models.PositiveIntegerField(
         null=True,
         blank=True,
-        help_text="X coordinate on floor plan",
+        help_text=_("X coordinate on floor plan"),
     )
     position_y = models.PositiveIntegerField(
         null=True,
         blank=True,
-        help_text="Y coordinate on floor plan",
+        help_text=_("Y coordinate on floor plan"),
     )
 
-    rotation = models.PositiveSmallIntegerField(default=0, help_text="Degrees, 0-359, on the floor plan.")
+    rotation = models.PositiveSmallIntegerField(default=0, help_text=_("Degrees, 0-359, on the floor plan."))
     width = models.PositiveSmallIntegerField(
-        default=100, help_text="Floor-plan width (logical px on a 1000-wide canvas)."
+        default=100, help_text=_("Floor-plan width (logical px on a 1000-wide canvas).")
     )
-    height = models.PositiveSmallIntegerField(default=100, help_text="Floor-plan height (logical px).")
+    height = models.PositiveSmallIntegerField(default=100, help_text=_("Floor-plan height (logical px)."))
 
     # Table shape for floor plan
     shape = models.CharField(
         max_length=20,
         choices=[
-            ("square", "Square"),
-            ("round", "Round"),
-            ("rectangle", "Rectangle"),
+            ("square", _("Square")),
+            ("round", _("Round")),
+            ("rectangle", _("Rectangle")),
         ],
         default="square",
     )
@@ -220,13 +220,13 @@ class TableQRCode(TimeStampedModel):
     name = models.CharField(
         max_length=100,
         blank=True,
-        help_text="Optional name (e.g., 'Main QR', 'Tent Card')",
+        help_text=_("Optional name (e.g., 'Main QR', 'Tent Card')"),
     )
     qr_image = models.ImageField(
         upload_to="qr_codes/",
         blank=True,
         null=True,
-        help_text="Generated QR code image",
+        help_text=_("Generated QR code image"),
     )
     is_active = models.BooleanField(default=True)
     scans_count = models.PositiveIntegerField(default=0)
@@ -240,7 +240,7 @@ class TableQRCode(TimeStampedModel):
         max_length=2000,
         blank=True,
         validators=[URLValidator(schemes=["http", "https"])],
-        help_text="Only used when destination is 'Custom URL'.",
+        help_text=_("Only used when destination is 'Custom URL'."),
     )
     # What the stored PNG encodes. Images printed before short links exist
     # encode the direct URL; they keep working but cannot be re-pointed.
@@ -346,9 +346,9 @@ class TableSession(TimeStampedModel):
     """
 
     STATUS_CHOICES = [
-        ("active", "Active"),
-        ("payment_pending", "Payment Pending"),
-        ("closed", "Closed"),
+        ("active", _("Active")),
+        ("payment_pending", _("Payment Pending")),
+        ("closed", _("Closed")),
     ]
 
     table = models.ForeignKey(
@@ -362,7 +362,7 @@ class TableSession(TimeStampedModel):
         null=True,
         blank=True,
         related_name="sessions",
-        help_text="QR code used to start this session",
+        help_text=_("QR code used to start this session"),
     )
     host = models.ForeignKey(
         "accounts.User",
@@ -370,18 +370,18 @@ class TableSession(TimeStampedModel):
         null=True,
         blank=True,
         related_name="hosted_sessions",
-        help_text="User who started this session",
+        help_text=_("User who started this session"),
     )
     invite_code = models.CharField(
         max_length=8,
         unique=True,
         blank=True,
         null=True,
-        help_text="Shareable code to invite others to this session",
+        help_text=_("Shareable code to invite others to this session"),
     )
     PAYMENT_MODE_CHOICES = [
-        ("split", "Everyone pays their own"),
-        ("host_covers", "Host covers the whole table"),
+        ("split", _("Everyone pays their own")),
+        ("host_covers", _("Host covers the whole table")),
     ]
     payment_mode = models.CharField(
         max_length=16,
@@ -478,8 +478,8 @@ class TableSessionGuest(TimeStampedModel):
     """
 
     STATUS_CHOICES = [
-        ("active", "Active"),
-        ("left", "Left"),
+        ("active", _("Active")),
+        ("left", _("Left")),
     ]
 
     session = models.ForeignKey(
@@ -497,17 +497,17 @@ class TableSessionGuest(TimeStampedModel):
     guest_name = models.CharField(
         max_length=100,
         blank=True,
-        help_text="Name for anonymous guests",
+        help_text=_("Name for anonymous guests"),
     )
     guest_contact = models.CharField(
         max_length=120,
         blank=True,
         default="",
-        help_text="Phone or email for anonymous guests so the host can reach them.",
+        help_text=_("Phone or email for anonymous guests so the host can reach them."),
     )
     is_host = models.BooleanField(
         default=False,
-        help_text="Whether this guest is the session host",
+        help_text=_("Whether this guest is the session host"),
     )
     status = models.CharField(
         max_length=20,

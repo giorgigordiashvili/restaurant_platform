@@ -10,6 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import path, reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
 from apps.core.tenant_admin_base import ModuleEnabledMixin, TenantModelAdmin, has_resource_permission
@@ -73,7 +74,7 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         now = timezone.now()
         cards = []
         for code, label in RestaurantDeliveryPlatform.PLATFORM_CHOICES:
-            link, _ = RestaurantDeliveryPlatform.objects.get_or_create(
+            link, _created = RestaurantDeliveryPlatform.objects.get_or_create(
                 restaurant=restaurant, platform=code, defaults={"is_enabled": False}
             )
             creds = link.get_credentials()
@@ -159,7 +160,7 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             raise PermissionDenied
         if implemented and code not in IMPLEMENTED:
             raise PermissionDenied
-        link, _ = RestaurantDeliveryPlatform.objects.get_or_create(
+        link, _created = RestaurantDeliveryPlatform.objects.get_or_create(
             restaurant=request.restaurant, platform=code, defaults={"is_enabled": False}
         )
         return link
@@ -203,7 +204,7 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
             f"{link.get_platform_display()} settings updated",
             {"enabled": link.is_enabled, "store": link.store_external_id},
         )
-        messages.success(request, f"{link.get_platform_display()} saved.")
+        messages.success(request, _("{p0} saved.").format(p0=link.get_platform_display()))
         return self._back()
 
     def rotate_webhook_view(self, request, code):
@@ -211,32 +212,32 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         link.webhook_token = secrets.token_urlsafe(32)
         link.save(update_fields=["webhook_token", "updated_at"])
         request.session[f"delivery:wt:{link.pk}"] = link.webhook_token
-        messages.success(request, "Webhook token rotated. Copy it now; it is shown once.")
+        messages.success(request, _("Webhook token rotated. Copy it now; it is shown once."))
         return self._back()
 
     def rotate_menu_view(self, request, code):
         link = self._link(request, code)
         link.menu_token = secrets.token_urlsafe(24)
         link.save(update_fields=["menu_token", "updated_at"])
-        messages.success(request, "Menu feed URL rotated. Push the menu again so the platform learns the new URL.")
+        messages.success(request, _("Menu feed URL rotated. Push the menu again so the platform learns the new URL."))
         return self._back()
 
     def push_menu_view(self, request, code):
         link = self._link(request, code)
         if code not in IMPLEMENTED:
-            messages.error(request, "This platform's API integration is not available yet.")
+            messages.error(request, _("This platform's API integration is not available yet."))
             return self._back()
         if not link.menu_token:
             link.menu_token = secrets.token_urlsafe(24)
             link.save(update_fields=["menu_token", "updated_at"])
         services.start_menu_sync(link, by=request.user)
-        messages.success(request, "Menu push queued.")
+        messages.success(request, _("Menu push queued."))
         return self._back()
 
     def sync_updates_view(self, request, code):
         link = self._link(request, code, implemented=True)
         services.start_menu_sync(link, by=request.user, kind="updates")
-        messages.success(request, "Prices and availability sync queued.")
+        messages.success(request, _("Prices and availability sync queued."))
         return self._back()
 
     def pause_view(self, request, code):
@@ -248,10 +249,10 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         try:
             event = services.pause_store(link, minutes, by=request.user)
         except (services.DeliveryError, Exception) as exc:  # noqa: BLE001 - shown to the admin
-            messages.error(request, f"Could not pause: {exc}")
+            messages.error(request, _("Could not pause: {p0}").format(p0=exc))
             return self._back()
         _audit(request, f"{link.get_platform_display()} store paused", {"until": event.payload.get("until")})
-        messages.success(request, f"{link.get_platform_display()} paused for {minutes} minutes.")
+        messages.success(request, _("{p0} paused for {p1} minutes.").format(p0=link.get_platform_display(), p1=minutes))
         return self._back()
 
     def resume_view(self, request, code):
@@ -259,10 +260,10 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         try:
             services.resume_store(link, by=request.user)
         except (services.DeliveryError, Exception) as exc:  # noqa: BLE001
-            messages.error(request, f"Could not resume: {exc}")
+            messages.error(request, _("Could not resume: {p0}").format(p0=exc))
             return self._back()
         _audit(request, f"{link.get_platform_display()} store resumed", {})
-        messages.success(request, f"{link.get_platform_display()} is taking orders again.")
+        messages.success(request, _("{p0} is taking orders again.").format(p0=link.get_platform_display()))
         return self._back()
 
     def check_view(self, request, code):
@@ -271,7 +272,7 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         try:
             status = services.store_status(link)
         except Exception as exc:  # noqa: BLE001
-            messages.error(request, f"Status check failed: {exc}")
+            messages.error(request, _("Status check failed: {p0}").format(p0=exc))
             return self._back()
         live = status.get("live") or {}
         if live.get("error"):
@@ -285,7 +286,7 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         else:
             messages.info(
                 request,
-                f"{link.get_platform_display()}: "
+                _("{p0}: ").format(p0=link.get_platform_display())
                 + ("paused until " + status["paused_until"] if status["paused_until"] else "not paused by us"),
             )
         return self._back()
@@ -303,7 +304,7 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
                 link, by=request.user, price_units=units if units in ("auto", "major", "minor") else "auto"
             )
         except menu_import.ImportError_ as exc:
-            messages.error(request, f"Could not fetch the menu: {exc.message}")
+            messages.error(request, _("Could not fetch the menu: {p0}").format(p0=exc.message))
             return self._back()
         return redirect("tenant_admin:delivery_deliveryplatformspage_import_preview", import_id=row.pk)
 

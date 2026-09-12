@@ -30,43 +30,43 @@ class ReservationSettings(TimeStampedModel):
     max_party_size = models.PositiveSmallIntegerField(default=20)
     reservation_duration = models.DurationField(
         default=timedelta(hours=2),
-        help_text="Default duration for a reservation",
+        help_text=_("Default duration for a reservation"),
     )
 
     # Booking window
     advance_booking_days = models.PositiveSmallIntegerField(
         default=30,
-        help_text="How many days in advance can guests book",
+        help_text=_("How many days in advance can guests book"),
     )
     min_advance_hours = models.PositiveSmallIntegerField(
         default=2,
-        help_text="Minimum hours in advance required for booking",
+        help_text=_("Minimum hours in advance required for booking"),
     )
     buffer_minutes = models.PositiveSmallIntegerField(
         default=15,
-        help_text="Buffer time between reservations on same table",
+        help_text=_("Buffer time between reservations on same table"),
     )
 
     # Time slots
     slot_interval_minutes = models.PositiveSmallIntegerField(
         default=30,
-        help_text="Time slot intervals (e.g., every 30 minutes)",
+        help_text=_("Time slot intervals (e.g., every 30 minutes)"),
     )
 
     # Cancellation policy
     cancellation_deadline_hours = models.PositiveSmallIntegerField(
         default=24,
-        help_text="Hours before reservation when cancellation is allowed",
+        help_text=_("Hours before reservation when cancellation is allowed"),
     )
 
     # Confirmation
     require_confirmation = models.BooleanField(
         default=False,
-        help_text="Require restaurant confirmation for reservations",
+        help_text=_("Require restaurant confirmation for reservations"),
     )
     auto_confirm_threshold = models.PositiveSmallIntegerField(
         default=4,
-        help_text="Auto-confirm reservations for parties up to this size",
+        help_text=_("Auto-confirm reservations for parties up to this size"),
     )
 
     # Notifications
@@ -76,11 +76,11 @@ class ReservationSettings(TimeStampedModel):
     # Overbooking protection
     max_daily_reservations = models.PositiveSmallIntegerField(
         default=0,
-        help_text="Maximum reservations per day (0 = unlimited)",
+        help_text=_("Maximum reservations per day (0 = unlimited)"),
     )
     max_hourly_reservations = models.PositiveSmallIntegerField(
         default=0,
-        help_text="Maximum reservations per hour (0 = unlimited)",
+        help_text=_("Maximum reservations per hour (0 = unlimited)"),
     )
 
     class Meta:
@@ -99,22 +99,22 @@ class Reservation(TimeStampedModel):
 
     STATUS_CHOICES = [
         # Reservation created but deposit payment not yet confirmed via BOG callback.
-        ("pending_payment", "Pending Payment"),
-        ("pending", "Pending Confirmation"),
-        ("confirmed", "Confirmed"),
-        ("waitlist", "Waitlisted"),
-        ("seated", "Seated"),
-        ("completed", "Completed"),
-        ("cancelled", "Cancelled"),
-        ("no_show", "No Show"),
+        ("pending_payment", _("Pending Payment")),
+        ("pending", _("Pending Confirmation")),
+        ("confirmed", _("Confirmed")),
+        ("waitlist", _("Waitlisted")),
+        ("seated", _("Seated")),
+        ("completed", _("Completed")),
+        ("cancelled", _("Cancelled")),
+        ("no_show", _("No Show")),
     ]
 
     SOURCE_CHOICES = [
-        ("website", "Website"),
-        ("phone", "Phone"),
-        ("walk_in", "Walk-in"),
-        ("third_party", "Third-party Platform"),
-        ("app", "Mobile App"),
+        ("website", _("Website")),
+        ("phone", _("Phone")),
+        ("walk_in", _("Walk-in")),
+        ("third_party", _("Third-party Platform")),
+        ("app", _("Mobile App")),
     ]
 
     # Restaurant
@@ -131,7 +131,7 @@ class Reservation(TimeStampedModel):
         null=True,
         blank=True,
         related_name="reservations",
-        help_text="Registered user making the reservation",
+        help_text=_("Registered user making the reservation"),
     )
 
     # Guest info (for non-registered users or phone bookings)
@@ -145,7 +145,7 @@ class Reservation(TimeStampedModel):
     party_size = models.PositiveSmallIntegerField()
     duration = models.DurationField(
         default=timedelta(hours=2),
-        help_text="Expected duration of the reservation",
+        help_text=_("Expected duration of the reservation"),
     )
 
     # Table assignment
@@ -189,7 +189,7 @@ class Reservation(TimeStampedModel):
     special_requests = models.TextField(blank=True)
     internal_notes = models.TextField(
         blank=True,
-        help_text="Private notes visible only to staff",
+        help_text=_("Private notes visible only to staff"),
     )
 
     # Reminders
@@ -351,16 +351,16 @@ class ReservationBlockedTime(TimeStampedModel):
         "tables.Table",
         blank=True,
         related_name="blocked_times",
-        help_text="Leave empty to block all tables",
+        help_text=_("Leave empty to block all tables"),
     )
 
     # Reason
     REASON_CHOICES = [
-        ("holiday", "Holiday"),
-        ("private_event", "Private Event"),
-        ("maintenance", "Maintenance"),
-        ("staff_shortage", "Staff Shortage"),
-        ("other", "Other"),
+        ("holiday", _("Holiday")),
+        ("private_event", _("Private Event")),
+        ("maintenance", _("Maintenance")),
+        ("staff_shortage", _("Staff Shortage")),
+        ("other", _("Other")),
     ]
     reason = models.CharField(
         max_length=20,
@@ -383,7 +383,7 @@ class ReservationBlockedTime(TimeStampedModel):
     recurrence_pattern = models.JSONField(
         null=True,
         blank=True,
-        help_text="Recurrence pattern (e.g., weekly, monthly)",
+        help_text=_("Recurrence pattern (e.g., weekly, monthly)"),
     )
 
     class Meta:

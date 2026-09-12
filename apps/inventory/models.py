@@ -73,12 +73,12 @@ class StockItem(TimeStampedModel):
     restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="stock_items")
     name = models.CharField(max_length=150)
     sku = models.CharField(max_length=50, blank=True, default="")
-    category = models.CharField(max_length=50, blank=True, default="", help_text="Free text, e.g. Dairy, Meat, Dry.")
+    category = models.CharField(max_length=50, blank=True, default="", help_text=_("Free text, e.g. Dairy, Meat, Dry."))
     base_unit = models.ForeignKey(
         UnitOfMeasure,
         on_delete=models.PROTECT,
         related_name="+",
-        help_text="Unit recipes and counts are kept in (g, ml, pcs).",
+        help_text=_("Unit recipes and counts are kept in (g, ml, pcs)."),
     )
     purchase_unit = models.ForeignKey(
         UnitOfMeasure,
@@ -86,20 +86,23 @@ class StockItem(TimeStampedModel):
         related_name="+",
         null=True,
         blank=True,
-        help_text="Unit you buy it in (e.g. kg). Same dimension as the base unit.",
+        help_text=_("Unit you buy it in (e.g. kg). Same dimension as the base unit."),
     )
     purchase_pack_qty = models.DecimalField(
         max_digits=14,
         decimal_places=4,
         null=True,
         blank=True,
-        help_text="Size of one purchase pack in the purchase unit (a 10 kg bag = 10).",
+        help_text=_("Size of one purchase pack in the purchase unit (a 10 kg bag = 10)."),
     )
     min_level = models.DecimalField(
-        max_digits=14, decimal_places=4, default=0, help_text="Alert when available stock drops to this (base unit)."
+        max_digits=14, decimal_places=4, default=0, help_text=_("Alert when available stock drops to this (base unit).")
     )
     par_level = models.DecimalField(
-        max_digits=14, decimal_places=4, default=0, help_text="Target stock level the buy list tops up to (base unit)."
+        max_digits=14,
+        decimal_places=4,
+        default=0,
+        help_text=_("Target stock level the buy list tops up to (base unit)."),
     )
     expiry_warning_days = models.PositiveSmallIntegerField(default=3)
     supplier_name = models.CharField(max_length=150, blank=True, default="")
@@ -108,7 +111,7 @@ class StockItem(TimeStampedModel):
         decimal_places=6,
         null=True,
         blank=True,
-        help_text="Cost per base unit used when no lot cost is known.",
+        help_text=_("Cost per base unit used when no lot cost is known."),
     )
     is_active = models.BooleanField(default=True)
 
@@ -166,12 +169,12 @@ class StockLot(TimeStampedModel):
     restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="stock_lots")
     received_qty = models.DecimalField(max_digits=14, decimal_places=4)
     remaining_qty = models.DecimalField(max_digits=14, decimal_places=4)
-    unit_cost = models.DecimalField(max_digits=12, decimal_places=6, default=0, help_text="Per base unit.")
+    unit_cost = models.DecimalField(max_digits=12, decimal_places=6, default=0, help_text=_("Per base unit."))
     total_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     expiry_date = models.DateField(null=True, blank=True)
     received_at = models.DateTimeField(default=timezone.now)
     supplier_name = models.CharField(max_length=150, blank=True, default="")
-    reference = models.CharField(max_length=100, blank=True, default="", help_text="Invoice / delivery note number.")
+    reference = models.CharField(max_length=100, blank=True, default="", help_text=_("Invoice / delivery note number."))
     received_by = models.ForeignKey(
         "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="received_stock_lots"
     )
@@ -204,21 +207,21 @@ class StockMovement(TimeStampedModel):
     """Append-only ledger. ``quantity`` is a signed delta in base units."""
 
     KIND_CHOICES = [
-        ("receive", "Received"),
-        ("consume_sale", "Consumed by order"),
-        ("restore_sale", "Restored (order cancelled)"),
-        ("waste", "Waste / write-off"),
-        ("employee_meal", "Employee meal"),
-        ("adjustment", "Adjustment / count"),
+        ("receive", _("Received")),
+        ("consume_sale", _("Consumed by order")),
+        ("restore_sale", _("Restored (order cancelled)")),
+        ("waste", _("Waste / write-off")),
+        ("employee_meal", _("Employee meal")),
+        ("adjustment", _("Adjustment / count")),
     ]
     REASON_CHOICES = [
         ("", "—"),
-        ("spoilage", "Spoiled"),
-        ("expired", "Expired"),
-        ("burnt", "Kitchen mistake"),
-        ("count", "Stock count"),
-        ("correction", "Correction"),
-        ("other", "Other"),
+        ("spoilage", _("Spoiled")),
+        ("expired", _("Expired")),
+        ("burnt", _("Kitchen mistake")),
+        ("count", _("Stock count")),
+        ("correction", _("Correction")),
+        ("other", _("Other")),
     ]
 
     restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="stock_movements")
@@ -286,7 +289,7 @@ class OrderStockReservation(TimeStampedModel):
     order = models.OneToOneField("orders.Order", on_delete=models.CASCADE, related_name="stock_reservation")
     restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="stock_reservations")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_RESERVED)
-    strict = models.BooleanField(default=True, help_text="False when a paid order was forced through short stock.")
+    strict = models.BooleanField(default=True, help_text=_("False when a paid order was forced through short stock."))
     consumed_at = models.DateTimeField(null=True, blank=True)
     released_at = models.DateTimeField(null=True, blank=True)
 
@@ -385,10 +388,10 @@ class RecipeLine(TimeStampedModel):
 
 class WasteEntry(TimeStampedModel):
     REASON_CHOICES = [
-        ("spoilage", "Spoiled / went bad"),
-        ("expired", "Expired"),
-        ("burnt", "Kitchen mistake (burnt, dropped, wrong dish)"),
-        ("other", "Other"),
+        ("spoilage", _("Spoiled / went bad")),
+        ("expired", _("Expired")),
+        ("burnt", _("Kitchen mistake (burnt, dropped, wrong dish)")),
+        ("other", _("Other")),
     ]
 
     restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="waste_entries")
@@ -399,7 +402,7 @@ class WasteEntry(TimeStampedModel):
         null=True,
         blank=True,
         related_name="waste_entries",
-        help_text="Optional: the exact lot that was thrown away. Otherwise the oldest stock is written off first.",
+        help_text=_("Optional: the exact lot that was thrown away. Otherwise the oldest stock is written off first."),
     )
     quantity = models.DecimalField(max_digits=12, decimal_places=4)
     unit = models.ForeignKey(UnitOfMeasure, on_delete=models.PROTECT, related_name="+")
@@ -433,7 +436,7 @@ class WasteEntry(TimeStampedModel):
 class EmployeeMeal(TimeStampedModel):
     restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="employee_meals")
     staff_member = models.ForeignKey(
-        "staff.StaffMember", on_delete=models.PROTECT, related_name="meals", help_text="Who ate."
+        "staff.StaffMember", on_delete=models.PROTECT, related_name="meals", help_text=_("Who ate.")
     )
     meal_date = models.DateField(default=timezone.localdate)
     menu_item = models.ForeignKey(
@@ -445,7 +448,7 @@ class EmployeeMeal(TimeStampedModel):
         null=True,
         blank=True,
         related_name="employee_meals",
-        help_text="For raw ingredients eaten as-is (fruit, bread...).",
+        help_text=_("For raw ingredients eaten as-is (fruit, bread...)."),
     )
     quantity = models.DecimalField(max_digits=12, decimal_places=4, default=1)
     unit = models.ForeignKey(UnitOfMeasure, on_delete=models.PROTECT, null=True, blank=True, related_name="+")
@@ -489,7 +492,9 @@ class StockAdjustment(TimeStampedModel):
     restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="stock_adjustments")
     stock_item = models.ForeignKey(StockItem, on_delete=models.PROTECT, related_name="adjustments")
     mode = models.CharField(max_length=10, choices=MODE_CHOICES, default="count")
-    quantity = models.DecimalField(max_digits=12, decimal_places=4, help_text="Counted amount, or the +/- correction.")
+    quantity = models.DecimalField(
+        max_digits=12, decimal_places=4, help_text=_("Counted amount, or the +/- correction.")
+    )
     unit = models.ForeignKey(UnitOfMeasure, on_delete=models.PROTECT, related_name="+")
     reason = models.CharField(max_length=20, choices=REASON_CHOICES, default="count")
     note = models.TextField(blank=True, default="")
@@ -497,7 +502,7 @@ class StockAdjustment(TimeStampedModel):
         "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="stock_adjustments"
     )
     delta_base = models.DecimalField(
-        max_digits=14, decimal_places=4, default=0, help_text="Resulting change in base units (filled on save)."
+        max_digits=14, decimal_places=4, default=0, help_text=_("Resulting change in base units (filled on save).")
     )
 
     class Meta:
@@ -522,19 +527,19 @@ class RestaurantDeliveryPlatform(TimeStampedModel):
     restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="delivery_platforms")
     platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES)
     is_enabled = models.BooleanField(default=True)
-    store_external_id = models.CharField(max_length=100, blank=True, default="", help_text="Your store id there.")
+    store_external_id = models.CharField(max_length=100, blank=True, default="", help_text=_("Your store id there."))
     credentials_encrypted = models.TextField(blank=True, default="")
     webhook_token = models.CharField(max_length=64, blank=True, default="", db_index=True)
     menu_token = models.CharField(
-        max_length=64, blank=True, default="", help_text="Unguessable part of the public menu URL."
+        max_length=64, blank=True, default="", help_text=_("Unguessable part of the public menu URL.")
     )
-    auto_accept = models.BooleanField(default=True, help_text="Platform orders go straight to the kitchen.")
+    auto_accept = models.BooleanField(default=True, help_text=_("Platform orders go straight to the kitchen."))
     prep_time_minutes = models.PositiveSmallIntegerField(default=20)
     last_menu_sync_at = models.DateTimeField(null=True, blank=True)
     last_menu_sync_status = models.CharField(max_length=20, blank=True, default="")
-    sandbox = models.BooleanField(default=True, help_text="Use the platform's stage environment.")
+    sandbox = models.BooleanField(default=True, help_text=_("Use the platform's stage environment."))
     store_paused_until = models.DateTimeField(
-        null=True, blank=True, help_text="We asked the platform to hide the store until then."
+        null=True, blank=True, help_text=_("We asked the platform to hide the store until then.")
     )
 
     class Meta:
@@ -569,13 +574,13 @@ class RestaurantDeliveryPlatform(TimeStampedModel):
 
 class InventoryAlert(TimeStampedModel):
     KIND_CHOICES = [
-        ("out_of_stock", "Dish sold out"),
-        ("back_in_stock", "Dish back in stock"),
-        ("low_stock", "Low stock"),
-        ("expiring_soon", "Expiring soon"),
-        ("expired", "Expired"),
-        ("negative_stock", "Negative stock"),
-        ("buy_list", "Buy list ready"),
+        ("out_of_stock", _("Dish sold out")),
+        ("back_in_stock", _("Dish back in stock")),
+        ("low_stock", _("Low stock")),
+        ("expiring_soon", _("Expiring soon")),
+        ("expired", _("Expired")),
+        ("negative_stock", _("Negative stock")),
+        ("buy_list", _("Buy list ready")),
     ]
     STATUS_OPEN = "open"
     STATUS_DONE = "done"
@@ -599,7 +604,7 @@ class InventoryAlert(TimeStampedModel):
     resolved_by = models.ForeignKey(
         "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="resolved_inventory_alerts"
     )
-    resolved_reason = models.CharField(max_length=20, blank=True, default="", help_text="auto / manual")
+    resolved_reason = models.CharField(max_length=20, blank=True, default="", help_text=_("auto / manual"))
 
     class Meta:
         db_table = "inventory_alerts"

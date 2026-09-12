@@ -84,13 +84,13 @@ class StaffRole(TimeStampedModel):
     SYSTEM_ROLES = ["owner", "manager", "warehouse_manager", "kitchen", "bar", "waiter"]
 
     ROLE_CHOICES = [
-        ("owner", "Owner"),
-        ("manager", "Manager"),
-        ("warehouse_manager", "Warehouse Manager"),
-        ("kitchen", "Kitchen Staff"),
-        ("bar", "Bar Staff"),
-        ("waiter", "Waiter"),
-        ("custom", "Custom Role"),
+        ("owner", _("Owner")),
+        ("manager", _("Manager")),
+        ("warehouse_manager", _("Warehouse Manager")),
+        ("kitchen", _("Kitchen Staff")),
+        ("bar", _("Bar Staff")),
+        ("waiter", _("Waiter")),
+        ("custom", _("Custom Role")),
     ]
 
     name = models.CharField(max_length=50, choices=ROLE_CHOICES, default="waiter")
@@ -102,11 +102,11 @@ class StaffRole(TimeStampedModel):
     )
     permissions = models.JSONField(
         default=dict,
-        help_text="JSON object mapping resources to allowed actions",
+        help_text=_("JSON object mapping resources to allowed actions"),
     )
     is_system_role = models.BooleanField(
         default=False,
-        help_text="System roles cannot be deleted",
+        help_text=_("System roles cannot be deleted"),
     )
     description = models.TextField(blank=True)
 
@@ -191,7 +191,7 @@ class StaffMember(TimeStampedModel):
     permissions_override = models.JSONField(
         default=dict,
         blank=True,
-        help_text="Individual permission overrides (additive)",
+        help_text=_("Individual permission overrides (additive)"),
     )
     invited_by = models.ForeignKey(
         "accounts.User",
@@ -202,7 +202,7 @@ class StaffMember(TimeStampedModel):
     )
     invited_at = models.DateTimeField(null=True, blank=True)
     joined_at = models.DateTimeField(null=True, blank=True)
-    notes = models.TextField(blank=True, help_text="Internal notes about this staff member")
+    notes = models.TextField(blank=True, help_text=_("Internal notes about this staff member"))
 
     class Meta:
         db_table = "staff_members"
@@ -253,10 +253,10 @@ class StaffInvitation(TimeStampedModel):
     """
 
     STATUS_CHOICES = [
-        ("pending", "Pending"),
-        ("accepted", "Accepted"),
-        ("expired", "Expired"),
-        ("cancelled", "Cancelled"),
+        ("pending", _("Pending")),
+        ("accepted", _("Accepted")),
+        ("expired", _("Expired")),
+        ("cancelled", _("Cancelled")),
     ]
 
     restaurant = models.ForeignKey(
@@ -286,7 +286,7 @@ class StaffInvitation(TimeStampedModel):
         blank=True,
         related_name="accepted_invitations",
     )
-    message = models.TextField(blank=True, help_text="Optional message to include in invitation")
+    message = models.TextField(blank=True, help_text=_("Optional message to include in invitation"))
 
     class Meta:
         db_table = "staff_invitations"

@@ -11,6 +11,7 @@ from __future__ import annotations
 from django.apps import apps
 from django.conf import settings
 from django.urls import NoReverseMatch, reverse
+from django.utils.translation import gettext_lazy as _
 
 from apps.core import modules
 from apps.core.tenant_admin_base import has_resource_permission
@@ -99,13 +100,13 @@ def navigation(request):
     if not restaurant or not getattr(request.user, "is_authenticated", False):
         return []
 
-    groups = [{"items": [{"title": "Dashboard", "icon": "dashboard", "link": reverse(f"{site.name}:index")}]}]
+    groups = [{"items": [{"title": _("Dashboard"), "icon": "dashboard", "link": reverse(f"{site.name}:index")}]}]
     for m in modules.enabled_modules(restaurant):
         items = [_model_item(site, app, name) for app, name in m.model_names]
         if m.code == "kitchen":
             items.append(
                 {
-                    "title": "Kitchen screen (POS)",
+                    "title": _("Kitchen screen (POS)"),
                     "icon": "skillet",
                     "link": f"{settings.POS_BASE_URL}/kitchen",
                     "permission": _perm("orders"),
@@ -125,18 +126,18 @@ def navigation(request):
         ]
         items = [i for i in items if i]
         if items:
-            groups.append({"title": "Reports", "separator": True, "items": items})
+            groups.append({"title": _("Reports"), "separator": True, "items": items})
 
     groups.append(
         {
-            "title": "Staff",
+            "title": _("Staff"),
             "separator": True,
             "items": [
                 i
                 for i in (
-                    _model_item(site, "staff", "staffmember", "Members"),
-                    _model_item(site, "staff", "staffinvitation", "Invitations"),
-                    _model_item(site, "staff", "staffrole", "Roles"),
+                    _model_item(site, "staff", "staffmember", _("Members")),
+                    _model_item(site, "staff", "staffinvitation", _("Invitations")),
+                    _model_item(site, "staff", "staffrole", _("Roles")),
                 )
                 if i
             ],
@@ -144,13 +145,13 @@ def navigation(request):
     )
     groups.append(
         {
-            "title": "Settings",
+            "title": _("Settings"),
             "separator": True,
             "items": [
                 i
                 for i in (
-                    _model_item(site, "tenants", "restaurant", "Restaurant settings"),
-                    _model_item(site, "tenants", "restaurantmodules", "Modules"),
+                    _model_item(site, "tenants", "restaurant", _("Restaurant settings")),
+                    _model_item(site, "tenants", "restaurantmodules", _("Modules")),
                 )
                 if i
             ],

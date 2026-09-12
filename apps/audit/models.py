@@ -3,6 +3,7 @@ Audit log models for tracking sensitive operations.
 """
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
 
@@ -13,37 +14,37 @@ class AuditLog(TimeStampedModel):
     """
 
     ACTION_CHOICES = [
-        ("login", "User Login"),
-        ("logout", "User Logout"),
-        ("login_failed", "Failed Login"),
-        ("password_change", "Password Change"),
-        ("password_reset", "Password Reset"),
-        ("user_create", "User Created"),
-        ("user_update", "User Updated"),
-        ("user_delete", "User Deleted"),
-        ("staff_add", "Staff Added"),
-        ("staff_remove", "Staff Removed"),
-        ("order_create", "Order Created"),
-        ("order_update", "Order Updated"),
-        ("order_cancel", "Order Cancelled"),
-        ("payment_collect", "Payment Collected"),
-        ("settings_update", "Settings Updated"),
-        ("data_export", "Data Exported"),
-        ("stock_receive", "Stock Received"),
-        ("stock_adjust", "Stock Adjusted"),
-        ("stock_waste", "Stock Written Off"),
-        ("employee_meal", "Employee Meal Recorded"),
-        ("recipe_update", "Recipe Updated"),
-        ("warehouse_toggle", "Warehouse Toggled"),
-        ("shift_open", "Cash Shift Opened"),
-        ("shift_close", "Cash Shift Closed"),
-        ("cash_movement", "Cash Paid In / Out"),
-        ("refund", "Refund Issued"),
-        ("order_discount", "Order Discount"),
-        ("item_comp", "Item Comped"),
-        ("item_void", "Item Voided"),
-        ("order_split", "Order Split"),
-        ("order_move", "Order Moved"),
+        ("login", _("User Login")),
+        ("logout", _("User Logout")),
+        ("login_failed", _("Failed Login")),
+        ("password_change", _("Password Change")),
+        ("password_reset", _("Password Reset")),
+        ("user_create", _("User Created")),
+        ("user_update", _("User Updated")),
+        ("user_delete", _("User Deleted")),
+        ("staff_add", _("Staff Added")),
+        ("staff_remove", _("Staff Removed")),
+        ("order_create", _("Order Created")),
+        ("order_update", _("Order Updated")),
+        ("order_cancel", _("Order Cancelled")),
+        ("payment_collect", _("Payment Collected")),
+        ("settings_update", _("Settings Updated")),
+        ("data_export", _("Data Exported")),
+        ("stock_receive", _("Stock Received")),
+        ("stock_adjust", _("Stock Adjusted")),
+        ("stock_waste", _("Stock Written Off")),
+        ("employee_meal", _("Employee Meal Recorded")),
+        ("recipe_update", _("Recipe Updated")),
+        ("warehouse_toggle", _("Warehouse Toggled")),
+        ("shift_open", _("Cash Shift Opened")),
+        ("shift_close", _("Cash Shift Closed")),
+        ("cash_movement", _("Cash Paid In / Out")),
+        ("refund", _("Refund Issued")),
+        ("order_discount", _("Order Discount")),
+        ("item_comp", _("Item Comped")),
+        ("item_void", _("Item Voided")),
+        ("order_split", _("Order Split")),
+        ("order_move", _("Order Moved")),
     ]
 
     # Actor
@@ -77,8 +78,8 @@ class AuditLog(TimeStampedModel):
 
     class Meta:
         db_table = "audit_logs"
-        verbose_name = "Audit Log"
-        verbose_name_plural = "Audit Logs"
+        verbose_name = _("Audit Log")
+        verbose_name_plural = _("Audit Logs")
         ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["user", "created_at"]),

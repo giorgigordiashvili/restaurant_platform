@@ -43,7 +43,7 @@ class MenuCategory(TranslatableModel, TimeStampedModel):
         max_length=64,
         blank=True,
         default="",
-        help_text="BlurHash string for the image — used as an inline LQIP.",
+        help_text=_("BlurHash string for the image — used as an inline LQIP."),
     )
     display_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
@@ -69,22 +69,22 @@ class MenuItem(TranslatableModel, TimeStampedModel):
     """
 
     PREPARATION_STATION_CHOICES = [
-        ("kitchen", "Kitchen"),
-        ("bar", "Bar"),
-        ("both", "Both"),
+        ("kitchen", _("Kitchen")),
+        ("bar", _("Bar")),
+        ("both", _("Both")),
     ]
 
     # Common allergens
     ALLERGEN_CHOICES = [
-        ("gluten", "Gluten"),
-        ("dairy", "Dairy"),
-        ("eggs", "Eggs"),
-        ("fish", "Fish"),
-        ("shellfish", "Shellfish"),
-        ("tree_nuts", "Tree Nuts"),
-        ("peanuts", "Peanuts"),
-        ("soy", "Soy"),
-        ("sesame", "Sesame"),
+        ("gluten", _("Gluten")),
+        ("dairy", _("Dairy")),
+        ("eggs", _("Eggs")),
+        ("fish", _("Fish")),
+        ("shellfish", _("Shellfish")),
+        ("tree_nuts", _("Tree Nuts")),
+        ("peanuts", _("Peanuts")),
+        ("soy", _("Soy")),
+        ("sesame", _("Sesame")),
     ]
 
     restaurant = models.ForeignKey(
@@ -117,24 +117,24 @@ class MenuItem(TranslatableModel, TimeStampedModel):
         max_length=64,
         blank=True,
         default="",
-        help_text="BlurHash string for the image — used as an inline LQIP.",
+        help_text=_("BlurHash string for the image — used as an inline LQIP."),
     )
     is_available = models.BooleanField(default=True)
     auto_disabled_by_stock = models.BooleanField(
         default=False,
         db_index=True,
-        help_text="Set by the warehouse when a recipe ingredient has run out; cleared when it is restocked.",
+        help_text=_("Set by the warehouse when a recipe ingredient has run out; cleared when it is restocked."),
     )
     is_featured = models.BooleanField(
         default=False,
-        help_text="Featured items appear prominently in the menu",
+        help_text=_("Featured items appear prominently in the menu"),
     )
     display_order = models.PositiveIntegerField(default=0)
 
     # Preparation
     preparation_time_minutes = models.PositiveIntegerField(
         default=15,
-        help_text="Estimated preparation time in minutes",
+        help_text=_("Estimated preparation time in minutes"),
     )
     preparation_station = models.CharField(
         max_length=10,
@@ -146,12 +146,12 @@ class MenuItem(TranslatableModel, TimeStampedModel):
     calories = models.PositiveIntegerField(
         null=True,
         blank=True,
-        help_text="Calorie count per serving",
+        help_text=_("Calorie count per serving"),
     )
     allergens = models.JSONField(
         default=list,
         blank=True,
-        help_text="List of allergen codes (e.g., ['gluten', 'dairy'])",
+        help_text=_("List of allergen codes (e.g., ['gluten', 'dairy'])"),
     )
     is_vegetarian = models.BooleanField(default=False)
     is_vegan = models.BooleanField(default=False)
@@ -159,13 +159,13 @@ class MenuItem(TranslatableModel, TimeStampedModel):
     is_spicy = models.BooleanField(default=False)
     spicy_level = models.PositiveSmallIntegerField(
         default=0,
-        help_text="Spicy level 0-5 (0 = not spicy)",
+        help_text=_("Spicy level 0-5 (0 = not spicy)"),
     )
 
     # Deprecated per-item counters -- superseded by warehouse recipes
     # (apps.inventory). Kept so nothing referencing them breaks.
-    track_inventory = models.BooleanField(default=False, help_text="Deprecated: see Warehouse recipes.")
-    stock_quantity = models.PositiveIntegerField(default=0, help_text="Deprecated: see Warehouse recipes.")
+    track_inventory = models.BooleanField(default=False, help_text=_("Deprecated: see Warehouse recipes."))
+    stock_quantity = models.PositiveIntegerField(default=0, help_text=_("Deprecated: see Warehouse recipes."))
 
     class Meta:
         db_table = "menu_items"
@@ -207,8 +207,8 @@ class ModifierGroup(TranslatableModel, TimeStampedModel):
     """
 
     SELECTION_TYPE_CHOICES = [
-        ("single", "Single Selection"),
-        ("multiple", "Multiple Selection"),
+        ("single", _("Single Selection")),
+        ("multiple", _("Multiple Selection")),
     ]
 
     restaurant = models.ForeignKey(
@@ -227,15 +227,15 @@ class ModifierGroup(TranslatableModel, TimeStampedModel):
     )
     min_selections = models.PositiveSmallIntegerField(
         default=0,
-        help_text="Minimum number of selections required",
+        help_text=_("Minimum number of selections required"),
     )
     max_selections = models.PositiveSmallIntegerField(
         default=1,
-        help_text="Maximum number of selections allowed",
+        help_text=_("Maximum number of selections allowed"),
     )
     is_required = models.BooleanField(
         default=False,
-        help_text="Customer must make a selection from this group",
+        help_text=_("Customer must make a selection from this group"),
     )
     display_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
@@ -246,7 +246,7 @@ class ModifierGroup(TranslatableModel, TimeStampedModel):
         max_length=150,
         blank=True,
         default="",
-        help_text="Only staff see this. Use it to tell similar groups apart, e.g. 'ქათმის ხვეულა - ექსტრა'.",
+        help_text=_("Only staff see this. Use it to tell similar groups apart, e.g. 'ქათმის ხვეულა - ექსტრა'."),
     )
 
     class Meta:
@@ -283,17 +283,17 @@ class Modifier(TranslatableModel, TimeStampedModel):
         max_digits=10,
         decimal_places=2,
         default=0,
-        help_text="Price adjustment (can be positive or negative)",
+        help_text=_("Price adjustment (can be positive or negative)"),
     )
     is_available = models.BooleanField(default=True)
     auto_disabled_by_stock = models.BooleanField(
         default=False,
         db_index=True,
-        help_text="Set by the warehouse when a recipe ingredient has run out; cleared when it is restocked.",
+        help_text=_("Set by the warehouse when a recipe ingredient has run out; cleared when it is restocked."),
     )
     is_default = models.BooleanField(
         default=False,
-        help_text="Pre-selected by default",
+        help_text=_("Pre-selected by default"),
     )
     display_order = models.PositiveIntegerField(default=0)
 

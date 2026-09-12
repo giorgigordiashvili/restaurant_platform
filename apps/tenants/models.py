@@ -69,7 +69,7 @@ class RestaurantCategory(TranslatableModel, TimeStampedModel):
     icon = models.CharField(
         max_length=50,
         blank=True,
-        help_text="Material icon name (e.g., 'restaurant', 'local_cafe', 'fastfood')",
+        help_text=_("Material icon name (e.g., 'restaurant', 'local_cafe', 'fastfood')"),
     )
     image = models.ImageField(
         upload_to="restaurant_categories/",
@@ -80,7 +80,7 @@ class RestaurantCategory(TranslatableModel, TimeStampedModel):
         max_length=64,
         blank=True,
         default="",
-        help_text="BlurHash string for the image — used as an inline LQIP.",
+        help_text=_("BlurHash string for the image — used as an inline LQIP."),
     )
     display_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
@@ -123,7 +123,7 @@ class Amenity(TranslatableModel, TimeStampedModel):
     icon = models.CharField(
         max_length=50,
         blank=True,
-        help_text="Material icon name (e.g., 'deck', 'music_note', 'wifi')",
+        help_text=_("Material icon name (e.g., 'deck', 'music_note', 'wifi')"),
     )
     display_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
@@ -177,7 +177,7 @@ class Restaurant(TimeStampedModel):
         null=True,
         blank=True,
         related_name="restaurants",
-        help_text="Restaurant category (e.g., Italian, Fast Food)",
+        help_text=_("Restaurant category (e.g., Italian, Fast Food)"),
     )
 
     # Amenities
@@ -185,7 +185,7 @@ class Restaurant(TimeStampedModel):
         Amenity,
         blank=True,
         related_name="restaurants",
-        help_text="Amenities available at the restaurant",
+        help_text=_("Amenities available at the restaurant"),
     )
 
     # Owner
@@ -242,7 +242,7 @@ class Restaurant(TimeStampedModel):
         max_length=64,
         blank=True,
         default="",
-        help_text="BlurHash string for the logo — used as an inline LQIP.",
+        help_text=_("BlurHash string for the logo — used as an inline LQIP."),
     )
     cover_image = models.ImageField(
         upload_to="restaurants/covers/",
@@ -253,7 +253,7 @@ class Restaurant(TimeStampedModel):
         max_length=64,
         blank=True,
         default="",
-        help_text="BlurHash string for the cover image — used as an inline LQIP.",
+        help_text=_("BlurHash string for the cover image — used as an inline LQIP."),
     )
     primary_color = models.CharField(
         max_length=7,
@@ -294,11 +294,11 @@ class Restaurant(TimeStampedModel):
     )
     accepts_reservations = models.BooleanField(
         default=True,
-        help_text="Allow customers to make reservations",
+        help_text=_("Allow customers to make reservations"),
     )
     accepts_takeaway = models.BooleanField(
         default=True,
-        help_text="Allow takeaway orders",
+        help_text=_("Allow takeaway orders"),
     )
     accepts_platform_loyalty = models.BooleanField(
         default=False,
@@ -320,31 +320,31 @@ class Restaurant(TimeStampedModel):
     )
     tables_enabled = models.BooleanField(
         default=True,
-        help_text="Tables & QR module: sections, tables, QR codes, table sessions, shared venues.",
+        help_text=_("Tables & QR module: sections, tables, QR codes, table sessions, shared venues."),
     )
     kitchen_enabled = models.BooleanField(
         default=True,
-        help_text="Kitchen display in the POS app. Needs Ordering.",
+        help_text=_("Kitchen display in the POS app. Needs Ordering."),
     )
     loyalty_enabled = models.BooleanField(
         default=True,
-        help_text="Loyalty module: punch-card programs; platform tier discounts are an option inside it.",
+        help_text=_("Loyalty module: punch-card programs; platform tier discounts are an option inside it."),
     )
     reviews_enabled = models.BooleanField(
         default=True,
-        help_text="Reviews module: customer reviews on the restaurant page.",
+        help_text=_("Reviews module: customer reviews on the restaurant page."),
     )
     notifications_enabled = models.BooleanField(
         default=True,
-        help_text="Notifications module: staff push / in-app alerts, guest SMS and email.",
+        help_text=_("Notifications module: staff push / in-app alerts, guest SMS and email."),
     )
     delivery_enabled = models.BooleanField(
         default=False,
-        help_text="Delivery platforms module: Glovo orders straight into the kitchen, menu push, sold-out sync.",
+        help_text=_("Delivery platforms module: Glovo orders straight into the kitchen, menu push, sold-out sync."),
     )
     fiscal_enabled = models.BooleanField(
         default=False,
-        help_text="Fiscal module: VAT profile, numbered receipts and refund receipts, RS.ge waybill export.",
+        help_text=_("Fiscal module: VAT profile, numbered receipts and refund receipts, RS.ge waybill export."),
     )
     printing_enabled = models.BooleanField(
         default=False,
@@ -382,7 +382,7 @@ class Restaurant(TimeStampedModel):
                 message="Must be a Georgian IBAN in the form GE##XX################.",
             )
         ],
-        help_text="Georgian IBAN (GE## + bank code + 16 digits) that receives the restaurant's share.",
+        help_text=_("Georgian IBAN (GE## + bank code + 16 digits) that receives the restaurant's share."),
     )
     accepts_flitt_payments = models.BooleanField(
         default=False,
@@ -397,7 +397,7 @@ class Restaurant(TimeStampedModel):
         max_length=32,
         blank=True,
         default="",
-        help_text="Flitt sub-merchant id provided by Flitt after onboarding.",
+        help_text=_("Flitt sub-merchant id provided by Flitt after onboarding."),
     )
 
     # Platform commission override. Falls back to settings.PLATFORM_COMMISSION_PERCENT
@@ -408,7 +408,7 @@ class Restaurant(TimeStampedModel):
         decimal_places=2,
         default=Decimal("5.00"),
         validators=[MinValueValidator(Decimal("0")), MaxValueValidator(Decimal("100"))],
-        help_text="Superuser-only. Percentage the platform keeps on every paid order.",
+        help_text=_("Superuser-only. Percentage the platform keeps on every paid order."),
     )
 
     # Tax settings
@@ -417,14 +417,14 @@ class Restaurant(TimeStampedModel):
         decimal_places=2,
         default=0,
         validators=[MinValueValidator(0), MaxValueValidator(100)],
-        help_text="Tax percentage to apply to orders",
+        help_text=_("Tax percentage to apply to orders"),
     )
     service_charge = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         default=0,
         validators=[MinValueValidator(0), MaxValueValidator(100)],
-        help_text="Service charge percentage",
+        help_text=_("Service charge percentage"),
     )
 
     # Cached statistics (updated periodically)
@@ -442,11 +442,11 @@ class Restaurant(TimeStampedModel):
         max_digits=10,
         decimal_places=2,
         default=0,
-        help_text="Minimum order amount for remote orders",
+        help_text=_("Minimum order amount for remote orders"),
     )
     average_preparation_time = models.PositiveIntegerField(
         default=30,
-        help_text="Average order preparation time in minutes",
+        help_text=_("Average order preparation time in minutes"),
     )
 
     class Meta:
@@ -549,7 +549,7 @@ class RestaurantHours(TimeStampedModel):
     close_time = models.TimeField()
     is_closed = models.BooleanField(
         default=False,
-        help_text="Mark as closed for this day (overrides open/close times)",
+        help_text=_("Mark as closed for this day (overrides open/close times)"),
     )
 
     class Meta:
@@ -587,5 +587,5 @@ class RestaurantModules(Restaurant):
 
     class Meta:
         proxy = True
-        verbose_name = "Modules"
-        verbose_name_plural = "Modules"
+        verbose_name = _("Modules")
+        verbose_name_plural = _("Modules")
