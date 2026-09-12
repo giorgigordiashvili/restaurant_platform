@@ -1,10 +1,3 @@
-from .base import PlatformAdapter
+"""Kept for imports; the adapter now lives in apps.delivery.bolt_food.adapter."""
 
-
-class BoltFoodAdapter(PlatformAdapter):
-    """Placeholder for the Bolt Food partner API integration."""
-
-    code = "bolt_food"
-
-    def set_item_availability(self, link, menu_item, available, *, task=None):
-        raise NotImplementedError("Bolt Food API sync is not implemented yet.")
+from apps.delivery.bolt_food.adapter import BoltFoodAdapter  # noqa: F401

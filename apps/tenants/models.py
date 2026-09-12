@@ -334,6 +334,10 @@ class Restaurant(TimeStampedModel):
         default=True,
         help_text="Reviews module: customer reviews on the restaurant page.",
     )
+    delivery_enabled = models.BooleanField(
+        default=False,
+        help_text="Delivery platforms module: Glovo orders straight into the kitchen, menu push, sold-out sync.",
+    )
     fiscal_enabled = models.BooleanField(
         default=False,
         help_text="Fiscal module: VAT profile, numbered receipts and refund receipts, RS.ge waybill export.",

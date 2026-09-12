@@ -173,6 +173,9 @@ class OrderSerializer(serializers.ModelSerializer):
             "completed_at",
             "cancelled_at",
             "cancellation_reason",
+            "source",
+            "external_id",
+            "platform_data",
             "items",
             "created_at",
             "updated_at",
@@ -180,6 +183,9 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id",
             "order_number",
+            "source",
+            "external_id",
+            "platform_data",
             "subtotal",
             "tax_amount",
             "service_charge",
@@ -345,6 +351,7 @@ class OrderListSerializer(serializers.ModelSerializer):
             "table_number",
             "table_session",
             "customer_name",
+            "source",
             "subtotal",
             "discount_amount",
             "total",
@@ -367,6 +374,8 @@ class KitchenOrderSerializer(serializers.ModelSerializer):
     items = serializers.SerializerMethodField()
     table_number = serializers.CharField(source="table.number", read_only=True)
     elapsed_minutes = serializers.SerializerMethodField()
+    platform_order_code = serializers.SerializerMethodField()
+    pickup_eta = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -375,6 +384,10 @@ class KitchenOrderSerializer(serializers.ModelSerializer):
             "order_number",
             "order_type",
             "status",
+            "source",
+            "external_id",
+            "platform_order_code",
+            "pickup_eta",
             "table_number",
             "customer_name",
             "customer_notes",
@@ -384,6 +397,12 @@ class KitchenOrderSerializer(serializers.ModelSerializer):
             "estimated_ready_at",
             "created_at",
         ]
+
+    def get_platform_order_code(self, obj):
+        return (obj.platform_data or {}).get("order_code", "") if obj.source in ("glovo", "wolt", "bolt_food") else ""
+
+    def get_pickup_eta(self, obj):
+        return (obj.platform_data or {}).get("pickup_eta") if obj.source in ("glovo", "wolt", "bolt_food") else None
 
     def get_items(self, obj):
         # Walk the prefetch instead of re-querying per ticket.

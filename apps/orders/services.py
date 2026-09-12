@@ -81,6 +81,9 @@ def transition_order(
             from apps.fiscal import hooks as fiscal_hooks
 
             fiscal_hooks.on_order_cancelled(order, by=by)
+        from apps.delivery import hooks as delivery_hooks
+
+        delivery_hooks.on_order_status_changed(order, old_status, new_status, by=by)
     return order
 
 

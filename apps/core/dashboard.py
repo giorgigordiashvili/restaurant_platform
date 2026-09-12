@@ -255,6 +255,33 @@ def module_cards(request):
             "menu",
         )
 
+    if "delivery" in on and has_resource_permission(request, "orders", "read"):
+        from apps.orders.models import Order
+
+        qs = Order.objects.filter(restaurant=restaurant, source__in=("glovo", "wolt", "bolt_food"))
+        card(
+            "delivery",
+            "Delivery platforms",
+            "delivery_dining",
+            [
+                {
+                    "label": "Platform orders today",
+                    "value": qs.filter(created_at__date=today).count(),
+                    "url": _url("orders_order_changelist") + "?source__exact=glovo",
+                },
+                {
+                    "label": "Awaiting accept",
+                    "value": qs.filter(status="pending").count(),
+                    "url": _url("orders_order_changelist") + "?status__exact=pending",
+                },
+            ],
+            [
+                _link("Platforms", "delivery_deliveryplatformspage_changelist"),
+                _link("Orders", "orders_order_changelist"),
+            ],
+            "orders",
+        )
+
     if "fiscal" in on and has_resource_permission(request, "fiscal", "read"):
         from apps.fiscal.models import FiscalDocument
 

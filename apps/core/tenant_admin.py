@@ -557,9 +557,9 @@ class OrderTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
 
     permission_resource = "orders"
     module_code = "ordering"
-    list_display = ["order_number", "status", "order_type", "table", "customer_name", "total", "created_at"]
-    list_filter = ["status", "order_type", "created_at"]
-    search_fields = ["order_number", "customer_name", "customer_phone"]
+    list_display = ["order_number", "status", "order_type", "source", "table", "customer_name", "total", "created_at"]
+    list_filter = ["status", "order_type", "source", "created_at"]
+    search_fields = ["order_number", "customer_name", "customer_phone", "external_id"]
     ordering = ["-created_at"]
     date_hierarchy = "created_at"
     inlines = [OrderItemInline, OrderStatusHistoryInline]
@@ -1247,7 +1247,7 @@ class RestaurantSettingsAdmin(UnfoldModelAdmin):
 
     def get_inlines(self, request, obj):
         inlines = list(super().get_inlines(request, obj))
-        if obj is not None and modules.is_enabled(obj, "warehouse"):
+        if obj is not None and (modules.is_enabled(obj, "warehouse") or modules.is_enabled(obj, "delivery")):
             inlines.append(RestaurantDeliveryPlatformInline)
         return inlines
 
@@ -1410,6 +1410,7 @@ class ModulesTenantAdmin(TenantModelAdmin):
 # Register all models with tenant_admin_site
 # =============================================================================
 
+from apps.delivery.tenant_admin import register_delivery_admin  # noqa: E402
 from apps.fiscal.tenant_admin import register_fiscal_admin  # noqa: E402
 from apps.inventory.tenant_admin import register_inventory_admin  # noqa: E402
 from apps.payments.tenant_admin import register_payments_admin  # noqa: E402
@@ -1421,6 +1422,7 @@ register_payments_admin(tenant_admin_site)
 register_reports_admin(tenant_admin_site)
 register_printing_admin(tenant_admin_site)
 register_fiscal_admin(tenant_admin_site)
+register_delivery_admin(tenant_admin_site)
 
 # Restaurant Settings + Modules
 tenant_admin_site.register(Restaurant, RestaurantSettingsAdmin)

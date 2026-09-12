@@ -92,6 +92,11 @@ class OrderListView(generics.ListAPIView):
         if order_status:
             queryset = queryset.filter(status=order_status)
 
+        # Filter by source (web / qr / pos / glovo ...)
+        source = self.request.query_params.get("source")
+        if source:
+            queryset = queryset.filter(source=source)
+
         # Filter by order type
         order_type = self.request.query_params.get("type")
         if order_type:
@@ -226,6 +231,7 @@ class OrderCreateView(APIView):
                 delivery_address=data.get("delivery_address", ""),
                 tip_amount=data.get("tip_amount", 0),
                 handled_by=request.user,
+                source="pos",
             )
             _add_items(order, data["items"])
             order.calculate_totals()
@@ -870,6 +876,7 @@ class CustomerOrderCreateView(APIView):
                 customer_notes=data.get("customer_notes", ""),
                 delivery_address=data.get("delivery_address", ""),
                 tip_amount=data.get("tip_amount", 0),
+                source="qr" if session is not None else "web",
             )
             _add_items(order, data["items"])
             order.calculate_totals()

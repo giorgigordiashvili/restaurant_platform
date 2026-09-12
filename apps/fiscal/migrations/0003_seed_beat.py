@@ -18,5 +18,5 @@ def unseed(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [("fiscal", "0002_profiles_from_tax_rate"), ("django_celery_beat", "0001_initial")]
+    dependencies = [("fiscal", "0002_profiles_from_tax_rate"), ("django_celery_beat", "0019_alter_periodictasks_options")]
     operations = [migrations.RunPython(seed, unseed)]

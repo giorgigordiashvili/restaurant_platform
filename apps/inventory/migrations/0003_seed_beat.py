@@ -43,6 +43,6 @@ def unseed(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [("inventory", "0002_seed_units"), ("django_celery_beat", "0001_initial")]
+    dependencies = [("inventory", "0002_seed_units"), ("django_celery_beat", "0019_alter_periodictasks_options")]
 
     operations = [migrations.RunPython(seed, unseed)]

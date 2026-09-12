@@ -1,0 +1,30 @@
+{
+  "order_id": "GL-1001",
+  "store_id": "store-1",
+  "order_time": "2026-09-12T12:00:00Z",
+  "estimated_pickup_time": "2026-09-12T12:25:00Z",
+  "utc_offset_minutes": 240,
+  "payment_method": "DELAYED",
+  "currency": "GEL",
+  "order_code": "A1B2C",
+  "allergy_info": "no nuts",
+  "special_requirements": "ring the bell",
+  "estimated_total_price": 2600,
+  "delivery_fee": 300,
+  "minimum_basket_surcharge": 0,
+  "customer_cash_payment_amount": null,
+  "courier": {"name": "Giorgi", "phone_number": "+995500000000"},
+  "customer": {"name": "Nino", "phone_number": "+995511111111", "hash": "abc", "invoicing_details": {}},
+  "products": [
+    {"id": "p{ITEM_ID}", "purchased_product_id": "1", "name": "ხინკალი", "price": 1000, "quantity": 2, "attributes": [{"id": "mNOPE", "name": "extra chili", "price": 100, "quantity": 1}]},
+    {"id": "pdeleted-dish", "purchased_product_id": "2", "name": "Cake", "price": 500, "quantity": 1, "attributes": []}
+  ],
+  "delivery_address": {"label": "Rustaveli 12", "latitude": 41.7, "longitude": 44.8},
+  "bundled_orders": [],
+  "pick_up_code": "7788",
+  "is_picked_up_by_customer": false,
+  "cutlery_requested": true,
+  "partner_discounts_total": 0,
+  "partner_discounted_products_total": 0,
+  "total_customer_to_pay": 2900
+}

@@ -81,6 +81,15 @@ class Order(TimeStampedModel):
         ("delivery", "Delivery"),
     ]
 
+    SOURCE_CHOICES = [
+        ("web", "Website"),
+        ("qr", "QR table"),
+        ("pos", "POS"),
+        ("glovo", "Glovo"),
+        ("wolt", "Wolt"),
+        ("bolt_food", "Bolt Food"),
+    ]
+
     # Order identification
     order_number = models.CharField(
         max_length=20,
@@ -209,6 +218,11 @@ class Order(TimeStampedModel):
         default=0,
         validators=[MinValueValidator(0)],
     )
+    # Where the order came from; delivery platforms keep their own id and payload.
+    source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default="web", db_index=True)
+    external_id = models.CharField(max_length=100, blank=True, default="")
+    platform_data = models.JSONField(default=dict, blank=True)
+
     # Fiscal snapshot at the time totals were computed (see apps.fiscal.vat).
     vat_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     prices_include_vat = models.BooleanField(default=False)
@@ -252,6 +266,13 @@ class Order(TimeStampedModel):
             models.Index(fields=["restaurant", "status"]),
             models.Index(fields=["restaurant", "created_at"]),
             models.Index(fields=["order_number"]),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["restaurant", "source", "external_id"],
+                condition=~models.Q(external_id=""),
+                name="order_external_id_unique_per_source",
+            ),
         ]
 
     def __str__(self):

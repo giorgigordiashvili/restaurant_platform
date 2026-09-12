@@ -61,6 +61,10 @@ class TenantAdminSite(UnfoldAdminSite):
         "shiftsreport": "analytics",
         "reservationsreport": "analytics",
         "reviewsreport": "analytics",
+        # Delivery
+        "deliveryplatformspage": "settings",
+        "deliveryplatformevent": "orders",
+        "platformmenusync": "settings",
         # Fiscal
         "fiscalsettingspage": "fiscal",
         "fiscaldocument": "fiscal",

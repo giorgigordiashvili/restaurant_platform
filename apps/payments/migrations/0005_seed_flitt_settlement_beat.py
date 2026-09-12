@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
             "payments",
             "0004_alter_bogtransaction_flow_type_flitttransaction_and_more",
         ),
-        ("django_celery_beat", "0001_initial"),
+        ("django_celery_beat", "0019_alter_periodictasks_options"),
     ]
 
     operations = [migrations.RunPython(seed, unseed)]

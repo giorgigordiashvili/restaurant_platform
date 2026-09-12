@@ -84,6 +84,7 @@ LOCAL_APPS = [
     "apps.reports",
     "apps.printing",
     "apps.fiscal",
+    "apps.delivery",
 ]
 
 INSTALLED_APPS = UNFOLD_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -609,6 +610,13 @@ PRINT_BRIDGE_LONG_POLL_SECONDS = config("PRINT_BRIDGE_LONG_POLL_SECONDS", defaul
 # Fiscal providers: "none" numbers documents locally; add {"code": "dotted.path.Provider"} when a live one exists.
 FISCAL_DEFAULT_PROVIDER = config("FISCAL_DEFAULT_PROVIDER", default="none")
 FISCAL_PROVIDERS = {}
+# Glovo Partners API (one integration token + one webhook auth value per integrator; a link may override).
+GLOVO_API_TOKEN = config("GLOVO_API_TOKEN", default="")
+GLOVO_WEBHOOK_TOKEN = config("GLOVO_WEBHOOK_TOKEN", default="")
+GLOVO_AUTH_SCHEME = config("GLOVO_AUTH_SCHEME", default="")
+GLOVO_BASE_URL_STAGE = config("GLOVO_BASE_URL_STAGE", default="https://stageapi.glovoapp.com")
+GLOVO_BASE_URL_PROD = config("GLOVO_BASE_URL_PROD", default="https://api.glovoapp.com")
+GLOVO_PRICES_IN_MINOR_UNITS = config("GLOVO_PRICES_IN_MINOR_UNITS", default=True, cast=bool)
 
 # Logging Configuration
 LOGGING = {

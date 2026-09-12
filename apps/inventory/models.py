@@ -524,6 +524,15 @@ class RestaurantDeliveryPlatform(TimeStampedModel):
     is_enabled = models.BooleanField(default=True)
     store_external_id = models.CharField(max_length=100, blank=True, default="", help_text="Your store id there.")
     credentials_encrypted = models.TextField(blank=True, default="")
+    webhook_token = models.CharField(max_length=64, blank=True, default="", db_index=True)
+    menu_token = models.CharField(
+        max_length=64, blank=True, default="", help_text="Unguessable part of the public menu URL."
+    )
+    auto_accept = models.BooleanField(default=True, help_text="Platform orders go straight to the kitchen.")
+    prep_time_minutes = models.PositiveSmallIntegerField(default=20)
+    last_menu_sync_at = models.DateTimeField(null=True, blank=True)
+    last_menu_sync_status = models.CharField(max_length=20, blank=True, default="")
+    sandbox = models.BooleanField(default=True, help_text="Use the platform's stage environment.")
 
     class Meta:
         db_table = "inventory_delivery_platforms"

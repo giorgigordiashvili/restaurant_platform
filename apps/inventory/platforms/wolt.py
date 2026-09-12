@@ -1,10 +1,3 @@
-from .base import PlatformAdapter
+"""Kept for imports; the adapter now lives in apps.delivery.wolt.adapter."""
 
-
-class WoltAdapter(PlatformAdapter):
-    """Placeholder for the Wolt Merchant API integration."""
-
-    code = "wolt"
-
-    def set_item_availability(self, link, menu_item, available, *, task=None):
-        raise NotImplementedError("Wolt API sync is not implemented yet.")
+from apps.delivery.wolt.adapter import WoltAdapter  # noqa: F401

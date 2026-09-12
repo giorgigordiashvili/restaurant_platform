@@ -1,0 +1,95 @@
+"""
+Hand-written fixtures modelled on the public Glovo Partners docs. NOT
+recorded from live traffic; see apps/delivery/glovo/__init__.py "VERIFY ON STAGE".
+"""
+
+import json
+from pathlib import Path
+
+import pytest
+
+FIXTURES = Path(__file__).parent / "fixtures" / "glovo"
+
+
+class FakeResponse:
+    def __init__(self, status_code, body):
+        self.status_code = status_code
+        self._body = body
+        self.text = json.dumps(body) if body is not None else ""
+
+    def json(self):
+        if self._body is None:
+            raise ValueError("no body")
+        return self._body
+
+    @property
+    def ok(self):
+        return self.status_code < 400
+
+
+class FakeSession:
+    """Replays (status, body) responses in order and records every call."""
+
+    def __init__(self, *responses):
+        self.calls = []
+        self.queue = list(responses)
+
+    def request(self, method, url, json=None, headers=None, timeout=None):
+        self.calls.append({"method": method, "url": url, "json": json, "headers": headers})
+        status, body = self.queue.pop(0) if self.queue else (202, {"transactionId": "tx-auto"})
+        return FakeResponse(status, body)
+
+
+@pytest.fixture
+def glovo_fixture():
+    def load(name):
+        return json.loads((FIXTURES / f"{name}.json").read_text())
+
+    return load
+
+
+@pytest.fixture
+def delivery_restaurant(restaurant):
+    restaurant.delivery_enabled = True
+    restaurant.accepts_remote_orders = True
+    restaurant.cash_enabled = False
+    restaurant.save(update_fields=["delivery_enabled", "accepts_remote_orders", "cash_enabled"])
+    return restaurant
+
+
+@pytest.fixture
+def glovo_link(delivery_restaurant):
+    from apps.delivery.models import RestaurantDeliveryPlatform
+
+    link = RestaurantDeliveryPlatform(
+        restaurant=delivery_restaurant,
+        platform="glovo",
+        is_enabled=True,
+        store_external_id="store-1",
+        webhook_token="tok",
+        menu_token="mt",
+        auto_accept=True,
+        sandbox=True,
+    )
+    link.set_credentials({"api_token": "x-token"})
+    link.save()
+    return link
+
+
+@pytest.fixture
+def fake_glovo(monkeypatch):
+    """Inject a FakeSession into every GlovoClient built through build_client."""
+    from apps.delivery.config import resolve_glovo_config
+    from apps.delivery.glovo import client as client_module
+
+    session = FakeSession()
+
+    def _build(link, session=None):
+        return client_module.GlovoClient(resolve_glovo_config(link), session=session or _build.session)
+
+    _build.session = session
+    monkeypatch.setattr("apps.delivery.glovo.client.build_client", _build)
+    monkeypatch.setattr("apps.delivery.services.build_client", _build, raising=False)
+    monkeypatch.setattr("apps.delivery.tasks.build_client", _build)
+    monkeypatch.setattr("apps.delivery.glovo.adapter.build_client", _build)
+    return session
