@@ -246,16 +246,28 @@ class TenantAwareModelAdmin(TenantSimulatorMixin, ExportMixin, UnfoldModelAdmin)
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         """
         Filter foreign key choices based on tenant context.
-        Only applies when simulating a restaurant.
+
+        Superusers get the full list unless they are simulating a restaurant.
+        Anyone else (restaurant owners are is_staff and can reach this site)
+        only ever sees their own restaurants, and rows belonging to them.
         """
+        related = db_field.related_model
+        restaurant_ids = None
+
         if request.user.is_superuser:
             simulated = request.session.get("admin_simulated_restaurant")
             if simulated:
-                # Filter related objects by simulated restaurant
-                if hasattr(db_field.related_model, "restaurant"):
-                    kwargs["queryset"] = db_field.related_model.objects.filter(restaurant_id=simulated)
-                elif hasattr(db_field.related_model, "restaurant_id"):
-                    kwargs["queryset"] = db_field.related_model.objects.filter(restaurant_id=simulated)
+                restaurant_ids = [simulated]
+        else:
+            restaurant_ids = list(
+                StaffMember.objects.filter(user=request.user, is_active=True).values_list("restaurant_id", flat=True)
+            )
+
+        if restaurant_ids is not None and "queryset" not in kwargs:
+            if related is Restaurant:
+                kwargs["queryset"] = Restaurant.objects.filter(pk__in=restaurant_ids)
+            elif any(f.name == "restaurant" for f in related._meta.get_fields()):
+                kwargs["queryset"] = related._default_manager.filter(restaurant_id__in=restaurant_ids)
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 

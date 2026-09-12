@@ -34,7 +34,7 @@ so the fields below then edit that translation.
         </nav>
 
         <div class="text-sm text-base-500 dark:text-base-400">
-            {% translate "Fill in the name and description in one language, save, then pick the next tab." %}
+            {% translate "Fill in this language, save, then pick the next tab. Option rows left blank keep showing their existing text." %}
             {% if language_tabs.current_is_translated and language_tabs.allow_deletion %}
                 {% for url, name, code, status in language_tabs %}{% if status == "current" %}
                     · <a href="./delete-translation/{{ code }}/" class="text-red-600 hover:underline dark:text-red-500">{% translate "Remove this translation" %}</a>

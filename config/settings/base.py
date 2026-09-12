@@ -207,7 +207,11 @@ PARLER_LANGUAGES = {
         {"code": "ru"},
     ),
     "default": {
-        "fallbacks": ["ka"],
+        # Fall back through every language, not just Georgian. Staff can now
+        # create a row in any language first, so a menu item that only has an
+        # English name must still render (and not raise TranslationDoesNotExist)
+        # for a Georgian or Russian visitor -- and in admin changelists.
+        "fallbacks": ["ka", "en", "ru"],
         "hide_untranslated": False,
     },
 }

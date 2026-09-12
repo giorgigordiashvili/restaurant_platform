@@ -30,7 +30,7 @@ class MenuCategoryAdmin(TenantAwareTranslatableAdmin):
 
     tenant_field = "restaurant"
 
-    list_display = ["name", "restaurant", "display_order", "is_active", "items_count"]
+    list_display = ["name", "all_languages_column", "restaurant", "display_order", "is_active", "items_count"]
     list_filter = ["is_active"]
     search_fields = ["translations__name", "restaurant__name"]
     ordering = ["restaurant", "display_order"]
@@ -72,8 +72,10 @@ class MenuItemAdmin(TenantAwareTranslatableAdmin):
     inlines = [MenuItemModifierGroupInline]
     actions = ["export_as_csv", "export_as_json", make_active, make_inactive]
 
+    # Translated fields are ordinary form fields to parler and must be listed
+    # like any other; leaving them out yields a form with no name at all.
     fieldsets = (
-        (None, {"fields": ("restaurant", "category", "price", "image")}),
+        (None, {"fields": ("name", "description", "restaurant", "category", "price", "image")}),
         ("Availability", {"fields": ("is_available", "is_featured", "display_order")}),
         ("Preparation", {"fields": ("preparation_time_minutes", "preparation_station")}),
         (

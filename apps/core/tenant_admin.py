@@ -11,6 +11,7 @@ from django.contrib import admin
 
 from parler.admin import TranslatableAdmin, TranslatableTabularInline
 from parler.forms import TranslatableModelForm
+from parler.utils.views import get_language_parameter
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
 from unfold.admin import TabularInline as UnfoldTabularInline
 
@@ -56,6 +57,104 @@ from apps.reviews.models import Review, ReviewReport
 from apps.staff.models import StaffInvitation, StaffMember, StaffRole
 from apps.tables.models import Table, TableQRCode, TableSection, TableSession
 from apps.tenants.models import Restaurant, RestaurantHours
+
+
+def staff_permissions(request):
+    """Effective role permissions of request.user at request.restaurant ({} if none)."""
+    restaurant = getattr(request, "restaurant", None)
+    if not restaurant or not request.user.is_authenticated:
+        return {}
+    if request.user.is_superuser:
+        return {"*": ["create", "read", "update", "delete"]}
+    try:
+        staff = request.user.staff_memberships.get(restaurant=restaurant, is_active=True)
+        return staff.get_effective_permissions()
+    except Exception:
+        return {}
+
+
+def has_resource_permission(request, resource, action):
+    """Role-based check used by every tenant admin and inline."""
+    if not resource:
+        return request.user.is_superuser
+    permissions = staff_permissions(request)
+    if "*" in permissions:
+        return True
+    resource_perms = permissions.get(resource, [])
+    return action in resource_perms or "*" in resource_perms
+
+
+class TenantInlineMixin:
+    """
+    Role-based permissions for inlines on the tenant admin.
+
+    Django gates every inline on model-level auth permissions
+    (``menu.change_modifier`` ...), which restaurant staff never hold -- they
+    are authorised through StaffMember roles. Without this the whole inline is
+    silently dropped for them: no option rows under a modifier group, no
+    modifier groups on a menu item, and rows they do post are discarded with
+    no error. Put this mixin *first* so it wins over the Django defaults.
+    """
+
+    permission_resource = None
+    # Which role action each admin operation needs. Override where adding or
+    # removing rows is really just editing the parent (e.g. opening hours are
+    # part of "settings", which only grants read/update).
+    permission_actions = {"view": "read", "add": "create", "change": "update", "delete": "delete"}
+
+    def _allowed(self, request, operation):
+        return has_resource_permission(request, self.permission_resource, self.permission_actions[operation])
+
+    def has_view_permission(self, request, obj=None):
+        return self._allowed(request, "view")
+
+    def has_add_permission(self, request, obj=None):
+        return self._allowed(request, "add")
+
+    def has_change_permission(self, request, obj=None):
+        return self._allowed(request, "change")
+
+    def has_delete_permission(self, request, obj=None):
+        return self._allowed(request, "delete")
+
+
+class OptionalTranslationInlineForm(TranslatableModelForm):
+    """
+    Inline row form for translatable children (modifier options).
+
+    The language tabs reload the whole page in one language, so on the English
+    tab every existing option shows its (still empty) English name. Parler
+    would then reject the save until *all* of them are filled in. Here an
+    existing row left blank simply gets no translation in that language --
+    customers see the fallback -- while a brand-new row still needs a name.
+    """
+
+    @property
+    def _is_existing_row(self):
+        # Not ``instance.pk``: these models have UUID keys with a default, so an
+        # unsaved row already carries one. ``_state.adding`` is the truth.
+        return not self.instance._state.adding
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self._is_existing_row:
+            for name in self._translated_fields:
+                self.fields[name].required = False
+
+    def save_translated_fields(self):
+        if self._is_existing_row and all(self.cleaned_data.get(name) in (None, "") for name in self._translated_fields):
+            return
+        super().save_translated_fields()
+
+
+class TenantLanguageDefaultMixin:
+    """Open forms on the restaurant's own default language instead of always Georgian."""
+
+    def _language(self, request, obj=None):
+        restaurant = getattr(request, "restaurant", None)
+        return get_language_parameter(
+            request, self.query_language_key, default=getattr(restaurant, "default_language", None)
+        )
 
 
 class TenantForeignKeyScopingMixin:
@@ -134,32 +233,11 @@ class TenantModelAdmin(TenantForeignKeyScopingMixin, UnfoldModelAdmin):
 
     def _get_staff_permissions(self, request):
         """Get the current user's staff permissions for this restaurant."""
-        restaurant = getattr(request, "restaurant", None)
-        if not restaurant:
-            return {}
-
-        if request.user.is_superuser:
-            return {"*": ["create", "read", "update", "delete"]}
-
-        try:
-            staff = request.user.staff_memberships.get(restaurant=restaurant, is_active=True)
-            return staff.get_effective_permissions()
-        except Exception:
-            return {}
+        return staff_permissions(request)
 
     def _has_resource_permission(self, request, action):
         """Check if user has permission for the given action on this resource."""
-        if not self.permission_resource:
-            return request.user.is_superuser
-
-        permissions = self._get_staff_permissions(request)
-
-        # Superuser has all permissions
-        if "*" in permissions:
-            return True
-
-        resource_perms = permissions.get(self.permission_resource, [])
-        return action in resource_perms or "*" in resource_perms
+        return has_resource_permission(request, self.permission_resource, action)
 
     def has_view_permission(self, request, obj=None):
         """Check read permission."""
@@ -182,7 +260,7 @@ class TenantModelAdmin(TenantForeignKeyScopingMixin, UnfoldModelAdmin):
         return self._has_resource_permission(request, "read")
 
 
-class TenantTranslatableAdmin(TranslatableAdmin, TenantModelAdmin):
+class TenantTranslatableAdmin(TenantLanguageDefaultMixin, TranslatableAdmin, TenantModelAdmin):
     """
     Combined admin for translatable models with tenant scoping.
 
@@ -221,9 +299,10 @@ class MenuCategoryTenantAdmin(TenantTranslatableAdmin):
     ordering = ["display_order"]
 
 
-class MenuItemModifierGroupInline(TenantForeignKeyScopingMixin, UnfoldTabularInline):
+class MenuItemModifierGroupInline(TenantInlineMixin, TenantForeignKeyScopingMixin, UnfoldTabularInline):
     """Inline for linking modifier groups to menu items."""
 
+    permission_resource = "menu"
     model = MenuItemModifierGroup
     extra = 1
     ordering = ["display_order"]
@@ -270,10 +349,12 @@ class MenuItemTenantAdmin(TenantTranslatableAdmin):
         return super().get_queryset(request).select_related("category")
 
 
-class ModifierInline(TranslatableTabularInline):
+class ModifierInline(TenantInlineMixin, TenantLanguageDefaultMixin, TranslatableTabularInline):
     """Inline for adding modifiers directly within a modifier group."""
 
+    permission_resource = "menu"
     model = Modifier
+    form = OptionalTranslationInlineForm
     extra = 3  # Show 3 empty rows for quick adding
     ordering = ["display_order"]
     # Don't specify 'fields' - let parler handle the translated fields (name)
@@ -733,7 +814,7 @@ class ReservationBlockedTimeTenantAdmin(TenantModelAdmin):
 # =============================================================================
 
 
-class RestaurantHoursInline(UnfoldTabularInline):
+class RestaurantHoursInline(TenantInlineMixin, UnfoldTabularInline):
     """Inline for restaurant operating hours."""
 
     model = RestaurantHours
@@ -741,28 +822,10 @@ class RestaurantHoursInline(UnfoldTabularInline):
     max_num = 7
     ordering = ["day_of_week"]
 
-    # Tenant staff authenticate via StaffMember, not Django auth perms,
-    # so the default InlineModelAdmin permission checks (which want
-    # `tenants.view_restauranthours` etc.) return False and the whole
-    # inline silently disappears from the Restaurant edit page.
-    # Anyone with permission to edit the parent Restaurant can edit its
-    # hours — gate on that, not on model-level Django perms.
-    def _parent_editable(self, request):
-        return request.user.is_authenticated and (
-            request.user.is_superuser or getattr(request, "restaurant", None) is not None
-        )
-
-    def has_view_permission(self, request, obj=None):
-        return self._parent_editable(request)
-
-    def has_change_permission(self, request, obj=None):
-        return self._parent_editable(request)
-
-    def has_add_permission(self, request, obj=None):
-        return self._parent_editable(request)
-
-    def has_delete_permission(self, request, obj=None):
-        return self._parent_editable(request)
+    # Hours are part of the restaurant's settings: whoever may update settings
+    # may add, change or remove hour rows.
+    permission_resource = "settings"
+    permission_actions = {"view": "read", "add": "update", "change": "update", "delete": "update"}
 
 
 class RestaurantSettingsAdmin(UnfoldModelAdmin):

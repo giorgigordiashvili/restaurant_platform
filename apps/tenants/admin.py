@@ -46,7 +46,7 @@ class CityAdmin(StyledTranslatableAdmin):
     ordering = ["display_order"]
 
     fieldsets = (
-        (None, {"fields": ("slug", "country")}),
+        (None, {"fields": ("name", "slug", "country")}),
         ("Settings", {"fields": ("display_order", "is_active")}),
     )
 
@@ -71,7 +71,7 @@ class RestaurantCategoryAdmin(StyledTranslatableAdmin):
     ordering = ["display_order"]
 
     fieldsets = (
-        (None, {"fields": ("slug", "icon", "image")}),
+        (None, {"fields": ("name", "description", "slug", "icon", "image")}),
         ("Settings", {"fields": ("display_order", "is_active")}),
     )
 
@@ -96,7 +96,7 @@ class AmenityAdmin(StyledTranslatableAdmin):
     ordering = ["display_order"]
 
     fieldsets = (
-        (None, {"fields": ("slug", "icon")}),
+        (None, {"fields": ("name", "description", "slug", "icon")}),
         ("Settings", {"fields": ("display_order", "is_active")}),
     )
 
