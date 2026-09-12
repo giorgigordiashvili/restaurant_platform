@@ -4,6 +4,8 @@ Serializers for tables app.
 
 from rest_framework import serializers
 
+from drf_spectacular.utils import extend_schema_field
+
 from .models import Table, TableQRCode, TableSection, TableSession, TableSessionGuest
 
 SHARED_TABLE_LOCKED = ("number", "name", "capacity", "min_capacity", "section", "shape")
@@ -84,9 +86,11 @@ class TableQRCodeSerializer(serializers.ModelSerializer):
             "last_resolved_at",
         ]
 
+    @extend_schema_field(serializers.URLField())
     def get_qr_url(self, obj):
         return obj.get_qr_url()
 
+    @extend_schema_field(serializers.URLField(allow_null=True))
     def get_resolved_url(self, obj):
         from .qr_links import resolve
 
