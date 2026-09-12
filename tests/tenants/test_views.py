@@ -198,3 +198,11 @@ class TestRestaurantCreateView:
         }
         response = authenticated_client.post(self.url, data, format="json")
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+def test_public_restaurant_detail_never_exposes_owner(api_client, restaurant):
+    """The owner's account (email, phone, name) is not public information."""
+    body = api_client.get(f"/api/v1/restaurants/{restaurant.slug}/").json()
+    assert "owner" not in body
+    assert restaurant.owner.email not in api_client.get(f"/api/v1/restaurants/{restaurant.slug}/").content.decode()

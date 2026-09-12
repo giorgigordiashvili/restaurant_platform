@@ -155,7 +155,6 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
     operating_hours = RestaurantHoursSerializer(many=True, read_only=True)
     is_open_now = serializers.SerializerMethodField()
     full_address = serializers.SerializerMethodField()
-    owner = UserSerializer(read_only=True)
     venue = serializers.SerializerMethodField()
     category = RestaurantCategorySerializer(read_only=True)
     amenities = AmenitySerializer(many=True, read_only=True)
@@ -170,7 +169,6 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
             "category",
             "amenities",
             "is_active",
-            "owner",
             "venue",
             # Contact
             "email",
@@ -219,7 +217,6 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id",
             "slug",
-            "owner",
             "average_rating",
             "total_reviews",
             "total_orders",
