@@ -79,6 +79,7 @@ urlpatterns = [
     path("api/v1/auth/", include("apps.accounts.urls")),
     path("api/v1/users/", include("apps.accounts.urls_users")),
     path("api/v1/restaurants/", include("apps.tenants.urls")),
+    path("api/v1/venues/", include("apps.venues.urls")),
     path("api/v1/menu/", include("apps.menu.urls")),
     path("api/v1/tables/", include("apps.tables.urls")),
     path("api/v1/orders/", include("apps.orders.urls")),
@@ -92,6 +93,7 @@ urlpatterns = [
     path("api/v1/staff/", include("apps.staff.urls")),
     # Dashboard API (tenant-scoped)
     path("api/v1/dashboard/settings/", include("apps.tenants.urls_dashboard")),
+    path("api/v1/dashboard/venue/", include("apps.venues.urls_dashboard")),
     path("api/v1/dashboard/staff/", include("apps.staff.urls_dashboard")),
     path("api/v1/dashboard/menu/", include("apps.menu.urls_dashboard")),
     path("api/v1/dashboard/tables/", include("apps.tables.urls_dashboard")),

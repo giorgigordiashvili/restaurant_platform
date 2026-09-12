@@ -4,7 +4,9 @@ Table models for restaurant table management and QR code ordering.
 
 import secrets
 
+from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
@@ -26,10 +28,30 @@ class TableSection(TimeStampedModel):
     display_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
+    # Set when this section mirrors a shared venue section (see apps.venues).
+    venue_section = models.ForeignKey(
+        "venues.VenueSection",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="mirrors",
+    )
+
+    @property
+    def venue_managed(self):
+        return self.venue_section_id is not None
+
     class Meta:
         db_table = "table_sections"
         ordering = ["display_order", "name"]
         unique_together = ["restaurant", "name"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["restaurant", "venue_section"],
+                condition=Q(venue_section__isnull=False),
+                name="uniq_section_mirror_per_member",
+            )
+        ]
         verbose_name = _("Table Section")
         verbose_name_plural = _("Table Sections")
 
@@ -108,10 +130,32 @@ class Table(TimeStampedModel):
         default="square",
     )
 
+    # Set when this table mirrors a shared venue table (see apps.venues). The
+    # venue registry owns number/name/capacity/shape; status and position stay
+    # this restaurant's own.
+    venue_table = models.ForeignKey(
+        "venues.VenueTable",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="mirrors",
+    )
+
+    @property
+    def venue_managed(self):
+        return self.venue_table_id is not None
+
     class Meta:
         db_table = "tables"
         ordering = ["section__display_order", "number"]
         unique_together = ["restaurant", "number"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["restaurant", "venue_table"],
+                condition=Q(venue_table__isnull=False),
+                name="uniq_mirror_per_member",
+            )
+        ]
         verbose_name = _("Table")
         verbose_name_plural = _("Tables")
         indexes = [
@@ -189,40 +233,18 @@ class TableQRCode(TimeStampedModel):
             self.generate_qr_image()
 
     def get_qr_url(self):
-        """Get the URL that the QR code should point to."""
-        restaurant = self.table.restaurant
-        # URL format: https://aimenu.ge/restaurant/{slug}?table={code}
-        return f"https://aimenu.ge/restaurant/{restaurant.slug}?table={self.code}"
+        """URL the QR code points to: {FRONTEND_BASE_URL}/restaurant/{slug}?table={code}."""
+        base = settings.FRONTEND_BASE_URL.rstrip("/")
+        return f"{base}/restaurant/{self.table.restaurant.slug}?table={self.code}"
 
     def generate_qr_image(self):
         """Generate and save QR code image."""
-        import io
-
         from django.core.files.base import ContentFile
 
-        import qrcode
+        from .qr import render_qr_png
 
-        # Create QR code
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_H,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(self.get_qr_url())
-        qr.make(fit=True)
-
-        # Create image
-        img = qr.make_image(fill_color="black", back_color="white")
-
-        # Save to buffer
-        buffer = io.BytesIO()
-        img.save(buffer, format="PNG")
-        buffer.seek(0)
-
-        # Save to model
         filename = f"qr_{self.table.restaurant.slug}_{self.table.number}_{self.code[:8]}.png"
-        self.qr_image.save(filename, ContentFile(buffer.read()), save=True)
+        self.qr_image.save(filename, ContentFile(render_qr_png(self.get_qr_url())), save=True)
 
     def record_scan(self):
         """Record a QR code scan."""
@@ -316,6 +338,11 @@ class TableSession(TimeStampedModel):
 
     def __str__(self):
         return f"Session at {self.table} ({self.started_at.strftime('%Y-%m-%d %H:%M')})"
+
+    @property
+    def restaurant(self):
+        """The restaurant this session belongs to (through its table)."""
+        return self.table.restaurant
 
     def close(self):
         """Close this session."""

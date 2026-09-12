@@ -3,6 +3,7 @@ Views for tables app.
 """
 
 from rest_framework import generics, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,6 +12,7 @@ from drf_spectacular.utils import extend_schema
 
 from apps.core.middleware.tenant import require_restaurant
 from apps.core.permissions import IsTenantManager
+from apps.venues.services import venue_for_table
 
 from .models import Table, TableQRCode, TableSection, TableSession, TableSessionGuest
 from .serializers import (
@@ -139,6 +141,15 @@ class TableValidateView(APIView):
             "restaurant_slug": restaurant.slug,
         }
 
+        # Shared venue context (None for ordinary tables). Lets a QR printed
+        # for one restaurant land on the venue page listing every member.
+        venue, venue_table = venue_for_table(table)
+        data["venue"] = (
+            {"slug": venue.slug, "name": venue.name, "table_code": venue_table.code, "table_number": venue_table.number}
+            if venue
+            else None
+        )
+
         return Response({"success": True, "data": data})
 
 
@@ -172,6 +183,13 @@ class TableSectionDetailView(generics.RetrieveUpdateDestroyAPIView):
     @require_restaurant
     def get_queryset(self):
         return TableSection.objects.filter(restaurant=self.request.restaurant)
+
+    def perform_destroy(self, instance):
+        if instance.venue_managed:
+            raise ValidationError(
+                {"detail": "Shared sections are managed by the venue layout; leave the venue to unlink them."}
+            )
+        super().perform_destroy(instance)
 
 
 @extend_schema(tags=["Dashboard - Tables"])
@@ -232,6 +250,13 @@ class TableDetailView(generics.RetrieveUpdateDestroyAPIView):
             .select_related("section")
             .prefetch_related("qr_codes")
         )
+
+    def perform_destroy(self, instance):
+        if instance.venue_managed:
+            raise ValidationError(
+                {"detail": "Shared tables are managed by the venue layout; leave the venue to unlink them."}
+            )
+        super().perform_destroy(instance)
 
 
 @extend_schema(tags=["Dashboard - Tables"])

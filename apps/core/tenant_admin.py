@@ -7,7 +7,13 @@ checked against the user's StaffRole.
 """
 
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q
+from django.shortcuts import redirect
+from django.urls import path
+from django.utils.html import format_html
+from django.views.decorators.http import require_POST
 
 from parler.admin import TranslatableAdmin, TranslatableTabularInline
 from parler.forms import TranslatableModelForm
@@ -57,6 +63,8 @@ from apps.reviews.models import Review, ReviewReport
 from apps.staff.models import StaffInvitation, StaffMember, StaffRole
 from apps.tables.models import Table, TableQRCode, TableSection, TableSession
 from apps.tenants.models import Restaurant, RestaurantHours
+from apps.venues import services as venue_services
+from apps.venues.models import VenueShareRequest
 
 
 def staff_permissions(request):
@@ -462,6 +470,263 @@ class ModifierTenantAdmin(TenantTranslatableAdmin):
 
 
 # =============================================================================
+# Shared venue (food hall) Admin
+# =============================================================================
+
+
+class VenueInviteForm(forms.Form):
+    to_restaurant = forms.SlugField(label="Restaurant slug", help_text="The part before .admin.aimenu.ge")
+    venue_name = forms.CharField(label="Venue name", max_length=150, required=False)
+    message = forms.CharField(label="Message", widget=forms.Textarea(attrs={"rows": 2}), required=False)
+
+
+class VenueAcceptForm(forms.Form):
+    layout = forms.ChoiceField(
+        choices=[
+            (venue_services.LAYOUT_OURS, "Use our sections & tables"),
+            (venue_services.LAYOUT_THEIRS, "Use theirs"),
+        ],
+        required=False,
+    )
+    venue_name = forms.CharField(max_length=150, required=False)
+
+
+class VenueTableForm(forms.Form):
+    number = forms.CharField(max_length=20)
+    name = forms.CharField(max_length=100, required=False)
+    capacity = forms.IntegerField(min_value=1, initial=4)
+    min_capacity = forms.IntegerField(min_value=1, initial=1)
+    shape = forms.ChoiceField(
+        choices=[("square", "Square"), ("round", "Round"), ("rectangle", "Rectangle")], initial="square"
+    )
+    section = forms.UUIDField(required=False)
+
+
+class VenueShareRequestTenantAdmin(TenantModelAdmin):
+    """
+    The "Shared venue" page: current venue, its tables, incoming/outgoing
+    share requests and the invite form. The stock add/change forms are
+    disabled -- they would render selects listing every restaurant on the
+    platform. Everything goes through apps.venues.services, same as the REST
+    endpoints under /api/v1/dashboard/venue/.
+    """
+
+    permission_resource = "settings"
+    restaurant_field = None
+    list_display = ["direction_display", "other_restaurant", "venue_name", "status", "created_at"]
+    list_filter = ["status"]
+    ordering = ["-created_at"]
+    change_list_template = "admin/venues/venuesharerequest/change_list.html"
+
+    def get_queryset(self, request):
+        restaurant = getattr(request, "restaurant", None)
+        qs = super().get_queryset(request).select_related("from_restaurant", "to_restaurant")
+        if not restaurant:
+            return qs.none()
+        return qs.filter(Q(from_restaurant=restaurant) | Q(to_restaurant=restaurant))
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def add_view(self, request, form_url="", extra_context=None):
+        raise PermissionDenied
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        raise PermissionDenied
+
+    @admin.display(description="Direction")
+    def direction_display(self, obj):
+        return "Incoming" if obj.to_restaurant_id == self._restaurant_id else "Outgoing"
+
+    @admin.display(description="Restaurant")
+    def other_restaurant(self, obj):
+        return obj.from_restaurant if obj.to_restaurant_id == self._restaurant_id else obj.to_restaurant
+
+    _restaurant_id = None
+
+    def changelist_view(self, request, extra_context=None):
+        self._restaurant_id = getattr(request.restaurant, "pk", None)
+        extra_context = dict(extra_context or {})
+        extra_context.update(self._page_context(request))
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def _can(self, request, action):
+        return has_resource_permission(request, "tables", action)
+
+    def _page_context(self, request):
+        restaurant = request.restaurant
+        membership = venue_services.get_membership(restaurant)
+        venue = membership.venue if membership and membership.venue.is_active else None
+        pending = VenueShareRequest.objects.filter(status=VenueShareRequest.STATUS_PENDING).select_related(
+            "from_restaurant", "to_restaurant"
+        )
+        incoming = [
+            {"obj": r, "layout_options": venue_services.layout_options(r)}
+            for r in pending.filter(to_restaurant=restaurant)
+        ]
+        tables, sections, local = [], [], {}
+        if venue:
+            sections = list(venue.sections.filter(is_active=True))
+            tables = list(venue.tables.select_related("section").order_by("section__display_order", "number"))
+            local = {t.venue_table_id: t for t in Table.objects.filter(restaurant=restaurant, venue_table__in=tables)}
+        return {
+            "venue": venue,
+            "membership": membership,
+            "members": list(venue.active_memberships()) if venue else [],
+            "venue_sections": sections,
+            "venue_tables": [(t, local.get(t.pk)) for t in tables],
+            "incoming_requests": incoming,
+            "outgoing_requests": list(pending.filter(from_restaurant=restaurant)),
+            "can_manage": self._can(request, "create"),
+            "can_leave": self._can(request, "delete") and venue is not None,
+            "invite_form": VenueInviteForm(),
+            "table_form": VenueTableForm(),
+            "layout_ours": venue_services.LAYOUT_OURS,
+            "layout_theirs": venue_services.LAYOUT_THEIRS,
+        }
+
+    # --- POST-only actions, all redirecting back to this page
+
+    def get_urls(self):
+        wrap = self.admin_site.admin_view
+        custom = [
+            path("invite/", wrap(require_POST(self.invite_view)), name="venues_venuesharerequest_invite"),
+            path(
+                "<uuid:object_id>/accept/", wrap(require_POST(self.accept_view)), name="venues_venuesharerequest_accept"
+            ),
+            path(
+                "<uuid:object_id>/decline/",
+                wrap(require_POST(self.decline_view)),
+                name="venues_venuesharerequest_decline",
+            ),
+            path(
+                "<uuid:object_id>/cancel/", wrap(require_POST(self.cancel_view)), name="venues_venuesharerequest_cancel"
+            ),
+            path("leave/", wrap(require_POST(self.leave_view)), name="venues_venuesharerequest_leave"),
+            path("tables/add/", wrap(require_POST(self.table_add_view)), name="venues_venuesharerequest_table_add"),
+            path(
+                "tables/<uuid:table_id>/deactivate/",
+                wrap(require_POST(self.table_deactivate_view)),
+                name="venues_venuesharerequest_table_deactivate",
+            ),
+        ]
+        return custom + super().get_urls()
+
+    def _back(self):
+        return redirect(f"{self.admin_site.name}:venues_venuesharerequest_changelist")
+
+    def _guard(self, request, action="create"):
+        if not getattr(request, "restaurant", None) or not self._can(request, action):
+            raise PermissionDenied
+
+    def _fail(self, request, exc):
+        messages.error(request, exc.message)
+        return self._back()
+
+    def invite_view(self, request):
+        self._guard(request)
+        form = VenueInviteForm(request.POST)
+        if not form.is_valid():
+            messages.error(request, "; ".join(f"{k}: {', '.join(v)}" for k, v in form.errors.items()))
+            return self._back()
+        try:
+            req = venue_services.send_share_request(
+                request.restaurant,
+                form.cleaned_data["to_restaurant"],
+                request.user,
+                venue_name=form.cleaned_data["venue_name"],
+                message=form.cleaned_data["message"],
+            )
+        except venue_services.VenueError as exc:
+            return self._fail(request, exc)
+        messages.success(request, f"Request sent to {req.to_restaurant.name}.")
+        return self._back()
+
+    def accept_view(self, request, object_id):
+        self._guard(request)
+        form = VenueAcceptForm(request.POST)
+        form.is_valid()
+        try:
+            venue, summary = venue_services.accept_share_request(
+                object_id,
+                request.restaurant,
+                request.user,
+                layout=form.cleaned_data.get("layout") or None,
+                venue_name=form.cleaned_data.get("venue_name", ""),
+            )
+        except venue_services.VenueError as exc:
+            return self._fail(request, exc)
+        messages.success(
+            request,
+            f"You now share tables at {venue.name}: {summary.created} table(s) added, {summary.linked} linked.",
+        )
+        return self._back()
+
+    def decline_view(self, request, object_id):
+        self._guard(request)
+        try:
+            venue_services.decline_share_request(object_id, request.restaurant, request.user)
+        except venue_services.VenueError as exc:
+            return self._fail(request, exc)
+        messages.success(request, "Request declined.")
+        return self._back()
+
+    def cancel_view(self, request, object_id):
+        self._guard(request)
+        try:
+            venue_services.cancel_share_request(object_id, request.restaurant, request.user)
+        except venue_services.VenueError as exc:
+            return self._fail(request, exc)
+        messages.success(request, "Request cancelled.")
+        return self._back()
+
+    def leave_view(self, request):
+        self._guard(request, "delete")
+        try:
+            venue_services.leave_venue(request.restaurant)
+        except venue_services.VenueError as exc:
+            return self._fail(request, exc)
+        messages.success(request, "You left the shared venue. Your tables are now your own again.")
+        return self._back()
+
+    def table_add_view(self, request):
+        self._guard(request)
+        membership = venue_services.get_membership(request.restaurant)
+        if membership is None:
+            raise PermissionDenied
+        form = VenueTableForm(request.POST)
+        if not form.is_valid():
+            messages.error(request, "; ".join(f"{k}: {', '.join(v)}" for k, v in form.errors.items()))
+            return self._back()
+        fields = dict(form.cleaned_data)
+        section_id = fields.pop("section", None)
+        fields["section"] = membership.venue.sections.filter(pk=section_id).first() if section_id else None
+        try:
+            vt, summary = venue_services.create_venue_table(membership.venue, **fields)
+        except venue_services.VenueError as exc:
+            return self._fail(request, exc)
+        messages.success(request, f"Table {vt.number} added to every restaurant at {membership.venue.name}.")
+        return self._back()
+
+    def table_deactivate_view(self, request, table_id):
+        self._guard(request)
+        membership = venue_services.get_membership(request.restaurant)
+        vt = membership.venue.tables.filter(pk=table_id).first() if membership else None
+        if vt is None:
+            raise PermissionDenied
+        skipped = venue_services.deactivate_venue_table(vt)
+        note = f" (kept active at {', '.join(skipped)}: session in progress)" if skipped else ""
+        messages.success(request, f"Table {vt.number} retired{note}.")
+        return self._back()
+
+
+# =============================================================================
 # Orders Admin
 # =============================================================================
 
@@ -561,36 +826,101 @@ class OrderStatusHistoryTenantAdmin(TenantModelAdmin):
 # =============================================================================
 
 
-class TableSectionTenantAdmin(TenantModelAdmin):
+class SharedRowsFilter(admin.SimpleListFilter):
+    title = "shared venue"
+    parameter_name = "shared"
+    link_field = "venue_table"
+
+    def lookups(self, request, model_admin):
+        return [("yes", "Shared (venue)"), ("no", "Own")]
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return queryset.filter(**{f"{self.link_field}__isnull": False})
+        if self.value() == "no":
+            return queryset.filter(**{f"{self.link_field}__isnull": True})
+        return queryset
+
+
+class SharedSectionsFilter(SharedRowsFilter):
+    link_field = "venue_section"
+
+
+class VenueManagedRowsMixin:
+    """
+    Rows mirrored from a shared venue: layout fields are read-only here (they
+    are edited on the Shared venue page), the venue link never shows, and the
+    row cannot be deleted -- leaving the venue unlinks it instead.
+    """
+
+    locked_fields = ()
+    link_field = ""
+
+    @admin.display(description="Shared")
+    def shared_badge(self, obj):
+        if getattr(obj, self.link_field + "_id", None):
+            return format_html(
+                '<span class="bg-primary-100 text-primary-700 dark:bg-primary-500/20 dark:text-primary-400 '
+                'inline-flex items-center px-2 py-0.5 rounded-default text-xs font-semibold">Shared (venue)</span>'
+            )
+        return ""
+
+    def get_readonly_fields(self, request, obj=None):
+        fields = list(super().get_readonly_fields(request, obj))
+        if obj is not None and getattr(obj, self.link_field + "_id", None):
+            fields += [f for f in self.locked_fields if f not in fields]
+        return fields
+
+    def get_exclude(self, request, obj=None):
+        exclude = list(super().get_exclude(request, obj) or [])
+        if self.link_field not in exclude:
+            exclude.append(self.link_field)
+        return exclude
+
+    def has_delete_permission(self, request, obj=None):
+        if obj is not None and getattr(obj, self.link_field + "_id", None):
+            return False
+        return super().has_delete_permission(request, obj)
+
+    def delete_queryset(self, request, queryset):
+        super().delete_queryset(request, queryset.filter(**{f"{self.link_field}__isnull": True}))
+
+
+class TableSectionTenantAdmin(VenueManagedRowsMixin, TenantModelAdmin):
     """Admin for table sections."""
 
     permission_resource = "tables"
-    list_display = ["name", "display_order", "is_active"]
-    list_filter = ["is_active"]
+    link_field = "venue_section"
+    locked_fields = ("name",)
+    list_display = ["name", "shared_badge", "display_order", "is_active"]
+    list_filter = ["is_active", SharedSectionsFilter]
     list_editable = ["display_order", "is_active"]
     search_fields = ["name"]
     ordering = ["display_order"]
 
 
-class TableTenantAdmin(TenantModelAdmin):
+class TableTenantAdmin(VenueManagedRowsMixin, TenantModelAdmin):
     """Admin for tables."""
 
     permission_resource = "tables"
+    link_field = "venue_table"
+    locked_fields = ("number", "name", "capacity", "min_capacity", "section", "shape")
     list_display = [
         "number",
+        "shared_badge",
         "name",
         "section",
         "capacity",
         "status",
         "is_active",
     ]
-    list_filter = ["status", "is_active", "section", "shape"]
+    list_filter = ["status", "is_active", "section", "shape", SharedRowsFilter]
     list_editable = ["status", "is_active"]
     search_fields = ["number", "name"]
     ordering = ["section__display_order", "number"]
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related("section")
+        return super().get_queryset(request).select_related("section", "venue_table")
 
 
 class TableQRCodeTenantAdmin(TenantModelAdmin):
@@ -1016,6 +1346,7 @@ tenant_admin_site.register(Modifier, ModifierTenantAdmin)
 tenant_admin_site.register(TableSection, TableSectionTenantAdmin)
 tenant_admin_site.register(Table, TableTenantAdmin)
 tenant_admin_site.register(TableQRCode, TableQRCodeTenantAdmin)
+tenant_admin_site.register(VenueShareRequest, VenueShareRequestTenantAdmin)
 tenant_admin_site.register(TableSession, TableSessionTenantAdmin)
 
 # Staff

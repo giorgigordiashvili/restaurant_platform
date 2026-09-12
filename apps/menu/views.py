@@ -38,7 +38,8 @@ class PublicMenuView(APIView):
     def get(self, request, slug):
         try:
             restaurant = Restaurant.objects.get(slug=slug, is_active=True)
-            serializer = FullMenuSerializer(restaurant)
+            # instance= is required: without it DRF returns get_initial(), i.e. an empty menu.
+            serializer = FullMenuSerializer(restaurant, instance=restaurant)
             return Response(
                 {
                     "success": True,

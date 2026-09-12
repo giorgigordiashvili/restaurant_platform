@@ -84,6 +84,14 @@ class RestaurantHoursSerializer(serializers.ModelSerializer):
         return obj.get_day_of_week_display()
 
 
+def venue_ref(restaurant):
+    """{slug, name} of the shared venue this restaurant belongs to, or None."""
+    membership = getattr(restaurant, "venue_membership", None)
+    if membership is None or not membership.venue.is_active:
+        return None
+    return {"slug": membership.venue.slug, "name": membership.venue.name}
+
+
 class RestaurantListSerializer(serializers.ModelSerializer):
     """Minimal serializer for restaurant lists."""
 
@@ -91,6 +99,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
     category = RestaurantCategorySerializer(read_only=True)
     amenities = AmenitySerializer(many=True, read_only=True)
     city_obj = serializers.SerializerMethodField()
+    venue = serializers.SerializerMethodField()
 
     class Meta:
         model = Restaurant
@@ -98,6 +107,7 @@ class RestaurantListSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "slug",
+            "venue",
             "description",
             "logo",
             "logo_blurhash",
@@ -117,6 +127,9 @@ class RestaurantListSerializer(serializers.ModelSerializer):
 
     def get_is_open_now(self, obj):
         return obj.is_open_now
+
+    def get_venue(self, obj):
+        return venue_ref(obj)
 
     def get_city_obj(self, obj):
         if not obj.city_obj_id:
@@ -143,6 +156,7 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
     is_open_now = serializers.SerializerMethodField()
     full_address = serializers.SerializerMethodField()
     owner = UserSerializer(read_only=True)
+    venue = serializers.SerializerMethodField()
     category = RestaurantCategorySerializer(read_only=True)
     amenities = AmenitySerializer(many=True, read_only=True)
 
@@ -157,6 +171,7 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
             "amenities",
             "is_active",
             "owner",
+            "venue",
             # Contact
             "email",
             "phone",
@@ -217,6 +232,9 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
 
     def get_full_address(self, obj):
         return obj.full_address
+
+    def get_venue(self, obj):
+        return venue_ref(obj)
 
 
 class RestaurantCreateSerializer(serializers.ModelSerializer):

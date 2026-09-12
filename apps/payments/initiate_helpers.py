@@ -304,6 +304,8 @@ def create_pending_reservation(request, payload: dict[str, Any]) -> ReservationI
                 special_instructions=item_payload.get("special_instructions", ""),
             )
             for modifier in item_payload.get("modifier_ids", []):
+                if modifier.group.restaurant_id != restaurant.id:
+                    raise ValueError("One or more modifiers don't belong to this restaurant.")
                 OrderItemModifier.objects.create(
                     order_item=order_item,
                     modifier=modifier,

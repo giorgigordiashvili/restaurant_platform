@@ -245,17 +245,17 @@ class TestMenuTranslations:
 
     def test_full_menu_includes_translations(self, api_client, restaurant, menu_category, menu_item):
         """Test that full menu response includes all translations."""
-        url = f"/api/v1/restaurants/{restaurant.slug}/menu/full/"
+        url = f"/api/v1/restaurants/{restaurant.slug}/menu/"
         response = api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
 
-        if "categories" in response.data and len(response.data["categories"]) > 0:
-            category_data = response.data["categories"][0]
-            assert "translations" in category_data["category"]
-
-            if len(category_data["items"]) > 0:
-                item = category_data["items"][0]
-                assert "translations" in item
+        menu = response.data["data"]["menu"]
+        # Regression: the serializer used to be built without instance= and
+        # returned an empty dict, so this endpoint served no menu at all.
+        assert menu["categories"], menu
+        category_data = menu["categories"][0]
+        assert "translations" in category_data["category"]
+        assert category_data["items"] and "translations" in category_data["items"][0]
 
     def test_menu_with_language_parameter(self, api_client, restaurant, menu_item):
         """Test menu endpoint with language parameter."""

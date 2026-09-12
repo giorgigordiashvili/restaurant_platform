@@ -53,6 +53,11 @@ class TenantAdminSite(UnfoldAdminSite):
         # Payments
         "payment": "payments",
         "refund": "payments",
+        # Shared venue (food hall): the page lives under settings; registry rows under tables.
+        "venuesharerequest": "settings",
+        "venue": "settings",
+        "venuetable": "tables",
+        "venuesection": "tables",
         # Loyalty — piggybacks on the menu-manager permission bucket.
         "loyaltyprogram": "menu",
         "loyaltycounter": "menu",

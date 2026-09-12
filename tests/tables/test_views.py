@@ -85,9 +85,9 @@ class TestTableValidateView:
         assert response.status_code == status.HTTP_200_OK
 
         # Active session should be included
-        assert "active_session" in response.data["data"]
-        if response.data["data"]["active_session"]:
-            session = response.data["data"]["active_session"]
+        assert "session" in response.data["data"]
+        if response.data["data"]["session"]:
+            session = response.data["data"]["session"]
             assert "id" in session
             assert "invite_code" in session
 

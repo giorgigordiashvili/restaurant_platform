@@ -316,6 +316,8 @@ class InitiatePaymentView(APIView):
             )
 
             for modifier in item_payload.get("modifier_ids", []):
+                if modifier.group.restaurant_id != restaurant.id:
+                    raise ValueError("One or more modifiers don't belong to this restaurant.")
                 OrderItemModifier.objects.create(
                     order_item=order_item,
                     modifier=modifier,

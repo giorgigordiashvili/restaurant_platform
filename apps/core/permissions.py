@@ -140,3 +140,21 @@ class AllowAny(BasePermission):
 
     def has_permission(self, request, view):
         return True
+
+
+def staff_can(request, resource, action):
+    """
+    Same rule as HasStaffPermission, callable outside a view: the owner may do
+    anything; otherwise the active StaffMember's role must grant the action.
+    """
+    restaurant = getattr(request, "restaurant", None)
+    user = getattr(request, "user", None)
+    if not restaurant or user is None or not user.is_authenticated:
+        return False
+    if restaurant.owner_id == user.pk:
+        return True
+    try:
+        staff = user.staff_memberships.get(restaurant=restaurant, is_active=True)
+        return action in staff.role.permissions.get(resource, [])
+    except Exception:
+        return False

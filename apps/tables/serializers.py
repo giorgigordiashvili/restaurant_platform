@@ -6,11 +6,27 @@ from rest_framework import serializers
 
 from .models import Table, TableQRCode, TableSection, TableSession, TableSessionGuest
 
+SHARED_TABLE_LOCKED = ("number", "name", "capacity", "min_capacity", "section", "shape")
+SHARED_SECTION_LOCKED = ("name",)
+
+
+def _reject_locked_changes(serializer, attrs, locked, what):
+    """Mirrors of a venue registry row keep their layout fields read-only."""
+    instance = serializer.instance
+    if instance is None or not instance.venue_managed:
+        return
+    for field in locked:
+        if field in attrs and attrs[field] != getattr(instance, field):
+            raise serializers.ValidationError(
+                {field: f"Shared {what} are managed by the venue layout; change it on the Shared venue page."}
+            )
+
 
 class TableSectionSerializer(serializers.ModelSerializer):
     """Serializer for table sections."""
 
     tables_count = serializers.SerializerMethodField()
+    is_shared = serializers.BooleanField(source="venue_managed", read_only=True)
 
     class Meta:
         model = TableSection
@@ -21,8 +37,13 @@ class TableSectionSerializer(serializers.ModelSerializer):
             "display_order",
             "is_active",
             "tables_count",
+            "is_shared",
         ]
         read_only_fields = ["id"]
+
+    def validate(self, attrs):
+        _reject_locked_changes(self, attrs, SHARED_SECTION_LOCKED, "sections")
+        return attrs
 
     def get_tables_count(self, obj):
         return obj.tables.filter(is_active=True).count()
@@ -50,6 +71,7 @@ class TableSerializer(serializers.ModelSerializer):
     section_name = serializers.CharField(source="section.name", read_only=True)
     qr_codes = TableQRCodeSerializer(many=True, read_only=True)
     display_name = serializers.CharField(read_only=True)
+    is_shared = serializers.BooleanField(source="venue_managed", read_only=True)
 
     class Meta:
         model = Table
@@ -68,8 +90,14 @@ class TableSerializer(serializers.ModelSerializer):
             "position_y",
             "shape",
             "qr_codes",
+            "is_shared",
+            "venue_table",
         ]
-        read_only_fields = ["id", "display_name"]
+        read_only_fields = ["id", "display_name", "venue_table"]
+
+    def validate(self, attrs):
+        _reject_locked_changes(self, attrs, SHARED_TABLE_LOCKED, "tables")
+        return attrs
 
 
 class TableCreateSerializer(serializers.ModelSerializer):

@@ -11,7 +11,7 @@ import uuid
 
 from django.conf import settings
 
-from rest_framework import generics, status
+from rest_framework import generics, serializers, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -409,3 +409,55 @@ class FacebookDataDeletionView(APIView):
             {"url": status_url, "confirmation_code": confirmation_code},
             status=status.HTTP_200_OK,
         )
+
+
+class MyRestaurantSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    slug = serializers.CharField()
+    name = serializers.CharField()
+    logo = serializers.CharField(allow_null=True)
+    role = serializers.CharField()
+    is_owner = serializers.BooleanField()
+    venue = serializers.DictField(allow_null=True)
+
+
+@extend_schema(tags=["Users"], responses={200: MyRestaurantSerializer(many=True)})
+class MyRestaurantsView(APIView):
+    """
+    Restaurants the current user can work in: owned ones plus active staff
+    memberships. Lets the POS offer a picker instead of a typed slug -- the
+    same person often runs a restaurant and the shared bar next to it.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        from apps.staff.models import StaffMember
+        from apps.tenants.models import Restaurant
+        from apps.tenants.serializers import venue_ref
+
+        rows = {}
+        owned = Restaurant.objects.filter(owner=request.user, is_active=True).select_related("venue_membership__venue")
+        for r in owned:
+            rows[r.pk] = (r, "owner", True)
+        memberships = (
+            StaffMember.objects.filter(user=request.user, is_active=True, restaurant__is_active=True)
+            .select_related("restaurant", "role", "restaurant__venue_membership__venue")
+            .order_by("restaurant__name")
+        )
+        for m in memberships:
+            if m.restaurant_id not in rows:
+                rows[m.restaurant_id] = (m.restaurant, m.role.name if m.role_id else "staff", False)
+        data = [
+            {
+                "id": str(r.pk),
+                "slug": r.slug,
+                "name": r.name,
+                "logo": request.build_absolute_uri(r.logo.url) if r.logo else None,
+                "role": role,
+                "is_owner": is_owner,
+                "venue": venue_ref(r),
+            }
+            for r, role, is_owner in sorted(rows.values(), key=lambda t: t[0].name.lower())
+        ]
+        return Response({"success": True, "data": data})

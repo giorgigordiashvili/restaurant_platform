@@ -1,0 +1,149 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% comment %}
+"Shared venue" page for restaurant managers. Everything posts to the admin
+views on VenueShareRequestTenantAdmin, which call apps.venues.services -- the
+same code path as /api/v1/dashboard/venue/. The stock changelist below it
+doubles as the request history.
+{% endcomment %}
+
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4 mb-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-3 py-1.5 text-sm w-full" %}
+
+<div class="mb-6" data-testid="shared-venue-page">
+
+  {# ------------------------------------------------ current venue #}
+  <div class="{{ base }}">
+    {% if venue %}
+      <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">{{ venue.name }}</h2>
+          <p class="text-sm text-base-500">{% translate "Shared venue" %} · {{ venue_tables|length }} {% translate "shared tables" %}</p>
+        </div>
+        {% if can_leave %}
+        <form method="post" action="{% url 'tenant_admin:venues_venuesharerequest_leave' %}" onsubmit="return confirm('{% translate "Leave this venue? Your tables stay, but stop being shared." %}')">
+          {% csrf_token %}
+          <button type="submit" class="{{ btn2 }} text-red-600 dark:text-red-500">{% translate "Leave venue" %}</button>
+        </form>
+        {% endif %}
+      </div>
+
+      <h3 class="mt-4 mb-2 text-sm font-semibold uppercase text-base-500">{% translate "Restaurants at this venue" %}</h3>
+      <ul class="flex flex-wrap gap-2">
+        {% for m in members %}
+          <li class="inline-flex items-center gap-2 px-3 py-1.5 rounded-default border border-base-200 dark:border-base-800">
+            {% if m.restaurant.logo %}<img src="{{ m.restaurant.logo.url }}" alt="" class="w-6 h-6 rounded-full object-cover">{% endif %}
+            <span>{{ m.restaurant.name }}</span>
+            {% if m.restaurant_id == request.restaurant.id %}<span class="text-xs text-base-500">({% translate "you" %})</span>{% endif %}
+            {% if m.is_layout_seed %}<span class="text-xs text-base-500">· {% translate "layout seed" %}</span>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      <h3 class="mt-4 mb-2 text-sm font-semibold uppercase text-base-500">{% translate "Shared tables" %}</h3>
+      <div class="overflow-x-auto">
+      <table class="w-full text-sm" data-testid="venue-tables">
+        <thead><tr class="text-left text-base-500">
+          <th class="py-1 pr-3">{% translate "Number" %}</th><th class="py-1 pr-3">{% translate "Name" %}</th><th class="py-1 pr-3">{% translate "Section" %}</th>
+          <th class="py-1 pr-3">{% translate "Seats" %}</th><th class="py-1 pr-3">{% translate "Venue QR" %}</th><th class="py-1 pr-3">{% translate "Your table" %}</th><th></th>
+        </tr></thead>
+        <tbody>
+        {% for vt, local in venue_tables %}
+          <tr class="border-t border-base-200 dark:border-base-800 {% if not vt.is_active %}opacity-50{% endif %}">
+            <td class="py-1 pr-3 font-medium">{{ vt.number }}</td>
+            <td class="py-1 pr-3">{{ vt.name }}</td>
+            <td class="py-1 pr-3">{{ vt.section.name|default:"—" }}</td>
+            <td class="py-1 pr-3">{{ vt.min_capacity }}–{{ vt.capacity }}</td>
+            <td class="py-1 pr-3">
+              {% if vt.qr_image %}<a href="{{ vt.qr_image.url }}" download class="text-primary-600 hover:underline">{% translate "Download" %}</a>{% endif %}
+              <span class="block text-xs text-base-500 break-all">{{ vt.get_qr_url }}</span>
+            </td>
+            <td class="py-1 pr-3">{% if local %}<a href="{% url 'tenant_admin:tables_table_change' local.pk %}" class="text-primary-600 hover:underline">{{ local.number }}</a>{% else %}—{% endif %}</td>
+            <td class="py-1">
+              {% if can_manage and vt.is_active %}
+              <form method="post" action="{% url 'tenant_admin:venues_venuesharerequest_table_deactivate' vt.pk %}" onsubmit="return confirm('{% translate "Retire this table at every restaurant?" %}')">{% csrf_token %}<button type="submit" class="text-xs text-red-600 hover:underline">{% translate "Retire" %}</button></form>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="py-2 text-base-500">{% translate "No shared tables yet." %}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+
+      {% if can_manage %}
+      <form method="post" action="{% url 'tenant_admin:venues_venuesharerequest_table_add' %}" class="mt-4 grid gap-2 md:grid-cols-6 items-end" data-testid="add-table-form">
+        {% csrf_token %}
+        <label class="text-sm">{% translate "Number" %}<input name="number" required class="{{ input }}"></label>
+        <label class="text-sm">{% translate "Name" %}<input name="name" class="{{ input }}"></label>
+        <label class="text-sm">{% translate "Seats" %}<input name="capacity" type="number" min="1" value="4" class="{{ input }}"></label>
+        <label class="text-sm">{% translate "Min" %}<input name="min_capacity" type="number" min="1" value="1" class="{{ input }}"></label>
+        <label class="text-sm">{% translate "Section" %}
+          <select name="section" class="{{ input }}"><option value="">—</option>{% for s in venue_sections %}<option value="{{ s.pk }}">{{ s.name }}</option>{% endfor %}</select>
+        </label>
+        <input type="hidden" name="shape" value="square">
+        <button type="submit" class="{{ btn }}">{% translate "Add shared table" %}</button>
+      </form>
+      <p class="mt-1 text-xs text-base-500">{% translate "A new shared table appears in every restaurant's table list. Tables only you use can still be added under Tables." %}</p>
+      {% endif %}
+    {% else %}
+      <h2 class="text-lg font-semibold">{% translate "Not part of a shared venue" %}</h2>
+      <p class="text-sm text-base-500">{% translate "If other restaurants serve the same tables as you (a food hall), invite one below. Your menus, orders and staff stay private; only the table layout is shared." %}</p>
+    {% endif %}
+  </div>
+
+  {# ------------------------------------------------ incoming #}
+  <div class="{{ base }}" data-testid="incoming-requests">
+    <h3 class="text-sm font-semibold uppercase text-base-500 mb-2">{% translate "Requests to share tables with you" %}</h3>
+    {% for item in incoming_requests %}
+      <div class="border-t border-base-200 dark:border-base-800 py-3 first:border-t-0">
+        <p><strong>{{ item.obj.from_restaurant.name }}</strong>{% if item.obj.venue_name %} · {{ item.obj.venue_name }}{% endif %}
+           <span class="text-xs text-base-500">· {{ item.obj.created_at|date:"Y-m-d" }}</span></p>
+        {% if item.obj.message %}<p class="text-sm text-base-500">{{ item.obj.message }}</p>{% endif %}
+        {% if can_manage %}
+        <form method="post" action="{% url 'tenant_admin:venues_venuesharerequest_accept' item.obj.pk %}" class="mt-2 flex flex-wrap gap-3 items-center">
+          {% csrf_token %}
+          {% if item.layout_options|length > 1 %}
+            <label class="text-sm"><input type="radio" name="layout" value="{{ layout_ours }}" checked> {% translate "Use our sections & tables" %}</label>
+            <label class="text-sm"><input type="radio" name="layout" value="{{ layout_theirs }}"> {% translate "Use theirs" %}</label>
+            <input name="venue_name" placeholder="{% translate 'Venue name' %}" value="{{ item.obj.venue_name }}" class="{{ input }} md:w-56">
+          {% else %}
+            <span class="text-sm text-base-500">{% translate "You will adopt the venue's existing table layout." %}</span>
+          {% endif %}
+          <button type="submit" class="{{ btn }}">{% translate "Accept" %}</button>
+        </form>
+        <form method="post" action="{% url 'tenant_admin:venues_venuesharerequest_decline' item.obj.pk %}" class="mt-1">{% csrf_token %}<button type="submit" class="text-sm text-red-600 hover:underline">{% translate "Decline" %}</button></form>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p class="text-sm text-base-500">{% translate "None." %}</p>
+    {% endfor %}
+  </div>
+
+  {# ------------------------------------------------ outgoing + invite #}
+  <div class="{{ base }}" data-testid="outgoing-requests">
+    <h3 class="text-sm font-semibold uppercase text-base-500 mb-2">{% translate "Your pending invitations" %}</h3>
+    {% for r in outgoing_requests %}
+      <div class="flex items-center justify-between border-t border-base-200 dark:border-base-800 py-2 first:border-t-0">
+        <span>{{ r.to_restaurant.name }} <span class="text-xs text-base-500">· {% translate "expires" %} {{ r.expires_at|date:"Y-m-d" }}</span></span>
+        {% if can_manage %}<form method="post" action="{% url 'tenant_admin:venues_venuesharerequest_cancel' r.pk %}">{% csrf_token %}<button type="submit" class="text-sm text-red-600 hover:underline">{% translate "Cancel" %}</button></form>{% endif %}
+      </div>
+    {% empty %}
+      <p class="text-sm text-base-500">{% translate "None." %}</p>
+    {% endfor %}
+
+    {% if can_manage %}
+    <form method="post" action="{% url 'tenant_admin:venues_venuesharerequest_invite' %}" class="mt-4 grid gap-2 md:grid-cols-3 items-end" data-testid="invite-form">
+      {% csrf_token %}
+      <label class="text-sm">{% translate "Restaurant slug" %}<input name="to_restaurant" required placeholder="e.g. tiali" class="{{ input }}"><span class="text-xs text-base-500">{% translate "the part before .admin.aimenu.ge" %}</span></label>
+      {% if not venue %}<label class="text-sm">{% translate "Venue name" %}<input name="venue_name" class="{{ input }}"></label>{% endif %}
+      <label class="text-sm">{% translate "Message" %}<input name="message" class="{{ input }}"></label>
+      <button type="submit" class="{{ btn }}">{% translate "Invite to share tables" %}</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endwith %}
+{{ block.super }}
+{% endblock %}

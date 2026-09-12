@@ -72,7 +72,11 @@ class OrderItemCreateSerializer(serializers.Serializer):
     def validate_modifier_ids(self, value):
         if not value:
             return []
-        modifiers = Modifier.objects.filter(id__in=value, is_available=True)
+        # Scoped to the restaurant: a combined venue menu makes other tenants'
+        # modifier ids visible to honest clients, never mind hostile ones.
+        modifiers = Modifier.objects.filter(
+            id__in=value, is_available=True, group__restaurant=self.context.get("restaurant")
+        )
         if len(modifiers) != len(value):
             raise serializers.ValidationError("One or more modifiers not found or unavailable.")
         return list(modifiers)
