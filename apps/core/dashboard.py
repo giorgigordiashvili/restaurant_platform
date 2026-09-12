@@ -255,6 +255,32 @@ def module_cards(request):
             "menu",
         )
 
+    if has_resource_permission(request, "analytics", "read"):
+        from apps.reports import queries
+        from apps.reports.periods import parse_period
+
+        period = parse_period({"range": "today"}, restaurant)
+        summary = queries.sales_summary(restaurant, period)
+        card(
+            None,
+            "Reports",
+            "monitoring",
+            [
+                {
+                    "label": "Sales today",
+                    "value": f"{summary['net_sales']} ₾",
+                    "url": _url("reports_salesreport_changelist"),
+                },
+                {"label": "Orders today", "value": summary["orders"], "url": _url("reports_salesreport_changelist")},
+            ],
+            [
+                _link("Sales", "reports_salesreport_changelist"),
+                _link("Menu", "reports_menureport_changelist"),
+                _link("Staff", "reports_staffreport_changelist"),
+            ],
+            "analytics",
+        )
+
     if has_resource_permission(request, "staff", "read"):
         from apps.staff.models import StaffInvitation, StaffMember
 

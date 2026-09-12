@@ -416,6 +416,7 @@ class WasteEntry(TimeStampedModel):
         ordering = ["-occurred_on", "-created_at"]
         verbose_name = _("Waste / spoilage")
         verbose_name_plural = _("Waste / spoilage / mistakes")
+        indexes = [models.Index(fields=["restaurant", "occurred_on"])]
 
     def __str__(self):
         return f"{self.get_reason_display()}: {fmt_qty(self.quantity, self.unit)} {self.stock_item}"
@@ -459,6 +460,7 @@ class EmployeeMeal(TimeStampedModel):
         ordering = ["-meal_date", "-created_at"]
         verbose_name = _("Employee meal")
         verbose_name_plural = _("Employee meals")
+        indexes = [models.Index(fields=["restaurant", "meal_date"])]
 
     def __str__(self):
         what = self.menu_item or self.stock_item

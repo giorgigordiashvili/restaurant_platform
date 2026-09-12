@@ -1,0 +1,97 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+{% comment %}
+Report page: sub-nav across reports, period picker, KPI tiles (with delta vs
+the previous period), Unfold charts, tables with CSV export. Sub-templates
+add report-specific blocks (menu engineering quadrants).
+{% endcomment %}
+
+{% block title %}{{ title }} | {{ site_title }}{% endblock %}
+{% block branding %}{% include "unfold/helpers/site_branding.html" %}{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" chip="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border" %}
+<div class="mb-6" data-testid="report-{{ report_key }}">
+
+  <div class="flex flex-wrap gap-2 mb-4" data-testid="report-nav">
+    {% for item in report_nav %}
+      <a href="{{ item.url }}?{{ query_string }}" class="{{ chip }} {% if item.key == report_key %}bg-primary-600 text-white border-primary-600{% else %}border-base-200 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800{% endif %}">{{ item.title }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="flex flex-wrap items-center gap-2 mb-4" data-testid="period-picker">
+    {% for r in ranges %}
+      <a href="{{ r.url }}" class="{{ chip }} {% if r.active %}bg-base-900 text-white border-base-900 dark:bg-base-100 dark:text-base-900{% else %}border-base-200 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800{% endif %}">{{ r.label }}</a>
+    {% endfor %}
+    <form method="get" class="flex items-center gap-2 ml-2">
+      <input type="hidden" name="range" value="custom">
+      <input type="date" name="from" value="{{ period.start_date|date:'Y-m-d' }}" class="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-2 py-1 text-sm">
+      <span class="text-base-500">–</span>
+      <input type="date" name="to" value="{{ period.end_date|date:'Y-m-d' }}" class="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-2 py-1 text-sm">
+      <button type="submit" class="{{ chip }} border-base-200 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800">{% translate "Apply" %}</button>
+    </form>
+    <span class="text-sm text-base-500 ml-auto">{{ period.label }} · {{ period.tz }}</span>
+  </div>
+
+  {% for notice in notices %}
+    <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-default px-3 py-2 mb-4">{{ notice }}</p>
+  {% endfor %}
+
+  {% if kpis %}
+  <div class="grid gap-3 grid-cols-2 md:grid-cols-4 mb-6" data-testid="kpis">
+    {% for k in kpis %}
+    <div class="{{ base }}">
+      <p class="text-xs uppercase text-base-500">{{ k.label }}</p>
+      <p class="text-2xl font-semibold">{% if k.kind == "money" %}{{ k.value|floatformat:2 }} ₾{% elif k.kind == "percent" %}{{ k.value }} %{% else %}{{ k.value }}{% endif %}</p>
+      {% if k.delta is not None %}
+        <p class="text-xs {% if k.delta >= 0 %}text-green-600{% else %}text-red-600{% endif %}">{% if k.delta >= 0 %}▲{% else %}▼{% endif %} {{ k.delta }} % {% translate "vs previous period" %}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% block report_body %}{% endblock %}
+
+  {% if charts %}
+  <div class="grid gap-4 lg:grid-cols-2 mb-6" data-testid="charts">
+    {% for c in charts %}
+    <div class="{{ base }}">
+      <h3 class="text-sm font-semibold uppercase text-base-500 mb-2">{{ c.title }}</h3>
+      {% if c.type == "line" %}
+        {% include "unfold/components/chart/line.html" with data=c.data height=220 %}
+      {% else %}
+        {% include "unfold/components/chart/bar.html" with data=c.data height=220 %}
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% for t in tables %}
+  <div class="{{ base }} mb-4 overflow-x-auto" data-testid="table-{{ t.key }}">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-sm font-semibold uppercase text-base-500">{{ t.title }}</h3>
+      <a href="{{ export_url|cut:'TABLE' }}{{ t.key }}.csv?{{ query_string }}" class="text-sm text-primary-600 hover:underline">{% translate "Export CSV" %}</a>
+    </div>
+    {% if t.note %}<p class="text-xs text-base-500 mb-2">{{ t.note }}</p>{% endif %}
+    <table class="w-full text-sm">
+      <thead><tr class="text-left text-base-500">{% for key, label in t.columns %}<th class="py-1 pr-4 font-medium">{{ label }}</th>{% endfor %}</tr></thead>
+      <tbody>
+        {% for row in t.cells %}
+        <tr class="border-t border-base-200 dark:border-base-800">
+          {% for key, value, kind in row %}
+            <td class="py-1.5 pr-4 {% if kind != "text" %}tabular-nums{% endif %}">{% if kind == "money" %}{{ value|floatformat:2 }}{% elif kind == "percent" %}{{ value }} %{% elif value is None %}—{% else %}{{ value }}{% endif %}</td>
+          {% endfor %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="{{ t.columns|length }}" class="py-3 text-base-500">{% translate "Nothing in this period." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endfor %}
+</div>
+{% endwith %}
+{% endblock %}

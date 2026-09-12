@@ -53,6 +53,14 @@ class TenantAdminSite(UnfoldAdminSite):
         "reservationsettings": "reservations",
         "reservationblockedtime": "reservations",
         "reservationhistory": "reservations",
+        # Reports (proxy models in apps.reports)
+        "salesreport": "analytics",
+        "menureport": "analytics",
+        "foodcostreport": "analytics",
+        "staffreport": "analytics",
+        "shiftsreport": "analytics",
+        "reservationsreport": "analytics",
+        "reviewsreport": "analytics",
         # Cash & payments
         "payment": "cash",
         "refund": "cash",

@@ -81,6 +81,7 @@ LOCAL_APPS = [
     "apps.referrals",
     "apps.venues",
     "apps.inventory",
+    "apps.reports",
 ]
 
 INSTALLED_APPS = UNFOLD_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

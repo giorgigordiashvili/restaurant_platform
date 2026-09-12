@@ -44,6 +44,13 @@ ICONS = {
     "cashshift": "point_of_sale",
     "payment": "payments",
     "discountreason": "sell",
+    "salesreport": "monitoring",
+    "menureport": "restaurant_menu",
+    "foodcostreport": "savings",
+    "staffreport": "groups",
+    "shiftsreport": "point_of_sale",
+    "reservationsreport": "event_seat",
+    "reviewsreport": "reviews",
     "staffmember": "badge",
     "staffinvitation": "mail",
     "staffrole": "admin_panel_settings",
@@ -100,6 +107,18 @@ def navigation(request):
         items = [i for i in items if i]
         if items:
             groups.append({"title": m.title, "separator": True, "items": items})
+
+    if has_resource_permission(request, "analytics", "read"):
+        from apps.reports.tenant_admin import REPORTS
+
+        items = [
+            _model_item(site, "reports", model._meta.model_name, title)
+            for _key, title, model, module in REPORTS
+            if not module or modules.is_enabled(restaurant, module)
+        ]
+        items = [i for i in items if i]
+        if items:
+            groups.append({"title": "Reports", "separator": True, "items": items})
 
     groups.append(
         {
