@@ -69,6 +69,11 @@ class TenantAdminSite(UnfoldAdminSite):
         "fiscalsettingspage": "fiscal",
         "fiscaldocument": "fiscal",
         "fiscalprofile": "fiscal",
+        # Timekeeping / activity
+        "timeentry": "timekeeping",
+        "rotashift": "timekeeping",
+        "hoursreport": "analytics",
+        "activityfeed": "staff",
         # Purchasing
         "purchaseorder": "warehouse",
         "supplier": "warehouse",

@@ -9,6 +9,7 @@ from apps.orders.models import Order, OrderItem
 from apps.payments.models import CashShift
 from apps.reservations.models import Reservation
 from apps.reviews.models import Review
+from apps.timekeeping.models import TimeEntry
 
 
 class SalesReport(Order):
@@ -65,3 +66,11 @@ class ReviewsReport(Review):
         app_label = "reports"
         verbose_name = "Reviews"
         verbose_name_plural = "Reviews"
+
+
+class HoursReport(TimeEntry):
+    class Meta:
+        proxy = True
+        app_label = "reports"
+        verbose_name = "Hours"
+        verbose_name_plural = "Hours"

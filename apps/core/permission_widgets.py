@@ -22,6 +22,7 @@ RESOURCE_LABELS = {
     "warehouse_logs": _("Warehouse logs (waste, meals)"),
     "cash": _("Cash & payments"),
     "fiscal": _("Fiscal & VAT"),
+    "timekeeping": _("Timekeeping & rota"),
     "staff": _("Staff"),
     "settings": _("Settings"),
     "analytics": _("Analytics"),
@@ -39,6 +40,11 @@ HINTS = {
         "delete": _("Refunds"),
     },
     "orders": {"update": _("Change status, add items, void items")},
+    "timekeeping": {
+        "create": _("Clock in / out"),
+        "read": _("See the rota and who is in"),
+        "update": _("Edit entries, plan and publish the rota"),
+    },
 }
 
 

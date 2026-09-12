@@ -50,6 +50,11 @@ class AuditLog(TimeStampedModel):
         ("po_send", _("Purchase order sent")),
         ("po_receive", _("Purchase order received")),
         ("po_cancel", _("Purchase order cancelled")),
+        ("clock_in", _("Clocked in")),
+        ("clock_out", _("Clocked out")),
+        ("clock_edit", _("Time entry edited")),
+        ("rota_publish", _("Rota published")),
+        ("price_change", _("Price changed")),
     ]
 
     # Actor
@@ -95,3 +100,12 @@ class AuditLog(TimeStampedModel):
 
     def __str__(self):
         return f"{self.action} by {self.user_email} at {self.created_at}"
+
+
+class ActivityFeed(AuditLog):
+    """Proxy: the 'Activity' page managers see in the tenant admin (who did what)."""
+
+    class Meta:
+        proxy = True
+        verbose_name = _("Activity")
+        verbose_name_plural = _("Activity")

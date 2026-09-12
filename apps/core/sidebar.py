@@ -46,6 +46,10 @@ ICONS = {
     "payment": "payments",
     "discountreason": "sell",
     "deliveryplatformspage": "delivery_dining",
+    "timeentry": "timer",
+    "rotashift": "calendar_month",
+    "hoursreport": "schedule",
+    "activityfeed": "history",
     "purchaseorder": "local_shipping",
     "supplier": "storefront",
     "promotion": "sell",
@@ -142,6 +146,7 @@ def navigation(request):
                     _model_item(site, "staff", "staffmember", _("Members")),
                     _model_item(site, "staff", "staffinvitation", _("Invitations")),
                     _model_item(site, "staff", "staffrole", _("Roles")),
+                    _model_item(site, "audit", "activityfeed", _("Activity")),
                 )
                 if i
             ],

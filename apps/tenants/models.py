@@ -334,6 +334,10 @@ class Restaurant(TimeStampedModel):
         default=True,
         help_text=_("Reviews module: customer reviews on the restaurant page."),
     )
+    timekeeping_enabled = models.BooleanField(
+        default=False,
+        help_text="Timekeeping module: clock in / out on the POS, weekly rota, hours report.",
+    )
     purchasing_enabled = models.BooleanField(
         default=False,
         help_text="Purchasing module: suppliers, price lists, purchase orders from the buy list, receiving.",

@@ -284,6 +284,35 @@ def module_cards(request):
             "orders",
         )
 
+    if "timekeeping" in on and has_resource_permission(request, "timekeeping", "read"):
+        from apps.timekeeping import services as tk
+        from apps.timekeeping.models import RotaShift
+
+        week = tk.week_start(today)
+        card(
+            "timekeeping",
+            _("Timekeeping"),
+            "schedule",
+            [
+                {
+                    "label": _("Clocked in now"),
+                    "value": len(tk.whos_in(restaurant)),
+                    "url": _url("timekeeping_timeentry_changelist"),
+                },
+                {
+                    "label": _("Unpublished shifts this week"),
+                    "value": RotaShift.objects.filter(restaurant=restaurant, published=False, date__gte=week).count(),
+                    "url": _url("timekeeping_rotashift_changelist"),
+                },
+            ],
+            [
+                _link(_("Rota"), "timekeeping_rotashift_changelist"),
+                _link(_("Time entries"), "timekeeping_timeentry_changelist"),
+                _link(_("Hours"), "reports_hoursreport_changelist"),
+            ],
+            "timekeeping",
+        )
+
     if "purchasing" in on and has_resource_permission(request, "warehouse", "read"):
         from apps.purchasing import services as purchasing_services
 

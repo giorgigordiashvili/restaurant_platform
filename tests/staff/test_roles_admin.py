@@ -47,6 +47,7 @@ def test_role_form_renders_grid_and_round_trips(owner_admin, restaurant, staff_r
         "orders": ["read", "update"],
         "reservations": ["create"],
         "warehouse_logs": ["create", "read", "update"],  # hidden module: kept as it was
+        "timekeeping": ["create", "read"],  # hidden module: kept as it was
     }
     assert waiter.name == "waiter" and waiter.is_system_role
 

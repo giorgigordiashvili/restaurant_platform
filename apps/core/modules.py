@@ -206,6 +206,17 @@ MODULES: tuple[Module, ...] = (
         hooks=("apps.fiscal.hooks.on_module_toggled",),
     ),
     Module(
+        "timekeeping",
+        _("Timekeeping & rota"),
+        _("Clock in / out on the POS, weekly rota with reminders, hours and labour cost report."),
+        "schedule",
+        "timekeeping_enabled",
+        app_labels=("timekeeping",),
+        model_names=(("timekeeping", "rotashift"), ("timekeeping", "timeentry")),
+        resources=("timekeeping",),
+        hooks=("apps.timekeeping.hooks.on_module_toggled",),
+    ),
+    Module(
         "purchasing",
         _("Purchasing"),
         _("Suppliers with price lists, purchase orders straight from the buy list, receiving against the order."),

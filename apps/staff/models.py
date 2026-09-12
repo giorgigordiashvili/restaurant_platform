@@ -38,6 +38,7 @@ class StaffRole(TimeStampedModel):
             "warehouse_logs": ["create", "read", "update", "delete"],
             "cash": ["create", "read", "update", "delete"],
             "fiscal": ["create", "read", "update", "delete"],
+            "timekeeping": ["create", "read", "update", "delete"],
         },
         "manager": {
             "menu": ["create", "read", "update", "delete"],
@@ -51,26 +52,31 @@ class StaffRole(TimeStampedModel):
             "warehouse_logs": ["create", "read", "update", "delete"],
             "cash": ["create", "read", "update", "delete"],
             "fiscal": ["read", "update"],
+            "timekeeping": ["create", "read", "update", "delete"],
         },
         "warehouse_manager": {
+            "timekeeping": ["create", "read"],
             "menu": ["read", "update"],
             "orders": ["read"],
             "warehouse": ["create", "read", "update", "delete"],
             "warehouse_logs": ["create", "read", "update", "delete"],
         },
         "kitchen": {
+            "timekeeping": ["create", "read"],
             "menu": ["read"],
             "orders": ["read", "update"],
             "warehouse": ["read"],
             "warehouse_logs": ["create", "read", "update"],
         },
         "bar": {
+            "timekeeping": ["create", "read"],
             "menu": ["read"],
             "orders": ["read", "update"],
             "warehouse": ["read"],
             "warehouse_logs": ["create", "read", "update"],
         },
         "waiter": {
+            "timekeeping": ["create", "read"],
             "menu": ["read"],
             "orders": ["create", "read", "update"],
             "tables": ["read", "update"],
@@ -203,6 +209,9 @@ class StaffMember(TimeStampedModel):
     invited_at = models.DateTimeField(null=True, blank=True)
     joined_at = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(blank=True, help_text=_("Internal notes about this staff member"))
+    hourly_rate = models.DecimalField(
+        max_digits=8, decimal_places=2, null=True, blank=True, help_text=_("For the hours report (labour cost).")
+    )
 
     class Meta:
         db_table = "staff_members"

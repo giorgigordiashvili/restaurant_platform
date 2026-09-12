@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-12 22:38+0400\n"
+"POT-Creation-Date: 2026-09-12 22:49+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
@@ -121,27 +121,53 @@ msgstr "Заказ перенесён"
 msgid "Dish availability changed"
 msgstr "Доступность блюда изменена"
 
-#| msgid "Purchase order"
 msgid "Purchase order created"
 msgstr "Заказ поставщику создан"
 
-#| msgid "Purchase order"
 msgid "Purchase order sent"
 msgstr "Заказ поставщику отправлен"
 
-#| msgid "Purchases received"
 msgid "Purchase order received"
 msgstr "Заказ поставщику получен"
 
-#| msgid "Purchase order"
 msgid "Purchase order cancelled"
 msgstr "Заказ поставщику отменён"
+
+#| msgid "Blocked Time"
+msgid "Clocked in"
+msgstr "Начал смену"
+
+#| msgid "Blocked times"
+msgid "Clocked out"
+msgstr "Закончил смену"
+
+msgid "Time entry edited"
+msgstr "Запись рабочего времени изменена"
+
+#| msgid "Status pushed"
+msgid "Rota published"
+msgstr "График опубликован"
+
+#| msgid "Service charge"
+msgid "Price changed"
+msgstr "Цена изменена"
 
 msgid "Audit Log"
 msgstr "Запись аудита"
 
 msgid "Audit Logs"
 msgstr "Журнал аудита"
+
+#| msgid "Activate"
+msgid "Activity"
+msgstr "Активность"
+
+#| msgid "Why"
+msgid "Who"
+msgstr "Кто"
+
+msgid "system"
+msgstr "система"
 
 # Models - Orders
 msgid "Orders"
@@ -267,23 +293,39 @@ msgstr "Платформы"
 msgid "Setup guide"
 msgstr "Руководство по настройке"
 
-#| msgid "Processing"
+msgid "Timekeeping"
+msgstr "Учёт времени"
+
+#| msgid "Blocked Time"
+msgid "Clocked in now"
+msgstr "Сейчас на смене"
+
+msgid "Unpublished shifts this week"
+msgstr "Неопубликованные смены на этой неделе"
+
+msgid "Rota"
+msgstr "График"
+
+msgid "Time entries"
+msgstr "Записи рабочего времени"
+
+#| msgid "Hour"
+msgid "Hours"
+msgstr "Часы"
+
 msgid "Purchasing"
 msgstr "Закупки"
 
-#| msgid "Open alerts"
 msgid "Open orders"
 msgstr "Открытые заказы"
 
 # Dates and times
-#| msgid "today"
 msgid "Due today"
 msgstr "Ожидаются сегодня"
 
 msgid "Suppliers"
 msgstr "Поставщики"
 
-#| msgid "Purchase order"
 msgid "Purchase orders"
 msgstr "Заказы поставщикам"
 
@@ -440,6 +482,16 @@ msgstr ""
 "Профиль НДС, последовательные чеки и чеки возврата, экспорт накладных RS.ge."
 " Фискальный провайдер подключается позже."
 
+msgid "Timekeeping & rota"
+msgstr "Учёт времени и график"
+
+msgid ""
+"Clock in / out on the POS, weekly rota with reminders, hours and labour cost"
+" report."
+msgstr ""
+"Начало / конец смены в POS, недельный график с напоминаниями, отчёт по часам"
+" и затратам на персонал."
+
 msgid ""
 "Suppliers with price lists, purchase orders straight from the buy list, "
 "receiving against the order."
@@ -516,6 +568,16 @@ msgstr "Возвраты"
 
 msgid "Change status, add items, void items"
 msgstr "Смена статуса, добавление и аннулирование позиций"
+
+#| msgid "Low / out"
+msgid "Clock in / out"
+msgstr "Начало / конец смены"
+
+msgid "See the rota and who is in"
+msgstr "Просмотр графика и кто на смене"
+
+msgid "Edit entries, plan and publish the rota"
+msgstr "Правка записей, планирование и публикация графика"
 
 # Dashboard
 msgid "Dashboard"
@@ -1665,7 +1727,6 @@ msgstr "Что купить на"
 msgid "Show"
 msgstr "Показать"
 
-#| msgid "Purchase order"
 msgid "Create purchase orders"
 msgstr "Создать заказы поставщикам"
 
@@ -2643,30 +2704,24 @@ msgstr "Цены поставщиков"
 msgid "Sent to supplier"
 msgstr "Отправлен поставщику"
 
-#| msgid "Partially Refunded"
 msgid "Partially received"
 msgstr "Частично получен"
 
-#| msgid "Shown to guests on the menu."
 msgid "Shown to the supplier."
 msgstr "Показывается поставщику."
 
 msgid "Supplier invoice / waybill no."
 msgstr "№ счёта / накладной поставщика"
 
-#| msgid "Per base unit."
 msgid "Per unit."
 msgstr "За единицу."
 
-#| msgid "Purchase order"
 msgid "Purchase order line"
 msgstr "Строка заказа поставщику"
 
-#| msgid "Purchase order"
 msgid "Purchase order lines"
 msgstr "Строки заказа поставщику"
 
-#| msgid "Delivery"
 msgid "Deliver by"
 msgstr "Доставить до"
 
@@ -2676,22 +2731,18 @@ msgstr "Отправить можно только черновик."
 msgid "Add at least one line first."
 msgstr "Сначала добавьте хотя бы одну строку."
 
-#| msgid "This code is not valid."
 msgid "This order is closed."
 msgstr "Этот заказ закрыт."
 
-#| msgid "Restored (order cancelled)"
 msgid "A received order cannot be cancelled."
 msgstr "Полученный заказ нельзя отменить."
 
 msgid "(no supplier)"
 msgstr "(без поставщика)"
 
-#| msgid "Overview"
 msgid "Overdue"
 msgstr "Просрочено"
 
-#| msgid "Receive stock"
 msgid "Received this month"
 msgstr "Получено в этом месяце"
 
@@ -2713,34 +2764,27 @@ msgstr ""
 "открытым на остальное). Цены за указанную единицу; они обновляют прайс "
 "поставщика."
 
-#| msgid "Invoice / delivery note number."
 msgid "Invoice / waybill number"
 msgstr "Номер счёта / накладной"
 
-#| msgid "Order"
 msgid "Ordered"
 msgstr "Заказано"
 
-#| msgid "Order received"
 msgid "Already received"
 msgstr "Уже получено"
 
-#| msgid "Received"
 msgid "Received now"
 msgstr "Получено сейчас"
 
-#| msgid "Per base unit."
 msgid "Price / unit"
 msgstr "Цена / единица"
 
-#| msgid "Delivery"
 msgid "Book delivery"
 msgstr "Оприходовать"
 
 msgid "Lines"
 msgstr "Строки"
 
-#| msgid "Everything is at par -- nothing to buy."
 msgid "Everything is at par -- nothing to order."
 msgstr "Всё на уровне — заказывать нечего."
 
@@ -2748,7 +2792,6 @@ msgstr "Всё на уровне — заказывать нечего."
 msgid "Created %(n)d draft purchase order(s): %(numbers)s"
 msgstr "Создано черновиков: %(n)d — %(numbers)s"
 
-#| msgid "Send test"
 msgid "Send"
 msgstr "Отправить"
 
@@ -2768,7 +2811,6 @@ msgid "Text"
 msgstr "Текст"
 
 #, python-format
-#| msgid "Request cancelled."
 msgid "%(number)s cancelled."
 msgstr "%(number)s отменён."
 
@@ -2996,16 +3038,40 @@ msgstr "Структура затрат"
 msgid "Margin"
 msgstr "Маржа"
 
-#| msgid "Purchase order"
 msgid "Purchases by supplier"
 msgstr "Закупки по поставщикам"
 
-#| msgid "Delivery"
 msgid "Deliveries"
 msgstr "Поставки"
 
 msgid "Total"
 msgstr "Итого"
+
+msgid "Hours worked"
+msgstr "Отработано часов"
+
+#| msgid "Food cost"
+msgid "Labour cost"
+msgstr "Затраты на персонал"
+
+msgid "People"
+msgstr "Человек"
+
+msgid "Auto-closed entries"
+msgstr "Автоматически закрытые записи"
+
+msgid "Hours by person"
+msgstr "Часы по сотрудникам"
+
+#| msgid "Schedules"
+msgid "Scheduled"
+msgstr "По графику"
+
+msgid "Entries"
+msgstr "Записи"
+
+msgid "Rate"
+msgstr "Ставка"
 
 msgid "Servers with sales"
 msgstr "Официанты с продажами"
@@ -3240,6 +3306,9 @@ msgstr "Индивидуальные права (дополняющие)"
 msgid "Internal notes about this staff member"
 msgstr "Внутренние заметки о сотруднике"
 
+msgid "For the hours report (labour cost)."
+msgstr "Для отчёта по часам (затраты на персонал)."
+
 msgid "Staff Member"
 msgstr "Сотрудник"
 
@@ -3472,6 +3541,73 @@ msgstr "Среднее время приготовления заказа в м�
 
 msgid "Mark as closed for this day (overrides open/close times)"
 msgstr "Отметить как закрытый в этот день (перекрывает часы работы)"
+
+msgid "Admin"
+msgstr "Админ"
+
+msgid "Auto-closed"
+msgstr "Закрыто автоматически"
+
+msgid "Closed by the system after 16 hours; check it."
+msgstr "Закрыто системой через 16 часов; проверьте."
+
+msgid "Time entry"
+msgstr "Запись рабочего времени"
+
+#| msgid "Earlier than the start = the window runs past midnight."
+msgid "Earlier than the start = the shift ends after midnight."
+msgstr "Раньше начала = смена заканчивается после полуночи."
+
+#| msgid "E.g. 'Breakfast', 'Lunch', 'Happy hour'."
+msgid "E.g. 'Bar', 'Kitchen', 'Floor'."
+msgstr "Напр. «Бар», «Кухня», «Зал»."
+
+#| msgid "Cash shift"
+msgid "Rota shift"
+msgstr "Смена в графике"
+
+#| msgid "Already received"
+msgid "Already clocked in."
+msgstr "Смена уже начата."
+
+#| msgid "Not allowed."
+msgid "Not clocked in."
+msgstr "Смена не начата."
+
+#, python-format
+msgid "Your shifts for the week of %(date)s"
+msgstr "Ваши смены на неделю с %(date)s"
+
+#, python-format
+msgid "Your shift starts at %(time)s"
+msgstr "Ваша смена начинается в %(time)s"
+
+msgid "Week of"
+msgstr "Неделя с"
+
+#| msgid "Refund pushed"
+msgid "unpublished"
+msgstr "не опубликовано"
+
+#| msgid "vs previous period"
+msgid "Copy previous week"
+msgstr "Скопировать прошлую неделю"
+
+#| msgid "This week"
+msgid "Publish week"
+msgstr "Опубликовать неделю"
+
+#| msgid "Nothing sent yet."
+msgid "No active staff yet."
+msgstr "Активных сотрудников пока нет."
+
+#, python-format
+msgid "Published %(n)d shift(s) for the week of %(date)s."
+msgstr "Опубликовано смен: %(n)d на неделю с %(date)s."
+
+#, python-format
+msgid "Copied %(n)d shift(s) from the previous week."
+msgstr "Скопировано смен из прошлой недели: %(n)d."
 
 msgid "Venues"
 msgstr "Площадки"

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-12 22:38+0400\n"
+"POT-Creation-Date: 2026-09-12 22:49+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Georgian\n"
@@ -121,27 +121,53 @@ msgstr "შეკვეთა გადატანილია"
 msgid "Dish availability changed"
 msgstr "კერძის ხელმისაწვდომობა შეიცვალა"
 
-#| msgid "Purchase order"
 msgid "Purchase order created"
 msgstr "შესყიდვის შეკვეთა შეიქმნა"
 
-#| msgid "Purchase order"
 msgid "Purchase order sent"
 msgstr "შესყიდვის შეკვეთა გაიგზავნა"
 
-#| msgid "Purchases received"
 msgid "Purchase order received"
 msgstr "შესყიდვის შეკვეთა მიღებულია"
 
-#| msgid "Purchase order"
 msgid "Purchase order cancelled"
 msgstr "შესყიდვის შეკვეთა გაუქმდა"
+
+#| msgid "Blocked Time"
+msgid "Clocked in"
+msgstr "ცვლა დაიწყო"
+
+#| msgid "Blocked times"
+msgid "Clocked out"
+msgstr "ცვლა დაასრულა"
+
+msgid "Time entry edited"
+msgstr "სამუშაო დროის ჩანაწერი შეიცვალა"
+
+#| msgid "Status pushed"
+msgid "Rota published"
+msgstr "განრიგი გამოქვეყნდა"
+
+#| msgid "Service charge"
+msgid "Price changed"
+msgstr "ფასი შეიცვალა"
 
 msgid "Audit Log"
 msgstr "აუდიტის ჩანაწერი"
 
 msgid "Audit Logs"
 msgstr "აუდიტის ჟურნალი"
+
+#| msgid "Activate"
+msgid "Activity"
+msgstr "აქტივობა"
+
+#| msgid "Why"
+msgid "Who"
+msgstr "ვინ"
+
+msgid "system"
+msgstr "სისტემა"
 
 # Models - Orders
 msgid "Orders"
@@ -267,23 +293,39 @@ msgstr "პლატფორმები"
 msgid "Setup guide"
 msgstr "დაყენების გზამკვლევი"
 
-#| msgid "Processing"
+msgid "Timekeeping"
+msgstr "სამუშაო დრო"
+
+#| msgid "Blocked Time"
+msgid "Clocked in now"
+msgstr "ახლა ცვლაზე"
+
+msgid "Unpublished shifts this week"
+msgstr "გამოუქვეყნებელი ცვლები ამ კვირაში"
+
+msgid "Rota"
+msgstr "განრიგი"
+
+msgid "Time entries"
+msgstr "სამუშაო დროის ჩანაწერები"
+
+#| msgid "Hour"
+msgid "Hours"
+msgstr "საათები"
+
 msgid "Purchasing"
 msgstr "შესყიდვები"
 
-#| msgid "Open alerts"
 msgid "Open orders"
 msgstr "ღია შეკვეთები"
 
 # Dates and times
-#| msgid "today"
 msgid "Due today"
 msgstr "დღეს მოსალოდნელი"
 
 msgid "Suppliers"
 msgstr "მომწოდებლები"
 
-#| msgid "Purchase order"
 msgid "Purchase orders"
 msgstr "შესყიდვის შეკვეთები"
 
@@ -444,6 +486,16 @@ msgstr ""
 "დღგ პროფილი, თანმიმდევრული ჩეკები და დაბრუნების ჩეკები, RS.ge ზედნადებების "
 "ექსპორტი. ფისკალური პროვაიდერი მოგვიანებით დაემატება."
 
+msgid "Timekeeping & rota"
+msgstr "სამუშაო დრო და განრიგი"
+
+msgid ""
+"Clock in / out on the POS, weekly rota with reminders, hours and labour cost"
+" report."
+msgstr ""
+"ცვლის დაწყება / დასრულება POS-ში, კვირის განრიგი შეხსენებებით, საათებისა და "
+"შრომის ხარჯის ანგარიში."
+
 msgid ""
 "Suppliers with price lists, purchase orders straight from the buy list, "
 "receiving against the order."
@@ -521,6 +573,16 @@ msgstr "თანხის დაბრუნებები"
 
 msgid "Change status, add items, void items"
 msgstr "სტატუსის შეცვლა, პოზიციების დამატება, ანულირება"
+
+#| msgid "Low / out"
+msgid "Clock in / out"
+msgstr "ცვლის დაწყება / დასრულება"
+
+msgid "See the rota and who is in"
+msgstr "განრიგისა და ცვლაზე მყოფების ნახვა"
+
+msgid "Edit entries, plan and publish the rota"
+msgstr "ჩანაწერების რედაქტირება, განრიგის დაგეგმვა და გამოქვეყნება"
 
 # Dashboard
 msgid "Dashboard"
@@ -1671,7 +1733,6 @@ msgstr "რა ვიყიდოთ"
 msgid "Show"
 msgstr "ჩვენება"
 
-#| msgid "Purchase order"
 msgid "Create purchase orders"
 msgstr "შესყიდვის შეკვეთების შექმნა"
 
@@ -2652,30 +2713,24 @@ msgstr "მომწოდებლის ფასები"
 msgid "Sent to supplier"
 msgstr "გაგზავნილია მომწოდებელს"
 
-#| msgid "Partially Refunded"
 msgid "Partially received"
 msgstr "ნაწილობრივ მიღებულია"
 
-#| msgid "Shown to guests on the menu."
 msgid "Shown to the supplier."
 msgstr "მომწოდებელს უჩვენებს."
 
 msgid "Supplier invoice / waybill no."
 msgstr "მომწოდებლის ინვოისის / ზედნადების №"
 
-#| msgid "Per base unit."
 msgid "Per unit."
 msgstr "ერთეულზე."
 
-#| msgid "Purchase order"
 msgid "Purchase order line"
 msgstr "შესყიდვის შეკვეთის ხაზი"
 
-#| msgid "Purchase order"
 msgid "Purchase order lines"
 msgstr "შესყიდვის შეკვეთის ხაზები"
 
-#| msgid "Delivery"
 msgid "Deliver by"
 msgstr "მიწოდება"
 
@@ -2685,22 +2740,18 @@ msgstr "მხოლოდ მონახაზის გაგზავნა�
 msgid "Add at least one line first."
 msgstr "ჯერ დაამატეთ ერთი ხაზი მაინც."
 
-#| msgid "This code is not valid."
 msgid "This order is closed."
 msgstr "ეს შეკვეთა დახურულია."
 
-#| msgid "Restored (order cancelled)"
 msgid "A received order cannot be cancelled."
 msgstr "მიღებული შეკვეთის გაუქმება შეუძლებელია."
 
 msgid "(no supplier)"
 msgstr "(მომწოდებლის გარეშე)"
 
-#| msgid "Overview"
 msgid "Overdue"
 msgstr "ვადაგადაცილებული"
 
-#| msgid "Receive stock"
 msgid "Received this month"
 msgstr "მიღებულია ამ თვეში"
 
@@ -2721,34 +2772,27 @@ msgstr ""
 "შეიყვანეთ, რა მოვიდა. ცარიელი რაოდენობა = არ მოწოდებულა (შეკვეთა დანარჩენზე "
 "ღია რჩება). ფასები ნაჩვენებ ერთეულზეა და მომწოდებლის ფასების სიას აახლებს."
 
-#| msgid "Invoice / delivery note number."
 msgid "Invoice / waybill number"
 msgstr "ინვოისის / ზედნადების ნომერი"
 
-#| msgid "Order"
 msgid "Ordered"
 msgstr "შეკვეთილი"
 
-#| msgid "Order received"
 msgid "Already received"
 msgstr "უკვე მიღებული"
 
-#| msgid "Received"
 msgid "Received now"
 msgstr "ახლა მიღებული"
 
-#| msgid "Per base unit."
 msgid "Price / unit"
 msgstr "ფასი / ერთეული"
 
-#| msgid "Delivery"
 msgid "Book delivery"
 msgstr "მიწოდების დაფიქსირება"
 
 msgid "Lines"
 msgstr "ხაზები"
 
-#| msgid "Everything is at par -- nothing to buy."
 msgid "Everything is at par -- nothing to order."
 msgstr "ყველაფერი ნორმაშია — შესაკვეთი არაფერია."
 
@@ -2756,7 +2800,6 @@ msgstr "ყველაფერი ნორმაშია — შესაკ
 msgid "Created %(n)d draft purchase order(s): %(numbers)s"
 msgstr "შეიქმნა %(n)d მონახაზი: %(numbers)s"
 
-#| msgid "Send test"
 msgid "Send"
 msgstr "გაგზავნა"
 
@@ -2776,7 +2819,6 @@ msgid "Text"
 msgstr "ტექსტი"
 
 #, python-format
-#| msgid "Request cancelled."
 msgid "%(number)s cancelled."
 msgstr "%(number)s გაუქმებულია."
 
@@ -3004,16 +3046,40 @@ msgstr "ღირებულების განაწილება"
 msgid "Margin"
 msgstr "მარჟა"
 
-#| msgid "Purchase order"
 msgid "Purchases by supplier"
 msgstr "შესყიდვები მომწოდებლების მიხედვით"
 
-#| msgid "Delivery"
 msgid "Deliveries"
 msgstr "მიწოდებები"
 
 msgid "Total"
 msgstr "ჯამი"
+
+msgid "Hours worked"
+msgstr "ნამუშევარი საათები"
+
+#| msgid "Food cost"
+msgid "Labour cost"
+msgstr "შრომის ხარჯი"
+
+msgid "People"
+msgstr "ადამიანი"
+
+msgid "Auto-closed entries"
+msgstr "ავტომატურად დახურული ჩანაწერები"
+
+msgid "Hours by person"
+msgstr "საათები ადამიანების მიხედვით"
+
+#| msgid "Schedules"
+msgid "Scheduled"
+msgstr "დაგეგმილი"
+
+msgid "Entries"
+msgstr "ჩანაწერები"
+
+msgid "Rate"
+msgstr "განაკვეთი"
 
 msgid "Servers with sales"
 msgstr "მიმტანები გაყიდვებით"
@@ -3247,6 +3313,9 @@ msgstr "ინდივიდუალური უფლებები (და
 
 msgid "Internal notes about this staff member"
 msgstr "შიდა შენიშვნები თანამშრომელზე"
+
+msgid "For the hours report (labour cost)."
+msgstr "საათების ანგარიშისთვის (შრომის ხარჯი)."
 
 msgid "Staff Member"
 msgstr "პერსონალის წევრი"
@@ -3483,6 +3552,73 @@ msgstr "შეკვეთის მომზადების საშუა�
 
 msgid "Mark as closed for this day (overrides open/close times)"
 msgstr "ამ დღეს დახურულად მონიშვნა (გადაფარავს გახსნა/დახურვის დროს)"
+
+msgid "Admin"
+msgstr "ადმინი"
+
+msgid "Auto-closed"
+msgstr "ავტომატურად დაიხურა"
+
+msgid "Closed by the system after 16 hours; check it."
+msgstr "სისტემამ 16 საათის შემდეგ დახურა; შეამოწმეთ."
+
+msgid "Time entry"
+msgstr "სამუშაო დროის ჩანაწერი"
+
+#| msgid "Earlier than the start = the window runs past midnight."
+msgid "Earlier than the start = the shift ends after midnight."
+msgstr "დაწყებაზე ადრე = ცვლა შუაღამის შემდეგ მთავრდება."
+
+#| msgid "E.g. 'Breakfast', 'Lunch', 'Happy hour'."
+msgid "E.g. 'Bar', 'Kitchen', 'Floor'."
+msgstr "მაგ. „ბარი“, „სამზარეულო“, „დარბაზი“."
+
+#| msgid "Cash shift"
+msgid "Rota shift"
+msgstr "განრიგის ცვლა"
+
+#| msgid "Already received"
+msgid "Already clocked in."
+msgstr "ცვლა უკვე დაწყებულია."
+
+#| msgid "Not allowed."
+msgid "Not clocked in."
+msgstr "ცვლა არ არის დაწყებული."
+
+#, python-format
+msgid "Your shifts for the week of %(date)s"
+msgstr "თქვენი ცვლები %(date)s კვირისთვის"
+
+#, python-format
+msgid "Your shift starts at %(time)s"
+msgstr "თქვენი ცვლა იწყება %(time)s-ზე"
+
+msgid "Week of"
+msgstr "კვირა"
+
+#| msgid "Refund pushed"
+msgid "unpublished"
+msgstr "გამოუქვეყნებელი"
+
+#| msgid "vs previous period"
+msgid "Copy previous week"
+msgstr "წინა კვირის კოპირება"
+
+#| msgid "This week"
+msgid "Publish week"
+msgstr "კვირის გამოქვეყნება"
+
+#| msgid "Nothing sent yet."
+msgid "No active staff yet."
+msgstr "აქტიური პერსონალი ჯერ არ არის."
+
+#, python-format
+msgid "Published %(n)d shift(s) for the week of %(date)s."
+msgstr "გამოქვეყნდა %(n)d ცვლა %(date)s კვირისთვის."
+
+#, python-format
+msgid "Copied %(n)d shift(s) from the previous week."
+msgstr "წინა კვირიდან დაკოპირდა %(n)d ცვლა."
 
 msgid "Venues"
 msgstr "სივრცეები"

@@ -8,12 +8,12 @@ from django.db.models import Count
 from django.utils import timezone
 
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.core.middleware.tenant import require_restaurant
-from apps.core.permissions import IsTenantOwner
+from apps.core.permissions import IsTenantOwner, IsTenantStaff, staff_can
 
 from .models import AuditLog
 from .serializers import (
@@ -23,11 +23,25 @@ from .serializers import (
 )
 
 
+class IsOwnerOrStaffRead(BasePermission):
+    """The owner, or any active staff member whose role reads 'staff' (managers): the activity feed."""
+
+    message = "You need staff:read to see the activity feed."
+
+    def has_permission(self, request, view):
+        restaurant = getattr(request, "restaurant", None)
+        if not restaurant or not request.user.is_authenticated:
+            return False
+        if restaurant.owner_id == request.user.pk:
+            return True
+        return staff_can(request, "staff", "read")
+
+
 class DashboardAuditLogListView(generics.ListAPIView):
     """List audit logs for a restaurant (dashboard)."""
 
     serializer_class = AuditLogListSerializer
-    permission_classes = [IsAuthenticated, IsTenantOwner]
+    permission_classes = [IsAuthenticated, IsOwnerOrStaffRead]
 
     @require_restaurant
     def get_queryset(self):
@@ -68,7 +82,7 @@ class DashboardAuditLogDetailView(generics.RetrieveAPIView):
     """Get audit log detail (dashboard)."""
 
     serializer_class = AuditLogDetailSerializer
-    permission_classes = [IsAuthenticated, IsTenantOwner]
+    permission_classes = [IsAuthenticated, IsOwnerOrStaffRead]
     lookup_field = "id"
 
     @require_restaurant
@@ -79,7 +93,7 @@ class DashboardAuditLogDetailView(generics.RetrieveAPIView):
 class DashboardAuditLogStatsView(APIView):
     """Get audit log statistics for a restaurant (dashboard)."""
 
-    permission_classes = [IsAuthenticated, IsTenantOwner]
+    permission_classes = [IsAuthenticated, IsOwnerOrStaffRead]
 
     @require_restaurant
     def get(self, request):
@@ -131,7 +145,7 @@ class DashboardAuditLogStatsView(APIView):
 class DashboardAuditLogActionsView(APIView):
     """Get available audit log actions."""
 
-    permission_classes = [IsAuthenticated, IsTenantOwner]
+    permission_classes = [IsAuthenticated, IsOwnerOrStaffRead]
 
     def get(self, request):
         actions = [{"value": choice[0], "label": choice[1]} for choice in AuditLog.ACTION_CHOICES]
@@ -141,7 +155,7 @@ class DashboardAuditLogActionsView(APIView):
 class DashboardAuditLogExportView(APIView):
     """Export audit logs for a restaurant (dashboard)."""
 
-    permission_classes = [IsAuthenticated, IsTenantOwner]
+    permission_classes = [IsAuthenticated, IsOwnerOrStaffRead]
 
     @require_restaurant
     def get(self, request):

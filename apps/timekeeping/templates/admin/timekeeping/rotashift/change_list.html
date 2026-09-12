@@ -1,0 +1,48 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800" %}
+{% if days %}
+<div class="{{ base }} mb-4" data-testid="rota-week">
+  <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+    <div class="flex items-center gap-2">
+      <a href="?week={{ prev_week }}" class="{{ btn2 }}">‹</a>
+      <h3 class="font-semibold">{% translate "Week of" %} {{ monday|date:"d.m.Y" }}</h3>
+      <a href="?week={{ next_week }}" class="{{ btn2 }}">›</a>
+      {% if unpublished %}<span class="text-xs uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-700">{{ unpublished }} {% translate "unpublished" %}</span>{% endif %}
+    </div>
+    {% if can_manage %}
+    <div class="flex gap-2">
+      <form method="post" action="{{ copy_url }}">{% csrf_token %}<input type="hidden" name="week" value="{{ monday|date:'Y-m-d' }}"><button type="submit" class="{{ btn2 }}" data-testid="rota-copy">{% translate "Copy previous week" %}</button></form>
+      <form method="post" action="{{ publish_url }}">{% csrf_token %}<input type="hidden" name="week" value="{{ monday|date:'Y-m-d' }}"><button type="submit" class="{{ btn }}" data-testid="rota-publish">{% translate "Publish week" %}</button></form>
+    </div>
+    {% endif %}
+  </div>
+  <div class="overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead><tr class="text-left text-xs uppercase text-base-500"><th class="py-1 pr-3">{% translate "Person" %}</th>{% for d in days %}<th class="py-1 pr-3">{{ d|date:"D d.m" }}</th>{% endfor %}<th class="py-1 pr-3">{% translate "Hours" %}</th></tr></thead>
+    <tbody>
+    {% for row in rows %}
+      <tr class="border-t border-base-100 dark:border-base-800 align-top">
+        <td class="py-1 pr-3 font-medium">{{ row.name }}<span class="block text-xs text-base-500">{{ row.role }}</span></td>
+        {% for cell in row.cells %}
+        <td class="py-1 pr-3">
+          {% for s in cell.shifts %}
+            <a href="{% url change_url_name s.pk %}" class="block text-xs rounded px-1.5 py-0.5 mb-1 {% if s.published %}bg-green-50 text-green-800{% else %}bg-amber-50 text-amber-800{% endif %}">{{ s.start_time|time:"H:i" }}–{{ s.end_time|time:"H:i" }}{% if s.label %} · {{ s.label }}{% endif %}</a>
+          {% endfor %}
+          {% if can_manage %}<a href="{{ add_url }}?staff_member={{ row.member.pk }}&date={{ cell.date|date:'Y-m-d' }}" class="text-xs text-base-400 hover:text-primary-600">+</a>{% endif %}
+        </td>
+        {% endfor %}
+        <td class="py-1 pr-3 font-semibold">{{ row.hours }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="9" class="py-2 text-base-500">{% translate "No active staff yet." %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endif %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}

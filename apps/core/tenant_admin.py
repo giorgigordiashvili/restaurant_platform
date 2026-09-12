@@ -147,6 +147,27 @@ class MenuItemTenantAdmin(RecipeAdminMixin, TenantTranslatableAdmin):
             form.base_fields["schedule"].queryset = MenuSchedule.objects.filter(restaurant=restaurant)
         return form
 
+    def save_model(self, request, obj, form, change):
+        old_price = None
+        if change and "price" in form.changed_data:
+            old_price = MenuItem.objects.filter(pk=obj.pk).values_list("price", flat=True).first()
+        super().save_model(request, obj, form, change)
+        if old_price is not None and old_price != obj.price:
+            try:
+                from apps.audit.services import log_action
+
+                log_action(
+                    "price_change",
+                    request=request,
+                    restaurant=request.restaurant,
+                    description=f"{obj}: {old_price} -> {obj.price}",
+                    target_model="menuitem",
+                    target_id=str(obj.pk),
+                    changes={"price": {"from": str(old_price), "to": str(obj.price)}},
+                )
+            except Exception:  # pragma: no cover
+                pass
+
     def get_queryset(self, request):
         """Ensure category is also filtered."""
         return super().get_queryset(request).select_related("category")
@@ -972,7 +993,16 @@ class StaffMemberTenantAdmin(TenantModelAdmin):
     list_filter = ["role", "is_active"]
     search_fields = ["user__email", "user__first_name", "user__last_name"]
     ordering = ["-created_at"]
-    fields = ["user_display", "role", "is_active", "permissions_override", "notes", "joined_at", "invited_by"]
+    fields = [
+        "user_display",
+        "role",
+        "is_active",
+        "hourly_rate",
+        "permissions_override",
+        "notes",
+        "joined_at",
+        "invited_by",
+    ]
     readonly_fields = ["user_display", "joined_at", "invited_by"]
 
     def get_queryset(self, request):
@@ -1440,6 +1470,7 @@ class ModulesTenantAdmin(TenantModelAdmin):
 # Register all models with tenant_admin_site
 # =============================================================================
 
+from apps.audit.tenant_admin import register_audit_admin  # noqa: E402
 from apps.delivery.tenant_admin import register_delivery_admin  # noqa: E402
 from apps.fiscal.tenant_admin import register_fiscal_admin  # noqa: E402
 from apps.inventory.tenant_admin import register_inventory_admin  # noqa: E402
@@ -1449,6 +1480,7 @@ from apps.printing.tenant_admin import register_printing_admin  # noqa: E402
 from apps.promotions.tenant_admin import register_promotions_admin  # noqa: E402
 from apps.purchasing.tenant_admin import register_purchasing_admin  # noqa: E402
 from apps.reports.tenant_admin import register_reports_admin  # noqa: E402
+from apps.timekeeping.tenant_admin import register_timekeeping_admin  # noqa: E402
 
 register_inventory_admin(tenant_admin_site)
 register_payments_admin(tenant_admin_site)
@@ -1459,6 +1491,8 @@ register_delivery_admin(tenant_admin_site)
 register_notifications_admin(tenant_admin_site)
 register_promotions_admin(tenant_admin_site)
 register_purchasing_admin(tenant_admin_site)
+register_timekeeping_admin(tenant_admin_site)
+register_audit_admin(tenant_admin_site)
 
 # Restaurant Settings + Modules
 tenant_admin_site.register(Restaurant, RestaurantSettingsAdmin)

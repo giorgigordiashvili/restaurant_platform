@@ -22,6 +22,7 @@ from apps.reports.cache import cached
 from apps.reports.exports import csv_response
 from apps.reports.models import (
     FoodCostReport,
+    HoursReport,
     MenuReport,
     ReservationsReport,
     ReviewsReport,
@@ -47,6 +48,7 @@ REPORTS = (
     ("menu", _("Menu & dishes"), MenuReport, None),
     ("food_cost", _("Food cost"), FoodCostReport, "warehouse"),
     ("staff", _("Staff"), StaffReport, None),
+    ("hours", _("Hours"), HoursReport, "timekeeping"),
     ("shifts", _("Cash shifts"), ShiftsReport, "cash"),
     ("reservations", _("Reservations"), ReservationsReport, "reservations"),
     ("reviews", _("Reviews"), ReviewsReport, "reviews"),
@@ -447,6 +449,56 @@ class FoodCostReportAdmin(ReportAdminBase):
 # ── Staff ─────────────────────────────────────────────────────────────────
 
 
+class HoursReportAdmin(ReportAdminBase):
+    module_code = "timekeeping"
+    report_key = "hours"
+    title = "Hours"
+
+    def data(self, request, period):
+        from apps.timekeeping import services as tk
+
+        r = request.restaurant
+        return self._cached(request, "hours", period, lambda: {"rows": tk.hours_report(r, period.start, period.end)})
+
+    def page(self, request, period, data):
+        rows = data["rows"]
+        total_hours = sum((row["hours"] for row in rows), queries.ZERO)
+        total_cost = sum((row["cost"] for row in rows), queries.ZERO)
+        kpis = [
+            kpi(_("Hours worked"), total_hours, kind="text"),
+            kpi(_("Labour cost"), total_cost),
+            kpi(_("People"), len(rows), kind="int"),
+            kpi(_("Auto-closed entries"), sum(row["auto_closed"] for row in rows), kind="int"),
+        ]
+        chart_list = [
+            {
+                "title": _("Hours by person"),
+                "type": "bar",
+                "data": charts.bar(
+                    [row["name"] for row in rows[:12]], [("Hours", [row["hours"] for row in rows[:12]])]
+                ),
+            }
+        ]
+        tables = [
+            Table(
+                "hours",
+                _("Hours"),
+                [
+                    ("name", _("Person")),
+                    ("role", _("Role")),
+                    ("hours", _("Hours")),
+                    ("scheduled", _("Scheduled")),
+                    ("variance", _("Difference")),
+                    ("entries", _("Entries")),
+                    ("rate", _("Rate")),
+                    ("cost", _("Cost")),
+                ],
+                rows,
+            )
+        ]
+        return {"kpis": kpis, "charts": chart_list, "tables": tables}
+
+
 class StaffReportAdmin(ReportAdminBase):
     report_key = "staff"
     title = "Staff"
@@ -651,6 +703,7 @@ class ReviewsReportAdmin(ReportAdminBase):
 
 
 ADMINS = {
+    "hours": HoursReportAdmin,
     "sales": SalesReportAdmin,
     "menu": MenuReportAdmin,
     "food_cost": FoodCostReportAdmin,
