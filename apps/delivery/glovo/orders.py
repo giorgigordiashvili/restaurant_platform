@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
 from decimal import Decimal
 
 from django.conf import settings
+
+from apps.delivery.parsed import ParsedAttribute, ParsedOrder, ParsedProduct
+from apps.delivery.parsed import parse_dt as _dt
 
 
 def money_from_minor(value) -> Decimal:
@@ -18,66 +19,6 @@ def money_from_minor(value) -> Decimal:
     if getattr(settings, "GLOVO_PRICES_IN_MINOR_UNITS", True):
         return (d / 100).quantize(Decimal("0.01"))
     return d.quantize(Decimal("0.01"))
-
-
-def _dt(value):
-    if not value:
-        return None
-    try:
-        s = str(value).replace("Z", "+00:00")
-        dt = datetime.fromisoformat(s)
-        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
-    except ValueError:
-        return None
-
-
-@dataclass
-class ParsedAttribute:
-    id: str
-    name: str
-    price: Decimal
-    quantity: int = 1
-
-
-@dataclass
-class ParsedProduct:
-    id: str
-    name: str
-    price: Decimal
-    quantity: int
-    purchased_product_id: str = ""
-    attributes: list[ParsedAttribute] = field(default_factory=list)
-
-
-@dataclass
-class ParsedOrder:
-    order_id: str
-    store_id: str
-    order_code: str = ""
-    order_time: datetime | None = None
-    estimated_pickup_time: datetime | None = None
-    utc_offset_minutes: int = 0
-    is_picked_up_by_customer: bool = False
-    payment_method: str = ""
-    currency: str = ""
-    customer_name: str = ""
-    customer_phone: str = ""
-    customer_hash: str = ""
-    invoicing_details: dict = field(default_factory=dict)
-    courier_name: str = ""
-    courier_phone: str = ""
-    allergy_info: str = ""
-    special_requirements: str = ""
-    products: list[ParsedProduct] = field(default_factory=list)
-    estimated_total_price: Decimal = Decimal("0")
-    total_customer_to_pay: Decimal = Decimal("0")
-    partner_discounted_products_total: Decimal = Decimal("0")
-    delivery_address: str = ""
-    latitude: float | None = None
-    longitude: float | None = None
-    pick_up_code: str = ""
-    cutlery_requested: bool = False
-    raw: str = ""
 
 
 def parse_order(payload: dict) -> ParsedOrder:

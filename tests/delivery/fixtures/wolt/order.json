@@ -1,0 +1,29 @@
+{
+  "id": "WO-2001",
+  "venue": {"id": "venue-1", "name": "Test Venue", "external_venue_id": "ext-1"},
+  "price": {"amount": 2300, "currency": "GEL"},
+  "delivery": {
+    "status": "pending", "type": "homedelivery", "time": "2026-09-12T12:40:00Z",
+    "fee": {"amount": 300, "currency": "GEL"},
+    "location": {"street_address": "Rustaveli 12", "city": "Tbilisi", "formatted_address": "Rustaveli 12, Tbilisi",
+                 "coordinates": {"lon": 44.8, "lat": 41.7}},
+    "small_order_surcharge": null, "self_delivery": false
+  },
+  "items": [
+    {"id": "line-1", "pos_id": "p{ITEM_ID}", "sku": null, "gtin": null, "count": 2, "name": "ხინკალი",
+     "category": {"id": "c1", "name": "Mains"}, "item_type": "regular", "is_bundle_offer": false,
+     "base_price": {"amount": 1000, "currency": "GEL"}, "unit_price": {"amount": 1100, "currency": "GEL"},
+     "total_price": {"amount": 2200, "currency": "GEL"},
+     "options": [{"id": "opt-1", "name": "Spice", "value": "extra chili", "price": {"amount": 100, "currency": "GEL"},
+                  "pos_id": "gNOPE", "count": 1, "value_pos_id": "mNOPE"}]},
+    {"id": "line-2", "pos_id": "pdeleted", "count": 1, "name": "Cake",
+     "base_price": {"amount": 100, "currency": "GEL"}, "unit_price": {"amount": 100, "currency": "GEL"},
+     "total_price": {"amount": 100, "currency": "GEL"}, "options": []}
+  ],
+  "created_at": "2026-09-12T12:00:00Z", "modified_at": "2026-09-12T12:00:05Z",
+  "consumer_name": "Nino", "consumer_comment": "ring the bell", "consumer_phone_number": "+995511111111",
+  "order_number": "A1B2", "order_status": "received", "type": "instant",
+  "pickup_eta": "2026-09-12T12:25:00Z", "attribution_id": null, "company_tax_id": null,
+  "loyalty_card_number": null, "is_wolt_plus": false, "is_no_contact_delivery": false,
+  "cash_payment": null, "order_handling": null, "in_store_operations": null
+}

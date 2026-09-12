@@ -289,6 +289,10 @@ def void_item(item: OrderItem, *, by, reason=None, reason_text: str = "", manage
         order.calculate_totals()
         remaining = order.items.exclude(status="cancelled").exists()
     label = reason.label if reason is not None else item.void_reason_text
+    if remaining:
+        from apps.delivery import hooks as delivery_hooks
+
+        delivery_hooks.on_order_item_voided(item, by=by)
     _audit("item_void", order, by, f"Voided {item} on {order.order_number}: {label}", item)
     if not remaining and order.status not in ("completed", "cancelled"):
         transition_order(

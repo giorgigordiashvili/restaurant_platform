@@ -33,6 +33,9 @@ class DeliveryPlatformEvent(TimeStampedModel):
         ("status_pushed", "Status pushed"),
         ("menu_status", "Menu sync status"),
         ("cancel_requested", "Cancellation requested by restaurant"),
+        ("order_status", "Order status notification"),
+        ("refund_pushed", "Refund pushed"),
+        ("store_status", "Store paused / resumed"),
     ]
 
     link = models.ForeignKey(RestaurantDeliveryPlatform, on_delete=models.CASCADE, related_name="events")

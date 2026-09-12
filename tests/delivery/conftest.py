@@ -1,6 +1,7 @@
 """
-Hand-written fixtures modelled on the public Glovo Partners docs. NOT
-recorded from live traffic; see apps/delivery/glovo/__init__.py "VERIFY ON STAGE".
+Hand-written fixtures modelled on the public Glovo Partners / Wolt developer
+docs. NOT recorded from live traffic; see apps/delivery/glovo/__init__.py
+"VERIFY ON STAGE" and apps/delivery/wolt/__init__.py "VERIFY ON DEV".
 """
 
 import json
@@ -9,6 +10,7 @@ from pathlib import Path
 import pytest
 
 FIXTURES = Path(__file__).parent / "fixtures" / "glovo"
+WOLT_FIXTURES = Path(__file__).parent / "fixtures" / "wolt"
 
 
 class FakeResponse:
@@ -34,8 +36,8 @@ class FakeSession:
         self.calls = []
         self.queue = list(responses)
 
-    def request(self, method, url, json=None, headers=None, timeout=None):
-        self.calls.append({"method": method, "url": url, "json": json, "headers": headers})
+    def request(self, method, url, json=None, headers=None, timeout=None, data=None):
+        self.calls.append({"method": method, "url": url, "json": json, "headers": headers, "data": data})
         status, body = self.queue.pop(0) if self.queue else (202, {"transactionId": "tx-auto"})
         return FakeResponse(status, body)
 
@@ -89,7 +91,51 @@ def fake_glovo(monkeypatch):
 
     _build.session = session
     monkeypatch.setattr("apps.delivery.glovo.client.build_client", _build)
-    monkeypatch.setattr("apps.delivery.services.build_client", _build, raising=False)
-    monkeypatch.setattr("apps.delivery.tasks.build_client", _build)
     monkeypatch.setattr("apps.delivery.glovo.adapter.build_client", _build)
+    return session
+
+
+@pytest.fixture
+def wolt_fixture():
+    def load(name):
+        return json.loads((WOLT_FIXTURES / f"{name}.json").read_text())
+
+    return load
+
+
+@pytest.fixture
+def wolt_link(delivery_restaurant):
+    from apps.delivery.models import RestaurantDeliveryPlatform
+
+    link = RestaurantDeliveryPlatform(
+        restaurant=delivery_restaurant,
+        platform="wolt",
+        is_enabled=True,
+        store_external_id="venue-1",
+        webhook_token="wolt-secret",
+        auto_accept=True,
+        sandbox=True,
+    )
+    link.set_credentials({"client_id": "cid", "client_secret": "csec", "refresh_token": "rt-1"})
+    link.save()
+    return link
+
+
+@pytest.fixture
+def fake_wolt(monkeypatch):
+    """Inject a FakeSession into every WoltClient built through build_client; cache cleared so tokens refresh."""
+    from django.core.cache import cache
+
+    from apps.delivery.config import resolve_wolt_config
+    from apps.delivery.wolt import client as client_module
+
+    cache.clear()
+    session = FakeSession()
+
+    def _build(link, session=None):
+        return client_module.WoltClient(resolve_wolt_config(link), link=link, session=session or _build.session)
+
+    _build.session = session
+    monkeypatch.setattr("apps.delivery.wolt.client.build_client", _build)
+    monkeypatch.setattr("apps.delivery.wolt.adapter.build_client", _build)
     return session

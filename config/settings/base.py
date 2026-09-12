@@ -617,6 +617,20 @@ GLOVO_AUTH_SCHEME = config("GLOVO_AUTH_SCHEME", default="")
 GLOVO_BASE_URL_STAGE = config("GLOVO_BASE_URL_STAGE", default="https://stageapi.glovoapp.com")
 GLOVO_BASE_URL_PROD = config("GLOVO_BASE_URL_PROD", default="https://api.glovoapp.com")
 GLOVO_PRICES_IN_MINOR_UNITS = config("GLOVO_PRICES_IN_MINOR_UNITS", default=True, cast=bool)
+# Wolt POS integration: OAuth client (one per integrator) or a legacy API key; per-link credentials override.
+WOLT_CLIENT_ID = config("WOLT_CLIENT_ID", default="")
+WOLT_CLIENT_SECRET = config("WOLT_CLIENT_SECRET", default="")
+WOLT_API_KEY = config("WOLT_API_KEY", default="")
+WOLT_WEBHOOK_SECRET = config("WOLT_WEBHOOK_SECRET", default="")
+WOLT_OAUTH_REDIRECT_URI = config("WOLT_OAUTH_REDIRECT_URI", default="")
+WOLT_BASE_URL_PROD = config("WOLT_BASE_URL_PROD", default="https://pos-integration-service.wolt.com")
+WOLT_BASE_URL_DEV = config("WOLT_BASE_URL_DEV", default="https://pos-integration-service.development.dev.woltapi.com")
+WOLT_AUTH_URL_PROD = config(
+    "WOLT_AUTH_URL_PROD", default="https://integrations-authentication-service.wolt.com/oauth2/token"
+)
+WOLT_AUTH_URL_DEV = config(
+    "WOLT_AUTH_URL_DEV", default="https://integrations-authentication-service.development.dev.woltapi.com/oauth2/token"
+)
 
 # Logging Configuration
 LOGGING = {

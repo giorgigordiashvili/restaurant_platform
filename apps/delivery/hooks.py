@@ -16,6 +16,13 @@ def on_order_status_changed(order, old_status, new_status, *, by=None) -> None:
         logger.exception("Delivery status hook failed for order %s", order.pk)
 
 
+def on_order_item_voided(item, *, by=None) -> None:
+    try:
+        services.on_order_item_voided(item)
+    except Exception:
+        logger.exception("Delivery refund hook failed for item %s", item.pk)
+
+
 def on_module_toggled(restaurant, enabled, *, by=None) -> None:
     """Make sure a row exists per platform so the admin page has something to show."""
     if not enabled:

@@ -1,0 +1,6 @@
+{
+  "id": "notif-1",
+  "type": "order.notification",
+  "order": {"id": "WO-2001", "venue_id": "venue-1", "status": "CREATED", "resource_url": "https://pos-integration-service.wolt.com/orders/WO-2001"},
+  "created_at": "2026-09-12T12:00:01Z"
+}

@@ -533,6 +533,9 @@ class RestaurantDeliveryPlatform(TimeStampedModel):
     last_menu_sync_at = models.DateTimeField(null=True, blank=True)
     last_menu_sync_status = models.CharField(max_length=20, blank=True, default="")
     sandbox = models.BooleanField(default=True, help_text="Use the platform's stage environment.")
+    store_paused_until = models.DateTimeField(
+        null=True, blank=True, help_text="We asked the platform to hide the store until then."
+    )
 
     class Meta:
         db_table = "inventory_delivery_platforms"

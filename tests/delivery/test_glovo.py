@@ -363,3 +363,50 @@ class TestAdminPage:
         res = authenticated_owner_client.get("/api/v1/dashboard/orders/kitchen/")
         row = res.json()["results"][0]
         assert row["source"] == "glovo" and row["platform_order_code"] == "A1B2C" and row["pickup_eta"]
+
+
+@pytest.mark.django_db
+class TestGlovoStoreAndPrices:
+    def test_pause_resume(self, glovo_link, fake_glovo, user):
+        fake_glovo.queue.append((200, {}))
+        ev = services.pause_store(glovo_link, 30, by=user)
+        call = fake_glovo.calls[-1]
+        assert call["method"] == "PUT" and call["url"].endswith("/webhook/stores/store-1/closing")
+        assert call["json"]["until"] == ev.payload["until"]
+        glovo_link.refresh_from_db()
+        assert glovo_link.store_paused_until and services.store_status(glovo_link)["online"] is False
+        fake_glovo.queue.append((200, {}))
+        services.resume_store(glovo_link, by=user)
+        assert fake_glovo.calls[-1]["method"] == "DELETE"
+        glovo_link.refresh_from_db()
+        assert glovo_link.store_paused_until is None and services.store_status(glovo_link)["online"] is True
+
+    def test_bulk_price_refresh(self, glovo_link, menu_item, fake_glovo, user, django_capture_on_commit_callbacks):
+        fake_glovo.queue.append((202, {"transactionId": "tx-prices"}))
+        with django_capture_on_commit_callbacks(execute=True):
+            sync = services.start_menu_sync(glovo_link, by=user, kind="updates")
+        sync.refresh_from_db()
+        assert sync.status == "success" and sync.transaction_id == "tx-prices" and sync.product_count == 1
+        body = fake_glovo.calls[-1]["json"]
+        assert body["products"] == [{"id": f"p{menu_item.pk}", "price": float(menu_item.price), "available": True}]
+
+    def test_dashboard_pause(
+        self,
+        authenticated_owner_client,
+        user,
+        delivery_restaurant,
+        staff_roles,
+        create_staff_member,
+        glovo_link,
+        fake_glovo,
+    ):
+        api_client = authenticated_owner_client
+        api_client.defaults["HTTP_X_RESTAURANT"] = delivery_restaurant.slug
+        create_staff_member(
+            user=user, restaurant=delivery_restaurant, role=next(r for r in staff_roles if r.name == "owner")
+        )
+        fake_glovo.queue.append((200, {}))
+        res = api_client.post("/api/v1/dashboard/delivery/platforms/glovo/pause/", {"minutes": 60}, format="json")
+        assert res.status_code == 200 and res.json()["online"] is False
+        rows = {r["platform"]: r for r in api_client.get("/api/v1/dashboard/delivery/platforms/").json()}
+        assert rows["glovo"]["paused_until"] and rows["glovo"]["configured"]

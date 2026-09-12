@@ -9,19 +9,15 @@ fixtures in tests/delivery/fixtures/glovo.
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from apps.delivery.config import GlovoConfig, resolve_glovo_config
+from apps.delivery.errors import PlatformClientError
 
 logger = logging.getLogger(__name__)
 
 
-class GlovoClientError(Exception):
-    def __init__(self, message: str, *, status_code: int | None = None, payload: Any = None, retryable: bool = False):
-        super().__init__(message)
-        self.status_code = status_code
-        self.payload = payload
-        self.retryable = retryable
+class GlovoClientError(PlatformClientError):
+    pass
 
 
 class GlovoClient:
@@ -87,9 +83,11 @@ class GlovoClient:
     # -- store --------------------------------------------------------------
 
     def close_store(self, until_iso: str) -> dict:
+        """PUT /webhook/stores/{storeId}/closing {"until": ISO-8601} -- the store disappears from the app until then."""
         return self._request("PUT", f"/webhook/stores/{self.config.store_id}/closing", {"until": until_iso})
 
     def open_store(self) -> dict:
+        """DELETE /webhook/stores/{storeId}/closing -- lifts a temporary closing."""
         return self._request("DELETE", f"/webhook/stores/{self.config.store_id}/closing")
 
 

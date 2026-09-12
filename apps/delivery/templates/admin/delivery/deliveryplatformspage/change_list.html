@@ -1,55 +1,75 @@
 {% extends "admin/change_list.html" %}
 {% load i18n %}
-{% comment %}Delivery platforms: one card per platform (Glovo live; Wolt / Bolt Food coming soon).{% endcomment %}
+{% comment %}Delivery platforms: one card per platform (Glovo + Wolt live; Bolt Food coming soon).{% endcomment %}
 
 {% block content %}
 {% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-3 py-1.5 text-sm w-full" %}
 <div class="mb-6" data-testid="delivery-platforms">
-  <p class="text-sm text-base-500 mb-4">{% translate "Orders from delivery apps land in the kitchen like any other; sold-out dishes are pushed back to the platform automatically." %}</p>
+  <p class="text-sm text-base-500 mb-4">{% translate "Orders from delivery apps land in the kitchen like any other; sold-out dishes and price changes are pushed back to the platform; pause the store when the kitchen is swamped." %}</p>
   <div class="grid gap-4 xl:grid-cols-2">
     {% for card in cards %}
     <div class="{{ base }} flex flex-col gap-3 {% if not card.implemented %}opacity-80{% endif %}" data-testid="platform-{{ card.code }}">
       <div class="flex items-center justify-between">
         <h3 class="font-semibold">{{ card.label }}</h3>
-        {% if not card.implemented %}<span class="text-xs uppercase px-2 py-0.5 rounded bg-base-100 text-base-500">{% translate "Coming soon" %}</span>
-        {% elif card.link.is_enabled %}<span class="text-xs uppercase px-2 py-0.5 rounded bg-green-100 text-green-700">{% translate "On" %}</span>
-        {% else %}<span class="text-xs uppercase px-2 py-0.5 rounded bg-base-100 text-base-500">{% translate "Off" %}</span>{% endif %}
+        <div class="flex items-center gap-2">
+          {% if card.paused_until %}<span class="text-xs uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-700" data-testid="paused-badge">{% translate "Paused until" %} {{ card.paused_until|date:"H:i" }}</span>{% endif %}
+          {% if not card.implemented %}<span class="text-xs uppercase px-2 py-0.5 rounded bg-base-100 text-base-500">{% translate "Coming soon" %}</span>
+          {% elif card.link.is_enabled %}<span class="text-xs uppercase px-2 py-0.5 rounded bg-green-100 text-green-700">{% translate "On" %}</span>
+          {% else %}<span class="text-xs uppercase px-2 py-0.5 rounded bg-base-100 text-base-500">{% translate "Off" %}</span>{% endif %}
+        </div>
       </div>
 
       <form method="post" action="{{ card.urls.save }}" class="grid gap-2 md:grid-cols-2">
         {% csrf_token %}
-        <label class="text-sm">{% translate "Store id on the platform" %}<input type="text" name="store_external_id" value="{{ card.link.store_external_id }}" class="{{ input }}" {% if not can_manage or not card.implemented %}disabled{% endif %}></label>
-        <label class="text-sm">{% translate "API token" %}<input type="password" name="api_token" value="" class="{{ input }}" autocomplete="new-password" placeholder="{% if card.has_token %}•••••••• ({% translate 'set' %}){% else %}{% translate 'not set' %}{% endif %}" {% if not can_manage or not card.implemented %}disabled{% endif %}></label>
+        <label class="text-sm">{{ card.store_label }}<input type="text" name="store_external_id" value="{{ card.link.store_external_id }}" class="{{ input }}" {% if not can_manage or not card.implemented %}disabled{% endif %}></label>
         <label class="text-sm">{% translate "Preparation time (min)" %}<input type="number" name="prep_time_minutes" value="{{ card.link.prep_time_minutes }}" min="1" max="240" class="{{ input }}" {% if not can_manage or not card.implemented %}disabled{% endif %}></label>
-        <div class="flex flex-col gap-1 text-sm">
+        {% for f in card.fields %}
+        <label class="text-sm" title="{{ f.hint }}">{{ f.label }}
+          <input type="{% if f.secret %}password{% else %}text{% endif %}" name="{{ f.name }}" value="" class="{{ input }}" autocomplete="new-password" placeholder="{% if f.is_set %}•••••••• ({% translate 'set' %}){% else %}{% translate 'not set' %}{% endif %}" {% if not can_manage or not card.implemented %}disabled{% endif %}>
+        </label>
+        {% endfor %}
+        <div class="flex flex-col gap-1 text-sm md:col-span-2">
           <label class="flex items-center gap-2"><input type="checkbox" name="is_enabled" value="1" {% if card.link.is_enabled %}checked{% endif %} {% if not can_manage or not card.implemented %}disabled{% endif %}>{% translate "Enabled" %}</label>
           <label class="flex items-center gap-2"><input type="checkbox" name="auto_accept" value="1" {% if card.link.auto_accept %}checked{% endif %} {% if not can_manage or not card.implemented %}disabled{% endif %}>{% translate "Auto-accept orders into the kitchen" %}</label>
-          <label class="flex items-center gap-2"><input type="checkbox" name="sandbox" value="1" {% if card.link.sandbox %}checked{% endif %} {% if not can_manage or not card.implemented %}disabled{% endif %}>{% translate "Sandbox (stage environment)" %}</label>
+          <label class="flex items-center gap-2"><input type="checkbox" name="sandbox" value="1" {% if card.link.sandbox %}checked{% endif %} {% if not can_manage or not card.implemented %}disabled{% endif %}>{% translate "Sandbox (stage / development environment)" %}</label>
+          {% if card.fields %}<label class="flex items-center gap-2"><input type="checkbox" name="clear_credentials" value="1" {% if not can_manage or not card.implemented %}disabled{% endif %}>{% translate "Clear stored credentials" %}</label>{% endif %}
         </div>
-        {% if can_manage and card.implemented %}<div class="md:col-span-2"><button type="submit" class="{{ btn }}">{% translate "Save" %}</button></div>{% endif %}
+        {% if can_manage and card.implemented %}<div class="md:col-span-2 flex items-center gap-3"><button type="submit" class="{{ btn }}">{% translate "Save" %}</button>{% if not card.configured %}<span class="text-xs text-amber-600">{% translate "Not configured yet: store id and credentials are required." %}</span>{% endif %}</div>{% endif %}
       </form>
 
       {% if card.implemented %}
       <div class="border-t border-base-200 dark:border-base-800 pt-3 text-sm flex flex-col gap-2">
         <p class="text-xs uppercase text-base-500">{% translate "Give these to the platform's onboarding team" %}</p>
         <p>{% translate "Order webhook" %}: <code class="text-xs">{{ card.webhook_url }}</code></p>
-        <p>{% translate "Cancel webhook" %}: <code class="text-xs">{{ card.cancel_url }}</code></p>
+        {% if card.cancel_url %}<p>{% translate "Cancel webhook" %}: <code class="text-xs">{{ card.cancel_url }}</code></p>{% endif %}
         {% if card.webhook_token_once %}
-          <p class="bg-amber-50 border border-amber-200 rounded-default px-3 py-2" data-testid="webhook-token-once">{% translate "Webhook token (shown once)" %}: <code class="text-xs">{{ card.webhook_token_once }}</code></p>
+          <p class="bg-amber-50 border border-amber-200 rounded-default px-3 py-2" data-testid="webhook-token-once">{% if card.code == "wolt" %}{% translate "Webhook signing secret (shown once)" %}{% else %}{% translate "Webhook token (shown once)" %}{% endif %}: <code class="text-xs">{{ card.webhook_token_once }}</code></p>
         {% elif card.link.webhook_token %}
-          <p class="text-base-500">{% translate "Webhook token set." %}</p>
+          <p class="text-base-500">{% if card.code == "wolt" %}{% translate "Webhook signing secret set." %}{% else %}{% translate "Webhook token set." %}{% endif %}</p>
         {% else %}
-          <p class="text-base-500">{% translate "No per-store webhook token: the platform-wide token is used." %}</p>
+          <p class="text-base-500">{% if card.code == "wolt" %}{% translate "No signing secret yet: rotate to create one and give it to Wolt." %}{% else %}{% translate "No per-store webhook token: the platform-wide token is used." %}{% endif %}</p>
         {% endif %}
         {% if card.menu_url %}<p>{% translate "Menu feed" %}: <code class="text-xs break-all">{{ card.menu_url }}</code></p>{% endif %}
         {% if can_manage %}
         <div class="flex flex-wrap gap-2">
-          <form method="post" action="{{ card.urls.rotate_webhook }}">{% csrf_token %}<button type="submit" class="{{ btn2 }}">{% translate "Rotate webhook token" %}</button></form>
-          <form method="post" action="{{ card.urls.rotate_menu }}">{% csrf_token %}<button type="submit" class="{{ btn2 }}">{% translate "Rotate menu URL" %}</button></form>
-          <form method="post" action="{{ card.urls.push_menu }}">{% csrf_token %}<button type="submit" class="{{ btn }}" {% if not card.link.store_external_id %}disabled{% endif %}>{% translate "Push menu" %}</button></form>
+          <form method="post" action="{{ card.urls.rotate_webhook }}">{% csrf_token %}<button type="submit" class="{{ btn2 }}">{% if card.code == "wolt" %}{% translate "Rotate signing secret" %}{% else %}{% translate "Rotate webhook token" %}{% endif %}</button></form>
+          {% if card.code == "glovo" %}<form method="post" action="{{ card.urls.rotate_menu }}">{% csrf_token %}<button type="submit" class="{{ btn2 }}">{% translate "Rotate menu URL" %}</button></form>{% endif %}
+          <form method="post" action="{{ card.urls.push_menu }}">{% csrf_token %}<button type="submit" class="{{ btn }}" {% if not card.configured %}disabled{% endif %}>{% translate "Push menu" %}</button></form>
+          <form method="post" action="{{ card.urls.sync_updates }}">{% csrf_token %}<button type="submit" class="{{ btn2 }}" {% if not card.configured %}disabled{% endif %}>{% translate "Sync prices & stock" %}</button></form>
+          <form method="post" action="{{ card.urls.check }}">{% csrf_token %}<button type="submit" class="{{ btn2 }}" {% if not card.configured %}disabled{% endif %}>{% translate "Check status" %}</button></form>
+        </div>
+        <div class="flex flex-wrap items-center gap-2" data-testid="store-pause">
+          {% if card.paused_until %}
+          <form method="post" action="{{ card.urls.resume }}">{% csrf_token %}<button type="submit" class="{{ btn }}">{% translate "Resume orders" %}</button></form>
+          {% else %}
+          <form method="post" action="{{ card.urls.pause }}" class="flex items-center gap-2">{% csrf_token %}
+            <select name="minutes" class="{{ input }} w-auto"><option value="15">15 {% translate "min" %}</option><option value="30" selected>30 {% translate "min" %}</option><option value="60">60 {% translate "min" %}</option><option value="120">2 {% translate "h" %}</option><option value="1440">{% translate "Rest of the day" %}</option></select>
+            <button type="submit" class="{{ btn2 }}" {% if not card.configured %}disabled{% endif %}>{% translate "Pause orders" %}</button>
+          </form>
+          {% endif %}
         </div>
         {% endif %}
-        {% if card.last_sync %}<p class="text-base-500">{% translate "Last menu push" %}: {{ card.last_sync.status }} · {{ card.last_sync.product_count }} {% translate "products" %} · {{ card.last_sync.created_at|date:"d.m.Y H:i" }}{% if card.last_sync.error %} · <span class="text-red-600">{{ card.last_sync.error|truncatechars:120 }}</span>{% endif %}</p>{% endif %}
+        {% if card.last_sync %}<p class="text-base-500">{% translate "Last menu push" %}: {{ card.last_sync.status }} · {{ card.last_sync.request.kind|default:"full" }} · {{ card.last_sync.product_count }} {% translate "products" %} · {{ card.last_sync.created_at|date:"d.m.Y H:i" }}{% if card.last_sync.error %} · <span class="text-red-600">{{ card.last_sync.error|truncatechars:120 }}</span>{% endif %}</p>{% endif %}
         {% if card.events %}
         <details><summary class="cursor-pointer text-base-500">{% translate "Recent events" %} ({{ card.events|length }})</summary>
           <ul class="mt-1 text-xs">{% for e in card.events %}<li>{{ e.created_at|date:"d.m H:i" }} · {{ e.get_kind_display }} · {{ e.event_id }}{% if e.order %} · {{ e.order.order_number }}{% endif %}{% if e.error %} · <span class="text-red-600">{{ e.error|truncatechars:80 }}</span>{% endif %}</li>{% endfor %}</ul>

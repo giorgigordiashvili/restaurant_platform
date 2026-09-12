@@ -1,0 +1,5 @@
+{
+  "external_venue_id": "ext-1",
+  "status": {"is_open": true, "is_online": true, "is_ipad_free": false},
+  "last_three_orders_status": ["DELIVERED", "PRODUCTION", "RECEIVED"]
+}

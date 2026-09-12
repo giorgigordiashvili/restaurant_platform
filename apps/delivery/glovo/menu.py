@@ -11,40 +11,19 @@ from decimal import Decimal
 
 from django.conf import settings
 
-from apps.menu.models import SELLABLE, MenuCategory, MenuItem, ModifierGroup
+from apps.delivery.ids import attribute_id, group_id, parse_attribute_id, parse_product_id, product_id
+from apps.menu.models import SELLABLE, MenuCategory, MenuItem, Modifier, ModifierGroup
 
-
-def product_id(menu_item) -> str:
-    return f"p{menu_item.pk}"
-
-
-def attribute_id(modifier) -> str:
-    return f"m{modifier.pk}"
-
-
-def group_id(group) -> str:
-    return f"g{group.pk}"
-
-
-def _uuid_after(prefix: str, value) -> str | None:
-    import uuid
-
-    s = str(value or "")
-    if not s.startswith(prefix) or len(s) <= len(prefix):
-        return None
-    try:
-        return str(uuid.UUID(s[len(prefix) :]))
-    except ValueError:
-        return None
-
-
-def parse_product_id(value) -> str | None:
-    """'p<uuid>' -> uuid string (None for anything else, incl. ids we never issued)."""
-    return _uuid_after("p", value)
-
-
-def parse_attribute_id(value) -> str | None:
-    return _uuid_after("m", value)
+__all__ = [
+    "build_menu",
+    "build_availability_update",
+    "build_bulk_refresh",
+    "product_id",
+    "attribute_id",
+    "group_id",
+    "parse_product_id",
+    "parse_attribute_id",
+]
 
 
 def _name(obj, language: str) -> str:
@@ -153,11 +132,30 @@ def build_menu(link) -> dict:
 
 def build_availability_update(target, available: bool) -> dict:
     """The bulk-update body that flips one dish or one modifier."""
-    from apps.menu.models import Modifier
-
     if isinstance(target, Modifier):
         return {"products": [], "attributes": [{"id": attribute_id(target), "available": bool(available)}]}
     return {"products": [{"id": product_id(target), "available": bool(available)}], "attributes": []}
+
+
+def build_bulk_refresh(restaurant) -> dict:
+    """Prices + availability of every dish / modifier in one bulk-update body (after a price change in admin)."""
+    products = [
+        {
+            "id": product_id(i),
+            "price": _price(i.price),
+            "available": bool(i.is_available and not i.auto_disabled_by_stock),
+        }
+        for i in MenuItem.objects.filter(restaurant=restaurant, category__is_active=True).order_by("display_order")
+    ]
+    attributes = [
+        {
+            "id": attribute_id(m),
+            "price_impact": _price(m.price_adjustment),
+            "available": bool(m.is_available and not m.auto_disabled_by_stock),
+        }
+        for m in Modifier.objects.filter(group__restaurant=restaurant, group__is_active=True).order_by("display_order")
+    ]
+    return {"products": products, "attributes": attributes}
 
 
 def sellable_products(restaurant):  # pragma: no cover - convenience

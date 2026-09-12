@@ -176,7 +176,7 @@ MODULES: tuple[Module, ...] = (
     Module(
         "delivery",
         "Delivery platforms",
-        "Glovo orders straight into the kitchen, menu push and sold-out sync; Wolt and Bolt Food coming soon.",
+        "Glovo and Wolt orders straight into the kitchen, menu push, sold-out sync, store pause; Bolt Food coming soon.",
         "delivery_dining",
         "delivery_enabled",
         requires=("ordering",),
