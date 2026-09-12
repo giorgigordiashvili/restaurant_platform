@@ -336,7 +336,6 @@ class RestaurantUpdateSerializer(serializers.ModelSerializer):
             "default_currency",
             "timezone",
             "default_language",
-            "tax_rate",
             "service_charge",
             "accepts_remote_orders",
             "accepts_reservations",

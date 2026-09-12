@@ -77,6 +77,10 @@ def transition_order(
             from apps.printing import hooks as printing_hooks
 
             printing_hooks.on_order_confirmed(order, by=by)
+        elif new_status == "cancelled":
+            from apps.fiscal import hooks as fiscal_hooks
+
+            fiscal_hooks.on_order_cancelled(order, by=by)
     return order
 
 

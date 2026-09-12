@@ -83,6 +83,7 @@ LOCAL_APPS = [
     "apps.inventory",
     "apps.reports",
     "apps.printing",
+    "apps.fiscal",
 ]
 
 INSTALLED_APPS = UNFOLD_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -605,6 +606,9 @@ POS_BASE_URL = config("POS_BASE_URL", default="https://pos.aimenu.ge")
 # Where print bridges and other devices reach this API (shown in setup instructions).
 PUBLIC_API_BASE_URL = config("PUBLIC_API_BASE_URL", default="https://admin.aimenu.ge")
 PRINT_BRIDGE_LONG_POLL_SECONDS = config("PRINT_BRIDGE_LONG_POLL_SECONDS", default=15, cast=int)
+# Fiscal providers: "none" numbers documents locally; add {"code": "dotted.path.Provider"} when a live one exists.
+FISCAL_DEFAULT_PROVIDER = config("FISCAL_DEFAULT_PROVIDER", default="none")
+FISCAL_PROVIDERS = {}
 
 # Logging Configuration
 LOGGING = {

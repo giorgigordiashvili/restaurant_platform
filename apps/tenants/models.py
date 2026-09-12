@@ -334,6 +334,10 @@ class Restaurant(TimeStampedModel):
         default=True,
         help_text="Reviews module: customer reviews on the restaurant page.",
     )
+    fiscal_enabled = models.BooleanField(
+        default=False,
+        help_text="Fiscal module: VAT profile, numbered receipts and refund receipts, RS.ge waybill export.",
+    )
     printing_enabled = models.BooleanField(
         default=False,
         help_text=(

@@ -20,13 +20,14 @@ RESOURCE_LABELS = {
     "warehouse": "Warehouse",
     "warehouse_logs": "Warehouse logs (waste, meals)",
     "cash": "Cash & payments",
+    "fiscal": "Fiscal & VAT",
     "staff": "Staff",
     "settings": "Settings",
     "analytics": "Analytics",
 }
 
 # Cells that make no sense for a resource are simply not offered.
-OFFERED = {"settings": ("read", "update"), "analytics": ("read",)}
+OFFERED = {"settings": ("read", "update"), "analytics": ("read",), "fiscal": ("read", "update")}
 
 # What each cell means, shown as a tooltip where the generic verb is unclear.
 HINTS = {

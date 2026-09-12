@@ -61,6 +61,10 @@ class TenantAdminSite(UnfoldAdminSite):
         "shiftsreport": "analytics",
         "reservationsreport": "analytics",
         "reviewsreport": "analytics",
+        # Fiscal
+        "fiscalsettingspage": "fiscal",
+        "fiscaldocument": "fiscal",
+        "fiscalprofile": "fiscal",
         # Printing
         "printer": "settings",
         "printjob": "orders",

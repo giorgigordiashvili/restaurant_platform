@@ -255,6 +255,33 @@ def module_cards(request):
             "menu",
         )
 
+    if "fiscal" in on and has_resource_permission(request, "fiscal", "read"):
+        from apps.fiscal.models import FiscalDocument
+
+        qs = FiscalDocument.objects.filter(restaurant=restaurant)
+        card(
+            "fiscal",
+            "Fiscal & VAT",
+            "receipt",
+            [
+                {
+                    "label": "Receipts today",
+                    "value": qs.filter(kind="receipt", created_at__date=today).count(),
+                    "url": _url("fiscal_fiscaldocument_changelist"),
+                },
+                {
+                    "label": "Failed",
+                    "value": qs.filter(status="failed").count(),
+                    "url": _url("fiscal_fiscaldocument_changelist") + "?status__exact=failed",
+                },
+            ],
+            [
+                _link("Documents", "fiscal_fiscaldocument_changelist"),
+                _link("Fiscal settings", "fiscal_fiscalsettingspage_changelist"),
+            ],
+            "fiscal",
+        )
+
     if "printing" in on and has_resource_permission(request, "settings", "read"):
         from apps.printing import services as printing
 

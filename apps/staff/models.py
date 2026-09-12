@@ -37,6 +37,7 @@ class StaffRole(TimeStampedModel):
             "warehouse": ["create", "read", "update", "delete"],
             "warehouse_logs": ["create", "read", "update", "delete"],
             "cash": ["create", "read", "update", "delete"],
+            "fiscal": ["create", "read", "update", "delete"],
         },
         "manager": {
             "menu": ["create", "read", "update", "delete"],
@@ -49,6 +50,7 @@ class StaffRole(TimeStampedModel):
             "warehouse": ["create", "read", "update", "delete"],
             "warehouse_logs": ["create", "read", "update", "delete"],
             "cash": ["create", "read", "update", "delete"],
+            "fiscal": ["read", "update"],
         },
         "warehouse_manager": {
             "menu": ["read", "update"],

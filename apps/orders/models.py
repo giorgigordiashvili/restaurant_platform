@@ -209,6 +209,9 @@ class Order(TimeStampedModel):
         default=0,
         validators=[MinValueValidator(0)],
     )
+    # Fiscal snapshot at the time totals were computed (see apps.fiscal.vat).
+    vat_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    prices_include_vat = models.BooleanField(default=False)
 
     # Customer info (for guest orders or delivery)
     customer_name = models.CharField(max_length=200, blank=True)
@@ -333,14 +336,28 @@ class Order(TimeStampedModel):
         self.discount_amount = item_discounts + order_discounts
         net = gross - self.discount_amount
 
-        tax_rate = self.restaurant.tax_rate if self.restaurant else Decimal("0")
+        from apps.fiscal.vat import add_vat, split_gross, tax_context
+
         service_rate = self.restaurant.service_charge if self.restaurant else Decimal("0")
-        self.tax_amount = q(net * (tax_rate or Decimal("0")) / Decimal("100"))
         self.service_charge = q(net * (service_rate or Decimal("0")) / Decimal("100"))
+        ctx = tax_context(self.restaurant) if self.restaurant_id else None
+        rate = ctx.rate if ctx else Decimal("0")
+        inclusive = bool(ctx and ctx.inclusive)
+        self.vat_rate = rate
+        self.prices_include_vat = inclusive
+        if inclusive:
+            # Georgian menus are gross: VAT is part of the price (informational),
+            # nothing is added on top.
+            self.tax_amount = split_gross(net + self.service_charge, rate)[1]
+            tax_added = Decimal("0")
+        else:
+            # Legacy / exclusive: tax on the net, service charge untaxed.
+            self.tax_amount = add_vat(net, rate)[1]
+            tax_added = self.tax_amount
 
         # Tip is customer-set; wallet is treated like a discount but kept
         # separate so refunds can identify wallet-funded amounts.
-        total = net + self.tax_amount + self.service_charge + q(self.tip_amount or 0) - q(self.wallet_applied or 0)
+        total = net + tax_added + self.service_charge + q(self.tip_amount or 0) - q(self.wallet_applied or 0)
         self.total = max(q(total), Decimal("0"))
 
         self.save(
@@ -349,6 +366,8 @@ class Order(TimeStampedModel):
                 "discount_amount",
                 "tax_amount",
                 "service_charge",
+                "vat_rate",
+                "prices_include_vat",
                 "total",
                 "updated_at",
             ]

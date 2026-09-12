@@ -44,6 +44,8 @@ ICONS = {
     "cashshift": "point_of_sale",
     "payment": "payments",
     "discountreason": "sell",
+    "fiscalsettingspage": "receipt",
+    "fiscaldocument": "receipt_long",
     "printer": "print",
     "printjob": "print_connect",
     "salesreport": "monitoring",

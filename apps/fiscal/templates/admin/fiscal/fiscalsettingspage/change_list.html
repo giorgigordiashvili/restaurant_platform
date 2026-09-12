@@ -1,0 +1,49 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% comment %}
+Fiscal settings: one form (legal data, VAT, provider, RS.ge credentials).
+Saves go to FiscalSettingsTenantAdmin.save_view.
+{% endcomment %}
+
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-3 py-1.5 text-sm w-full" %}
+<div class="mb-6" data-testid="fiscal-settings">
+  <div class="grid gap-3 md:grid-cols-3 mb-4">
+    <a href="{{ documents_url }}?status__exact=confirmed" class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Confirmed documents" %}</p><p class="text-2xl font-semibold">{{ counts.confirmed }}</p></a>
+    <a href="{{ documents_url }}?status__exact=failed" class="{{ base }} {% if counts.failed %}border-red-300{% endif %}"><p class="text-xs uppercase text-base-500">{% translate "Failed" %}</p><p class="text-2xl font-semibold {% if counts.failed %}text-red-600{% endif %}">{{ counts.failed }}</p></a>
+    <a href="{{ documents_url }}?status__exact=draft" class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Draft waybills" %}</p><p class="text-2xl font-semibold">{{ counts.drafts }}</p></a>
+  </div>
+
+  <form method="post" action="{{ save_url }}" class="{{ base }} grid gap-4 md:grid-cols-2">
+    {% csrf_token %}
+    <div class="md:col-span-2"><h3 class="font-semibold">{% translate "Legal entity" %}</h3><p class="text-xs text-base-500">{% translate "Printed on every receipt and used for RS.ge documents." %}</p></div>
+    <label class="text-sm">{% translate "Legal name" %}<input type="text" name="legal_name" value="{{ form.legal_name.value|default_if_none:'' }}" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm">{% translate "Tax id (ს/კ)" %}<input type="text" name="tax_id" value="{{ form.tax_id.value|default_if_none:'' }}" class="{{ input }}" placeholder="9 or 11 digits" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm md:col-span-2">{% translate "Legal address" %}<input type="text" name="legal_address" value="{{ form.legal_address.value|default_if_none:'' }}" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+
+    <div class="md:col-span-2 border-t border-base-200 dark:border-base-800 pt-3"><h3 class="font-semibold">{% translate "VAT" %}</h3></div>
+    <label class="flex items-start gap-2 text-sm"><input type="checkbox" name="vat_payer" value="1" {% if form.vat_payer.value %}checked{% endif %} class="mt-1" {% if not can_manage %}disabled{% endif %}><span>{% translate "Registered VAT payer" %}<span class="block text-xs text-base-500">{% translate "Off for small businesses under the registration threshold: receipts say 'not a VAT payer'." %}</span></span></label>
+    <label class="text-sm">{% translate "VAT rate %" %}<input type="number" step="0.01" name="vat_rate" value="{{ form.vat_rate.value|default_if_none:'18.00' }}" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="flex items-start gap-2 text-sm md:col-span-2"><input type="checkbox" name="prices_include_vat" value="1" {% if form.prices_include_vat.value %}checked{% endif %} class="mt-1" {% if not can_manage %}disabled{% endif %}><span>{% translate "Menu prices include VAT" %}<span class="block text-xs text-base-500">{% translate "Georgian menus are gross: VAT is shown on the receipt but not added on top. Untick to add VAT to the bill." %}</span></span></label>
+
+    <div class="md:col-span-2 border-t border-base-200 dark:border-base-800 pt-3"><h3 class="font-semibold">{% translate "Provider" %}</h3><p class="text-xs text-base-500">{% translate "No live fiscal provider is connected yet: receipts are numbered locally (non-fiscal); RS.ge waybills can be exported as XML and, with a service user, sent." %}</p></div>
+    <label class="text-sm">{% translate "Provider" %}
+      <select name="provider" class="{{ input }}" {% if not can_manage %}disabled{% endif %}>
+        {% for value, label in form.fields.provider.choices %}<option value="{{ value }}" {% if form.provider.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label class="text-sm">{% translate "Receipt prefix" %}<input type="text" name="receipt_prefix" value="{{ form.receipt_prefix.value|default_if_none:'R' }}" class="{{ input }}" maxlength="8" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm">{% translate "RS.ge service user" %}<input type="text" name="service_user" value="{{ form.service_user.value|default_if_none:'' }}" class="{{ input }}" autocomplete="off" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm">{% translate "RS.ge service password" %}<input type="password" name="service_password" value="" class="{{ input }}" autocomplete="new-password" placeholder="{% if has_password %}••••••••  ({% translate 'kept' %}){% endif %}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm md:col-span-2">{% translate "Receipt footer" %}<input type="text" name="receipt_footer" value="{{ form.receipt_footer.value|default_if_none:'' }}" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+
+    {% if can_manage %}
+    <div class="md:col-span-2 flex gap-2">
+      <button type="submit" class="{{ btn }}">{% translate "Save" %}</button>
+      <button type="submit" formaction="{{ test_url }}" class="{{ btn2 }}">{% translate "Test provider connection" %}</button>
+    </div>
+    {% endif %}
+  </form>
+</div>
+{% endwith %}
+{% endblock %}

@@ -24,6 +24,39 @@ METHOD_LABELS = {
 }
 
 
+def _apply_fiscal(data: dict, order, payment) -> None:
+    """Legal header, VAT breakdown and the fiscal number when the Fiscal module is on."""
+    restaurant = order.restaurant
+    if not getattr(restaurant, "fiscal_enabled", False):
+        return
+    from apps.fiscal import vat
+    from apps.fiscal.models import FiscalDocument, FiscalProfile
+
+    profile = FiscalProfile.objects.filter(restaurant=restaurant).first()
+    if profile is None:
+        return
+    data["restaurant"].update(
+        {
+            "legal_name": profile.legal_name,
+            "address": profile.legal_address or data["restaurant"].get("address", ""),
+            "tax_id_line": f"ს/კ {profile.tax_id}" if profile.tax_id else "",
+        }
+    )
+    data["footer"] = profile.receipt_footer
+    doc = None
+    if payment is not None:
+        doc = FiscalDocument.objects.filter(payment=payment, kind="receipt").exclude(status="cancelled").first()
+    if doc is not None:
+        data["number"] = doc.fiscal_number
+        data["fiscal"] = doc.is_fiscal
+        data["vat_breakdown"] = doc.vat_breakdown
+        data["labels"] = {"vat_note": doc.payload.get("vat_label", "")}
+    else:
+        bd = vat.vat_breakdown(order)
+        data["vat_breakdown"] = bd.breakdown
+        data["labels"] = {"vat_note": bd.label}
+
+
 def _user(u) -> str:
     if not u:
         return ""
@@ -102,6 +135,7 @@ def receipt_data(order, *, payment: Payment | None = None) -> dict:
         "cashier": "",
         "footer": "",
     }
+    _apply_fiscal(data, order, payment)
     if payment is not None:
         data["payment"] = {
             "method": payment.payment_method,

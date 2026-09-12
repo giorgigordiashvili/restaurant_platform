@@ -557,6 +557,9 @@ def receive_stock(
         _resolve_lot_alerts(item)
         recompute_availability(item.restaurant_id, [item.pk])
     _audit("stock_receive", item.restaurant_id, by, f"Received {qty} {unit.code} of {item.name}", lot)
+    from apps.fiscal import hooks as fiscal_hooks
+
+    fiscal_hooks.on_stock_received(lot)
     stock_item.on_hand_qty = item.on_hand_qty
     return lot
 

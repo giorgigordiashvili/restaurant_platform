@@ -174,6 +174,18 @@ MODULES: tuple[Module, ...] = (
         resources=("cash",),
     ),
     Module(
+        "fiscal",
+        "Fiscal & VAT",
+        "VAT profile, sequential receipts and refund receipts, RS.ge waybill export. A live fiscal provider plugs in later.",
+        "receipt",
+        "fiscal_enabled",
+        recommends=("ordering",),
+        app_labels=("fiscal",),
+        model_names=(("fiscal", "fiscalsettingspage"), ("fiscal", "fiscaldocument")),
+        resources=("fiscal",),
+        hooks=("apps.fiscal.hooks.on_module_toggled",),
+    ),
+    Module(
         "payments",
         "Online payments",
         "Card payments via Bank of Georgia and/or Flitt. Without them customers pay cash at the table.",

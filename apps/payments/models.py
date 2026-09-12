@@ -351,6 +351,9 @@ class Payment(TimeStampedModel):
         if not self.receipt_number:
             self.receipt_number = self._generate_receipt_number()
         self.save(update_fields=["status", "completed_at", "receipt_number", "updated_at"])
+        from apps.fiscal import hooks as fiscal_hooks
+
+        fiscal_hooks.on_payment_completed(self)
 
     def fail(self, reason: str = ""):
         """Mark payment as failed."""
@@ -512,6 +515,9 @@ class Refund(TimeStampedModel):
         else:
             self.payment.status = "partially_refunded"
         self.payment.save(update_fields=["status", "updated_at"])
+        from apps.fiscal import hooks as fiscal_hooks
+
+        fiscal_hooks.on_refund_completed(self)
 
     def fail(self, reason: str = ""):
         """Mark refund as failed."""

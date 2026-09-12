@@ -17,7 +17,10 @@ from apps.orders.models import Order, OrderItem
 def test_only_one_of_two_concurrent_orders_wins(create_user, create_restaurant, create_menu_item):
     owner = create_user(email="race-owner@example.com")
     restaurant = create_restaurant(owner=owner, name="Race", slug="race", warehouse_enabled=True)
-    g = UnitOfMeasure.objects.get(code="g")
+    # Transaction tests flush the DB; re-seed the unit when an earlier one ran first.
+    g, _ = UnitOfMeasure.objects.get_or_create(
+        code="g", defaults={"name": "gram", "dimension": "mass", "factor_to_base": 1}
+    )
     flour = StockItem.objects.create(restaurant=restaurant, name="Flour", base_unit=g)
     services.receive_stock(flour, "300", g)
     pizza = create_menu_item(restaurant, name="Pizza", price=Decimal("10"))
