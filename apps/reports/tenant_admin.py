@@ -430,6 +430,17 @@ class FoodCostReportAdmin(ReportAdminBase):
                 percent=("food_cost_pct",),
             )
         ]
+        if modules.is_enabled(request.restaurant, "purchasing"):
+            from apps.purchasing import services as purchasing_services
+
+            tables.append(
+                Table(
+                    "suppliers",
+                    _("Purchases by supplier"),
+                    [("supplier", _("Supplier")), ("lots", _("Deliveries")), ("total", _("Total"))],
+                    purchasing_services.supplier_report(request.restaurant, period.start, period.end),
+                )
+            )
         return {"kpis": kpis, "charts": chart_list, "tables": tables}
 
 

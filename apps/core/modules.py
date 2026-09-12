@@ -206,6 +206,17 @@ MODULES: tuple[Module, ...] = (
         hooks=("apps.fiscal.hooks.on_module_toggled",),
     ),
     Module(
+        "purchasing",
+        _("Purchasing"),
+        _("Suppliers with price lists, purchase orders straight from the buy list, receiving against the order."),
+        "local_shipping",
+        "purchasing_enabled",
+        requires=("warehouse",),
+        app_labels=("purchasing",),
+        model_names=(("purchasing", "purchaseorder"), ("purchasing", "supplier")),
+        hooks=("apps.purchasing.hooks.on_module_toggled",),
+    ),
+    Module(
         "promotions",
         _("Promotions & schedules"),
         _("Breakfast / lunch menus by time, '86 today', happy hours, promo codes and combo menus."),

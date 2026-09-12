@@ -26,6 +26,7 @@ from django.views.decorators.http import require_POST
 from unfold.admin import TabularInline as UnfoldTabularInline
 from unfold.decorators import display
 
+from apps.core import modules
 from apps.core.tenant_admin_base import (
     UNFOLD_INPUT_CLASSES,
     ModuleEnabledMixin,
@@ -152,7 +153,7 @@ class StockItemTenantAdmin(WarehouseEnabledMixin, TenantModelAdmin):
         (
             "Purchasing",
             {
-                "fields": ("purchase_unit", "purchase_pack_qty", "supplier_name", "default_unit_cost"),
+                "fields": ("purchase_unit", "purchase_pack_qty", "supplier", "supplier_name", "default_unit_cost"),
                 "description": "How you buy it (e.g. kg, 10 per bag) -- the buy list is written in these packs.",
             },
         ),
@@ -161,6 +162,16 @@ class StockItemTenantAdmin(WarehouseEnabledMixin, TenantModelAdmin):
     def has_delete_permission(self, request, obj=None):
         # Ledger rows point at items (PROTECT); deactivate instead.
         return False
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if "supplier" in form.base_fields:
+            from apps.purchasing.models import Supplier
+
+            form.base_fields["supplier"].queryset = Supplier.objects.filter(
+                restaurant=getattr(request, "restaurant", None), is_active=True
+            )
+        return form
 
     @display(description=_("On hand"))
     def on_hand_display(self, obj):
@@ -622,6 +633,12 @@ class WarehouseOverviewTenantAdmin(WarehouseEnabledMixin, TenantModelAdmin):
             "can_log": has_resource_permission(request, "warehouse_logs", "update"),
             "can_receive": has_resource_permission(request, "warehouse", "create"),
             "currency": restaurant.default_currency,
+            "purchasing_on": modules.is_enabled(restaurant, "purchasing"),
+            "po_from_buy_list_url": (
+                reverse("tenant_admin:purchasing_purchaseorder_from_buy_list")
+                if modules.is_enabled(restaurant, "purchasing")
+                else ""
+            ),
         }
 
     def get_urls(self):

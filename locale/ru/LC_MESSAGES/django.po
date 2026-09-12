@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-12 22:24+0400\n"
+"POT-Creation-Date: 2026-09-12 22:38+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
@@ -118,9 +118,24 @@ msgstr "Заказ разделён"
 msgid "Order Moved"
 msgstr "Заказ перенесён"
 
-#| msgid "Prices and availability sync queued."
 msgid "Dish availability changed"
 msgstr "Доступность блюда изменена"
+
+#| msgid "Purchase order"
+msgid "Purchase order created"
+msgstr "Заказ поставщику создан"
+
+#| msgid "Purchase order"
+msgid "Purchase order sent"
+msgstr "Заказ поставщику отправлен"
+
+#| msgid "Purchases received"
+msgid "Purchase order received"
+msgstr "Заказ поставщику получен"
+
+#| msgid "Purchase order"
+msgid "Purchase order cancelled"
+msgstr "Заказ поставщику отменён"
 
 msgid "Audit Log"
 msgstr "Запись аудита"
@@ -252,7 +267,26 @@ msgstr "Платформы"
 msgid "Setup guide"
 msgstr "Руководство по настройке"
 
-#| msgid "Promotion"
+#| msgid "Processing"
+msgid "Purchasing"
+msgstr "Закупки"
+
+#| msgid "Open alerts"
+msgid "Open orders"
+msgstr "Открытые заказы"
+
+# Dates and times
+#| msgid "today"
+msgid "Due today"
+msgstr "Ожидаются сегодня"
+
+msgid "Suppliers"
+msgstr "Поставщики"
+
+#| msgid "Purchase order"
+msgid "Purchase orders"
+msgstr "Заказы поставщикам"
+
 msgid "Promotions"
 msgstr "Акции"
 
@@ -263,11 +297,9 @@ msgid "Happy hours live now"
 msgstr "Активные happy hour"
 
 # Models - Orders
-#| msgid "Orders today"
 msgid "Codes used today"
 msgstr "Кодов использовано сегодня"
 
-#| msgid "Modules"
 msgid "Schedules"
 msgstr "Расписания"
 
@@ -407,6 +439,13 @@ msgid ""
 msgstr ""
 "Профиль НДС, последовательные чеки и чеки возврата, экспорт накладных RS.ge."
 " Фискальный провайдер подключается позже."
+
+msgid ""
+"Suppliers with price lists, purchase orders straight from the buy list, "
+"receiving against the order."
+msgstr ""
+"Поставщики с прайс-листами, заказы прямо из списка закупок, приёмка по "
+"заказу."
 
 msgid "Promotions & schedules"
 msgstr "Акции и расписания"
@@ -1425,6 +1464,9 @@ msgid "Target stock level the buy list tops up to (base unit)."
 msgstr ""
 "Целевой уровень, до которого пополняет список закупок (базовая единица)."
 
+msgid "Preferred supplier (Purchasing module)."
+msgstr "Предпочитаемый поставщик (модуль закупок)."
+
 msgid "Cost per base unit used when no lot cost is known."
 msgstr "Стоимость базовой единицы, когда цена партии неизвестна."
 
@@ -1622,6 +1664,10 @@ msgstr "Что купить на"
 
 msgid "Show"
 msgstr "Показать"
+
+#| msgid "Purchase order"
+msgid "Create purchase orders"
+msgstr "Создать заказы поставщикам"
 
 msgid "Item"
 msgstr "Позиция"
@@ -2388,7 +2434,6 @@ msgstr "Повторить (снова в очередь)"
 msgid "{p0} job(s) queued again."
 msgstr "Заданий снова в очереди: {p0}."
 
-#| msgid "None available"
 msgid "Not available today"
 msgstr "Сегодня недоступно"
 
@@ -2405,7 +2450,6 @@ msgstr "Среда"
 msgid "Thursday"
 msgstr "Четверг"
 
-#| msgid "Holiday"
 msgid "Friday"
 msgstr "Пятница"
 
@@ -2424,11 +2468,9 @@ msgstr "0 = понедельник … 6 = воскресенье. Пусто = 
 msgid "Earlier than the start = the window runs past midnight."
 msgstr "Раньше начала = окно переходит за полночь."
 
-#| msgid "Menu push queued."
 msgid "Menu schedule"
 msgstr "Расписание меню"
 
-#| msgid "Menu syncs"
 msgid "Menu schedules"
 msgstr "Расписания меню"
 
@@ -2441,11 +2483,9 @@ msgstr "Компоненты комбо"
 msgid "Happy hour (automatic)"
 msgstr "Happy hour (автоматически)"
 
-#| msgid "Promotion"
 msgid "Promo code"
 msgstr "Промокод"
 
-#| msgid "Write off"
 msgid "Percent off"
 msgstr "Скидка в процентах"
 
@@ -2453,15 +2493,12 @@ msgid "Fixed amount off"
 msgstr "Фиксированная скидка"
 
 # Models - Orders
-#| msgid "All orders"
 msgid "Whole order"
 msgstr "Весь заказ"
 
-#| msgid "categories"
 msgid "Selected categories"
 msgstr "Выбранные категории"
 
-#| msgid "Distinct dishes"
 msgid "Selected dishes"
 msgstr "Выбранные блюда"
 
@@ -2484,11 +2521,9 @@ msgstr "Пусто = везде (сайт, QR, POS)."
 msgid "May combine with other promotions on one order."
 msgstr "Может сочетаться с другими акциями в одном заказе."
 
-#| msgid "Promotion"
 msgid "Promotion use"
 msgstr "Использование акции"
 
-#| msgid "Promotion"
 msgid "Promotion uses"
 msgstr "Использования акций"
 
@@ -2499,14 +2534,12 @@ msgid "This code is not valid."
 msgstr "Этот код недействителен."
 
 # Form validation
-#| msgid "This field is required."
 msgid "This code has expired."
 msgstr "Срок действия кода истёк."
 
 msgid "This code has been used up."
 msgstr "Этот код исчерпан."
 
-#| msgid "This field cannot be blank."
 msgid "This code cannot be used here."
 msgstr "Этот код здесь не действует."
 
@@ -2524,12 +2557,10 @@ msgstr "Добавьте ещё %(amount)s, чтобы использовать 
 msgid "This code cannot be combined with another promotion."
 msgstr "Этот код нельзя сочетать с другой акцией."
 
-#| msgid "Nothing in this period."
 msgid "Nothing in this order is eligible for the code."
 msgstr "В этом заказе нет позиций, подходящих под код."
 
 # Form validation
-#| msgid "This field is required."
 msgid "This code is already applied."
 msgstr "Этот код уже применён."
 
@@ -2542,15 +2573,12 @@ msgstr "Окно"
 msgid "Every day"
 msgstr "Каждый день"
 
-#| msgid "Used in"
 msgid "Used by"
 msgstr "Используется"
 
-#| msgid "Promotion"
 msgid "promotions"
 msgstr "акций"
 
-#| msgid "Channel"
 msgid "Channels"
 msgstr "Каналы"
 
@@ -2566,25 +2594,195 @@ msgstr "Happy hour нужно расписание (когда действуе�
 msgid "Percent cannot exceed 100."
 msgstr "Процент не может превышать 100."
 
-#| msgid "Open now"
 msgid "Live now"
 msgstr "Действует сейчас"
 
 # Models - Accounts
-#| msgid "Discount"
 msgid "Discount total"
 msgstr "Сумма скидок"
 
-#| msgid "Active"
 msgid "Activate"
 msgstr "Активировать"
 
-#| msgid "Is active"
 msgid "Deactivate"
 msgstr "Деактивировать"
 
 msgid "Combo components (tick 'Is combo' on the dish)"
 msgstr "Компоненты комбо (отметьте «Комбо» у блюда)"
+
+msgid "ს/კ of the supplier (waybills)."
+msgstr "ს/კ поставщика (для накладных)."
+
+msgid "E.g. 'on delivery', '14 days'."
+msgstr "Напр. «при доставке», «14 дней»."
+
+msgid "Days between ordering and delivery."
+msgstr "Дней от заказа до поставки."
+
+msgid "Supplier"
+msgstr "Поставщик"
+
+msgid "Unit the price is per."
+msgstr "Единица, за которую указана цена."
+
+msgid "Units per pack (a 10 kg bag = 10)."
+msgstr "Единиц в упаковке (мешок 10 кг = 10)."
+
+msgid "Per unit, latest known."
+msgstr "За единицу, последняя известная."
+
+msgid "The buy list orders from this supplier."
+msgstr "Список закупок заказывает у этого поставщика."
+
+msgid "Supplier price"
+msgstr "Цена поставщика"
+
+msgid "Supplier prices"
+msgstr "Цены поставщиков"
+
+msgid "Sent to supplier"
+msgstr "Отправлен поставщику"
+
+#| msgid "Partially Refunded"
+msgid "Partially received"
+msgstr "Частично получен"
+
+#| msgid "Shown to guests on the menu."
+msgid "Shown to the supplier."
+msgstr "Показывается поставщику."
+
+msgid "Supplier invoice / waybill no."
+msgstr "№ счёта / накладной поставщика"
+
+#| msgid "Per base unit."
+msgid "Per unit."
+msgstr "За единицу."
+
+#| msgid "Purchase order"
+msgid "Purchase order line"
+msgstr "Строка заказа поставщику"
+
+#| msgid "Purchase order"
+msgid "Purchase order lines"
+msgstr "Строки заказа поставщику"
+
+#| msgid "Delivery"
+msgid "Deliver by"
+msgstr "Доставить до"
+
+msgid "Only draft orders can be sent."
+msgstr "Отправить можно только черновик."
+
+msgid "Add at least one line first."
+msgstr "Сначала добавьте хотя бы одну строку."
+
+#| msgid "This code is not valid."
+msgid "This order is closed."
+msgstr "Этот заказ закрыт."
+
+#| msgid "Restored (order cancelled)"
+msgid "A received order cannot be cancelled."
+msgstr "Полученный заказ нельзя отменить."
+
+msgid "(no supplier)"
+msgstr "(без поставщика)"
+
+#| msgid "Overview"
+msgid "Overdue"
+msgstr "Просрочено"
+
+#| msgid "Receive stock"
+msgid "Received this month"
+msgstr "Получено в этом месяце"
+
+msgid "Create from buy list"
+msgstr "Создать из списка закупок"
+
+msgid "One draft order per supplier for everything below par."
+msgstr "Один черновик на поставщика для всего, что ниже нормы."
+
+msgid "Expected"
+msgstr "Ожидалось"
+
+msgid ""
+"Enter what arrived. Empty quantity = not delivered (the order stays open for"
+" the rest). Prices are per the unit shown; they update the supplier's price "
+"list."
+msgstr ""
+"Введите, что пришло. Пустое количество = не доставлено (заказ остаётся "
+"открытым на остальное). Цены за указанную единицу; они обновляют прайс "
+"поставщика."
+
+#| msgid "Invoice / delivery note number."
+msgid "Invoice / waybill number"
+msgstr "Номер счёта / накладной"
+
+#| msgid "Order"
+msgid "Ordered"
+msgstr "Заказано"
+
+#| msgid "Order received"
+msgid "Already received"
+msgstr "Уже получено"
+
+#| msgid "Received"
+msgid "Received now"
+msgstr "Получено сейчас"
+
+#| msgid "Per base unit."
+msgid "Price / unit"
+msgstr "Цена / единица"
+
+#| msgid "Delivery"
+msgid "Book delivery"
+msgstr "Оприходовать"
+
+msgid "Lines"
+msgstr "Строки"
+
+#| msgid "Everything is at par -- nothing to buy."
+msgid "Everything is at par -- nothing to order."
+msgstr "Всё на уровне — заказывать нечего."
+
+#, python-format
+msgid "Created %(n)d draft purchase order(s): %(numbers)s"
+msgstr "Создано черновиков: %(n)d — %(numbers)s"
+
+#| msgid "Send test"
+msgid "Send"
+msgstr "Отправить"
+
+#, python-format
+msgid ""
+"%(number)s marked as sent. The supplier has no email / phone: open 'Text' to"
+" copy the order."
+msgstr ""
+"%(number)s отмечен как отправленный. У поставщика нет email / телефона: "
+"откройте «Текст» и скопируйте заказ."
+
+#, python-format
+msgid "%(number)s sent by %(via)s."
+msgstr "%(number)s отправлен через %(via)s."
+
+msgid "Text"
+msgstr "Текст"
+
+#, python-format
+#| msgid "Request cancelled."
+msgid "%(number)s cancelled."
+msgstr "%(number)s отменён."
+
+#, python-format
+msgid "Bad quantity for %(item)s."
+msgstr "Неверное количество: %(item)s."
+
+#, python-format
+msgid "Booked %(n)d lot(s); %(number)s is now %(status)s."
+msgstr "Оприходовано партий: %(n)d; %(number)s теперь: %(status)s."
+
+#, python-format
+msgid "Receive %(number)s"
+msgstr "Приёмка %(number)s"
 
 msgid "Referrals"
 msgstr "Рефералы"
@@ -2768,7 +2966,6 @@ msgstr "Себестоимость %"
 msgid "Kind"
 msgstr "Тип"
 
-#| msgid "QR Code"
 msgid "Code"
 msgstr "Код"
 
@@ -2798,6 +2995,17 @@ msgstr "Структура затрат"
 
 msgid "Margin"
 msgstr "Маржа"
+
+#| msgid "Purchase order"
+msgid "Purchases by supplier"
+msgstr "Закупки по поставщикам"
+
+#| msgid "Delivery"
+msgid "Deliveries"
+msgstr "Поставки"
+
+msgid "Total"
+msgstr "Итого"
 
 msgid "Servers with sales"
 msgstr "Официанты с продажами"
@@ -2843,9 +3051,6 @@ msgstr "Открыта"
 
 msgid "Closed"
 msgstr "Закрыта"
-
-msgid "Expected"
-msgstr "Ожидалось"
 
 msgid "Counted"
 msgstr "Подсчитано"
@@ -3421,9 +3626,6 @@ msgstr "Запрос на общую площадку"
 
 #~ msgid "Time"
 #~ msgstr "Время"
-
-#~ msgid "Total"
-#~ msgstr "Итого"
 
 #~ msgid "Subtotal"
 #~ msgstr "Промежуточный итог"

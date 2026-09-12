@@ -284,6 +284,30 @@ def module_cards(request):
             "orders",
         )
 
+    if "purchasing" in on and has_resource_permission(request, "warehouse", "read"):
+        from apps.purchasing import services as purchasing_services
+
+        ps = purchasing_services.open_summary(restaurant)
+        card(
+            "purchasing",
+            _("Purchasing"),
+            "local_shipping",
+            [
+                {
+                    "label": _("Open orders"),
+                    "value": ps["open"],
+                    "url": _url("purchasing_purchaseorder_changelist") + "?status__exact=sent",
+                },
+                {"label": _("Due today"), "value": ps["due_today"], "url": _url("purchasing_purchaseorder_changelist")},
+                {"label": _("Suppliers"), "value": ps["suppliers"], "url": _url("purchasing_supplier_changelist")},
+            ],
+            [
+                _link(_("Purchase orders"), "purchasing_purchaseorder_changelist"),
+                _link(_("Suppliers"), "purchasing_supplier_changelist"),
+            ],
+            "warehouse",
+        )
+
     if "promotions" in on and has_resource_permission(request, "menu", "read"):
         from apps.promotions import services as promo_services
         from apps.promotions.models import Promotion, PromotionUse

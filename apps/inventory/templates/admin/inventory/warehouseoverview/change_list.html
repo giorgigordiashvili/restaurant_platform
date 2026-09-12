@@ -71,7 +71,10 @@ changelist underneath is the alert history.
     <div class="{{ base }}" data-testid="buy-list">
       <div class="flex items-center justify-between gap-2 mb-2">
         <h3 class="text-sm font-semibold uppercase text-base-500">{% translate "What to buy for" %} {{ for_date }}</h3>
+        <div class="flex items-center gap-2">
         <form method="get" class="flex items-center gap-2"><input type="date" name="for_date" value="{{ for_date|date:'Y-m-d' }}" class="{{ input }}"><button type="submit" class="{{ btn2 }}">{% translate "Show" %}</button></form>
+        {% if purchasing_on and can_receive and buy_lines %}<form method="post" action="{{ po_from_buy_list_url }}">{% csrf_token %}<input type="hidden" name="for_date" value="{{ for_date|date:'Y-m-d' }}"><button type="submit" class="{{ btn }}" data-testid="buy-list-to-po">{% translate "Create purchase orders" %}</button></form>{% endif %}
+        </div>
       </div>
       <div class="overflow-x-auto">
       <table class="w-full text-sm">
@@ -79,7 +82,7 @@ changelist underneath is the alert history.
         <tbody>
         {% for line in buy_lines %}
           <tr class="border-t border-base-200 dark:border-base-800">
-            <td class="py-1 pr-3 font-medium">{{ line.stock_item.name }}{% if line.stock_item.supplier_name %}<span class="block text-xs text-base-500">{{ line.stock_item.supplier_name }}</span>{% endif %}</td>
+            <td class="py-1 pr-3 font-medium">{{ line.stock_item.name }}{% if line.stock_item.supplier %}<span class="block text-xs text-base-500">{{ line.stock_item.supplier.name }}</span>{% elif line.stock_item.supplier_name %}<span class="block text-xs text-base-500">{{ line.stock_item.supplier_name }}</span>{% endif %}</td>
             <td class="py-1 pr-3">{{ line.available|floatformat:"-2" }} {{ line.stock_item.base_unit.code }}</td>
             <td class="py-1 pr-3 font-semibold">{{ line.suggested_purchase|floatformat:"-2" }} {{ line.purchase_unit.code }}{% if line.packs %} <span class="text-xs text-base-500">({{ line.packs }} × {{ line.stock_item.purchase_pack_qty|floatformat:"-2" }})</span>{% endif %}</td>
             <td class="py-1 pr-3">{{ line.estimated_cost }}</td>

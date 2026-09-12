@@ -106,6 +106,14 @@ class StockItem(TimeStampedModel):
     )
     expiry_warning_days = models.PositiveSmallIntegerField(default=3)
     supplier_name = models.CharField(max_length=150, blank=True, default="")
+    supplier = models.ForeignKey(
+        "purchasing.Supplier",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="stock_items",
+        help_text=_("Preferred supplier (Purchasing module)."),
+    )
     default_unit_cost = models.DecimalField(
         max_digits=12,
         decimal_places=6,

@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-2 py-1 text-sm w-full" %}
+<form method="post" class="{{ base }} flex flex-col gap-4" data-testid="po-receive">
+  {% csrf_token %}
+  <div>
+    <h2 class="font-semibold text-lg">{{ title }}</h2>
+    <p class="text-sm text-base-500">{% translate "Supplier" %}: {{ po.supplier|default:"—" }} · {% translate "Expected" %}: {{ po.expected_on|date:"d.m.Y"|default:"—" }} · {{ po.get_status_display }}</p>
+    <p class="text-sm text-base-500">{% translate "Enter what arrived. Empty quantity = not delivered (the order stays open for the rest). Prices are per the unit shown; they update the supplier's price list." %}</p>
+  </div>
+  <label class="text-sm md:w-1/2">{% translate "Invoice / waybill number" %}<input type="text" name="reference" value="{{ po.reference }}" class="{{ input }}"></label>
+  <div class="overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead><tr class="text-left text-xs uppercase text-base-500"><th class="py-1 pr-3">{% translate "Item" %}</th><th class="py-1 pr-3">{% translate "Ordered" %}</th><th class="py-1 pr-3">{% translate "Already received" %}</th><th class="py-1 pr-3">{% translate "Received now" %}</th><th class="py-1 pr-3">{% translate "Price / unit" %}</th><th class="py-1 pr-3">{% translate "Expiry" %}</th></tr></thead>
+    <tbody>
+    {% for line in lines %}
+      <tr class="border-t border-base-100 dark:border-base-800">
+        <td class="py-1 pr-3 font-medium">{{ line.stock_item.name }}{% if line.note %}<span class="block text-xs text-base-500">{{ line.note }}</span>{% endif %}</td>
+        <td class="py-1 pr-3">{{ line.quantity|floatformat:"-2" }} {{ line.unit.code }}</td>
+        <td class="py-1 pr-3">{{ line.received_qty|floatformat:"-2" }}</td>
+        <td class="py-1 pr-3"><input type="number" step="0.01" min="0" name="qty_{{ line.pk }}" value="{% if line.outstanding > 0 %}{{ line.outstanding|floatformat:'-2' }}{% endif %}" class="{{ input }}" data-testid="qty-{{ line.pk }}"></td>
+        <td class="py-1 pr-3"><input type="number" step="0.0001" min="0" name="price_{{ line.pk }}" value="{{ line.unit_price|floatformat:'-4' }}" class="{{ input }}"></td>
+        <td class="py-1 pr-3"><input type="date" name="expiry_{{ line.pk }}" class="{{ input }}"></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <div class="flex gap-2">
+    <button type="submit" class="{{ btn }}" data-testid="po-receive-submit">{% translate "Book delivery" %}</button>
+    <a href="{{ back_url }}" class="{{ btn2 }}">{% translate "Back" %}</a>
+  </div>
+</form>
+{% endwith %}
+{% endblock %}

@@ -46,6 +46,10 @@ class AuditLog(TimeStampedModel):
         ("order_split", _("Order Split")),
         ("order_move", _("Order Moved")),
         ("menu_availability", _("Dish availability changed")),
+        ("po_create", _("Purchase order created")),
+        ("po_send", _("Purchase order sent")),
+        ("po_receive", _("Purchase order received")),
+        ("po_cancel", _("Purchase order cancelled")),
     ]
 
     # Actor

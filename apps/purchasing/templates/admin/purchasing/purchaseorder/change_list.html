@@ -1,0 +1,19 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-3 py-1.5 text-sm" %}
+{% if summary %}
+<div class="mb-4 grid gap-3 md:grid-cols-5" data-testid="po-summary">
+  <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Open orders" %}</p><p class="text-2xl font-semibold">{{ summary.open }}</p></div>
+  <div class="{{ base }} {% if summary.due_today %}border-amber-300{% endif %}"><p class="text-xs uppercase text-base-500">{% translate "Due today" %}</p><p class="text-2xl font-semibold">{{ summary.due_today }}</p></div>
+  <div class="{{ base }} {% if summary.overdue %}border-red-300{% endif %}"><p class="text-xs uppercase text-base-500">{% translate "Overdue" %}</p><p class="text-2xl font-semibold {% if summary.overdue %}text-red-600{% endif %}">{{ summary.overdue }}</p></div>
+  <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Received this month" %}</p><p class="text-2xl font-semibold">{{ summary.received_this_month }}</p></div>
+  <div class="{{ base }} flex flex-col justify-center gap-2">
+    {% if can_create %}<form method="post" action="{{ from_buy_list_url }}" class="flex flex-wrap items-center gap-2">{% csrf_token %}<input type="date" name="for_date" class="{{ input }}"><button type="submit" class="{{ btn }}" data-testid="po-from-buy-list">{% translate "Create from buy list" %}</button></form>{% endif %}
+    <p class="text-xs text-base-500">{% translate "One draft order per supplier for everything below par." %}</p>
+  </div>
+</div>
+{% endif %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-12 22:24+0400\n"
+"POT-Creation-Date: 2026-09-12 22:38+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Georgian\n"
@@ -118,9 +118,24 @@ msgstr "შეკვეთა გაიყო"
 msgid "Order Moved"
 msgstr "შეკვეთა გადატანილია"
 
-#| msgid "Prices and availability sync queued."
 msgid "Dish availability changed"
 msgstr "კერძის ხელმისაწვდომობა შეიცვალა"
+
+#| msgid "Purchase order"
+msgid "Purchase order created"
+msgstr "შესყიდვის შეკვეთა შეიქმნა"
+
+#| msgid "Purchase order"
+msgid "Purchase order sent"
+msgstr "შესყიდვის შეკვეთა გაიგზავნა"
+
+#| msgid "Purchases received"
+msgid "Purchase order received"
+msgstr "შესყიდვის შეკვეთა მიღებულია"
+
+#| msgid "Purchase order"
+msgid "Purchase order cancelled"
+msgstr "შესყიდვის შეკვეთა გაუქმდა"
 
 msgid "Audit Log"
 msgstr "აუდიტის ჩანაწერი"
@@ -252,7 +267,26 @@ msgstr "პლატფორმები"
 msgid "Setup guide"
 msgstr "დაყენების გზამკვლევი"
 
-#| msgid "Promotion"
+#| msgid "Processing"
+msgid "Purchasing"
+msgstr "შესყიდვები"
+
+#| msgid "Open alerts"
+msgid "Open orders"
+msgstr "ღია შეკვეთები"
+
+# Dates and times
+#| msgid "today"
+msgid "Due today"
+msgstr "დღეს მოსალოდნელი"
+
+msgid "Suppliers"
+msgstr "მომწოდებლები"
+
+#| msgid "Purchase order"
+msgid "Purchase orders"
+msgstr "შესყიდვის შეკვეთები"
+
 msgid "Promotions"
 msgstr "აქციები"
 
@@ -263,11 +297,9 @@ msgid "Happy hours live now"
 msgstr "აქტიური happy hour"
 
 # Models - Orders
-#| msgid "Orders today"
 msgid "Codes used today"
 msgstr "დღეს გამოყენებული კოდები"
 
-#| msgid "Modules"
 msgid "Schedules"
 msgstr "განრიგები"
 
@@ -411,6 +443,13 @@ msgid ""
 msgstr ""
 "დღგ პროფილი, თანმიმდევრული ჩეკები და დაბრუნების ჩეკები, RS.ge ზედნადებების "
 "ექსპორტი. ფისკალური პროვაიდერი მოგვიანებით დაემატება."
+
+msgid ""
+"Suppliers with price lists, purchase orders straight from the buy list, "
+"receiving against the order."
+msgstr ""
+"მომწოდებლები ფასების სიით, შესყიდვის შეკვეთები პირდაპირ შესყიდვის სიიდან, "
+"მიღება შეკვეთის მიხედვით."
 
 msgid "Promotions & schedules"
 msgstr "აქციები და განრიგები"
@@ -1431,6 +1470,9 @@ msgstr "გაფრთხილება, როცა მარაგი ა�
 msgid "Target stock level the buy list tops up to (base unit)."
 msgstr "სამიზნე მარაგი, რომლამდეც შესყიდვის სია ავსებს (ძირითადი ერთეული)."
 
+msgid "Preferred supplier (Purchasing module)."
+msgstr "სასურველი მომწოდებელი (შესყიდვების მოდული)."
+
 msgid "Cost per base unit used when no lot cost is known."
 msgstr "ძირითადი ერთეულის ღირებულება, როცა პარტიის ფასი უცნობია."
 
@@ -1628,6 +1670,10 @@ msgstr "რა ვიყიდოთ"
 
 msgid "Show"
 msgstr "ჩვენება"
+
+#| msgid "Purchase order"
+msgid "Create purchase orders"
+msgstr "შესყიდვის შეკვეთების შექმნა"
 
 msgid "Item"
 msgstr "პოზიცია"
@@ -2397,7 +2443,6 @@ msgstr "ხელახლა (რიგში დაბრუნება)"
 msgid "{p0} job(s) queued again."
 msgstr "{p0} დავალება ხელახლა რიგშია."
 
-#| msgid "None available"
 msgid "Not available today"
 msgstr "დღეს არ არის"
 
@@ -2414,7 +2459,6 @@ msgstr "ოთხშაბათი"
 msgid "Thursday"
 msgstr "ხუთშაბათი"
 
-#| msgid "Holiday"
 msgid "Friday"
 msgstr "პარასკევი"
 
@@ -2433,11 +2477,9 @@ msgstr "0 = ორშაბათი … 6 = კვირა. ცარიელ
 msgid "Earlier than the start = the window runs past midnight."
 msgstr "დაწყებაზე ადრე = ფანჯარა შუაღამეს გადადის."
 
-#| msgid "Menu push queued."
 msgid "Menu schedule"
 msgstr "მენიუს განრიგი"
 
-#| msgid "Menu syncs"
 msgid "Menu schedules"
 msgstr "მენიუს განრიგები"
 
@@ -2450,11 +2492,9 @@ msgstr "კომბოს კომპონენტები"
 msgid "Happy hour (automatic)"
 msgstr "Happy hour (ავტომატური)"
 
-#| msgid "Promotion"
 msgid "Promo code"
 msgstr "პრომო კოდი"
 
-#| msgid "Write off"
 msgid "Percent off"
 msgstr "პროცენტული ფასდაკლება"
 
@@ -2462,15 +2502,12 @@ msgid "Fixed amount off"
 msgstr "ფიქსირებული ფასდაკლება"
 
 # Models - Orders
-#| msgid "All orders"
 msgid "Whole order"
 msgstr "მთელი შეკვეთა"
 
-#| msgid "categories"
 msgid "Selected categories"
 msgstr "არჩეული კატეგორიები"
 
-#| msgid "Distinct dishes"
 msgid "Selected dishes"
 msgstr "არჩეული კერძები"
 
@@ -2493,11 +2530,9 @@ msgstr "ცარიელი = ყველგან (ვები, QR, POS)."
 msgid "May combine with other promotions on one order."
 msgstr "შეიძლება სხვა აქციებთან ერთად ერთ შეკვეთაზე."
 
-#| msgid "Promotion"
 msgid "Promotion use"
 msgstr "აქციის გამოყენება"
 
-#| msgid "Promotion"
 msgid "Promotion uses"
 msgstr "აქციის გამოყენებები"
 
@@ -2508,14 +2543,12 @@ msgid "This code is not valid."
 msgstr "ეს კოდი არასწორია."
 
 # Form validation
-#| msgid "This field is required."
 msgid "This code has expired."
 msgstr "ამ კოდს ვადა გაუვიდა."
 
 msgid "This code has been used up."
 msgstr "ეს კოდი ამოწურულია."
 
-#| msgid "This field cannot be blank."
 msgid "This code cannot be used here."
 msgstr "ეს კოდი აქ არ გამოიყენება."
 
@@ -2533,12 +2566,10 @@ msgstr "დაამატეთ კიდევ %(amount)s ამ კოდი�
 msgid "This code cannot be combined with another promotion."
 msgstr "ეს კოდი სხვა აქციასთან არ ერთდება."
 
-#| msgid "Nothing in this period."
 msgid "Nothing in this order is eligible for the code."
 msgstr "ამ შეკვეთაში კოდისთვის შესაფერისი არაფერია."
 
 # Form validation
-#| msgid "This field is required."
 msgid "This code is already applied."
 msgstr "ეს კოდი უკვე გამოყენებულია."
 
@@ -2551,15 +2582,12 @@ msgstr "ფანჯარა"
 msgid "Every day"
 msgstr "ყოველდღე"
 
-#| msgid "Used in"
 msgid "Used by"
 msgstr "გამოიყენება"
 
-#| msgid "Promotion"
 msgid "promotions"
 msgstr "აქცია"
 
-#| msgid "Channel"
 msgid "Channels"
 msgstr "არხები"
 
@@ -2575,25 +2603,194 @@ msgstr "Happy hour-ს განრიგი სჭირდება (როდ
 msgid "Percent cannot exceed 100."
 msgstr "პროცენტი 100-ს ვერ გადააჭარბებს."
 
-#| msgid "Open now"
 msgid "Live now"
 msgstr "ახლა აქტიური"
 
 # Models - Accounts
-#| msgid "Discount"
 msgid "Discount total"
 msgstr "ფასდაკლება ჯამში"
 
-#| msgid "Active"
 msgid "Activate"
 msgstr "გააქტიურება"
 
-#| msgid "Is active"
 msgid "Deactivate"
 msgstr "დეაქტივაცია"
 
 msgid "Combo components (tick 'Is combo' on the dish)"
 msgstr "კომბოს კომპონენტები (მონიშნეთ „კომბო“ კერძზე)"
+
+msgid "ს/კ of the supplier (waybills)."
+msgstr "მომწოდებლის ს/კ (ზედნადებებისთვის)."
+
+msgid "E.g. 'on delivery', '14 days'."
+msgstr "მაგ. „მიწოდებისას“, „14 დღე“."
+
+msgid "Days between ordering and delivery."
+msgstr "დღეები შეკვეთიდან მიწოდებამდე."
+
+msgid "Supplier"
+msgstr "მომწოდებელი"
+
+msgid "Unit the price is per."
+msgstr "ერთეული, რომელზეც ფასია."
+
+msgid "Units per pack (a 10 kg bag = 10)."
+msgstr "ერთეული შეფუთვაში (10 კგ ტომარა = 10)."
+
+msgid "Per unit, latest known."
+msgstr "ერთეულზე, ბოლო ცნობილი."
+
+msgid "The buy list orders from this supplier."
+msgstr "შესყიდვის სია ამ მომწოდებლისგან უკვეთავს."
+
+msgid "Supplier price"
+msgstr "მომწოდებლის ფასი"
+
+msgid "Supplier prices"
+msgstr "მომწოდებლის ფასები"
+
+msgid "Sent to supplier"
+msgstr "გაგზავნილია მომწოდებელს"
+
+#| msgid "Partially Refunded"
+msgid "Partially received"
+msgstr "ნაწილობრივ მიღებულია"
+
+#| msgid "Shown to guests on the menu."
+msgid "Shown to the supplier."
+msgstr "მომწოდებელს უჩვენებს."
+
+msgid "Supplier invoice / waybill no."
+msgstr "მომწოდებლის ინვოისის / ზედნადების №"
+
+#| msgid "Per base unit."
+msgid "Per unit."
+msgstr "ერთეულზე."
+
+#| msgid "Purchase order"
+msgid "Purchase order line"
+msgstr "შესყიდვის შეკვეთის ხაზი"
+
+#| msgid "Purchase order"
+msgid "Purchase order lines"
+msgstr "შესყიდვის შეკვეთის ხაზები"
+
+#| msgid "Delivery"
+msgid "Deliver by"
+msgstr "მიწოდება"
+
+msgid "Only draft orders can be sent."
+msgstr "მხოლოდ მონახაზის გაგზავნაა შესაძლებელი."
+
+msgid "Add at least one line first."
+msgstr "ჯერ დაამატეთ ერთი ხაზი მაინც."
+
+#| msgid "This code is not valid."
+msgid "This order is closed."
+msgstr "ეს შეკვეთა დახურულია."
+
+#| msgid "Restored (order cancelled)"
+msgid "A received order cannot be cancelled."
+msgstr "მიღებული შეკვეთის გაუქმება შეუძლებელია."
+
+msgid "(no supplier)"
+msgstr "(მომწოდებლის გარეშე)"
+
+#| msgid "Overview"
+msgid "Overdue"
+msgstr "ვადაგადაცილებული"
+
+#| msgid "Receive stock"
+msgid "Received this month"
+msgstr "მიღებულია ამ თვეში"
+
+msgid "Create from buy list"
+msgstr "შესყიდვის სიიდან შექმნა"
+
+msgid "One draft order per supplier for everything below par."
+msgstr "ერთი მონახაზი თითო მომწოდებელზე ყველაფრისთვის, რაც ნორმას ქვემოთაა."
+
+msgid "Expected"
+msgstr "მოსალოდნელი"
+
+msgid ""
+"Enter what arrived. Empty quantity = not delivered (the order stays open for"
+" the rest). Prices are per the unit shown; they update the supplier's price "
+"list."
+msgstr ""
+"შეიყვანეთ, რა მოვიდა. ცარიელი რაოდენობა = არ მოწოდებულა (შეკვეთა დანარჩენზე "
+"ღია რჩება). ფასები ნაჩვენებ ერთეულზეა და მომწოდებლის ფასების სიას აახლებს."
+
+#| msgid "Invoice / delivery note number."
+msgid "Invoice / waybill number"
+msgstr "ინვოისის / ზედნადების ნომერი"
+
+#| msgid "Order"
+msgid "Ordered"
+msgstr "შეკვეთილი"
+
+#| msgid "Order received"
+msgid "Already received"
+msgstr "უკვე მიღებული"
+
+#| msgid "Received"
+msgid "Received now"
+msgstr "ახლა მიღებული"
+
+#| msgid "Per base unit."
+msgid "Price / unit"
+msgstr "ფასი / ერთეული"
+
+#| msgid "Delivery"
+msgid "Book delivery"
+msgstr "მიწოდების დაფიქსირება"
+
+msgid "Lines"
+msgstr "ხაზები"
+
+#| msgid "Everything is at par -- nothing to buy."
+msgid "Everything is at par -- nothing to order."
+msgstr "ყველაფერი ნორმაშია — შესაკვეთი არაფერია."
+
+#, python-format
+msgid "Created %(n)d draft purchase order(s): %(numbers)s"
+msgstr "შეიქმნა %(n)d მონახაზი: %(numbers)s"
+
+#| msgid "Send test"
+msgid "Send"
+msgstr "გაგზავნა"
+
+#, python-format
+msgid ""
+"%(number)s marked as sent. The supplier has no email / phone: open 'Text' to"
+" copy the order."
+msgstr ""
+"%(number)s გაგზავნილად მოინიშნა. მომწოდებელს ელფოსტა / ტელეფონი არ აქვს: "
+"გახსენით „ტექსტი“ და დააკოპირეთ."
+
+#, python-format
+msgid "%(number)s sent by %(via)s."
+msgstr "%(number)s გაიგზავნა (%(via)s)."
+
+msgid "Text"
+msgstr "ტექსტი"
+
+#, python-format
+#| msgid "Request cancelled."
+msgid "%(number)s cancelled."
+msgstr "%(number)s გაუქმებულია."
+
+#, python-format
+msgid "Bad quantity for %(item)s."
+msgstr "არასწორი რაოდენობა: %(item)s."
+
+#, python-format
+msgid "Booked %(n)d lot(s); %(number)s is now %(status)s."
+msgstr "დაფიქსირდა %(n)d პარტია; %(number)s ახლა: %(status)s."
+
+#, python-format
+msgid "Receive %(number)s"
+msgstr "მიღება: %(number)s"
 
 msgid "Referrals"
 msgstr "რეფერალები"
@@ -2777,7 +2974,6 @@ msgstr "პროდუქტების ღირებულება %"
 msgid "Kind"
 msgstr "ტიპი"
 
-#| msgid "QR Code"
 msgid "Code"
 msgstr "კოდი"
 
@@ -2807,6 +3003,17 @@ msgstr "ღირებულების განაწილება"
 
 msgid "Margin"
 msgstr "მარჟა"
+
+#| msgid "Purchase order"
+msgid "Purchases by supplier"
+msgstr "შესყიდვები მომწოდებლების მიხედვით"
+
+#| msgid "Delivery"
+msgid "Deliveries"
+msgstr "მიწოდებები"
+
+msgid "Total"
+msgstr "ჯამი"
 
 msgid "Servers with sales"
 msgstr "მიმტანები გაყიდვებით"
@@ -2852,9 +3059,6 @@ msgstr "გახსნილია"
 
 msgid "Closed"
 msgstr "დახურულია"
-
-msgid "Expected"
-msgstr "მოსალოდნელი"
 
 msgid "Counted"
 msgstr "დათვლილი"
@@ -3433,9 +3637,6 @@ msgstr "საერთო სივრცის მოთხოვნა"
 
 #~ msgid "Time"
 #~ msgstr "დრო"
-
-#~ msgid "Total"
-#~ msgstr "ჯამი"
 
 #~ msgid "Subtotal"
 #~ msgstr "ქვეჯამი"

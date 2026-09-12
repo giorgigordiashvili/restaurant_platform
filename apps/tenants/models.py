@@ -334,6 +334,10 @@ class Restaurant(TimeStampedModel):
         default=True,
         help_text=_("Reviews module: customer reviews on the restaurant page."),
     )
+    purchasing_enabled = models.BooleanField(
+        default=False,
+        help_text="Purchasing module: suppliers, price lists, purchase orders from the buy list, receiving.",
+    )
     promotions_enabled = models.BooleanField(
         default=False,
         help_text="Promotions module: menu schedules, happy hours, promo codes, combos, '86 today'.",
