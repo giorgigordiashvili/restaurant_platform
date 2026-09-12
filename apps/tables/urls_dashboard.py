@@ -16,6 +16,7 @@ from .views import (
     TableSessionCreateView,
     TableSessionListView,
     TableSessionMarkCashPaidView,
+    TableSessionStaffBillView,
     TableStatusUpdateView,
 )
 
@@ -42,4 +43,5 @@ urlpatterns = [
         TableSessionMarkCashPaidView.as_view(),
         name="session-mark-cash-paid",
     ),
+    path("sessions/<uuid:id>/bill/", TableSessionStaffBillView.as_view(), name="session-bill"),
 ]

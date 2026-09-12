@@ -81,6 +81,7 @@ def test_module_pages_disappear_when_off(owner_admin, restaurant, user, code, ur
     assert owner_admin.get(url).status_code == 200
     if code == "ordering":
         modules.set_module(restaurant, "kitchen", False, by=user)
+        modules.set_module(restaurant, "cash", False, by=user)
     modules.set_module(restaurant, code, False, by=user)
     assert owner_admin.get(url).status_code == 403
 

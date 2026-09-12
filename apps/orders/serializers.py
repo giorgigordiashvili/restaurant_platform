@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from apps.menu.models import SELLABLE, MenuItem, Modifier
 
-from .models import Order, OrderItem, OrderItemModifier, OrderStatusHistory
+from .models import Order, OrderDiscount, OrderItem, OrderItemModifier, OrderStatusHistory
 
 
 class OrderItemModifierSerializer(serializers.ModelSerializer):
@@ -27,6 +27,10 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     modifiers = OrderItemModifierSerializer(many=True, read_only=True)
 
+    net_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    discount_reason_label = serializers.SerializerMethodField()
+    void_reason_label = serializers.SerializerMethodField()
+
     class Meta:
         model = OrderItem
         fields = [
@@ -37,12 +41,61 @@ class OrderItemSerializer(serializers.ModelSerializer):
             "unit_price",
             "quantity",
             "total_price",
+            "discount_amount",
+            "net_price",
+            "is_comped",
+            "discount_reason_label",
             "status",
+            "voided_at",
+            "void_reason_label",
+            "was_sent_to_kitchen",
             "preparation_station",
             "special_instructions",
             "modifiers",
         ]
-        read_only_fields = ["id", "item_name", "item_description", "unit_price", "total_price"]
+        read_only_fields = [
+            "id",
+            "item_name",
+            "item_description",
+            "unit_price",
+            "total_price",
+            "discount_amount",
+            "net_price",
+            "is_comped",
+            "discount_reason_label",
+            "voided_at",
+            "void_reason_label",
+            "was_sent_to_kitchen",
+        ]
+
+    def get_discount_reason_label(self, obj):
+        if obj.discount_reason_id and obj.discount_reason:
+            return obj.discount_reason.label
+        return obj.discount_reason_text or ""
+
+    def get_void_reason_label(self, obj):
+        if obj.void_reason_id and obj.void_reason:
+            return obj.void_reason.label
+        return obj.void_reason_text or ""
+
+
+class OrderDiscountSerializer(serializers.ModelSerializer):
+    label = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = OrderDiscount
+        fields = ["id", "kind", "mode", "value", "amount", "label", "applied_by", "created_at"]
+        read_only_fields = fields
+
+
+class OrderPaymentBriefSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    payment_method = serializers.CharField()
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    tip_amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    receipt_number = serializers.CharField()
+    status = serializers.CharField()
+    completed_at = serializers.DateTimeField(allow_null=True)
 
 
 class OrderItemCreateSerializer(serializers.Serializer):
@@ -81,6 +134,11 @@ class OrderSerializer(serializers.ModelSerializer):
 
     items = OrderItemSerializer(many=True, read_only=True)
     table_number = serializers.CharField(source="table.number", read_only=True)
+    discounts = OrderDiscountSerializer(many=True, read_only=True)
+    paid_amount = serializers.SerializerMethodField()
+    balance = serializers.SerializerMethodField()
+    is_paid = serializers.SerializerMethodField()
+    payments = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -91,6 +149,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "status",
             "table",
             "table_number",
+            "table_session",
             "customer_name",
             "customer_phone",
             "customer_email",
@@ -100,9 +159,15 @@ class OrderSerializer(serializers.ModelSerializer):
             "tax_amount",
             "service_charge",
             "discount_amount",
+            "discounts",
+            "wallet_applied",
             "tip_amount",
             "server",
             "total",
+            "paid_amount",
+            "balance",
+            "is_paid",
+            "payments",
             "estimated_ready_at",
             "confirmed_at",
             "completed_at",
@@ -118,6 +183,8 @@ class OrderSerializer(serializers.ModelSerializer):
             "subtotal",
             "tax_amount",
             "service_charge",
+            "discount_amount",
+            "wallet_applied",
             "total",
             "confirmed_at",
             "completed_at",
@@ -125,6 +192,46 @@ class OrderSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def _paid(self, obj):
+        from apps.payments.services import paid_amount
+
+        cache = self.context.setdefault("_paid_cache", {})
+        if obj.pk not in cache:
+            cache[obj.pk] = paid_amount(obj)
+        return cache[obj.pk]
+
+    def get_paid_amount(self, obj):
+        return str(self._paid(obj))
+
+    def get_balance(self, obj):
+        from decimal import Decimal
+
+        return str(max((obj.total or Decimal("0")) - self._paid(obj), Decimal("0")))
+
+    def get_is_paid(self, obj):
+        from decimal import Decimal
+
+        return obj.status == "cancelled" or (obj.total or Decimal("0")) - self._paid(obj) <= 0
+
+    def get_payments(self, obj):
+        rows = []
+        for a in obj.payment_allocations.select_related("payment").order_by("payment__created_at"):
+            p = a.payment
+            if p.status not in ("completed", "partially_refunded", "refunded"):
+                continue
+            rows.append(
+                {
+                    "id": str(p.pk),
+                    "payment_method": p.payment_method,
+                    "amount": str(a.amount),
+                    "tip_amount": str(p.tip_amount),
+                    "receipt_number": p.receipt_number,
+                    "status": p.status,
+                    "completed_at": p.completed_at.isoformat() if p.completed_at else None,
+                }
+            )
+        return rows
 
 
 class OrderCreateSerializer(serializers.Serializer):
@@ -169,6 +276,39 @@ class OrderStatusUpdateSerializer(serializers.Serializer):
         return data
 
 
+class ReasonMixin(serializers.Serializer):
+    reason_id = serializers.UUIDField(required=False, allow_null=True)
+    reason_text = serializers.CharField(max_length=200, required=False, allow_blank=True, default="")
+
+
+class OrderDiscountCreateSerializer(ReasonMixin):
+    mode = serializers.ChoiceField(choices=OrderDiscount.MODE_CHOICES, default="percent")
+    value = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0.01)
+
+
+class OrderDiscountDeleteSerializer(serializers.Serializer):
+    discount_id = serializers.UUIDField(required=False, allow_null=True)
+
+
+class OrderItemDiscountSerializer(ReasonMixin):
+    mode = serializers.ChoiceField(choices=OrderDiscount.MODE_CHOICES, default="percent")
+    value = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0.01)
+
+
+class OrderItemReasonSerializer(ReasonMixin):
+    """Comp / void: just a reason."""
+
+
+class OrderSplitSerializer(serializers.Serializer):
+    item_ids = serializers.ListField(child=serializers.UUIDField(), min_length=1)
+    table_id = serializers.UUIDField(required=False, allow_null=True)
+    session_id = serializers.UUIDField(required=False, allow_null=True)
+
+
+class OrderMoveSerializer(serializers.Serializer):
+    table_id = serializers.UUIDField()
+
+
 class OrderStatusHistorySerializer(serializers.ModelSerializer):
     """Serializer for order status history."""
 
@@ -201,8 +341,12 @@ class OrderListSerializer(serializers.ModelSerializer):
             "order_number",
             "order_type",
             "status",
+            "table",
             "table_number",
+            "table_session",
             "customer_name",
+            "subtotal",
+            "discount_amount",
             "total",
             "tip_amount",
             "server",
@@ -211,7 +355,7 @@ class OrderListSerializer(serializers.ModelSerializer):
         ]
 
     def get_items_count(self, obj):
-        return obj.items.count()
+        return sum(1 for i in obj.items.all() if i.status != "cancelled")
 
 
 class KitchenOrderSerializer(serializers.ModelSerializer):

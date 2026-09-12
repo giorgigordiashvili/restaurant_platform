@@ -35,6 +35,15 @@ class AuditLog(TimeStampedModel):
         ("employee_meal", "Employee Meal Recorded"),
         ("recipe_update", "Recipe Updated"),
         ("warehouse_toggle", "Warehouse Toggled"),
+        ("shift_open", "Cash Shift Opened"),
+        ("shift_close", "Cash Shift Closed"),
+        ("cash_movement", "Cash Paid In / Out"),
+        ("refund", "Refund Issued"),
+        ("order_discount", "Order Discount"),
+        ("item_comp", "Item Comped"),
+        ("item_void", "Item Voided"),
+        ("order_split", "Order Split"),
+        ("order_move", "Order Moved"),
     ]
 
     # Actor

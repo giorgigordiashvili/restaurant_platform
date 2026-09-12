@@ -334,6 +334,13 @@ class Restaurant(TimeStampedModel):
         default=True,
         help_text="Reviews module: customer reviews on the restaurant page.",
     )
+    cash_enabled = models.BooleanField(
+        default=True,
+        help_text=(
+            "Cash & payments module: cash shifts (open/close the till with an X/Z report), "
+            "taking payments in the POS, discounts, comps, voids and refunds. Needs Ordering."
+        ),
+    )
 
     # Payment provider activation + payout identifiers. Each provider is
     # independently opt-in; when the flag is on, the corresponding payout

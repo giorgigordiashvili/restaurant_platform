@@ -39,8 +39,9 @@ def test_payments_is_derived_from_providers(restaurant):
 
 def test_kitchen_depends_on_ordering(restaurant, user):
     with pytest.raises(modules.ModuleError):
-        modules.set_module(restaurant, "ordering", False, by=user)  # kitchen still on
+        modules.set_module(restaurant, "ordering", False, by=user)  # kitchen + cash still on
     modules.set_module(restaurant, "kitchen", False, by=user)
+    modules.set_module(restaurant, "cash", False, by=user)
     modules.set_module(restaurant, "ordering", False, by=user)
     restaurant.refresh_from_db()
     assert not restaurant.accepts_remote_orders and not restaurant.kitchen_enabled
@@ -105,9 +106,11 @@ def test_settings_api_goes_through_the_registry(authenticated_owner_client, rest
     resp = authenticated_owner_client.patch(
         "/api/v1/dashboard/settings/", {"accepts_remote_orders": False}, format="json"
     )
-    assert resp.status_code == 400  # kitchen still on
+    assert resp.status_code == 400  # kitchen + cash still on
     resp = authenticated_owner_client.patch(
-        "/api/v1/dashboard/settings/", {"accepts_remote_orders": False, "kitchen_enabled": False}, format="json"
+        "/api/v1/dashboard/settings/",
+        {"accepts_remote_orders": False, "kitchen_enabled": False, "cash_enabled": False},
+        format="json",
     )
     assert resp.status_code == 200, resp.content
     restaurant.refresh_from_db()

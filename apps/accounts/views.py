@@ -421,6 +421,7 @@ class MyRestaurantSerializer(serializers.Serializer):
     venue = serializers.DictField(allow_null=True)
     warehouse_enabled = serializers.BooleanField()
     modules = serializers.DictField(child=serializers.BooleanField())
+    permissions = serializers.DictField(child=serializers.ListField(child=serializers.CharField()))
 
 
 @extend_schema(tags=["Users"], responses={200: MyRestaurantSerializer(many=True)})
@@ -434,6 +435,7 @@ class MyRestaurantsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        from apps.core.modules import resources_available
         from apps.staff.models import StaffMember
         from apps.tenants.models import Restaurant
         from apps.tenants.serializers import venue_ref
@@ -441,7 +443,12 @@ class MyRestaurantsView(APIView):
         rows = {}
         owned = Restaurant.objects.filter(owner=request.user, is_active=True).select_related("venue_membership__venue")
         for r in owned:
-            rows[r.pk] = (r, "owner", True)
+            rows[r.pk] = (
+                r,
+                "owner",
+                True,
+                {res: ["create", "read", "update", "delete"] for res in resources_available(r)},
+            )
         memberships = (
             StaffMember.objects.filter(user=request.user, is_active=True, restaurant__is_active=True)
             .select_related("restaurant", "role", "restaurant__venue_membership__venue")
@@ -449,7 +456,12 @@ class MyRestaurantsView(APIView):
         )
         for m in memberships:
             if m.restaurant_id not in rows:
-                rows[m.restaurant_id] = (m.restaurant, m.role.name if m.role_id else "staff", False)
+                rows[m.restaurant_id] = (
+                    m.restaurant,
+                    m.role.name if m.role_id else "staff",
+                    False,
+                    m.get_effective_permissions(),
+                )
         data = [
             {
                 "id": str(r.pk),
@@ -461,7 +473,8 @@ class MyRestaurantsView(APIView):
                 "venue": venue_ref(r),
                 "warehouse_enabled": r.warehouse_enabled,
                 "modules": r.modules,
+                "permissions": perms,
             }
-            for r, role, is_owner in sorted(rows.values(), key=lambda t: t[0].name.lower())
+            for r, role, is_owner, perms in sorted(rows.values(), key=lambda t: t[0].name.lower())
         ]
         return Response({"success": True, "data": data})

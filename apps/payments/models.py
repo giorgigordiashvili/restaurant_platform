@@ -3,12 +3,154 @@ Payment models for restaurant payment processing.
 """
 
 import uuid
+from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
+
+# ---------------------------------------------------------------------------
+# Cash ledger: shifts, counters, reasons, allocations
+# ---------------------------------------------------------------------------
+
+
+class ReceiptSequence(models.Model):
+    """
+    Locked per-restaurant counter. ``kind`` names the series (``payment_daily``
+    for RCP- numbers; the fiscal module adds ``receipt``, ``refund`` ...) and
+    ``period`` scopes it ("" = continuous, ``YYMMDD`` = restarts daily).
+    """
+
+    restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="receipt_sequences")
+    kind = models.CharField(max_length=30)
+    period = models.CharField(max_length=10, blank=True, default="")
+    last = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        db_table = "receipt_sequences"
+        unique_together = [("restaurant", "kind", "period")]
+
+    def __str__(self):  # pragma: no cover
+        return f"{self.kind}/{self.period or 'all'}: {self.last}"
+
+
+class CashShift(TimeStampedModel):
+    """
+    One till session: opened with a float, closed with a count. Every payment
+    taken while it is open is attached to it, so the Z report reconciles the
+    drawer. One open shift per restaurant (``register`` is reserved for a
+    per-drawer split later).
+    """
+
+    STATUS_CHOICES = [("open", "Open"), ("closed", "Closed")]
+
+    restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="cash_shifts")
+    number = models.PositiveIntegerField(help_text="Sequential per restaurant.")
+    register = models.CharField(max_length=50, blank=True, default="")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="open", db_index=True)
+    opened_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="opened_shifts"
+    )
+    opened_at = models.DateTimeField()
+    closed_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="closed_shifts"
+    )
+    closed_at = models.DateTimeField(null=True, blank=True)
+    opening_float = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    counted_cash = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    expected_cash = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    difference = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True, help_text="counted - expected"
+    )
+    report = models.JSONField(default=dict, blank=True, help_text="Z report frozen at close.")
+    notes = models.TextField(blank=True, default="")
+
+    class Meta:
+        db_table = "cash_shifts"
+        ordering = ["-opened_at"]
+        verbose_name = _("Cash shift")
+        verbose_name_plural = _("Cash shifts")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["restaurant"], condition=models.Q(status="open"), name="one_open_cash_shift_per_restaurant"
+            ),
+            models.UniqueConstraint(fields=["restaurant", "number"], name="cash_shift_number_unique"),
+        ]
+        indexes = [models.Index(fields=["restaurant", "status"])]
+
+    def __str__(self):
+        return f"Shift #{self.number} ({self.status})"
+
+    @property
+    def is_open(self) -> bool:
+        return self.status == "open"
+
+
+class CashMovement(TimeStampedModel):
+    """Cash paid into or taken out of the drawer outside of sales (float top-up, supplier paid in cash ...)."""
+
+    KIND_CHOICES = [("paid_in", "Paid in"), ("paid_out", "Paid out")]
+
+    shift = models.ForeignKey(CashShift, on_delete=models.CASCADE, related_name="movements")
+    kind = models.CharField(max_length=10, choices=KIND_CHOICES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))])
+    reason = models.CharField(max_length=200)
+    created_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="cash_movements"
+    )
+
+    class Meta:
+        db_table = "cash_movements"
+        ordering = ["created_at"]
+
+    def __str__(self):  # pragma: no cover
+        return f"{self.get_kind_display()} {self.amount}"
+
+
+class DiscountReason(TimeStampedModel):
+    """Reasons staff pick when discounting, comping, voiding or refunding."""
+
+    KIND_CHOICES = [
+        ("discount", "Discount"),
+        ("comp", "Comp (on the house)"),
+        ("void", "Void"),
+        ("refund", "Refund"),
+    ]
+
+    restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="discount_reasons")
+    kind = models.CharField(max_length=10, choices=KIND_CHOICES, db_index=True)
+    label = models.CharField(max_length=100)
+    requires_manager = models.BooleanField(
+        default=False, help_text="Only roles with 'Cash & payments: edit' may use it."
+    )
+    is_active = models.BooleanField(default=True)
+    sort_order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        db_table = "discount_reasons"
+        ordering = ["kind", "sort_order", "label"]
+        verbose_name = _("Discount / void reason")
+        verbose_name_plural = _("Discount / void reasons")
+
+    def __str__(self):
+        return f"{self.label} ({self.get_kind_display()})"
+
+
+class PaymentAllocation(models.Model):
+    """How much of a payment settles which order. A payment may cover several orders (a table) and an order may be paid in parts."""
+
+    payment = models.ForeignKey("payments.Payment", on_delete=models.CASCADE, related_name="allocations")
+    order = models.ForeignKey("orders.Order", on_delete=models.CASCADE, related_name="payment_allocations")
+    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+
+    class Meta:
+        db_table = "payment_allocations"
+        unique_together = [("payment", "order")]
+
+    def __str__(self):  # pragma: no cover
+        return f"{self.amount} of {self.payment_id} -> {self.order_id}"
 
 
 class Payment(TimeStampedModel):
@@ -28,17 +170,51 @@ class Payment(TimeStampedModel):
     ]
 
     PAYMENT_METHOD_CHOICES = [
-        ("card", "Card"),
         ("cash", "Cash"),
-        ("mobile", "Mobile Payment"),
+        ("card_terminal", "Card (terminal)"),
+        ("online_bog", "Online (Bank of Georgia)"),
+        ("online_flitt", "Online (Flitt)"),
         ("voucher", "Voucher"),
         ("other", "Other"),
+        # Legacy values kept for rows written before the ledger existed.
+        ("card", "Card"),
+        ("mobile", "Mobile Payment"),
     ]
+    STAFF_METHODS = ("cash", "card_terminal", "voucher", "other")
+    ONLINE_METHODS = ("online_bog", "online_flitt", "card", "mobile")
 
     # Relationships
+    restaurant = models.ForeignKey(
+        "tenants.Restaurant",
+        on_delete=models.CASCADE,
+        related_name="payments",
+    )
     order = models.ForeignKey(
         "orders.Order",
         on_delete=models.CASCADE,
+        related_name="payments",
+        null=True,
+        blank=True,
+        help_text="The (first) order this payment settles; the full split is in the allocations.",
+    )
+    session = models.ForeignKey(
+        "tables.TableSession",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="payments",
+    )
+    covered_orders = models.ManyToManyField(
+        "orders.Order",
+        through="payments.PaymentAllocation",
+        related_name="covering_payments",
+        blank=True,
+    )
+    shift = models.ForeignKey(
+        "payments.CashShift",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="payments",
     )
     customer = models.ForeignKey(
@@ -107,8 +283,17 @@ class Payment(TimeStampedModel):
         help_text="Stripe PaymentIntent ID",
     )
 
+    tendered = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Cash handed over by the customer (cash payments).",
+    )
+    change_given = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
     # Metadata
-    currency = models.CharField(max_length=3, default="USD")
+    currency = models.CharField(max_length=3, default="GEL")
     receipt_number = models.CharField(
         max_length=50,
         blank=True,
@@ -129,6 +314,8 @@ class Payment(TimeStampedModel):
         indexes = [
             models.Index(fields=["order", "status"]),
             models.Index(fields=["status", "created_at"]),
+            models.Index(fields=["restaurant", "status", "completed_at"]),
+            models.Index(fields=["shift", "status"]),
         ]
 
     def __str__(self):
@@ -136,7 +323,11 @@ class Payment(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         # Calculate total amount
-        self.total_amount = self.amount + self.tip_amount
+        self.total_amount = (self.amount or Decimal("0")) + (self.tip_amount or Decimal("0"))
+
+        # Older call sites create payments from an order only.
+        if self.restaurant_id is None and self.order_id:
+            self.restaurant_id = self.order.restaurant_id
 
         # Generate receipt number if not set
         if not self.receipt_number and self.status == "completed":
@@ -145,19 +336,11 @@ class Payment(TimeStampedModel):
         super().save(*args, **kwargs)
 
     def _generate_receipt_number(self) -> str:
-        """Generate a unique receipt number."""
-        from django.utils import timezone
+        """Race-free daily receipt number (RCP-YYMMDD-NNNN) from the locked counter."""
+        from apps.payments.services import next_receipt_number
 
-        today = timezone.localdate()
-        prefix = today.strftime("%y%m%d")
-
-        count = Payment.objects.filter(
-            order__restaurant=self.order.restaurant,
-            created_at__date=today,
-            receipt_number__startswith=f"RCP-{prefix}",
-        ).count()
-
-        return f"RCP-{prefix}-{count + 1:04d}"
+        restaurant_id = self.restaurant_id or (self.order.restaurant_id if self.order_id else None)
+        return next_receipt_number(restaurant_id)
 
     def complete(self):
         """Mark payment as completed."""
@@ -222,9 +405,47 @@ class Refund(TimeStampedModel):
         ("other", "Other"),
     ]
 
+    METHOD_CHOICES = [
+        ("cash", "Cash"),
+        ("card_terminal", "Card (terminal)"),
+        ("online", "Online provider"),
+        ("voucher", "Voucher"),
+        ("other", "Other"),
+    ]
+
     payment = models.ForeignKey(
         Payment,
         on_delete=models.CASCADE,
+        related_name="refunds",
+    )
+    restaurant = models.ForeignKey(
+        "tenants.Restaurant",
+        on_delete=models.CASCADE,
+        related_name="refunds",
+        null=True,
+        blank=True,
+    )
+    order = models.ForeignKey(
+        "orders.Order",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="refunds",
+        help_text="Order the refunded amount is taken off (for paid/balance figures).",
+    )
+    shift = models.ForeignKey(
+        "payments.CashShift",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="refunds",
+    )
+    method = models.CharField(max_length=20, choices=METHOD_CHOICES, default="cash")
+    reason_code = models.ForeignKey(
+        "payments.DiscountReason",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="refunds",
     )
     processed_by = models.ForeignKey(
@@ -271,6 +492,11 @@ class Refund(TimeStampedModel):
 
     def __str__(self):
         return f"Refund {self.id} - {self.amount} for Payment {self.payment_id}"
+
+    def save(self, *args, **kwargs):
+        if self.restaurant_id is None and self.payment_id:
+            self.restaurant_id = self.payment.restaurant_id
+        super().save(*args, **kwargs)
 
     def complete(self):
         """Mark refund as completed."""

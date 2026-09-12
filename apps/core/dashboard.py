@@ -120,6 +120,53 @@ def module_cards(request):
             "tables",
         )
 
+    if "cash" in on and has_resource_permission(request, "cash", "read"):
+        from django.db.models import Sum
+
+        from apps.payments import services as ledger
+        from apps.payments.models import Payment
+
+        shift = ledger.current_shift(restaurant)
+        today_qs = Payment.objects.filter(
+            restaurant=restaurant, status__in=ledger.PAID_STATUSES, completed_at__date=today
+        )
+        stats = [
+            {
+                "label": "Open shift" if shift else "Shift",
+                "value": f"#{shift.number}" if shift else "closed",
+                "url": (
+                    _url("payments_cashshift_change", object_id=shift.pk)
+                    if shift
+                    else _url("payments_cashshift_changelist")
+                ),
+            },
+            {
+                "label": "Taken today",
+                "value": today_qs.aggregate(s=Sum("total_amount"))["s"] or 0,
+                "url": _url("payments_payment_changelist"),
+            },
+        ]
+        if shift:
+            stats.append(
+                {
+                    "label": "Cash in drawer",
+                    "value": ledger.x_report(shift)["expected_cash"],
+                    "url": _url("payments_cashshift_change", object_id=shift.pk),
+                }
+            )
+        card(
+            "cash",
+            "Cash & payments",
+            "point_of_sale",
+            stats,
+            [
+                _link("Shifts", "payments_cashshift_changelist"),
+                _link("Payments", "payments_payment_changelist"),
+                _link("Reasons", "payments_discountreason_changelist"),
+            ],
+            "cash",
+        )
+
     if "warehouse" in on and has_resource_permission(request, "warehouse", "read"):
         from apps.inventory.models import InventoryAlert, StockItem
 

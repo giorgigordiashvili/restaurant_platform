@@ -230,9 +230,14 @@ class TableSessionSerializer(serializers.ModelSerializer):
         """
         Per-session orders roll-up for the POS "Tables" tab. Returns status
         counts + the grand total + the `all_terminal` flag staff use to
-        decide whether "Close table" is safe.
+        decide whether "Close table" is safe. Paid / unpaid comes from the
+        payment ledger (allocations), whatever the payment method.
         """
-        orders = list(obj.orders.prefetch_related("bog_transactions", "settle_transactions").all())
+        from decimal import Decimal
+
+        from apps.payments.services import annotate_paid
+
+        orders = list(obj.orders.all())
         counts = {
             "pending_payment": 0,
             "pending": 0,
@@ -243,27 +248,30 @@ class TableSessionSerializer(serializers.ModelSerializer):
             "completed": 0,
             "cancelled": 0,
         }
-        grand_total = 0
+        paid = annotate_paid(orders)
+        grand_total = Decimal("0")
+        paid_total = Decimal("0")
         unpaid_numbers: list[str] = []
-        unpaid_total = 0
+        unpaid_total = Decimal("0")
         for o in orders:
             counts[o.status] = counts.get(o.status, 0) + 1
-            if o.total is not None:
-                grand_total += o.total
-            if (
-                o.status != "cancelled"
-                and not any(t.status == "completed" for t in o.bog_transactions.all())
-                and not any(t.status == "completed" for t in o.settle_transactions.all())
-            ):
+            if o.status == "cancelled":
+                continue
+            total = o.total or Decimal("0")
+            grand_total += total
+            paid_total += min(paid[o.pk], total)
+            balance = total - paid[o.pk]
+            if balance > 0:
                 unpaid_numbers.append(o.order_number)
-                if o.total is not None:
-                    unpaid_total += o.total
+                unpaid_total += balance
         non_terminal = sum(counts[s] for s in ("pending_payment", "pending", "confirmed", "preparing", "ready"))
         return {
             "counts": counts,
             "total_orders": len(orders),
             "non_terminal": non_terminal,
             "grand_total": str(grand_total),
+            "paid_total": str(paid_total),
+            "balance": str(unpaid_total),
             "all_terminal": non_terminal == 0 and len(orders) > 0,
             "unpaid_count": len(unpaid_numbers),
             "unpaid_order_numbers": unpaid_numbers,

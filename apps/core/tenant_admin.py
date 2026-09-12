@@ -1411,8 +1411,10 @@ class ModulesTenantAdmin(TenantModelAdmin):
 # =============================================================================
 
 from apps.inventory.tenant_admin import register_inventory_admin  # noqa: E402
+from apps.payments.tenant_admin import register_payments_admin  # noqa: E402
 
 register_inventory_admin(tenant_admin_site)
+register_payments_admin(tenant_admin_site)
 
 # Restaurant Settings + Modules
 tenant_admin_site.register(Restaurant, RestaurantSettingsAdmin)

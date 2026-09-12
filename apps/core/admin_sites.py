@@ -53,9 +53,13 @@ class TenantAdminSite(UnfoldAdminSite):
         "reservationsettings": "reservations",
         "reservationblockedtime": "reservations",
         "reservationhistory": "reservations",
-        # Payments
-        "payment": "payments",
-        "refund": "payments",
+        # Cash & payments
+        "payment": "cash",
+        "refund": "cash",
+        "cashshift": "cash",
+        "cashmovement": "cash",
+        "discountreason": "cash",
+        "paymentallocation": "cash",
         # Shared venue (food hall): the page lives under settings; registry rows under tables.
         "venuesharerequest": "settings",
         "venue": "settings",

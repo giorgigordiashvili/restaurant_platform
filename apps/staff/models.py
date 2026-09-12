@@ -18,6 +18,9 @@ class StaffRole(TimeStampedModel):
     """
 
     # Default role permissions
+    # Cash: read = see the shift / X report / payments; create = take payments,
+    # paid in/out, open a shift; update = discounts, comps, close a shift;
+    # delete = refunds.
     # Warehouse: "warehouse" is the catalogue side (stock items, lots and
     # receiving, counts, recipes, alerts, platform settings); "warehouse_logs"
     # is what any employee may record themselves (waste, employee meals,
@@ -33,6 +36,7 @@ class StaffRole(TimeStampedModel):
             "reservations": ["create", "read", "update", "delete"],
             "warehouse": ["create", "read", "update", "delete"],
             "warehouse_logs": ["create", "read", "update", "delete"],
+            "cash": ["create", "read", "update", "delete"],
         },
         "manager": {
             "menu": ["create", "read", "update", "delete"],
@@ -44,6 +48,7 @@ class StaffRole(TimeStampedModel):
             "reservations": ["create", "read", "update", "delete"],
             "warehouse": ["create", "read", "update", "delete"],
             "warehouse_logs": ["create", "read", "update", "delete"],
+            "cash": ["create", "read", "update", "delete"],
         },
         "warehouse_manager": {
             "menu": ["read", "update"],
@@ -69,6 +74,8 @@ class StaffRole(TimeStampedModel):
             "tables": ["read", "update"],
             "reservations": ["read"],
             "warehouse_logs": ["create", "read", "update"],
+            # Take payments and open the till; discounts / closing need a manager.
+            "cash": ["read", "create"],
         },
     }
 

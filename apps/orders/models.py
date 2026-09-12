@@ -9,6 +9,55 @@ from django.utils.translation import gettext_lazy as _
 from apps.core.models import TimeStampedModel
 
 
+def _q(value):
+    """Money quantizer: 0.01, half-up."""
+    from decimal import ROUND_HALF_UP, Decimal
+
+    return Decimal(value or 0).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
+class OrderDiscount(TimeStampedModel):
+    """
+    One order-level discount. Several may coexist (a manual one and the
+    platform loyalty tier); ``Order.discount_amount`` is the sum of these plus
+    the item-level discounts. ``amount`` is frozen by ``calculate_totals``.
+    """
+
+    KIND_CHOICES = [
+        ("manual", "Manual"),
+        ("loyalty_tier", "Loyalty tier"),
+        ("promo", "Promotion"),
+    ]
+    MODE_CHOICES = [("percent", "Percent"), ("fixed", "Fixed amount")]
+
+    order = models.ForeignKey("orders.Order", on_delete=models.CASCADE, related_name="discounts")
+    kind = models.CharField(max_length=20, choices=KIND_CHOICES, default="manual")
+    mode = models.CharField(max_length=10, choices=MODE_CHOICES, default="percent")
+    value = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, validators=[MinValueValidator(0)])
+    reason = models.ForeignKey(
+        "payments.DiscountReason", on_delete=models.SET_NULL, null=True, blank=True, related_name="order_discounts"
+    )
+    reason_text = models.CharField(max_length=200, blank=True, default="")
+    applied_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="applied_discounts"
+    )
+
+    class Meta:
+        db_table = "order_discounts"
+        ordering = ["created_at"]
+
+    def __str__(self):
+        unit = "%" if self.mode == "percent" else ""
+        return f"{self.get_kind_display()} {self.value}{unit} (-{self.amount})"
+
+    @property
+    def label(self) -> str:
+        if self.reason_id and self.reason:
+            return self.reason.label
+        return self.reason_text or self.get_kind_display()
+
+
 class Order(TimeStampedModel):
     """
     Customer order containing multiple items.
@@ -244,41 +293,70 @@ class Order(TimeStampedModel):
         return f"ORD-{prefix}-{count + 1:04d}"
 
     def calculate_totals(self):
-        """Recalculate order totals from items."""
+        """
+        Recalculate order totals from the live (non-voided) items.
+
+        subtotal        = gross of live items
+        discount_amount = item-level discounts/comps + order-level discount rows
+                          (percent rows are re-derived on the post-item-discount
+                          base; fixed rows are capped at what is left)
+        tax / service   = percentages of the net (subtotal - discounts)
+        total           = net + tax + service + tip - wallet
+        Everything is quantized to 0.01 so the receipt adds up.
+        """
         from decimal import Decimal
 
         from django.db.models import Sum
 
-        # Calculate subtotal from items
-        items_total = self.items.aggregate(total=Sum("total_price"))["total"] or Decimal("0")
-        self.subtotal = items_total
+        q = _q
+        live = self.items.exclude(status="cancelled")
+        agg = live.aggregate(gross=Sum("total_price"), item_discounts=Sum("discount_amount"))
+        gross = q(agg["gross"] or Decimal("0"))
+        item_discounts = min(q(agg["item_discounts"] or Decimal("0")), gross)
+        base = gross - item_discounts
 
-        # Apply tax and service charge from restaurant settings
-        if self.restaurant:
-            self.tax_amount = self.subtotal * (self.restaurant.tax_rate / Decimal("100"))
-            self.service_charge = self.subtotal * (self.restaurant.service_charge / Decimal("100"))
+        order_discounts = Decimal("0")
+        if self.pk:
+            for d in self.discounts.all().order_by("created_at"):
+                room = base - order_discounts
+                if d.mode == "percent":
+                    amount = q(base * d.value / Decimal("100"))
+                else:
+                    amount = q(d.value)
+                amount = max(min(amount, room), Decimal("0"))
+                if d.amount != amount:
+                    d.amount = amount
+                    d.save(update_fields=["amount", "updated_at"])
+                order_discounts += amount
 
-        # Calculate total (tip is customer-set; not recalculated). Wallet is
-        # treated like a discount — same effect on what the customer pays via
-        # card, but kept separate so refunds can identify wallet-funded amounts.
-        self.total = (
-            self.subtotal
-            + self.tax_amount
-            + self.service_charge
-            + (self.tip_amount or Decimal("0"))
-            - self.discount_amount
-            - (self.wallet_applied or Decimal("0"))
-        )
+        self.subtotal = gross
+        self.discount_amount = item_discounts + order_discounts
+        net = gross - self.discount_amount
+
+        tax_rate = self.restaurant.tax_rate if self.restaurant else Decimal("0")
+        service_rate = self.restaurant.service_charge if self.restaurant else Decimal("0")
+        self.tax_amount = q(net * (tax_rate or Decimal("0")) / Decimal("100"))
+        self.service_charge = q(net * (service_rate or Decimal("0")) / Decimal("100"))
+
+        # Tip is customer-set; wallet is treated like a discount but kept
+        # separate so refunds can identify wallet-funded amounts.
+        total = net + self.tax_amount + self.service_charge + q(self.tip_amount or 0) - q(self.wallet_applied or 0)
+        self.total = max(q(total), Decimal("0"))
 
         self.save(
             update_fields=[
                 "subtotal",
+                "discount_amount",
                 "tax_amount",
                 "service_charge",
                 "total",
                 "updated_at",
             ]
         )
+
+    @property
+    def live_items(self):
+        return self.items.exclude(status="cancelled")
 
     def confirm(self, estimated_minutes: int = None):
         """Confirm the order."""
@@ -379,12 +457,48 @@ class OrderItem(TimeStampedModel):
     # Customer customization
     special_instructions = models.TextField(blank=True)
 
+    # Discounts / comps (item level). A comp is a 100% discount flagged so
+    # reports can tell "on the house" from "10% off".
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, validators=[MinValueValidator(0)])
+    is_comped = models.BooleanField(default=False)
+    discount_reason = models.ForeignKey(
+        "payments.DiscountReason", on_delete=models.SET_NULL, null=True, blank=True, related_name="item_discounts"
+    )
+    discount_reason_text = models.CharField(max_length=200, blank=True, default="")
+    discounted_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="discounted_items"
+    )
+
+    # Voids: status="cancelled" plus who / why / when. ``was_sent_to_kitchen``
+    # separates a real void (food may have been cooked) from an item removed
+    # before the order ever reached the kitchen.
+    voided_at = models.DateTimeField(null=True, blank=True)
+    voided_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="voided_items"
+    )
+    void_reason = models.ForeignKey(
+        "payments.DiscountReason", on_delete=models.SET_NULL, null=True, blank=True, related_name="item_voids"
+    )
+    void_reason_text = models.CharField(max_length=200, blank=True, default="")
+    was_sent_to_kitchen = models.BooleanField(default=False)
+
     class Meta:
         db_table = "order_items"
         ordering = ["created_at"]
 
     def __str__(self):
         return f"{self.quantity}x {self.item_name}"
+
+    @property
+    def net_price(self):
+        """What the customer pays for this line after item-level discounts."""
+        from decimal import Decimal
+
+        return max((self.total_price or Decimal("0")) - (self.discount_amount or Decimal("0")), Decimal("0"))
+
+    @property
+    def is_voided(self) -> bool:
+        return self.status == "cancelled"
 
     def save(self, *args, **kwargs):
         # Calculate total price

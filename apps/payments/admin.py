@@ -11,22 +11,68 @@ from apps.core.admin import TenantAwareModelAdmin
 
 from .models import (
     BogTransaction,
+    CashMovement,
+    CashShift,
+    DiscountReason,
     FlittTransaction,
     Payment,
+    PaymentAllocation,
     PaymentMethod,
     Refund,
     RestaurantDebit,
 )
 
 
+class PaymentAllocationInline(admin.TabularInline):
+    model = PaymentAllocation
+    extra = 0
+    raw_id_fields = ["order"]
+
+
+class CashMovementInline(admin.TabularInline):
+    model = CashMovement
+    extra = 0
+    raw_id_fields = ["created_by"]
+
+
+@admin.register(CashShift)
+class CashShiftAdmin(TenantAwareModelAdmin):
+    tenant_field = "restaurant"
+    list_display = [
+        "number",
+        "restaurant",
+        "status",
+        "opened_at",
+        "closed_at",
+        "expected_cash",
+        "counted_cash",
+        "difference",
+    ]
+    list_filter = ["status", "opened_at"]
+    search_fields = ["restaurant__name", "number"]
+    readonly_fields = ["report", "created_at", "updated_at"]
+    raw_id_fields = ["restaurant", "opened_by", "closed_by"]
+    inlines = [CashMovementInline]
+
+
+@admin.register(DiscountReason)
+class DiscountReasonAdmin(TenantAwareModelAdmin):
+    tenant_field = "restaurant"
+    list_display = ["label", "kind", "restaurant", "requires_manager", "is_active", "sort_order"]
+    list_filter = ["kind", "is_active"]
+    search_fields = ["label", "restaurant__name"]
+    raw_id_fields = ["restaurant"]
+
+
 @admin.register(Payment)
 class PaymentAdmin(TenantAwareModelAdmin):
     """Admin for payments with tenant filtering."""
 
-    tenant_field = "order__restaurant"
+    tenant_field = "restaurant"
 
     list_display = [
         "id",
+        "restaurant",
         "order",
         "amount",
         "tip_amount",
@@ -34,6 +80,7 @@ class PaymentAdmin(TenantAwareModelAdmin):
         "payment_method",
         "status",
         "receipt_number",
+        "shift",
         "created_at",
     ]
     list_filter = ["status", "payment_method", "created_at"]
@@ -52,28 +99,30 @@ class PaymentAdmin(TenantAwareModelAdmin):
         "completed_at",
         "failed_at",
     ]
-    raw_id_fields = ["order", "customer", "processed_by"]
+    raw_id_fields = ["restaurant", "order", "session", "shift", "customer", "processed_by"]
     date_hierarchy = "created_at"
+    inlines = [PaymentAllocationInline]
 
 
 @admin.register(Refund)
 class RefundAdmin(TenantAwareModelAdmin):
     """Admin for refunds with tenant filtering."""
 
-    tenant_field = "payment__order__restaurant"
+    tenant_field = "restaurant"
 
     list_display = [
         "id",
         "payment",
         "amount",
+        "method",
         "reason",
         "status",
         "created_at",
     ]
-    list_filter = ["status", "reason", "created_at"]
+    list_filter = ["status", "method", "reason", "created_at"]
     search_fields = ["external_refund_id", "payment__receipt_number"]
     readonly_fields = ["id", "created_at", "updated_at", "completed_at", "failed_at"]
-    raw_id_fields = ["payment", "processed_by"]
+    raw_id_fields = ["restaurant", "payment", "order", "shift", "processed_by", "reason_code"]
 
 
 @admin.register(BogTransaction)

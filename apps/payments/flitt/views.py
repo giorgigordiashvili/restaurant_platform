@@ -430,6 +430,23 @@ def _apply_success_side_effects(txn: FlittTransaction) -> None:
         order: Order = txn.order
         if order.status == "pending_payment":
             transition_order(order, "pending", notes="Payment confirmed via Flitt.")
+        # Book the charge in the money ledger; idempotent on the Flitt order id.
+        from apps.payments import services as ledger
+
+        try:
+            ledger.record_payment(
+                order.restaurant,
+                method="online_flitt",
+                amount=txn.amount,
+                order=order,
+                external_id=f"flitt:{txn.flitt_order_id}",
+                allow_overpay=True,
+                currency=txn.currency,
+                customer=order.customer,
+                notes="Paid online via Flitt",
+            )
+        except ledger.LedgerError as exc:  # pragma: no cover
+            logger.exception("Flitt payment %s not booked: %s", txn.flitt_order_id, exc)
         # Wallet + referral side-effects. Idempotent per (user, order, kind);
         # safe under Flitt's webhook retry policy.
         try:

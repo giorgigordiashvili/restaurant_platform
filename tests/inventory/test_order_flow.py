@@ -113,7 +113,9 @@ def test_item_cancel_releases_its_share(manager_api, pizza, flour, lots):
     )
     item = order.items.get()
     resp = manager_api.patch(
-        f"/api/v1/dashboard/orders/{order.id}/items/{item.id}/status/", {"status": "cancelled"}, format="json"
+        f"/api/v1/dashboard/orders/{order.id}/items/{item.id}/status/",
+        {"status": "cancelled", "reason_text": "Guest changed mind"},
+        format="json",
     )
     assert resp.status_code == 200
     flour.refresh_from_db()

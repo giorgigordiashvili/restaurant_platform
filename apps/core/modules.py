@@ -151,6 +151,17 @@ MODULES: tuple[Module, ...] = (
         resources=("menu",),
     ),
     Module(
+        "cash",
+        "Cash & payments",
+        "Cash shifts with X/Z reports, taking payments in the POS, discounts, comps, voids and refunds.",
+        "point_of_sale",
+        "cash_enabled",
+        requires=("ordering",),
+        app_labels=("payments",),
+        model_names=(("payments", "cashshift"), ("payments", "payment"), ("payments", "discountreason")),
+        resources=("cash",),
+    ),
+    Module(
         "payments",
         "Online payments",
         "Card payments via Bank of Georgia and/or Flitt. Without them customers pay cash at the table.",

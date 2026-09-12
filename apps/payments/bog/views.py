@@ -342,13 +342,10 @@ class InitiatePaymentView(APIView):
         # `order.total` (and therefore the BOG charge below) reflects it.
         try:
             from apps.loyalty.services import current_user_tier
+            from apps.orders.services import apply_loyalty_tier_discount
 
             if request.user.is_authenticated and restaurant.accepts_platform_loyalty:
-                tier = current_user_tier(request.user)
-                if tier and tier.discount_percent > 0:
-                    pct = Decimal(tier.discount_percent) / Decimal(100)
-                    order.discount_amount = (order.subtotal * pct).quantize(Decimal("0.01"))
-                    order.calculate_totals()
+                apply_loyalty_tier_discount(order, current_user_tier(request.user))
         except Exception:
             logger.exception("Failed to apply platform loyalty discount")
 
@@ -437,13 +434,9 @@ class InitiatePaymentView(APIView):
         # already paid by an individual BOG charge AND not already covered
         # by a previous completed settle txn.
         orders = list(session_obj.orders.prefetch_related("bog_transactions", "settle_transactions").all())
-        unpaid_orders = [
-            o
-            for o in orders
-            if o.status != "cancelled"
-            and not any(t.status == "completed" for t in o.bog_transactions.all())
-            and not any(t.status == "completed" for t in o.settle_transactions.all())
-        ]
+        from apps.payments import services as ledger
+
+        unpaid_orders = ledger.unpaid_orders(session)
         if not unpaid_orders:
             raise ValueError("All orders on this table are already paid.")
 
@@ -452,19 +445,17 @@ class InitiatePaymentView(APIView):
         # single-order and whole-table-settle flows behave identically.
         try:
             from apps.loyalty.services import current_user_tier
+            from apps.orders.services import apply_loyalty_tier_discount
 
             if request.user.is_authenticated and restaurant.accepts_platform_loyalty:
                 tier = current_user_tier(request.user)
-                if tier and tier.discount_percent > 0:
-                    pct = Decimal(tier.discount_percent) / Decimal(100)
-                    for o in unpaid_orders:
-                        o.discount_amount = (o.subtotal * pct).quantize(Decimal("0.01"))
-                        o.calculate_totals()
+                for o in unpaid_orders:
+                    apply_loyalty_tier_discount(o, tier)
         except Exception:
             logger.exception("Failed to apply platform loyalty discount (session settle)")
 
         tip_amount = Decimal(payload.get("tip_amount") or 0)
-        orders_total = sum((o.total or Decimal("0")) for o in unpaid_orders)
+        orders_total = sum((ledger.balance(o) for o in unpaid_orders), Decimal("0"))
         amount = orders_total + tip_amount
         if amount <= 0:
             raise ValueError("Settle total must be greater than zero.")
@@ -1051,32 +1042,25 @@ def _apply_order_status(txn: BogTransaction) -> None:
     if txn.is_successful and order.status == "pending_payment":
         # Payment confirmed → enter the kitchen queue.
         transition_order(order, "pending", notes="Payment confirmed via BOG.")
-        # Mirror the successful charge into a Payment row so the standard admin /
-        # reporting surfaces work for BOG-paid orders (receipt numbers, refund
-        # accounting, customer payment history). Idempotent: skip if we already
-        # created one for this BOG transaction.
-        if not Payment.objects.filter(external_payment_id=txn.bog_order_id).exists():
-            payment = Payment.objects.create(
-                order=order,
-                customer=order.customer,
-                amount=txn.amount,
-                total_amount=txn.amount,
-                payment_method="card",
-                status="pending",
-                currency=txn.currency,
-                external_payment_id=txn.bog_order_id,
-            )
-            payment.complete()  # flips to 'completed' + generates receipt_number
+        # Book the charge in the money ledger (Payment + allocation). Idempotent
+        # on the BOG order id, so webhook retries never double-book. Loyalty
+        # points are accrued there once the order is fully paid.
+        from apps.payments import services as ledger
 
-        # Credit platform-loyalty points. Helper is a no-op when the
-        # restaurant hasn't opted in or the order was anonymous; safe
-        # to call unconditionally here.
         try:
-            from apps.loyalty.services import accrue_platform_points
-
-            accrue_platform_points(order, source="bog")
-        except Exception:  # pragma: no cover
-            logger.exception("accrue_platform_points failed for order %s", order.id)
+            ledger.record_payment(
+                order.restaurant,
+                method="online_bog",
+                amount=txn.amount,
+                order=order,
+                external_id=txn.bog_order_id,
+                allow_overpay=True,
+                currency=txn.currency,
+                customer=order.customer,
+                notes="Paid online via Bank of Georgia",
+            )
+        except ledger.LedgerError as exc:  # pragma: no cover - the money has moved; never lose it
+            logger.error("BOG payment %s not booked: %s", txn.bog_order_id, exc)
 
         # Wallet + referral side-effects. Both helpers are idempotent per
         # order, so webhook retries don't double-credit.
@@ -1106,26 +1090,26 @@ def _apply_session_settle_status(txn: BogTransaction) -> None:
     """
     if not txn.is_successful:
         return
-    if Payment.objects.filter(external_payment_id=txn.bog_order_id).exists():
+    covered = list(txn.covered_orders.all())
+    if not covered:
         return
-    # Attach the ledger row to the first covered order so it shows up in
-    # normal order-payment admin views. The bulk nature is captured by
-    # notes + the M2M.
-    anchor = txn.covered_orders.first()
-    if anchor is None:
-        return
-    payment = Payment.objects.create(
-        order=anchor,
-        customer=anchor.customer,
-        amount=txn.amount,
-        total_amount=txn.amount,
-        payment_method="card",
-        status="pending",
-        currency=txn.currency,
-        external_payment_id=txn.bog_order_id,
-        notes=f"Session settle — covers orders: {', '.join(o.order_number for o in txn.covered_orders.all())}",
-    )
-    payment.complete()
+    from apps.payments import services as ledger
+
+    try:
+        ledger.record_payment(
+            covered[0].restaurant,
+            method="online_bog",
+            amount=txn.amount,
+            orders=covered,
+            session=txn.session,
+            external_id=txn.bog_order_id,
+            allow_overpay=True,
+            currency=txn.currency,
+            customer=txn.initiated_by,
+            notes=f"Session settle — covers orders: {', '.join(o.order_number for o in covered)}",
+        )
+    except ledger.LedgerError as exc:  # pragma: no cover
+        logger.error("BOG session settle %s not booked: %s", txn.bog_order_id, exc)
 
 
 def _apply_reservation_status(txn: BogTransaction) -> None:

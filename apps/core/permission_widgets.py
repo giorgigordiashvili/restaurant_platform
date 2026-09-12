@@ -19,6 +19,7 @@ RESOURCE_LABELS = {
     "reservations": "Reservations",
     "warehouse": "Warehouse",
     "warehouse_logs": "Warehouse logs (waste, meals)",
+    "cash": "Cash & payments",
     "staff": "Staff",
     "settings": "Settings",
     "analytics": "Analytics",
@@ -26,6 +27,17 @@ RESOURCE_LABELS = {
 
 # Cells that make no sense for a resource are simply not offered.
 OFFERED = {"settings": ("read", "update"), "analytics": ("read",)}
+
+# What each cell means, shown as a tooltip where the generic verb is unclear.
+HINTS = {
+    "cash": {
+        "read": "See the open shift, X report and payments",
+        "create": "Take payments, open a shift, cash paid in / out",
+        "update": "Discounts, comps, close a shift",
+        "delete": "Refunds",
+    },
+    "orders": {"update": "Change status, add items, void items"},
+}
 
 
 def rows_for(restaurant):
@@ -58,6 +70,7 @@ class PermissionMatrixWidget(forms.Widget):
                         "name": f"{name}__{resource}__{action}",
                         "checked": action in value.get(resource, []) or "*" in value.get(resource, []),
                         "offered": action in OFFERED.get(resource, tuple(a for a, _ in ACTIONS)),
+                        "hint": HINTS.get(resource, {}).get(action, ""),
                     }
                     for action, _ in ACTIONS
                 ],

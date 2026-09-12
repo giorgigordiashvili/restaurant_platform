@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
 from apps.core.middleware.tenant import require_restaurant
-from apps.core.permissions import IsTenantManager, ModuleRequired
+from apps.core.permissions import HasStaffPermission, IsTenantManager, IsTenantStaff, ModuleRequired
 from apps.venues.services import venue_for_table
 
 from .models import Table, TableQRCode, TableSection, TableSession, TableSessionGuest
@@ -413,7 +413,8 @@ class TableSessionListView(generics.ListAPIView):
     """List table sessions."""
 
     serializer_class = TableSessionSerializer
-    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
+    required_permission = ("tables", "read")
 
     @require_restaurant
     def get_queryset(self):
@@ -440,7 +441,8 @@ class TableSessionListView(generics.ListAPIView):
 class TableSessionCreateView(APIView):
     """Start a new table session."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
+    required_permission = ("tables", "update")
 
     @require_restaurant
     def post(self, request):
@@ -507,10 +509,13 @@ class TableSessionCreateView(APIView):
 class TableSessionCloseView(APIView):
     """Close a table session."""
 
-    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
+    required_permission = ("tables", "update")
 
     @require_restaurant
     def post(self, request, id):
+        from apps.payments import services as ledger
+
         try:
             session = TableSession.objects.get(
                 id=id,
@@ -528,19 +533,11 @@ class TableSessionCloseView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Money-leak guard: refuse to close a session that has orders which
-        # were never paid for. An order is settled if it is cancelled OR has
-        # at least one BOG transaction with status='completed'. Staff must
-        # either cancel the stray order or have the customer pay before the
-        # table can be released.
+        # Money-leak guard: refuse to close a session that still carries a
+        # balance (paid = allocations in the ledger, whatever the method).
+        # Staff must take the payment or cancel the stray order first.
         force = str(request.data.get("force", "")).lower() in {"1", "true", "yes"}
-        unpaid = [
-            o
-            for o in session.orders.prefetch_related("bog_transactions", "settle_transactions").all()
-            if o.status != "cancelled"
-            and not any(t.status == "completed" for t in o.bog_transactions.all())
-            and not any(t.status == "completed" for t in o.settle_transactions.all())
-        ]
+        unpaid = ledger.unpaid_orders(session)
         if unpaid and not force:
             return Response(
                 {
@@ -552,7 +549,7 @@ class TableSessionCloseView(APIView):
                             "Collect payment or cancel them before closing."
                         ),
                         "unpaid_order_numbers": [o.order_number for o in unpaid],
-                        "unpaid_total": str(sum((o.total or 0) for o in unpaid)),
+                        "unpaid_total": str(ledger.session_balance(session)),
                     },
                 },
                 status=status.HTTP_400_BAD_REQUEST,
@@ -572,23 +569,19 @@ class TableSessionCloseView(APIView):
 @extend_schema(tags=["Dashboard - Tables"])
 class TableSessionMarkCashPaidView(APIView):
     """
-    Record a cash payment for every unpaid order on a table session.
-
-    Creates a single `BogTransaction` with flow_type='cash_settle' and
-    status='completed' whose `covered_orders` includes the unpaid orders.
-    That satisfies the close-session money-leak guard while leaving an
-    auditable ledger entry (including `initiated_by` = the staff member
-    who recorded the cash). No BOG API call is made.
+    Record a cash payment covering every unpaid order on a table session
+    (one ``Payment`` allocated across them). Kept for older POS builds;
+    ``/dashboard/payments/record/`` is the full-featured entry point.
     """
 
-    permission_classes = [IsAuthenticated, IsTenantManager, ModuleRequired("tables")]
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
+    required_permission = ("cash", "create")
 
     @require_restaurant
     def post(self, request, id):
-        import uuid as _uuid
         from decimal import Decimal
 
-        from apps.payments.models import BogTransaction
+        from apps.payments import services as ledger
 
         try:
             session = TableSession.objects.get(
@@ -601,60 +594,110 @@ class TableSessionMarkCashPaidView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        unpaid = [
-            o
-            for o in session.orders.prefetch_related("bog_transactions", "settle_transactions").all()
-            if o.status != "cancelled"
-            and not any(t.status == "completed" for t in o.bog_transactions.all())
-            and not any(t.status == "completed" for t in o.settle_transactions.all())
-        ]
-        if not unpaid:
+        total = ledger.session_balance(session)
+        if total <= 0:
             return Response(
-                {
-                    "success": False,
-                    "error": {"message": "No unpaid orders on this session."},
-                },
+                {"success": False, "error": {"code": "nothing_to_pay", "message": "No unpaid orders on this session."}},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-        total = sum((o.total or Decimal("0")) for o in unpaid)
-
-        txn = BogTransaction.objects.create(
-            bog_order_id=f"CASH-{_uuid.uuid4().hex[:24]}",
-            external_order_id=str(session.id)[:12],
-            flow_type=BogTransaction.FLOW_CASH_SETTLE,
-            session=session,
-            amount=total,
-            currency="GEL",
-            status=BogTransaction.STATUS_COMPLETED,
-            initiated_by=request.user,
-        )
-        txn.covered_orders.set(unpaid)
-
-        # Platform loyalty accrual — one ledger row per covered order.
-        # No-op when the restaurant hasn't opted in or the order was
-        # anonymous; safe to call in all cases.
+        tendered = request.data.get("tendered")
         try:
-            from apps.loyalty.services import accrue_platform_points
-
-            for o in unpaid:
-                accrue_platform_points(o, source="cash")
-        except Exception:  # pragma: no cover
-            import logging
-
-            logging.getLogger(__name__).exception("accrue_platform_points failed during cash settle")
+            payment = ledger.record_payment(
+                request.restaurant,
+                method="cash",
+                amount=total,
+                tip=Decimal(str(request.data.get("tip_amount") or 0)),
+                tendered=Decimal(str(tendered)) if tendered not in (None, "") else None,
+                session=session,
+                by=request.user,
+                request=request,
+            )
+        except ledger.LedgerError as exc:
+            return Response({"success": False, "error": exc.as_dict()}, status=status.HTTP_409_CONFLICT)
 
         return Response(
             {
                 "success": True,
                 "message": "Cash payment recorded.",
                 "data": {
-                    "transaction_id": str(txn.id),
-                    "amount": str(total),
-                    "covered_order_numbers": [o.order_number for o in unpaid],
+                    "transaction_id": str(payment.id),
+                    "payment_id": str(payment.id),
+                    "receipt_number": payment.receipt_number,
+                    "amount": str(payment.amount),
+                    "change": str(payment.change_given),
+                    "covered_order_numbers": [
+                        a.order.order_number for a in payment.allocations.select_related("order")
+                    ],
                 },
             },
             status=status.HTTP_201_CREATED,
+        )
+
+
+@extend_schema(tags=["Dashboard - Tables"])
+class TableSessionStaffBillView(APIView):
+    """The table's bill for staff: every live order with paid / balance, and the payments taken so far."""
+
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("tables")]
+    required_permission = ("tables", "read")
+
+    @require_restaurant
+    def get(self, request, id):
+        from decimal import Decimal
+
+        from apps.payments import services as ledger
+        from apps.payments.models import Payment
+        from apps.payments.serializers import PaymentListSerializer
+
+        try:
+            session = TableSession.objects.select_related("table").get(id=id, table__restaurant=request.restaurant)
+        except TableSession.DoesNotExist:
+            return Response(
+                {"success": False, "error": {"message": "Session not found."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        orders = list(session.orders.exclude(status="cancelled").order_by("created_at").prefetch_related("items"))
+        paid = ledger.annotate_paid(orders)
+        rows = []
+        grand_total = Decimal("0")
+        for o in orders:
+            total = o.total or Decimal("0")
+            grand_total += total
+            rows.append(
+                {
+                    "id": str(o.id),
+                    "order_number": o.order_number,
+                    "status": o.status,
+                    "customer_name": o.customer_name or (o.customer.get_full_name() if o.customer else "Guest"),
+                    "subtotal": str(o.subtotal),
+                    "discount_amount": str(o.discount_amount),
+                    "total": str(total),
+                    "paid": str(paid[o.pk]),
+                    "balance": str(max(total - paid[o.pk], Decimal("0"))),
+                    "is_paid": total - paid[o.pk] <= 0,
+                    "items_count": sum(1 for i in o.items.all() if i.status != "cancelled"),
+                    "created_at": o.created_at.isoformat(),
+                }
+            )
+        payments = (
+            Payment.objects.filter(status__in=ledger.PAID_STATUSES, allocations__order__in=orders)
+            .distinct()
+            .order_by("created_at")
+        )
+        return Response(
+            {
+                "success": True,
+                "data": {
+                    "session_id": str(session.id),
+                    "table_number": session.table.number,
+                    "payment_mode": session.payment_mode,
+                    "orders": rows,
+                    "grand_total": str(grand_total),
+                    "paid_total": str(sum((paid[o.pk] for o in orders), Decimal("0"))),
+                    "balance": str(ledger.session_balance(session)),
+                    "payments": PaymentListSerializer(payments, many=True).data,
+                },
+            }
         )
 
 

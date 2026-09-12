@@ -212,6 +212,7 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
             "kitchen_enabled",
             "loyalty_enabled",
             "reviews_enabled",
+            "cash_enabled",
             "modules",
             # Stats
             "average_rating",
@@ -346,6 +347,7 @@ class RestaurantUpdateSerializer(serializers.ModelSerializer):
             "kitchen_enabled",
             "loyalty_enabled",
             "reviews_enabled",
+            "cash_enabled",
             "minimum_order_amount",
             "average_preparation_time",
         ]
@@ -358,6 +360,7 @@ class RestaurantUpdateSerializer(serializers.ModelSerializer):
         "kitchen_enabled",
         "loyalty_enabled",
         "reviews_enabled",
+        "cash_enabled",
     )
 
     def update(self, instance, validated_data):

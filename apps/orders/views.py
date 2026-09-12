@@ -4,6 +4,7 @@ Views for orders app.
 
 from django.db import transaction
 from django.db.models import F, Q
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from rest_framework import generics, status
@@ -14,22 +15,45 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
 from apps.core.middleware.tenant import require_restaurant
-from apps.core.permissions import HasStaffPermission, IsTenantStaff
+from apps.core.permissions import HasStaffPermission, IsTenantStaff, ModuleRequired, staff_can
 from apps.inventory import hooks as inventory_hooks
 from apps.tables.models import Table, TableSession
 
-from .models import Order, OrderItem, OrderItemModifier, OrderStatusHistory
+from . import services
+from .models import Order, OrderDiscount, OrderItem, OrderItemModifier, OrderStatusHistory
 from .serializers import (
     KitchenOrderSerializer,
     OrderCreateSerializer,
+    OrderDiscountCreateSerializer,
+    OrderDiscountDeleteSerializer,
+    OrderDiscountSerializer,
     OrderItemCreateSerializer,
+    OrderItemDiscountSerializer,
+    OrderItemReasonSerializer,
     OrderItemSerializer,
     OrderListSerializer,
+    OrderMoveSerializer,
     OrderSerializer,
+    OrderSplitSerializer,
     OrderStatusHistorySerializer,
     OrderStatusUpdateSerializer,
 )
 from .services import transition_order
+
+
+def _order_error(exc: services.OrderError, http_status=status.HTTP_409_CONFLICT):
+    return Response({"success": False, "error": exc.as_dict()}, status=http_status)
+
+
+def _reason(request, data, kind):
+    """Resolve reason_id -> DiscountReason (scoped) and tell whether the caller may use manager-only reasons."""
+    from apps.payments.models import DiscountReason
+
+    reason = None
+    if data.get("reason_id"):
+        reason = get_object_or_404(DiscountReason, id=data["reason_id"], restaurant=request.restaurant, kind=kind)
+    return reason, data.get("reason_text", ""), staff_can(request, "cash", "update")
+
 
 # ============== Dashboard Views ==============
 
@@ -342,11 +366,21 @@ class OrderItemStatusUpdateView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        was_cancelled = item.status == "cancelled"
-        item.status = new_status
-        item.save(update_fields=["status", "updated_at"])
-        if new_status == "cancelled" and not was_cancelled:
-            inventory_hooks.on_order_item_cancelled(item, by=request.user)
+        if new_status == "cancelled":
+            # Cancelling a line is a void: who / why / when, stock back, totals redone.
+            reason, reason_text, manager = _reason(request, request.data, "void")
+            try:
+                services.void_item(item, by=request.user, reason=reason, reason_text=reason_text, manager=manager)
+            except services.OrderError as exc:
+                return _order_error(exc, status.HTTP_400_BAD_REQUEST)
+        else:
+            if item.status == "cancelled":
+                return Response(
+                    {"success": False, "error": {"code": "item_voided", "message": "This item was voided."}},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            item.status = new_status
+            item.save(update_fields=["status", "updated_at"])
 
         return Response(
             {
@@ -398,6 +432,197 @@ class OrderHistoryView(generics.ListAPIView):
             order_id=order_id,
             order__restaurant=self.request.restaurant,
         ).order_by("-created_at")
+
+
+# ============== Discounts / comps / voids / split / move ==============
+
+
+class _OrderMoneyView(APIView):
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission, ModuleRequired("cash")]
+
+    def _order(self, request, id):
+        return get_object_or_404(Order, id=id, restaurant=request.restaurant)
+
+    def _item(self, request, order_id, item_id):
+        return get_object_or_404(OrderItem, id=item_id, order_id=order_id, order__restaurant=request.restaurant)
+
+
+@extend_schema(tags=["Dashboard - Orders"], request=OrderDiscountCreateSerializer, responses={200: OrderSerializer})
+class OrderDiscountView(_OrderMoneyView):
+    """POST adds an order-level discount (percent or fixed); DELETE removes one (or all manual ones)."""
+
+    required_permission = ("cash", "update")
+
+    @require_restaurant
+    def post(self, request, id):
+        order = self._order(request, id)
+        serializer = OrderDiscountCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        reason, reason_text, manager = _reason(request, data, "discount")
+        try:
+            services.apply_discount(
+                order,
+                mode=data["mode"],
+                value=data["value"],
+                by=request.user,
+                reason=reason,
+                reason_text=reason_text,
+                manager=manager,
+            )
+        except services.OrderError as exc:
+            return _order_error(exc)
+        order.refresh_from_db()
+        return Response({"success": True, "message": "Discount applied.", "data": OrderSerializer(order).data})
+
+    @require_restaurant
+    def delete(self, request, id):
+        order = self._order(request, id)
+        serializer = OrderDiscountDeleteSerializer(data=request.data or {})
+        serializer.is_valid(raise_exception=True)
+        discount_id = serializer.validated_data.get("discount_id")
+        qs = order.discounts.all()
+        qs = qs.filter(id=discount_id) if discount_id else qs.filter(kind="manual")
+        try:
+            for d in list(qs):
+                services.remove_discount(order, d, by=request.user)
+        except services.OrderError as exc:
+            return _order_error(exc)
+        order.refresh_from_db()
+        return Response({"success": True, "message": "Discount removed.", "data": OrderSerializer(order).data})
+
+
+@extend_schema(tags=["Dashboard - Orders"], request=OrderItemDiscountSerializer, responses={200: OrderSerializer})
+class OrderItemDiscountView(_OrderMoneyView):
+    required_permission = ("cash", "update")
+
+    @require_restaurant
+    def post(self, request, order_id, item_id):
+        item = self._item(request, order_id, item_id)
+        serializer = OrderItemDiscountSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        reason, reason_text, manager = _reason(request, data, "discount")
+        try:
+            services.discount_item(
+                item,
+                mode=data["mode"],
+                value=data["value"],
+                by=request.user,
+                reason=reason,
+                reason_text=reason_text,
+                manager=manager,
+            )
+        except services.OrderError as exc:
+            return _order_error(exc)
+        item.order.refresh_from_db()
+        return Response({"success": True, "message": "Item discounted.", "data": OrderSerializer(item.order).data})
+
+    @require_restaurant
+    def delete(self, request, order_id, item_id):
+        item = self._item(request, order_id, item_id)
+        try:
+            services.clear_item_discount(item, by=request.user)
+        except services.OrderError as exc:
+            return _order_error(exc)
+        item.order.refresh_from_db()
+        return Response(
+            {"success": True, "message": "Item discount removed.", "data": OrderSerializer(item.order).data}
+        )
+
+
+@extend_schema(tags=["Dashboard - Orders"], request=OrderItemReasonSerializer, responses={200: OrderSerializer})
+class OrderItemCompView(_OrderMoneyView):
+    required_permission = ("cash", "update")
+
+    @require_restaurant
+    def post(self, request, order_id, item_id):
+        item = self._item(request, order_id, item_id)
+        serializer = OrderItemReasonSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        reason, reason_text, manager = _reason(request, serializer.validated_data, "comp")
+        try:
+            services.comp_item(item, by=request.user, reason=reason, reason_text=reason_text, manager=manager)
+        except services.OrderError as exc:
+            return _order_error(exc)
+        item.order.refresh_from_db()
+        return Response({"success": True, "message": "Item comped.", "data": OrderSerializer(item.order).data})
+
+
+@extend_schema(tags=["Dashboard - Orders"], request=OrderItemReasonSerializer, responses={200: OrderSerializer})
+class OrderItemVoidView(APIView):
+    """Void a line. Any role that may update orders; manager-only reasons need 'Cash & payments: edit'."""
+
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission]
+    required_permission = ("orders", "update")
+
+    @require_restaurant
+    def post(self, request, order_id, item_id):
+        item = get_object_or_404(OrderItem, id=item_id, order_id=order_id, order__restaurant=request.restaurant)
+        serializer = OrderItemReasonSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        reason, reason_text, manager = _reason(request, serializer.validated_data, "void")
+        try:
+            services.void_item(item, by=request.user, reason=reason, reason_text=reason_text, manager=manager)
+        except services.OrderError as exc:
+            return _order_error(exc)
+        item.order.refresh_from_db()
+        return Response({"success": True, "message": "Item voided.", "data": OrderSerializer(item.order).data})
+
+
+@extend_schema(tags=["Dashboard - Orders"], request=OrderSplitSerializer, responses={201: OrderSerializer})
+class OrderSplitView(_OrderMoneyView):
+    """Move some items to a new order (same table unless table_id / session_id given) so they can be paid separately."""
+
+    required_permission = ("orders", "update")
+
+    @require_restaurant
+    def post(self, request, id):
+        order = self._order(request, id)
+        serializer = OrderSplitSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        table = session = None
+        if data.get("table_id"):
+            table = get_object_or_404(Table, id=data["table_id"], restaurant=request.restaurant)
+        if data.get("session_id"):
+            session = get_object_or_404(TableSession, id=data["session_id"], table__restaurant=request.restaurant)
+        try:
+            new_order = services.split_items(order, data["item_ids"], by=request.user, table=table, session=session)
+        except services.OrderError as exc:
+            return _order_error(exc)
+        order.refresh_from_db()
+        return Response(
+            {
+                "success": True,
+                "message": f"Split to {new_order.order_number}.",
+                "data": {"order": OrderSerializer(order).data, "new_order": OrderSerializer(new_order).data},
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
+@extend_schema(tags=["Dashboard - Orders"], request=OrderMoveSerializer, responses={200: OrderSerializer})
+class OrderMoveView(APIView):
+    """Re-seat an order at another table."""
+
+    permission_classes = [IsAuthenticated, IsTenantStaff, HasStaffPermission]
+    required_permission = ("orders", "update")
+
+    @require_restaurant
+    def post(self, request, id):
+        order = get_object_or_404(Order, id=id, restaurant=request.restaurant)
+        serializer = OrderMoveSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        table = get_object_or_404(Table, id=serializer.validated_data["table_id"], restaurant=request.restaurant)
+        try:
+            services.move_order(order, table, by=request.user)
+        except services.OrderError as exc:
+            return _order_error(exc)
+        order.refresh_from_db()
+        return Response(
+            {"success": True, "message": f"Moved to table {table.number}.", "data": OrderSerializer(order).data}
+        )
 
 
 # ============== Tip distribution (Phase-3) =====================
