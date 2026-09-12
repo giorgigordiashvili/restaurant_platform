@@ -58,7 +58,26 @@ from apps.tables.models import Table, TableQRCode, TableSection, TableSession
 from apps.tenants.models import Restaurant, RestaurantHours
 
 
-class TenantModelAdmin(UnfoldModelAdmin):
+class TenantForeignKeyScopingMixin:
+    """
+    Restrict foreign-key choices to the current restaurant.
+
+    Applies to any related model that carries a ``restaurant`` FK (categories,
+    modifier groups, sections, roles...). Without it a select lists rows from
+    every tenant, and a hand-crafted POST could attach another restaurant's
+    category or modifier group.
+    """
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        restaurant = getattr(request, "restaurant", None)
+        related = db_field.related_model
+        if restaurant and related is not None and "queryset" not in kwargs:
+            if any(f.name == "restaurant" for f in related._meta.get_fields()):
+                kwargs["queryset"] = related._default_manager.filter(restaurant=restaurant)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+class TenantModelAdmin(TenantForeignKeyScopingMixin, UnfoldModelAdmin):
     """
     Base admin class for tenant-scoped models.
 
@@ -85,12 +104,32 @@ class TenantModelAdmin(UnfoldModelAdmin):
 
         return qs
 
+    def _direct_restaurant_field(self):
+        """The restaurant FK on this model itself, or None when reached via a relation."""
+        if self.restaurant_field and "__" not in self.restaurant_field:
+            return self.restaurant_field
+        return None
+
+    def get_exclude(self, request, obj=None):
+        """
+        Never put the restaurant FK on the form. The tenant is fixed by the
+        subdomain, and the default select would list every restaurant on the
+        platform to this restaurant's staff.
+        """
+        exclude = list(super().get_exclude(request, obj) or [])
+        field = self._direct_restaurant_field()
+        if field and field not in exclude:
+            exclude.append(field)
+        return exclude
+
     def save_model(self, request, obj, form, change):
-        """Auto-set restaurant on new objects."""
-        if not change and self.restaurant_field:
-            restaurant = getattr(request, "restaurant", None)
-            if restaurant and hasattr(obj, self.restaurant_field):
-                setattr(obj, self.restaurant_field, restaurant)
+        """Pin the object to the current restaurant, since the FK is never on the form."""
+        field = self._direct_restaurant_field()
+        restaurant = getattr(request, "restaurant", None)
+        # Check the raw *_id: hasattr() on an unset FK raises and reads as False,
+        # which used to leave restaurant NULL and 500 on insert.
+        if field and restaurant and getattr(obj, f"{field}_id", None) is None:
+            setattr(obj, field, restaurant)
         super().save_model(request, obj, form, change)
 
     def _get_staff_permissions(self, request):
@@ -175,14 +214,14 @@ class MenuCategoryTenantAdmin(TenantTranslatableAdmin):
     """Admin for menu categories."""
 
     permission_resource = "menu"
-    list_display = ["name", "display_order", "is_active", "items_count"]
+    list_display = ["name", "all_languages_column", "display_order", "is_active", "items_count"]
     list_filter = ["is_active"]
     list_editable = ["display_order", "is_active"]
     search_fields = ["translations__name"]
     ordering = ["display_order"]
 
 
-class MenuItemModifierGroupInline(UnfoldTabularInline):
+class MenuItemModifierGroupInline(TenantForeignKeyScopingMixin, UnfoldTabularInline):
     """Inline for linking modifier groups to menu items."""
 
     model = MenuItemModifierGroup
@@ -204,6 +243,7 @@ class MenuItemTenantAdmin(TenantTranslatableAdmin):
     permission_resource = "menu"
     list_display = [
         "name",
+        "all_languages_column",
         "category",
         "price",
         "is_available",
@@ -263,6 +303,7 @@ class ModifierGroupTenantAdmin(TenantTranslatableAdmin):
     permission_resource = "menu"
     list_display = [
         "name",
+        "all_languages_column",
         "selection_type",
         "min_selections",
         "max_selections",
@@ -275,9 +316,12 @@ class ModifierGroupTenantAdmin(TenantTranslatableAdmin):
     ordering = ["display_order"]
     inlines = [ModifierInline]
 
-    # Note: name and description are translated fields handled by parler
-    # They will appear in the language tabs automatically
+    # Translated fields are ordinary form fields to parler, so they have to be
+    # listed here like any other -- an explicit fieldsets that leaves them out
+    # produces a form with no name at all (the language tabs only switch which
+    # translation those fields edit).
     fieldsets = (
+        (None, {"fields": ("name", "description")}),
         (
             "Selection Rules",
             {
@@ -306,6 +350,7 @@ class ModifierTenantAdmin(TenantTranslatableAdmin):
 
     list_display = [
         "name",
+        "all_languages_column",
         "group",
         "price_adjustment",
         "is_available",

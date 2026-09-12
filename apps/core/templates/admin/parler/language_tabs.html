@@ -1,0 +1,46 @@
+{% load i18n %}
+{% comment %}
+Overrides parler's language tabs for the Unfold admin. Parler injects this
+into the change form's field_sets block (admin/parler/change_form.html); the
+stock template only styles itself under the classic admin, so the tabs were
+unusable here. Each tab is a real link: it reloads the form with ?language=xx,
+so the fields below then edit that translation.
+{% endcomment %}
+{% if language_tabs %}
+<div class="border-b border-base-200 dark:border-base-800 px-3 pt-3 pb-3 mb-3" data-testid="language-tabs">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <nav class="bg-base-100 flex flex-col font-medium gap-1 p-1 rounded-default text-important md:inline-flex md:flex-row md:w-auto dark:bg-white/[.06]">
+            {% for url, name, code, status in language_tabs %}
+                {% if status == "current" %}
+                    <span aria-current="page" data-language="{{ code }}"
+                          class="flex flex-row gap-2 items-center px-2.5 py-[5px] rounded-default bg-white shadow-xs dark:bg-base-700">
+                        <span class="material-symbols-outlined text-[18px] {% if language_tabs.current_is_translated %}text-primary-600{% else %}text-base-400{% endif %}">
+                            {% if language_tabs.current_is_translated %}check_circle{% else %}radio_button_unchecked{% endif %}
+                        </span>
+                        {{ name }}
+                        <span class="text-xs uppercase text-base-500">{{ code }}</span>
+                    </span>
+                {% else %}
+                    <a href="{{ url }}" data-language="{{ code }}"
+                       class="flex flex-row gap-2 items-center px-2.5 py-[5px] rounded-default hover:bg-base-700/[.06] dark:hover:bg-white/[.06]">
+                        <span class="material-symbols-outlined text-[18px] {% if status == 'available' %}text-primary-600{% else %}text-base-400{% endif %}">
+                            {% if status == 'available' %}check_circle{% else %}radio_button_unchecked{% endif %}
+                        </span>
+                        {{ name }}
+                        <span class="text-xs uppercase text-base-500">{{ code }}</span>
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </nav>
+
+        <div class="text-sm text-base-500 dark:text-base-400">
+            {% translate "Fill in the name and description in one language, save, then pick the next tab." %}
+            {% if language_tabs.current_is_translated and language_tabs.allow_deletion %}
+                {% for url, name, code, status in language_tabs %}{% if status == "current" %}
+                    · <a href="./delete-translation/{{ code }}/" class="text-red-600 hover:underline dark:text-red-500">{% translate "Remove this translation" %}</a>
+                {% endif %}{% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}

@@ -196,8 +196,12 @@ LOCALE_PATHS = [
 ]
 
 # Parler (model translations)
+# Keyed by SITE_ID, not None: parler looks the tab list up with
+# PARLER_LANGUAGES.get(settings.SITE_ID) and only falls back to the None key
+# when no SITE_ID is set. django.contrib.sites (SITE_ID = 1, for allauth) made
+# that lookup miss, which silently removed every language tab from the admin.
 PARLER_LANGUAGES = {
-    None: (
+    SITE_ID: (
         {"code": "ka"},
         {"code": "en"},
         {"code": "ru"},
