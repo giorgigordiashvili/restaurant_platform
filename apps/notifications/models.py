@@ -33,6 +33,10 @@ DEFAULT_TEMPLATES = {
     "waitlist_joined_en": "{restaurant}: you are on the list ({guests} guests), about {minutes} min. Follow it here: {link}",
     "table_ready_ka": "{restaurant}: {name}, თქვენი მაგიდა მზადაა! გთხოვთ, მობრძანდეთ შესასვლელთან.",
     "table_ready_en": "{restaurant}: {name}, your table is ready! Please come to the entrance.",
+    "gift_card_ka": "{restaurant}: სასაჩუქრე ბარათი {amount} ₾. კოდი {code}. {message} {url}",
+    "gift_card_en": "{restaurant}: a gift card for {amount} GEL. Code {code}. {message} {url}",
+    "statement_ka": "{restaurant}: {name}, თქვენი ამონაწერი {period}: დავალიანება {amount} ₾. {url}",
+    "statement_en": "{restaurant}: {name}, your statement for {period}: balance {amount} GEL. {url}",
 }
 
 
@@ -141,6 +145,10 @@ class RestaurantNotificationSettings(TimeStampedModel):
     waitlist_joined_en = models.TextField(default=DEFAULT_TEMPLATES["waitlist_joined_en"])
     table_ready_ka = models.TextField(default=DEFAULT_TEMPLATES["table_ready_ka"])
     table_ready_en = models.TextField(default=DEFAULT_TEMPLATES["table_ready_en"])
+    gift_card_ka = models.TextField(default=DEFAULT_TEMPLATES["gift_card_ka"])
+    gift_card_en = models.TextField(default=DEFAULT_TEMPLATES["gift_card_en"])
+    statement_ka = models.TextField(default=DEFAULT_TEMPLATES["statement_ka"])
+    statement_en = models.TextField(default=DEFAULT_TEMPLATES["statement_en"])
 
     class Meta:
         db_table = "notification_settings"
@@ -178,6 +186,8 @@ class OutboundMessage(TimeStampedModel):
         ("pay_link", _("Payment link")),
         ("waitlist_joined", _("Joined the waitlist")),
         ("table_ready", _("Table ready")),
+        ("gift_card", _("Gift card")),
+        ("statement", _("House account statement")),
         ("test", _("Test message")),
         ("other", _("Other")),
     ]

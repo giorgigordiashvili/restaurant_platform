@@ -171,6 +171,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "delivery_instructions",
             "delivery_fee",
             "packaging_fee",
+            "gift_card_applied",
             "scheduled_for",
             "delivery",
             "subtotal",
@@ -299,6 +300,7 @@ class OrderCreateSerializer(serializers.Serializer):
     scheduled_for = serializers.DateTimeField(required=False, allow_null=True)
     tip_amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0, required=False, default=0)
     promo_code = serializers.CharField(max_length=30, required=False, allow_blank=True)
+    gift_card_code = serializers.CharField(max_length=20, required=False, allow_blank=True)
     marketing_opt_in = serializers.BooleanField(required=False, default=False)
     items = OrderItemCreateSerializer(many=True, min_length=1)
 

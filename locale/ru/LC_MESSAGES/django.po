@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-13 11:56+0400\n"
+"POT-Creation-Date: 2026-09-13 12:19+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
@@ -163,13 +163,23 @@ msgstr "Продажа через терминал"
 msgid "Card terminal refund"
 msgstr "Возврат через терминал"
 
-#| msgid "Mark seated"
 msgid "Walk-in seated"
 msgstr "Гость посажен"
 
-#| msgid "Walk-in"
 msgid "Walk-in notified"
 msgstr "Гость уведомлён"
+
+msgid "Gift card issued"
+msgstr "Подарочная карта выпущена"
+
+msgid "Gift card redeemed"
+msgstr "Подарочная карта использована"
+
+msgid "Charged to house account"
+msgstr "Записано на счёт заведения"
+
+msgid "House account settled"
+msgstr "Счёт заведения оплачен"
 
 msgid "Audit Log"
 msgstr "Запись аудита"
@@ -310,7 +320,35 @@ msgstr "Платформы"
 msgid "Setup guide"
 msgstr "Руководство по настройке"
 
-#| msgid "Waitlisted"
+msgid "Gift cards"
+msgstr "Подарочные карты"
+
+msgid "Outstanding balance"
+msgstr "Неиспользованный остаток"
+
+msgid "Active cards"
+msgstr "Активные карты"
+
+msgid "Sold today"
+msgstr "Продано сегодня"
+
+msgid "Sell a batch"
+msgstr "Выпустить партию"
+
+# Models - Accounts
+msgid "House accounts"
+msgstr "Счета заведения"
+
+msgid "Outstanding"
+msgstr "Задолженность"
+
+msgid "Overdue (30 d)"
+msgstr "Просрочено (30 дн.)"
+
+# Models - Payments
+msgid "Statements"
+msgstr "Выписки"
+
 msgid "Waitlist"
 msgstr "Лист ожидания"
 
@@ -320,14 +358,12 @@ msgstr "Ожидают сейчас"
 msgid "Longest wait"
 msgstr "Самое долгое ожидание"
 
-#| msgid "Sales today"
 msgid "Seated today"
 msgstr "Посажено сегодня"
 
 msgid "Today's queue"
 msgstr "Очередь на сегодня"
 
-#| msgid "Settings & hours"
 msgid "Settings & door QR"
 msgstr "Настройки и QR у входа"
 
@@ -581,6 +617,20 @@ msgid ""
 msgstr ""
 "Заказы Glovo и Wolt сразу на кухню, отправка меню, синхронизация "
 "«распродано», пауза магазина; Bolt Food скоро."
+
+msgid ""
+"Sell physical and digital gift cards, redeem them at the till or at online "
+"checkout; liability report."
+msgstr ""
+"Продажа физических и цифровых подарочных карт, использование на кассе или "
+"при онлайн-оплате; отчёт по обязательствам."
+
+msgid ""
+"Regulars and companies on credit: charge bills to an account, settle later, "
+"monthly statements."
+msgstr ""
+"Постоянные гости и компании в кредит: запись счетов на аккаунт, оплата "
+"позже, ежемесячные выписки."
 
 msgid "Waitlist & walk-ins"
 msgstr "Лист ожидания и гости без брони"
@@ -1849,6 +1899,287 @@ msgstr "{p0} снова в очереди."
 msgid "{p0} cancelled."
 msgstr "{p0} отменён."
 
+msgid "Awaiting payment"
+msgstr "Ожидает оплаты"
+
+msgid "Used up"
+msgstr "Использована"
+
+msgid "Void"
+msgstr "Аннулирование"
+
+msgid "Expired"
+msgstr "Просрочено"
+
+msgid "Physical card"
+msgstr "Физическая карта"
+
+msgid "Digital (SMS / email)"
+msgstr "Цифровая (SMS / email)"
+
+msgid "Classic"
+msgstr "Классический"
+
+msgid "Birthday"
+msgstr "День рождения"
+
+msgid "Thank you"
+msgstr "Спасибо"
+
+msgid "Holiday"
+msgstr "Праздник"
+
+msgid "Gift card"
+msgstr "Подарочная карта"
+
+msgid "Issued"
+msgstr "Выпущена"
+
+msgid "Redeemed"
+msgstr "Использована"
+
+msgid "Refunded to card"
+msgstr "Возвращено на карту"
+
+msgid "Adjusted"
+msgstr "Скорректировано"
+
+msgid "Voided"
+msgstr "Аннулирована"
+
+msgid "Signed: + adds to the balance."
+msgstr "Со знаком: + добавляется к балансу."
+
+msgid "Gift card transaction"
+msgstr "Транзакция подарочной карты"
+
+msgid "Gift card transactions"
+msgstr "Транзакции подарочных карт"
+
+msgid "Physical card batch"
+msgstr "Партия физических карт"
+
+msgid "Redeemed today"
+msgstr "Использовано сегодня"
+
+msgid "Sell a physical batch"
+msgstr "Выпустить партию физических карт"
+
+msgid "Issue physical cards"
+msgstr "Выпуск физических карт"
+
+msgid ""
+"Cards are active immediately; sell them at the till (Sell gift card in the "
+"POS books the money) or hand them out as prizes. Print the codes and stick "
+"them on the cards."
+msgstr ""
+"Карты активны сразу; продавайте их на кассе («Продать подарочную карту» в "
+"POS записывает деньги) или раздавайте как призы. Распечатайте коды и "
+"наклейте на карты."
+
+msgid "How many"
+msgstr "Сколько"
+
+msgid "Value each"
+msgstr "Номинал каждой"
+
+msgid "Design"
+msgstr "Дизайн"
+
+msgid "Note"
+msgstr "Заметка"
+
+msgid "e.g. New Year promo"
+msgstr "напр. новогодняя акция"
+
+msgid "Issue cards"
+msgstr "Выпустить карты"
+
+msgid "Codes to print"
+msgstr "Коды для печати"
+
+msgid "Print"
+msgstr "Печать"
+
+msgid "Code"
+msgstr "Код"
+
+msgid "Value"
+msgstr "Номинал"
+
+msgid "Valid until"
+msgstr "Действует до"
+
+msgid "Recipient"
+msgstr "Получатель"
+
+msgid "Resend"
+msgstr "Отправить повторно"
+
+#, python-brace-format
+msgid "Card {p0} sent again."
+msgstr "Карта {p0} отправлена повторно."
+
+msgid "No phone / email on this card."
+msgstr "У этой карты нет телефона / email."
+
+#, python-brace-format
+msgid "Card {p0} voided."
+msgstr "Карта {p0} аннулирована."
+
+msgid "Enter a count and an amount."
+msgstr "Введите количество и сумму."
+
+#, python-brace-format
+msgid "{p0} card(s) issued. Print the codes below."
+msgstr "Выпущено карт: {p0}. Распечатайте коды ниже."
+
+msgid "Show this code at the restaurant or type it at online checkout."
+msgstr "Покажите этот код в ресторане или введите при онлайн-оплате."
+
+msgid "Suspended"
+msgstr "Приостановлен"
+
+msgid "Closed"
+msgstr "Закрыта"
+
+msgid "Person or company on the account."
+msgstr "Человек или компания на счёте."
+
+msgid "0 = no limit."
+msgstr "0 = без лимита."
+
+msgid "Amount owed to you."
+msgstr "Сумма долга перед вами."
+
+msgid "Day of month the statement goes out."
+msgstr "День месяца, когда отправляется выписка."
+
+msgid "Who may charge to this account (comma separated)."
+msgstr "Кто может записывать на этот счёт (через запятую)."
+
+msgid "Ask who signed at the POS."
+msgstr "Спрашивать в POS, кто подписал."
+
+msgid "House account"
+msgstr "Счёт заведения"
+
+msgid "Charge"
+msgstr "Запись на счёт"
+
+msgid "Payment received"
+msgstr "Получена оплата"
+
+msgid "Adjustment"
+msgstr "Корректировка"
+
+msgid "Written off"
+msgstr "Списано"
+
+msgid "Signed: + increases what is owed."
+msgstr "Со знаком: + увеличивает долг."
+
+msgid "House account entry"
+msgstr "Запись по счёту"
+
+msgid "House account entries"
+msgstr "Записи по счёту"
+
+msgid "Statement"
+msgstr "Выписка"
+
+msgid "Active accounts"
+msgstr "Активные счета"
+
+msgid "Overdue (30 days)"
+msgstr "Просрочено (30 дней)"
+
+msgid "Balance due"
+msgstr "К оплате"
+
+msgid "limit"
+msgstr "лимит"
+
+msgid "Amount"
+msgstr "Сумма"
+
+msgid "Method"
+msgstr "Способ"
+
+msgid "Cash"
+msgstr "Наличные"
+
+msgid "Card (terminal)"
+msgstr "Карта (терминал)"
+
+msgid "Bank transfer / other"
+msgstr "Банковский перевод / другое"
+
+msgid "Write off instead of receiving money"
+msgstr "Списать вместо получения денег"
+
+msgid "Book"
+msgstr "Провести"
+
+msgid "Overdue"
+msgstr "Просрочено"
+
+msgid "Settle"
+msgstr "Оплатить"
+
+#, python-brace-format
+msgid "Statement {p0} – {p1} built{p2}."
+msgstr "Выписка {p0} – {p1} сформирована{p2}."
+
+msgid " and sent"
+msgstr " и отправлена"
+
+msgid " (no phone / email to send to)"
+msgstr " (нет телефона / email для отправки)"
+
+#, python-brace-format
+msgid "{p0} written off."
+msgstr "{p0} списано."
+
+#, python-brace-format
+msgid "{p0} received from {p1}."
+msgstr "{p0} получено от {p1}."
+
+#, python-brace-format
+msgid "Settle {p0}"
+msgstr "Оплата: {p0}"
+
+msgid "Send"
+msgstr "Отправить"
+
+#, python-brace-format
+msgid "Statement sent to {p0}."
+msgstr "Выписка отправлена: {p0}."
+
+msgid "No phone / email on the account."
+msgstr "На счёте нет телефона / email."
+
+msgid "Open"
+msgstr "Открыто"
+
+msgid "Opening balance"
+msgstr "Начальный баланс"
+
+msgid "Charges"
+msgstr "Начисления"
+
+msgid "Adjustments"
+msgstr "Корректировки"
+
+msgid "Date"
+msgstr "Дата"
+
+msgid "Entry"
+msgstr "Запись"
+
+msgid "Balance"
+msgstr "Баланс"
+
 msgid "Unit"
 msgstr "Единица"
 
@@ -1918,9 +2249,6 @@ msgstr "Корректировка / инвентаризация"
 
 msgid "Spoiled"
 msgstr "Испорчено"
-
-msgid "Expired"
-msgstr "Просрочено"
 
 msgid "Kitchen mistake"
 msgstr "Ошибка кухни"
@@ -2430,9 +2758,11 @@ msgstr "Ссылка на оплату"
 msgid "Joined the waitlist"
 msgstr "Встал в очередь"
 
-#| msgid "Order ready"
 msgid "Table ready"
 msgstr "Стол готов"
+
+msgid "House account statement"
+msgstr "Выписка по счёту заведения"
 
 msgid "Test message"
 msgstr "Тестовое сообщение"
@@ -2538,9 +2868,6 @@ msgstr "Выберите SMS или email и укажите адресата."
 #, python-brace-format
 msgid "Test {p0} sent to {p1}."
 msgstr "Тестовое {p0} отправлено на {p1}."
-
-msgid "Resend"
-msgstr "Отправить повторно"
 
 #, python-brace-format
 msgid "Message to {p0} queued again."
@@ -2688,12 +3015,6 @@ msgstr ""
 
 msgid "Right now"
 msgstr "Сейчас"
-
-msgid "Open"
-msgstr "Открыто"
-
-msgid "Closed"
-msgstr "Закрыта"
 
 msgid "paused"
 msgstr "пауза"
@@ -3053,6 +3374,9 @@ msgstr "Особые пожелания или заметки гостя"
 msgid "Structured address: street, building, entrance, floor, apartment."
 msgstr "Структурированный адрес: улица, дом, подъезд, этаж, квартира."
 
+msgid "Paid from a gift card at checkout (a gift_card payment)."
+msgstr "Оплачено подарочной картой при оформлении (платёж gift_card)."
+
 msgid "Pickup / delivery time the guest chose; empty = ASAP."
 msgstr ""
 "Время самовывоза / доставки, выбранное гостем; пусто = как можно скорее."
@@ -3085,9 +3409,6 @@ msgstr "Скидка"
 msgid "Comp (on the house)"
 msgstr "За счёт заведения"
 
-msgid "Void"
-msgstr "Аннулирование"
-
 msgid "Refund"
 msgstr "Возврат"
 
@@ -3105,12 +3426,6 @@ msgstr "Возвращено"
 
 msgid "Partially Refunded"
 msgstr "Частично возвращено"
-
-msgid "Cash"
-msgstr "Наличные"
-
-msgid "Card (terminal)"
-msgstr "Карта (терминал)"
 
 msgid "Online (Bank of Georgia)"
 msgstr "Онлайн (Банк Грузии)"
@@ -3142,6 +3457,12 @@ msgstr "Сотрудник, принявший оплату"
 
 msgid "Amount + tip"
 msgstr "Сумма + чаевые"
+
+msgid "Sale of this card (no order) or a redemption against a bill."
+msgstr "Продажа этой карты (без заказа) или использование по счёту."
+
+msgid "Charge to this account (on a bill) or a settlement of it (no order)."
+msgstr "Запись на этот счёт (по чеку) или его оплата (без заказа)."
 
 msgid "The card terminal / pay-by-link that took this payment."
 msgstr "Терминал / ссылка, через которые прошла эта оплата."
@@ -3175,6 +3496,12 @@ msgstr "Неверный заказ"
 
 msgid "Online provider"
 msgstr "Онлайн-провайдер"
+
+msgid "Back to the gift card"
+msgstr "Обратно на подарочную карту"
+
+msgid "Back to the house account"
+msgstr "Обратно на счёт заведения"
 
 msgid "Order the refunded amount is taken off (for paid/balance figures)."
 msgstr ""
@@ -3546,9 +3873,6 @@ msgstr "Полученный заказ нельзя отменить."
 msgid "(no supplier)"
 msgstr "(без поставщика)"
 
-msgid "Overdue"
-msgstr "Просрочено"
-
 msgid "Received this month"
 msgstr "Получено в этом месяце"
 
@@ -3597,9 +3921,6 @@ msgstr "Всё на уровне — заказывать нечего."
 #, python-format
 msgid "Created %(n)d draft purchase order(s): %(numbers)s"
 msgstr "Создано черновиков: %(n)d — %(numbers)s"
-
-msgid "Send"
-msgstr "Отправить"
 
 #, python-format
 msgid ""
@@ -3729,6 +4050,36 @@ msgstr "Отменённые заказы"
 msgid "Voided items"
 msgstr "Аннулированные позиции"
 
+#, fuzzy
+#| msgid "Gift cards"
+msgid "Gift cards sold"
+msgstr "Продано подарочных карт"
+
+#, fuzzy
+#| msgid "Gift card redeemed"
+msgid "Gift cards redeemed"
+msgstr "Использовано подарочных карт"
+
+#, fuzzy
+#| msgid "Gift card"
+msgid "Gift card liability"
+msgstr "Обязательства по подарочным картам"
+
+#, fuzzy
+#| msgid "Charged to house account"
+msgid "Charged to house accounts"
+msgstr "Записано на счета заведения"
+
+#, fuzzy
+#| msgid "House account settled"
+msgid "House accounts settled"
+msgstr "Оплачено по счетам заведения"
+
+#, fuzzy
+#| msgid "House account statement"
+msgid "House accounts outstanding"
+msgstr "Задолженность по счетам заведения"
+
 msgid "Sales by day"
 msgstr "Продажи по дням"
 
@@ -3741,12 +4092,6 @@ msgstr "Брутто"
 
 msgid "Type"
 msgstr "Тип"
-
-msgid "Method"
-msgstr "Способ"
-
-msgid "Amount"
-msgstr "Сумма"
 
 msgid "Hour"
 msgstr "Час"
@@ -3819,9 +4164,6 @@ msgstr "Себестоимость %"
 
 msgid "Kind"
 msgstr "Тип"
-
-msgid "Code"
-msgstr "Код"
 
 msgid "Uses"
 msgstr "Использований"
@@ -3959,15 +4301,12 @@ msgstr "Неявки"
 msgid "No-show rate"
 msgstr "Доля неявок"
 
-#| msgid "Walk-in"
 msgid "Walk-ins"
 msgstr "Гости без брони"
 
-#| msgid "Mark seated"
 msgid "Walk-ins seated"
 msgstr "Посажено без брони"
 
-#| msgid "Average rating"
 msgid "Average wait (min)"
 msgstr "Среднее ожидание (мин)"
 
@@ -4070,9 +4409,6 @@ msgstr "Бронирование"
 
 msgid "Leave empty to block all tables"
 msgstr "Оставьте пустым, чтобы заблокировать все столы"
-
-msgid "Holiday"
-msgstr "Праздник"
 
 msgid "Private Event"
 msgstr "Частное мероприятие"
@@ -4743,43 +5079,34 @@ msgstr "Гости могут встать в очередь по QR у вход
 msgid "Text the guest their place in line when added."
 msgstr "При добавлении отправлять гостю SMS с местом в очереди."
 
-#| msgid "The guest at the table who placed this order"
 msgid "Text the guest when the table is ready."
 msgstr "SMS гостю, когда стол готов."
 
 # Profile Settings
-#| msgid "Fiscal settings"
 msgid "Waitlist settings"
 msgstr "Настройки листа ожидания"
 
-#| msgid "Waiting now"
 msgid "Waiting"
 msgstr "Ожидает"
 
 msgid "Table ready · notified"
 msgstr "Стол готов · уведомлён"
 
-#| msgid "No-shows"
 msgid "No-show"
 msgstr "Неявка"
 
-#| msgid "Guest"
 msgid "Guest (QR)"
 msgstr "Гость (QR)"
 
-#| msgid "Reservation"
 msgid "From a reservation"
 msgstr "Из брони"
 
-#| msgid "Courier service saved."
 msgid "Local service day."
 msgstr "Локальный рабочий день."
 
-#| msgid "Waitlisted"
 msgid "Waitlist entry"
 msgstr "Запись в очереди"
 
-#| msgid "Verified"
 msgid "Notified"
 msgstr "Уведомлён"
 
@@ -4787,23 +5114,18 @@ msgid "Pick a table; a table session opens and the guest is marked seated."
 msgstr ""
 "Выберите стол; откроется сессия стола, гость будет отмечен как посаженный."
 
-#| msgid "Seats"
 msgid "seats"
 msgstr "мест"
 
-#| msgid "No shared tables yet."
 msgid "No tables yet."
 msgstr "Столов пока нет."
 
-#| msgid "Seats"
 msgid "Seat"
 msgstr "Посадить"
 
-#| msgid "Waitlisted"
 msgid "Waitlist rules"
 msgstr "Правила очереди"
 
-#| msgid "Slot interval (minutes)"
 msgid "Default quoted wait (minutes)"
 msgstr "Ожидание по умолчанию (мин)"
 
@@ -4819,7 +5141,6 @@ msgstr "Гости могут встать в очередь по QR у вход
 msgid "SMS when added (place in line + link)"
 msgstr "SMS при добавлении (место в очереди + ссылка)"
 
-#| msgid "When the order is ready"
 msgid "SMS when the table is ready"
 msgstr "SMS, когда стол готов"
 
@@ -4838,32 +5159,26 @@ msgstr ""
 "Распечатайте и поставьте у входа: гости сканируют, вводят имя, телефон и "
 "число гостей и следят за местом в очереди с телефона."
 
-#| msgid "Generated QR code image"
 msgid "Generate a new link"
 msgstr "Создать новую ссылку"
 
-#| msgid "Waiter"
 msgid "Waited"
 msgstr "Ждёт"
 
 msgid "Notify"
 msgstr "Уведомить"
 
-#| msgid "Guests now"
 msgid "Guest notified."
 msgstr "Гость уведомлён."
 
 #, python-brace-format
-#| msgid "{p0} assigned to {p1}."
 msgid "{p0} seated at table {p1}."
 msgstr "{p0} посажен за стол {p1}."
 
 #, python-brace-format
-#| msgid "Test {p0} sent to {p1}."
 msgid "Seat {p0} ({p1})"
 msgstr "Посадить {p0} ({p1})"
 
-#| msgid "Fiscal settings saved."
 msgid "Waitlist settings saved."
 msgstr "Настройки очереди сохранены."
 
@@ -4973,14 +5288,8 @@ msgstr "Создана новая QR-ссылка -- перепечатайте 
 #~ msgid "Phone number"
 #~ msgstr "Номер телефона"
 
-#~ msgid "Note"
-#~ msgstr "Заметка"
-
 #~ msgid "Notes"
 #~ msgstr "Заметки"
-
-#~ msgid "Date"
-#~ msgstr "Дата"
 
 #~ msgid "Time"
 #~ msgstr "Время"

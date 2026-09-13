@@ -105,6 +105,7 @@ class OrderPayloadSerializer(serializers.Serializer):
     delivery_instructions = serializers.CharField(max_length=300, required=False, allow_blank=True, default="")
     scheduled_for = serializers.DateTimeField(required=False, allow_null=True)
     promo_code = serializers.CharField(max_length=30, required=False, allow_blank=True, default="")
+    gift_card_code = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
     marketing_opt_in = serializers.BooleanField(required=False, default=False)
     tip_amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0, required=False, default=0)
     # Customer-supplied wallet credit to apply at checkout. Clamped server-side
@@ -119,6 +120,21 @@ class OrderPayloadSerializer(serializers.Serializer):
         if not value:
             raise serializers.ValidationError("Order must contain at least one item.")
         return value
+
+
+class GiftCardPayloadSerializer(serializers.Serializer):
+    """Digital gift card bought on the restaurant page."""
+
+    restaurant_slug = serializers.SlugField(max_length=100)
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=ZERO)
+    purchaser_name = serializers.CharField(max_length=120, required=False, allow_blank=True, default="")
+    purchaser_phone = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
+    purchaser_email = serializers.EmailField(required=False, allow_blank=True, default="")
+    recipient_name = serializers.CharField(max_length=120, required=False, allow_blank=True, default="")
+    recipient_phone = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
+    recipient_email = serializers.EmailField(required=False, allow_blank=True, default="")
+    message = serializers.CharField(max_length=300, required=False, allow_blank=True, default="")
+    design = serializers.CharField(max_length=12, required=False, default="classic")
 
 
 class ReservationPayloadSerializer(serializers.Serializer):
@@ -164,16 +180,19 @@ class InitiatePaymentSerializer(ReturnURLMixin, serializers.Serializer):
     TARGET_ORDER = "order"
     TARGET_RESERVATION = "reservation"
     TARGET_SESSION = "session"
+    TARGET_GIFT_CARD = "gift_card"
     TARGET_CHOICES = [
         (TARGET_ORDER, "Order"),
         (TARGET_RESERVATION, "Reservation"),
         (TARGET_SESSION, "Session"),
+        (TARGET_GIFT_CARD, "Gift card"),
     ]
 
     target = serializers.ChoiceField(choices=TARGET_CHOICES)
     order_payload = OrderPayloadSerializer(required=False)
     reservation_payload = ReservationPayloadSerializer(required=False)
     session_payload = SessionSettlePayloadSerializer(required=False)
+    gift_card_payload = GiftCardPayloadSerializer(required=False)
 
     def validate(self, attrs):
         target = attrs["target"]
@@ -185,6 +204,10 @@ class InitiatePaymentSerializer(ReturnURLMixin, serializers.Serializer):
             )
         if target == self.TARGET_SESSION and "session_payload" not in attrs:
             raise serializers.ValidationError({"session_payload": "session_payload is required when target='session'."})
+        if target == self.TARGET_GIFT_CARD and "gift_card_payload" not in attrs:
+            raise serializers.ValidationError(
+                {"gift_card_payload": "gift_card_payload is required when target='gift_card'."}
+            )
         return attrs
 
 

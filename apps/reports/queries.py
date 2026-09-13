@@ -208,6 +208,18 @@ def online_orders(restaurant, period) -> list[dict]:
     ]
 
 
+def gift_cards_report(restaurant, period) -> dict:
+    from apps.giftcards import services as gift_services
+
+    return gift_services.report(restaurant, period.start_date, period.end_date)
+
+
+def house_accounts_report(restaurant, period) -> dict:
+    from apps.houseaccounts import services as ha_services
+
+    return ha_services.report(restaurant, period.start_date, period.end_date)
+
+
 def sales_by_method(restaurant, period) -> list[dict]:
     """Payments taken in the period by method, plus an 'unrecorded' row so the table reconciles to sales."""
     rows = (

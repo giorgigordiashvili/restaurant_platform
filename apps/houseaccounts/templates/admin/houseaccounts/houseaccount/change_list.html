@@ -1,0 +1,14 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% block content %}
+{% if summary %}
+<div class="mb-4 grid gap-3 md:grid-cols-3" data-testid="houseaccounts-summary">
+  {% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" %}
+  <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Outstanding" %}</p><p class="text-2xl font-semibold">{{ summary.outstanding }}</p></div>
+  <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Active accounts" %}</p><p class="text-2xl font-semibold">{{ summary.accounts }}</p></div>
+  <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Overdue (30 days)" %}</p><p class="text-2xl font-semibold">{{ summary.overdue }}</p></div>
+  {% endwith %}
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}

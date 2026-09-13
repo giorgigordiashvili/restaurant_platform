@@ -63,8 +63,12 @@ class SessionSettleInitiateResult:
 # ── Basket helpers ────────────────────────────────────────────────────
 
 
-def build_order_basket(order: Order) -> list[dict[str, Any]]:
-    """Translate OrderItem rows (+ delivery / packaging fee lines) into a provider-agnostic basket."""
+def build_order_basket(order: Order, *, charge: Decimal | None = None) -> list[dict[str, Any]]:
+    """
+    Translate OrderItem rows (+ delivery / packaging fee lines) into a
+    provider-agnostic basket. When ``charge`` is less than the order total
+    (part paid by a gift card) a negative line keeps the basket adding up.
+    """
     basket: list[dict[str, Any]] = []
     for item in order.items.exclude(status="cancelled"):
         basket.append(
@@ -88,6 +92,18 @@ def build_order_basket(order: Order) -> list[dict[str, Any]]:
                     "total_price": float(amount),
                 }
             )
+    if charge is not None:
+        diff = Decimal(str(order.total)) - Decimal(charge)
+        if diff > 0:
+            basket.append(
+                {
+                    "product_id": "gift_card",
+                    "description": "Gift card",
+                    "quantity": 1,
+                    "unit_price": float(-diff),
+                    "total_price": float(-diff),
+                }
+            )
     return basket
 
 
@@ -109,6 +125,81 @@ def _resolve_restaurant(slug: str) -> Restaurant:
         return Restaurant.objects.get(slug=slug, is_active=True)
     except Restaurant.DoesNotExist as exc:
         raise ValueError(f"Restaurant '{slug}' not found") from exc
+
+
+# ── Gift card purchase ────────────────────────────────────────────────
+
+
+@dataclass
+class GiftCardInitiateResult:
+    card: Any
+    restaurant: Restaurant
+    amount: Decimal
+    basket: list[dict[str, Any]]
+
+
+def create_pending_gift_card(request, payload: dict[str, Any]) -> GiftCardInitiateResult:
+    """A digital gift card bought on the restaurant's page: pending until the provider confirms."""
+    from apps.giftcards import services as gift_services
+
+    restaurant = _resolve_restaurant(payload["restaurant_slug"])
+    if not gift_services.enabled(restaurant):
+        raise ValueError("Gift cards are not sold here.")
+    amount = Decimal(str(payload["amount"]))
+    if amount <= 0:
+        raise ValueError("Amount must be greater than zero.")
+    user = getattr(request, "user", None)
+    purchaser = {
+        "name": payload.get("purchaser_name")
+        or (user.get_full_name() if getattr(user, "is_authenticated", False) else ""),
+        "phone": payload.get("purchaser_phone", ""),
+        "email": payload.get("purchaser_email") or (user.email if getattr(user, "is_authenticated", False) else ""),
+    }
+    recipient = {
+        "name": payload.get("recipient_name", ""),
+        "phone": payload.get("recipient_phone", ""),
+        "email": payload.get("recipient_email", ""),
+    }
+    if not (recipient["phone"] or recipient["email"] or purchaser["phone"] or purchaser["email"]):
+        raise ValueError("Give a phone number or an email to deliver the card to.")
+    card = gift_services.issue(
+        restaurant,
+        amount,
+        kind="digital",
+        status="pending",
+        purchaser=purchaser,
+        recipient=recipient,
+        message=payload.get("message", ""),
+        design=payload.get("design", "classic"),
+        sold_online=True,
+    )
+    basket = [
+        {
+            "product_id": f"gift-card-{card.pk}",
+            "description": f"{restaurant.name} gift card {amount}",
+            "quantity": 1,
+            "unit_price": float(amount),
+            "total_price": float(amount),
+        }
+    ]
+    return GiftCardInitiateResult(card=card, restaurant=restaurant, amount=amount, basket=basket)
+
+
+def gift_card_paid(card, *, method: str, external_id: str, amount, currency: str = "GEL") -> None:
+    """Provider confirmed: book the money (no order) and activate + deliver the card. Idempotent."""
+    from apps.giftcards import services as gift_services
+    from apps.payments import services as ledger
+
+    payment = ledger.record_payment(
+        card.restaurant,
+        method=method,
+        amount=amount,
+        external_id=external_id,
+        gift_card=card,
+        currency=currency,
+        notes=f"Gift card {card.code} bought online",
+    )
+    gift_services.activate(card, payment=payment)
 
 
 # ── Order flow ────────────────────────────────────────────────────────
@@ -251,6 +342,9 @@ def create_pending_order(request, payload: dict[str, Any]) -> OrderInitiateResul
     # amount so over-asking on the frontend (stale balance, race) silently
     # downsizes rather than throwing — the user just pays the rest by card.
     _apply_wallet_to_order(request, order, payload.get("wallet_amount"))
+    # A gift card typed at checkout pays (part of) the bill right away; the
+    # provider charges only what is left. Cancelling the order refunds the card.
+    apply_gift_card_to_order(order, payload.get("gift_card_code"), by=getattr(request, "user", None))
 
     OrderStatusHistory.objects.create(
         order=order,
@@ -259,7 +353,9 @@ def create_pending_order(request, payload: dict[str, Any]) -> OrderInitiateResul
         notes="Order awaiting payment confirmation.",
     )
 
-    amount = Decimal(str(order.total))
+    from apps.payments import services as ledger
+
+    amount = ledger.balance(order) if order.gift_card_applied else Decimal(str(order.total))
     if amount <= 0:
         raise ValueError("Order total must be greater than zero.")
 
@@ -267,8 +363,31 @@ def create_pending_order(request, payload: dict[str, Any]) -> OrderInitiateResul
         order=order,
         restaurant=restaurant,
         amount=amount,
-        basket=build_order_basket(order),
+        basket=build_order_basket(order, charge=amount),
     )
+
+
+def apply_gift_card_to_order(order: Order, code, *, by=None) -> None:
+    """Redeem up to the order balance from the card; raises ValueError with the card's problem."""
+    if not code:
+        return
+    from apps.giftcards import services as gift_services
+    from apps.payments import services as ledger
+
+    if not gift_services.enabled(order.restaurant):
+        raise ValueError("Gift cards are not accepted here.")
+    try:
+        card = gift_services.lookup(order.restaurant, code)
+        gift_services.check_usable(card)
+        amount = min(Decimal(card.balance), ledger.balance(order))
+        if amount <= 0:
+            return
+        gift_services.redeem(card, amount, order=order, by=by)
+    except gift_services.GiftCardError as exc:
+        raise ValueError(exc.message) from exc
+    order.gift_card = card
+    order.gift_card_applied = amount
+    order.save(update_fields=["gift_card", "gift_card_applied", "updated_at"])
 
 
 def _apply_wallet_to_order(request, order: Order, requested_amount) -> None:

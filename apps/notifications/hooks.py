@@ -178,6 +178,18 @@ def on_delivery_cancel_requested(order) -> None:
 
 
 @_safe
+def on_house_account_limit(account) -> None:
+    services.notify(
+        account.restaurant,
+        "house_account.limit",
+        title=f"House account {account.name} at {account.balance} / {account.credit_limit}",
+        body="Consider a settlement before the next charge.",
+        url=_admin("houseaccounts_houseaccount_change", object_id=account.pk),
+        dedupe_key=f"house_account.limit:{account.pk}:{account.balance}",
+    )
+
+
+@_safe
 def on_waitlist_self_joined(entry) -> None:
     services.notify(
         entry.restaurant,

@@ -338,6 +338,14 @@ class Restaurant(TimeStampedModel):
         default=False,
         help_text="CRM & marketing module: guest records, segments, SMS / email campaigns and automations.",
     )
+    gift_cards_enabled = models.BooleanField(
+        default=False,
+        help_text="Gift cards module: sell physical / digital cards, redeem at the till or at checkout.",
+    )
+    house_accounts_enabled = models.BooleanField(
+        default=False,
+        help_text="House accounts module: regulars and companies on credit, monthly statements.",
+    )
     waitlist_enabled = models.BooleanField(
         default=False,
         help_text="Waitlist module: today's walk-in queue, quoted waits, 'table ready' SMS, QR at the door.",

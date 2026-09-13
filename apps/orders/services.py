@@ -88,6 +88,10 @@ def transition_order(
 
         ordering_hooks.on_order_status_changed(order, old_status, new_status, by=by)
         if new_status == "cancelled":
+            from apps.giftcards import hooks as gift_hooks
+
+            gift_hooks.on_order_cancelled(order, by=by)
+        if new_status == "cancelled":
             from apps.notifications import hooks as notification_hooks
 
             notification_hooks.on_order_cancelled(order, by=by)

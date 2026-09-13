@@ -56,6 +56,15 @@ EVENTS = (
         "update",
         "Reservations",
     ),
+    Event(
+        "house_account.limit",
+        "House account near its limit",
+        "An account on credit reached 90% of its limit.",
+        "cash",
+        "update",
+        "Operations",
+        False,
+    ),
     Event("reservation.new", "New reservation", "A guest booked a table.", "reservations", "update", "Reservations"),
     Event(
         "reservation.cancelled",

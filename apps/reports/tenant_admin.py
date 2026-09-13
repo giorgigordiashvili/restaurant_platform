@@ -190,6 +190,16 @@ class SalesReportAdmin(ReportAdminBase):
                 if getattr(r, "online_ordering_enabled", False)
                 else []
             ),
+            "gift_cards": (
+                self._cached(request, "sales_gift_cards", period, lambda: queries.gift_cards_report(r, period))
+                if getattr(r, "gift_cards_enabled", False)
+                else None
+            ),
+            "house_accounts": (
+                self._cached(request, "sales_house_accounts", period, lambda: queries.house_accounts_report(r, period))
+                if getattr(r, "house_accounts_enabled", False)
+                else None
+            ),
         }
 
     def page(self, request, period, data):
@@ -210,6 +220,20 @@ class SalesReportAdmin(ReportAdminBase):
             kpi(_("Voided items"), f"{cur['voids']['count']} · {cur['voids']['value']}", kind="text"),
             kpi(_("Refunds"), f"{cur['refunds']['count']} · {cur['refunds']['value']}", kind="text"),
         ]
+        if data.get("gift_cards"):
+            g = data["gift_cards"]
+            kpis += [
+                kpi(_("Gift cards sold"), f"{g['sold_count']} · {g['sold_value']}", kind="text"),
+                kpi(_("Gift cards redeemed"), f"{g['redeemed_count']} · {g['redeemed_value']}", kind="text"),
+                kpi(_("Gift card liability"), g["outstanding"]),
+            ]
+        if data.get("house_accounts"):
+            h = data["house_accounts"]
+            kpis += [
+                kpi(_("Charged to house accounts"), h["charged"]),
+                kpi(_("House accounts settled"), h["settled"]),
+                kpi(_("House accounts outstanding"), h["outstanding"]),
+            ]
         by_day = data["by_day"]
         by_hour = data["by_hour"]
         chart_list = [

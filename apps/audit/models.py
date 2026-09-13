@@ -62,6 +62,10 @@ class AuditLog(TimeStampedModel):
         ("terminal_refund", _("Card terminal refund")),
         ("waitlist_seated", _("Walk-in seated")),
         ("waitlist_notified", _("Walk-in notified")),
+        ("gift_card_issued", _("Gift card issued")),
+        ("gift_card_redeemed", _("Gift card redeemed")),
+        ("house_account_charge", _("Charged to house account")),
+        ("house_account_settle", _("House account settled")),
     ]
 
     # Actor

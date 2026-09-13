@@ -61,6 +61,13 @@ class TenantAdminSite(UnfoldAdminSite):
         "shiftsreport": "analytics",
         "reservationsreport": "analytics",
         "reviewsreport": "analytics",
+        # Gift cards / house accounts
+        "giftcard": "cash",
+        "giftcardbatchpage": "cash",
+        "giftcardtransaction": "cash",
+        "houseaccount": "cash",
+        "houseaccountentry": "cash",
+        "houseaccountstatement": "cash",
         # Waitlist
         "waitlistentry": "reservations",
         "waitlistsettingspage": "settings",

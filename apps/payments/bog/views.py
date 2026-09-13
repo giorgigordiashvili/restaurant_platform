@@ -42,7 +42,7 @@ from apps.reservations.models import Reservation
 from apps.reservations.serializers import ReservationDetailSerializer
 from apps.tenants.models import Restaurant
 
-from ..initiate_helpers import create_pending_order
+from ..initiate_helpers import create_pending_gift_card, create_pending_order
 from ..models import BogTransaction, Payment, PaymentMethod
 from .client import BogClientError, get_client
 from .serializers import (
@@ -221,6 +221,8 @@ class InitiatePaymentView(APIView):
                 return self._initiate_order(request, data["order_payload"], data["return_url"])
             if target == InitiatePaymentSerializer.TARGET_SESSION:
                 return self._initiate_session_settle(request, data["session_payload"], data["return_url"])
+            if target == InitiatePaymentSerializer.TARGET_GIFT_CARD:
+                return self._initiate_gift_card(request, data["gift_card_payload"], data["return_url"])
             return self._initiate_reservation(request, data["reservation_payload"], data["return_url"])
         except ValueError as exc:
             return Response(
@@ -309,6 +311,52 @@ class InitiatePaymentView(APIView):
                 "data": {
                     "bog_order_id": transaction_row.bog_order_id,
                     "order_number": order.order_number,
+                    "redirect_url": redirect_url,
+                },
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    @transaction.atomic
+    def _initiate_gift_card(self, request: Request, payload: dict[str, Any], return_url: str) -> Response:
+        result = create_pending_gift_card(request, payload)
+        external_id = f"gc-{result.card.pk}"
+        bog_payload = {
+            "callback_url": _callback_url(request),
+            "external_order_id": external_id,
+            "payment_method": ["card"],
+            "purchase_units": {"currency": "GEL", "total_amount": float(result.amount), "basket": result.basket},
+            "redirect_urls": _redirect_urls(return_url, external_id),
+        }
+        split_config = _split_config(result.restaurant, result.amount)
+        if split_config:
+            bog_payload["config"] = split_config
+        response = get_client().create_order(bog_payload, idempotency_key=str(result.card.pk))
+        bog_order_id = response.get("id")
+        redirect_url = (response.get("_links") or {}).get("redirect", {}).get("href")
+        if not bog_order_id or not redirect_url:
+            raise BogClientError("BOG response missing id/redirect.href", payload=response)
+        BogTransaction.objects.create(
+            bog_order_id=bog_order_id,
+            external_order_id=external_id,
+            flow_type=BogTransaction.FLOW_GIFT_CARD,
+            gift_card=result.card,
+            initiated_by=request.user if request.user.is_authenticated else None,
+            amount=result.amount,
+            currency="GEL",
+            status=BogTransaction.STATUS_CREATED,
+            redirect_url=redirect_url,
+            return_url=return_url,
+            callback_url=bog_payload["callback_url"],
+            request_payload=bog_payload,
+            response_payload=response,
+        )
+        return Response(
+            {
+                "success": True,
+                "data": {
+                    "bog_order_id": bog_order_id,
+                    "gift_card_id": str(result.card.pk),
                     "redirect_url": redirect_url,
                 },
             },
@@ -857,6 +905,19 @@ def _apply_receipt(txn: BogTransaction, receipt: dict[str, Any], *, source: str)
         _apply_add_card_status(txn, payment_detail)
     elif txn.flow_type == BogTransaction.FLOW_SESSION_SETTLE:
         _apply_session_settle_status(txn)
+    elif txn.flow_type == BogTransaction.FLOW_GIFT_CARD and txn.gift_card_id and txn.is_successful:
+        from ..initiate_helpers import gift_card_paid
+
+        try:
+            gift_card_paid(
+                txn.gift_card,
+                method="online_bog",
+                external_id=f"bog:{txn.bog_order_id}",
+                amount=txn.amount,
+                currency=txn.currency,
+            )
+        except Exception:  # pragma: no cover - never lose the webhook
+            logger.exception("Gift card %s not activated after BOG payment", txn.gift_card_id)
 
     # Whenever BOG reports a refund — full or partial — and the original
     # order was split-paid, the restaurant's 95 % share has already landed

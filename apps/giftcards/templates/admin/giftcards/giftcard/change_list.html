@@ -1,0 +1,15 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% block content %}
+{% if summary %}
+<div class="mb-4 grid gap-3 md:grid-cols-4" data-testid="giftcards-summary">
+  {% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" %}
+  <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Outstanding balance" %}</p><p class="text-2xl font-semibold">{{ summary.outstanding }}</p></div>
+  <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Active cards" %}</p><p class="text-2xl font-semibold">{{ summary.active }}</p></div>
+  <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Sold today" %}</p><p class="text-2xl font-semibold">{{ summary.sold_today }}</p></div>
+  <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Redeemed today" %}</p><p class="text-2xl font-semibold">{{ summary.redeemed_today }}</p><a class="text-xs underline" href="{{ batch_url }}">{% translate "Sell a physical batch" %}</a></div>
+  {% endwith %}
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}

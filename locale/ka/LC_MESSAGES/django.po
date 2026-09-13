@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-13 11:56+0400\n"
+"POT-Creation-Date: 2026-09-13 12:19+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Georgian\n"
@@ -163,13 +163,23 @@ msgstr "ბარათით გადახდა ტერმინალზ�
 msgid "Card terminal refund"
 msgstr "ბარათზე დაბრუნება ტერმინალზე"
 
-#| msgid "Mark seated"
 msgid "Walk-in seated"
 msgstr "სტუმარი დაბრძანდა"
 
-#| msgid "Walk-in"
 msgid "Walk-in notified"
 msgstr "სტუმარს შეატყობინეს"
+
+msgid "Gift card issued"
+msgstr "სასაჩუქრე ბარათი გაიცა"
+
+msgid "Gift card redeemed"
+msgstr "სასაჩუქრე ბარათი გამოყენებულია"
+
+msgid "Charged to house account"
+msgstr "ჩაიწერა სახლის ანგარიშზე"
+
+msgid "House account settled"
+msgstr "სახლის ანგარიში დაიფარა"
 
 msgid "Audit Log"
 msgstr "აუდიტის ჩანაწერი"
@@ -310,7 +320,35 @@ msgstr "პლატფორმები"
 msgid "Setup guide"
 msgstr "დაყენების გზამკვლევი"
 
-#| msgid "Waitlisted"
+msgid "Gift cards"
+msgstr "სასაჩუქრე ბარათები"
+
+msgid "Outstanding balance"
+msgstr "გამოუყენებელი ბალანსი"
+
+msgid "Active cards"
+msgstr "აქტიური ბარათები"
+
+msgid "Sold today"
+msgstr "დღეს გაყიდული"
+
+msgid "Sell a batch"
+msgstr "პარტიის გაყიდვა"
+
+# Models - Accounts
+msgid "House accounts"
+msgstr "სახლის ანგარიშები"
+
+msgid "Outstanding"
+msgstr "დავალიანება"
+
+msgid "Overdue (30 d)"
+msgstr "ვადაგადაცილებული (30 დღე)"
+
+# Models - Payments
+msgid "Statements"
+msgstr "ამონაწერები"
+
 msgid "Waitlist"
 msgstr "რიგი"
 
@@ -320,14 +358,12 @@ msgstr "ახლა ელოდება"
 msgid "Longest wait"
 msgstr "ყველაზე გრძელი ლოდინი"
 
-#| msgid "Sales today"
 msgid "Seated today"
 msgstr "დღეს დაბრძანდა"
 
 msgid "Today's queue"
 msgstr "დღევანდელი რიგი"
 
-#| msgid "Settings & hours"
 msgid "Settings & door QR"
 msgstr "პარამეტრები და QR შესასვლელთან"
 
@@ -585,6 +621,20 @@ msgid ""
 msgstr ""
 "Glovo-სა და Wolt-ის შეკვეთები პირდაპირ სამზარეულოში, მენიუს გაგზავნა, "
 "„ამოწურულის“ სინქრონიზაცია, მაღაზიის შეჩერება; Bolt Food მალე."
+
+msgid ""
+"Sell physical and digital gift cards, redeem them at the till or at online "
+"checkout; liability report."
+msgstr ""
+"ფიზიკური და ციფრული სასაჩუქრე ბარათების გაყიდვა, გამოყენება სალაროსთან ან "
+"ონლაინ შეკვეთისას; ვალდებულებების ანგარიში."
+
+msgid ""
+"Regulars and companies on credit: charge bills to an account, settle later, "
+"monthly statements."
+msgstr ""
+"მუდმივი სტუმრები და კომპანიები კრედიტით: ანგარიშის ჩაწერა, მოგვიანებით "
+"დაფარვა, ყოველთვიური ამონაწერები."
 
 msgid "Waitlist & walk-ins"
 msgstr "რიგი და უჯავშნო სტუმრები"
@@ -1857,6 +1907,287 @@ msgstr "{p0} ხელახლა რიგშია."
 msgid "{p0} cancelled."
 msgstr "{p0} გაუქმებულია."
 
+msgid "Awaiting payment"
+msgstr "გადახდის მოლოდინში"
+
+msgid "Used up"
+msgstr "ამოწურულია"
+
+msgid "Void"
+msgstr "ანულირება"
+
+msgid "Expired"
+msgstr "ვადაგასული"
+
+msgid "Physical card"
+msgstr "ფიზიკური ბარათი"
+
+msgid "Digital (SMS / email)"
+msgstr "ციფრული (SMS / ელფოსტა)"
+
+msgid "Classic"
+msgstr "კლასიკური"
+
+msgid "Birthday"
+msgstr "დაბადების დღე"
+
+msgid "Thank you"
+msgstr "მადლობა"
+
+msgid "Holiday"
+msgstr "დღესასწაული"
+
+msgid "Gift card"
+msgstr "სასაჩუქრე ბარათი"
+
+msgid "Issued"
+msgstr "გაცემული"
+
+msgid "Redeemed"
+msgstr "გამოყენებული"
+
+msgid "Refunded to card"
+msgstr "ბარათზე დაბრუნებული"
+
+msgid "Adjusted"
+msgstr "კორექტირებული"
+
+msgid "Voided"
+msgstr "გაუქმებული"
+
+msgid "Signed: + adds to the balance."
+msgstr "ნიშნით: + ბალანსს ემატება."
+
+msgid "Gift card transaction"
+msgstr "სასაჩუქრე ბარათის ტრანზაქცია"
+
+msgid "Gift card transactions"
+msgstr "სასაჩუქრე ბარათის ტრანზაქციები"
+
+msgid "Physical card batch"
+msgstr "ფიზიკური ბარათების პარტია"
+
+msgid "Redeemed today"
+msgstr "დღეს გამოყენებული"
+
+msgid "Sell a physical batch"
+msgstr "ფიზიკური პარტიის გაყიდვა"
+
+msgid "Issue physical cards"
+msgstr "ფიზიკური ბარათების გაცემა"
+
+msgid ""
+"Cards are active immediately; sell them at the till (Sell gift card in the "
+"POS books the money) or hand them out as prizes. Print the codes and stick "
+"them on the cards."
+msgstr ""
+"ბარათები მაშინვე აქტიურდება; გაყიდეთ სალაროსთან (POS-ში „სასაჩუქრე ბარათის "
+"გაყიდვა“ ფულს აღრიცხავს) ან დაარიგეთ პრიზებად. დაბეჭდეთ კოდები და დააკარით "
+"ბარათებზე."
+
+msgid "How many"
+msgstr "რაოდენობა"
+
+msgid "Value each"
+msgstr "თითოს ღირებულება"
+
+msgid "Design"
+msgstr "დიზაინი"
+
+msgid "Note"
+msgstr "შენიშვნა"
+
+msgid "e.g. New Year promo"
+msgstr "მაგ. საახალწლო აქცია"
+
+msgid "Issue cards"
+msgstr "ბარათების გაცემა"
+
+msgid "Codes to print"
+msgstr "დასაბეჭდი კოდები"
+
+msgid "Print"
+msgstr "ბეჭდვა"
+
+msgid "Code"
+msgstr "კოდი"
+
+msgid "Value"
+msgstr "ღირებულება"
+
+msgid "Valid until"
+msgstr "მოქმედებს"
+
+msgid "Recipient"
+msgstr "მიმღები"
+
+msgid "Resend"
+msgstr "ხელახლა გაგზავნა"
+
+#, python-brace-format
+msgid "Card {p0} sent again."
+msgstr "ბარათი {p0} ხელახლა გაიგზავნა."
+
+msgid "No phone / email on this card."
+msgstr "ამ ბარათზე ტელეფონი / ელფოსტა არ არის."
+
+#, python-brace-format
+msgid "Card {p0} voided."
+msgstr "ბარათი {p0} გაუქმდა."
+
+msgid "Enter a count and an amount."
+msgstr "შეიყვანეთ რაოდენობა და თანხა."
+
+#, python-brace-format
+msgid "{p0} card(s) issued. Print the codes below."
+msgstr "გაიცა {p0} ბარათი. დაბეჭდეთ კოდები ქვემოთ."
+
+msgid "Show this code at the restaurant or type it at online checkout."
+msgstr "აჩვენეთ ეს კოდი რესტორანში ან ჩაწერეთ ონლაინ შეკვეთისას."
+
+msgid "Suspended"
+msgstr "შეჩერებული"
+
+msgid "Closed"
+msgstr "დახურულია"
+
+msgid "Person or company on the account."
+msgstr "პირი ან კომპანია ანგარიშზე."
+
+msgid "0 = no limit."
+msgstr "0 = ლიმიტის გარეშე."
+
+msgid "Amount owed to you."
+msgstr "თქვენი მოთხოვნა."
+
+msgid "Day of month the statement goes out."
+msgstr "თვის დღე, როცა ამონაწერი იგზავნება."
+
+msgid "Who may charge to this account (comma separated)."
+msgstr "ვის შეუძლია ამ ანგარიშზე ჩაწერა (მძიმით გამოყოფილი)."
+
+msgid "Ask who signed at the POS."
+msgstr "POS-ში ვკითხოთ, ვინ მოაწერა ხელი."
+
+msgid "House account"
+msgstr "სახლის ანგარიში"
+
+msgid "Charge"
+msgstr "ჩაწერა"
+
+msgid "Payment received"
+msgstr "მიღებული გადახდა"
+
+msgid "Adjustment"
+msgstr "კორექტირება"
+
+msgid "Written off"
+msgstr "ჩამოწერილი"
+
+msgid "Signed: + increases what is owed."
+msgstr "ნიშნით: + ზრდის დავალიანებას."
+
+msgid "House account entry"
+msgstr "სახლის ანგარიშის ჩანაწერი"
+
+msgid "House account entries"
+msgstr "სახლის ანგარიშის ჩანაწერები"
+
+msgid "Statement"
+msgstr "ამონაწერი"
+
+msgid "Active accounts"
+msgstr "აქტიური ანგარიშები"
+
+msgid "Overdue (30 days)"
+msgstr "ვადაგადაცილებული (30 დღე)"
+
+msgid "Balance due"
+msgstr "გადასახდელი ბალანსი"
+
+msgid "limit"
+msgstr "ლიმიტი"
+
+msgid "Amount"
+msgstr "თანხა"
+
+msgid "Method"
+msgstr "მეთოდი"
+
+msgid "Cash"
+msgstr "ნაღდი"
+
+msgid "Card (terminal)"
+msgstr "ბარათი (ტერმინალი)"
+
+msgid "Bank transfer / other"
+msgstr "საბანკო გადარიცხვა / სხვა"
+
+msgid "Write off instead of receiving money"
+msgstr "ჩამოწერა ფულის მიღების ნაცვლად"
+
+msgid "Book"
+msgstr "აღრიცხვა"
+
+msgid "Overdue"
+msgstr "ვადაგადაცილებული"
+
+msgid "Settle"
+msgstr "დაფარვა"
+
+#, python-brace-format
+msgid "Statement {p0} – {p1} built{p2}."
+msgstr "ამონაწერი {p0} – {p1} შედგა{p2}."
+
+msgid " and sent"
+msgstr " და გაიგზავნა"
+
+msgid " (no phone / email to send to)"
+msgstr " (გასაგზავნი ტელეფონი / ელფოსტა არ არის)"
+
+#, python-brace-format
+msgid "{p0} written off."
+msgstr "{p0} ჩამოიწერა."
+
+#, python-brace-format
+msgid "{p0} received from {p1}."
+msgstr "{p0} მიღებულია {p1}-სგან."
+
+#, python-brace-format
+msgid "Settle {p0}"
+msgstr "დაფარვა: {p0}"
+
+msgid "Send"
+msgstr "გაგზავნა"
+
+#, python-brace-format
+msgid "Statement sent to {p0}."
+msgstr "ამონაწერი გაიგზავნა: {p0}."
+
+msgid "No phone / email on the account."
+msgstr "ანგარიშზე ტელეფონი / ელფოსტა არ არის."
+
+msgid "Open"
+msgstr "ღიაა"
+
+msgid "Opening balance"
+msgstr "საწყისი ბალანსი"
+
+msgid "Charges"
+msgstr "ჩანაწერები"
+
+msgid "Adjustments"
+msgstr "კორექტირებები"
+
+msgid "Date"
+msgstr "თარიღი"
+
+msgid "Entry"
+msgstr "ჩანაწერი"
+
+msgid "Balance"
+msgstr "ბალანსი"
+
 msgid "Unit"
 msgstr "ერთეული"
 
@@ -1926,9 +2257,6 @@ msgstr "კორექცია / აღრიცხვა"
 
 msgid "Spoiled"
 msgstr "გაფუჭდა"
-
-msgid "Expired"
-msgstr "ვადაგასული"
 
 msgid "Kitchen mistake"
 msgstr "სამზარეულოს შეცდომა"
@@ -2439,9 +2767,11 @@ msgstr "გადახდის ბმული"
 msgid "Joined the waitlist"
 msgstr "რიგში ჩადგა"
 
-#| msgid "Order ready"
 msgid "Table ready"
 msgstr "მაგიდა მზადაა"
+
+msgid "House account statement"
+msgstr "სახლის ანგარიშის ამონაწერი"
 
 msgid "Test message"
 msgstr "სატესტო შეტყობინება"
@@ -2547,9 +2877,6 @@ msgstr "აირჩიეთ SMS ან ელფოსტა და მიუ�
 #, python-brace-format
 msgid "Test {p0} sent to {p1}."
 msgstr "სატესტო {p0} გაიგზავნა {p1}-ზე."
-
-msgid "Resend"
-msgstr "ხელახლა გაგზავნა"
 
 #, python-brace-format
 msgid "Message to {p0} queued again."
@@ -2696,12 +3023,6 @@ msgstr ""
 
 msgid "Right now"
 msgstr "ახლა"
-
-msgid "Open"
-msgstr "ღიაა"
-
-msgid "Closed"
-msgstr "დახურულია"
 
 msgid "paused"
 msgstr "შეჩერებული"
@@ -3064,6 +3385,9 @@ msgstr "სტუმრის სპეციალური მოთხოვ�
 msgid "Structured address: street, building, entrance, floor, apartment."
 msgstr "სტრუქტურირებული მისამართი: ქუჩა, შენობა, სადარბაზო, სართული, ბინა."
 
+msgid "Paid from a gift card at checkout (a gift_card payment)."
+msgstr "გადახდილია სასაჩუქრე ბარათით შეკვეთისას (gift_card გადახდა)."
+
 msgid "Pickup / delivery time the guest chose; empty = ASAP."
 msgstr "სტუმრის არჩეული წასაღების / მიტანის დრო; ცარიელი = რაც შეიძლება მალე."
 
@@ -3095,9 +3419,6 @@ msgstr "ფასდაკლება"
 msgid "Comp (on the house)"
 msgstr "უფასოდ (რესტორნისგან)"
 
-msgid "Void"
-msgstr "ანულირება"
-
 msgid "Refund"
 msgstr "თანხის დაბრუნება"
 
@@ -3115,12 +3436,6 @@ msgstr "დაბრუნებულია"
 
 msgid "Partially Refunded"
 msgstr "ნაწილობრივ დაბრუნებულია"
-
-msgid "Cash"
-msgstr "ნაღდი"
-
-msgid "Card (terminal)"
-msgstr "ბარათი (ტერმინალი)"
 
 msgid "Online (Bank of Georgia)"
 msgstr "ონლაინ (საქართველოს ბანკი)"
@@ -3152,6 +3467,12 @@ msgstr "თანამშრომელი, რომელმაც გად
 
 msgid "Amount + tip"
 msgstr "თანხა + ჩაი"
+
+msgid "Sale of this card (no order) or a redemption against a bill."
+msgstr "ამ ბარათის გაყიდვა (შეკვეთის გარეშე) ან გამოყენება ანგარიშზე."
+
+msgid "Charge to this account (on a bill) or a settlement of it (no order)."
+msgstr "ჩაწერა ამ ანგარიშზე (ანგარიშით) ან მისი დაფარვა (შეკვეთის გარეშე)."
 
 msgid "The card terminal / pay-by-link that took this payment."
 msgstr "ტერმინალი / გადახდის ბმული, რომლითაც ეს გადახდა შესრულდა."
@@ -3185,6 +3506,12 @@ msgstr "არასწორი შეკვეთა"
 
 msgid "Online provider"
 msgstr "ონლაინ პროვაიდერი"
+
+msgid "Back to the gift card"
+msgstr "სასაჩუქრე ბარათზე დაბრუნება"
+
+msgid "Back to the house account"
+msgstr "სახლის ანგარიშზე დაბრუნება"
 
 msgid "Order the refunded amount is taken off (for paid/balance figures)."
 msgstr "შეკვეთა, რომელსაც დაბრუნებული თანხა აკლდება (გადახდილი/ბალანსისთვის)."
@@ -3558,9 +3885,6 @@ msgstr "მიღებული შეკვეთის გაუქმებ�
 msgid "(no supplier)"
 msgstr "(მომწოდებლის გარეშე)"
 
-msgid "Overdue"
-msgstr "ვადაგადაცილებული"
-
 msgid "Received this month"
 msgstr "მიღებულია ამ თვეში"
 
@@ -3608,9 +3932,6 @@ msgstr "ყველაფერი ნორმაშია — შესაკ
 #, python-format
 msgid "Created %(n)d draft purchase order(s): %(numbers)s"
 msgstr "შეიქმნა %(n)d მონახაზი: %(numbers)s"
-
-msgid "Send"
-msgstr "გაგზავნა"
 
 #, python-format
 msgid ""
@@ -3740,6 +4061,36 @@ msgstr "გაუქმებული შეკვეთები"
 msgid "Voided items"
 msgstr "ანულირებული პოზიციები"
 
+#, fuzzy
+#| msgid "Gift cards"
+msgid "Gift cards sold"
+msgstr "გაყიდული სასაჩუქრე ბარათები"
+
+#, fuzzy
+#| msgid "Gift card redeemed"
+msgid "Gift cards redeemed"
+msgstr "გამოყენებული სასაჩუქრე ბარათები"
+
+#, fuzzy
+#| msgid "Gift card"
+msgid "Gift card liability"
+msgstr "სასაჩუქრე ბარათების ვალდებულება"
+
+#, fuzzy
+#| msgid "Charged to house account"
+msgid "Charged to house accounts"
+msgstr "ჩაწერილი სახლის ანგარიშებზე"
+
+#, fuzzy
+#| msgid "House account settled"
+msgid "House accounts settled"
+msgstr "დაფარული სახლის ანგარიშები"
+
+#, fuzzy
+#| msgid "House account statement"
+msgid "House accounts outstanding"
+msgstr "სახლის ანგარიშების დავალიანება"
+
 msgid "Sales by day"
 msgstr "გაყიდვები დღეების მიხედვით"
 
@@ -3752,12 +4103,6 @@ msgstr "მთლიანი"
 
 msgid "Type"
 msgstr "ტიპი"
-
-msgid "Method"
-msgstr "მეთოდი"
-
-msgid "Amount"
-msgstr "თანხა"
 
 msgid "Hour"
 msgstr "საათი"
@@ -3830,9 +4175,6 @@ msgstr "პროდუქტების ღირებულება %"
 
 msgid "Kind"
 msgstr "ტიპი"
-
-msgid "Code"
-msgstr "კოდი"
 
 msgid "Uses"
 msgstr "გამოყენება"
@@ -3970,15 +4312,12 @@ msgstr "არ მოვიდნენ"
 msgid "No-show rate"
 msgstr "არმოსვლის წილი"
 
-#| msgid "Walk-in"
 msgid "Walk-ins"
 msgstr "უჯავშნო სტუმრები"
 
-#| msgid "Mark seated"
 msgid "Walk-ins seated"
 msgstr "დაბრძანდა უჯავშნო"
 
-#| msgid "Average rating"
 msgid "Average wait (min)"
 msgstr "საშუალო ლოდინი (წთ)"
 
@@ -4081,9 +4420,6 @@ msgstr "დაჯავშნა"
 
 msgid "Leave empty to block all tables"
 msgstr "დატოვეთ ცარიელი ყველა მაგიდის დასაბლოკად"
-
-msgid "Holiday"
-msgstr "დღესასწაული"
 
 msgid "Private Event"
 msgstr "კერძო ღონისძიება"
@@ -4758,43 +5094,34 @@ msgstr "სტუმრებს შეუძლიათ QR-ით ჩადგ
 msgid "Text the guest their place in line when added."
 msgstr "დამატებისას სტუმარს SMS-ით ეცნობება ადგილი რიგში."
 
-#| msgid "The guest at the table who placed this order"
 msgid "Text the guest when the table is ready."
 msgstr "SMS სტუმარს, როცა მაგიდა მზადაა."
 
 # Profile Settings
-#| msgid "Fiscal settings"
 msgid "Waitlist settings"
 msgstr "რიგის პარამეტრები"
 
-#| msgid "Waiting now"
 msgid "Waiting"
 msgstr "ელოდება"
 
 msgid "Table ready · notified"
 msgstr "მაგიდა მზადაა · შეტყობინებულია"
 
-#| msgid "No-shows"
 msgid "No-show"
 msgstr "არ მოვიდა"
 
-#| msgid "Guest"
 msgid "Guest (QR)"
 msgstr "სტუმარი (QR)"
 
-#| msgid "Reservation"
 msgid "From a reservation"
 msgstr "ჯავშნიდან"
 
-#| msgid "Courier service saved."
 msgid "Local service day."
 msgstr "ადგილობრივი სამუშაო დღე."
 
-#| msgid "Waitlisted"
 msgid "Waitlist entry"
 msgstr "რიგის ჩანაწერი"
 
-#| msgid "Verified"
 msgid "Notified"
 msgstr "შეტყობინებულია"
 
@@ -4802,23 +5129,18 @@ msgid "Pick a table; a table session opens and the guest is marked seated."
 msgstr ""
 "აირჩიეთ მაგიდა; გაიხსნება მაგიდის სესია და სტუმარი დაბრძანებულად აღინიშნება."
 
-#| msgid "Seats"
 msgid "seats"
 msgstr "ადგილი"
 
-#| msgid "No shared tables yet."
 msgid "No tables yet."
 msgstr "მაგიდები ჯერ არ არის."
 
-#| msgid "Seats"
 msgid "Seat"
 msgstr "დასმა"
 
-#| msgid "Waitlisted"
 msgid "Waitlist rules"
 msgstr "რიგის წესები"
 
-#| msgid "Slot interval (minutes)"
 msgid "Default quoted wait (minutes)"
 msgstr "ნაგულისხმევი სავარაუდო ლოდინი (წთ)"
 
@@ -4834,7 +5156,6 @@ msgstr "სტუმრებს შეუძლიათ QR-ით ჩადგ
 msgid "SMS when added (place in line + link)"
 msgstr "SMS დამატებისას (ადგილი რიგში + ბმული)"
 
-#| msgid "When the order is ready"
 msgid "SMS when the table is ready"
 msgstr "SMS, როცა მაგიდა მზადაა"
 
@@ -4853,32 +5174,26 @@ msgstr ""
 "დაბეჭდეთ და დადგით შესასვლელთან: სტუმრები ასკანერებენ, შეჰყავთ სახელი, "
 "ტელეფონი და რაოდენობა და ტელეფონით ადევნებენ თვალს ადგილს რიგში."
 
-#| msgid "Generated QR code image"
 msgid "Generate a new link"
 msgstr "ახალი ბმულის გენერაცია"
 
-#| msgid "Waiter"
 msgid "Waited"
 msgstr "ელოდა"
 
 msgid "Notify"
 msgstr "შეტყობინება"
 
-#| msgid "Guests now"
 msgid "Guest notified."
 msgstr "სტუმარს შეატყობინეს."
 
 #, python-brace-format
-#| msgid "{p0} assigned to {p1}."
 msgid "{p0} seated at table {p1}."
 msgstr "{p0} დაბრძანდა მაგიდასთან {p1}."
 
 #, python-brace-format
-#| msgid "Test {p0} sent to {p1}."
 msgid "Seat {p0} ({p1})"
 msgstr "დასმა: {p0} ({p1})"
 
-#| msgid "Fiscal settings saved."
 msgid "Waitlist settings saved."
 msgstr "რიგის პარამეტრები შენახულია."
 
@@ -4988,14 +5303,8 @@ msgstr "ახალი QR ბმული შეიქმნა -- ხელა
 #~ msgid "Phone number"
 #~ msgstr "ტელეფონის ნომერი"
 
-#~ msgid "Note"
-#~ msgstr "შენიშვნა"
-
 #~ msgid "Notes"
 #~ msgstr "შენიშვნები"
-
-#~ msgid "Date"
-#~ msgstr "თარიღი"
 
 #~ msgid "Time"
 #~ msgstr "დრო"

@@ -93,6 +93,8 @@ LOCAL_APPS = [
     "apps.ordering",
     "apps.terminals",
     "apps.waitlist",
+    "apps.giftcards",
+    "apps.houseaccounts",
 ]
 
 INSTALLED_APPS = UNFOLD_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -667,6 +669,7 @@ GLOVO_ODR_BASE_URL_STAGE = config(
     "GLOVO_ODR_BASE_URL_STAGE", default="https://api-infra-eu-central-1.stg.ondemandrider.net"
 )
 GLOVO_ODR_STS_URL = config("GLOVO_ODR_STS_URL", default="https://sts.deliveryhero.io/oauth2/token")
+GIFT_CARD_DEFAULT_MONTHS = config("GIFT_CARD_DEFAULT_MONTHS", default=12, cast=int)
 # TBC Checkout (TPAY) base for pay-by-link terminals (per-terminal keys live on the terminal row).
 TBC_TPAY_BASE_URL = config("TBC_TPAY_BASE_URL", default="https://api.tbcbank.ge/v1")
 # Custom domains: what a restaurant points its DNS at.

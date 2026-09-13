@@ -31,6 +31,8 @@ TEMPLATE_FIELDS = [
     ("pay_link", "Payment link (card terminals)"),
     ("waitlist_joined", "Joined the waitlist"),
     ("table_ready", "Table ready (waitlist)"),
+    ("gift_card", "Gift card delivery"),
+    ("statement", "House account statement"),
 ]
 
 

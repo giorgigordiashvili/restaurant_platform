@@ -377,6 +377,8 @@ def record_payment(
     customer=None,
     currency: str | None = None,
     request=None,
+    gift_card=None,
+    house_account=None,
 ) -> Payment:
     """
     The single settlement entry point.
@@ -405,6 +407,50 @@ def record_payment(
         tendered = q(tendered)
         if tendered < amount + tip:
             raise LedgerError("insufficient_tendered", "Cash tendered is less than the amount due.")
+
+    standalone = (
+        order is None and session is None and not orders and (gift_card is not None or house_account is not None)
+    )
+    if standalone:
+        # Selling a gift card / settling a house account: money in, no bill to allocate to.
+        with transaction.atomic():
+            if method == "cash" and shifts_required(restaurant):
+                shift = current_shift(restaurant, lock=True)
+                if shift is None:
+                    raise LedgerError("shift_required", "Open a cash shift before taking cash.")
+            else:
+                shift = current_shift(restaurant)
+            change = q(tendered - amount - tip) if tendered is not None else ZERO
+            payment = Payment.objects.create(
+                restaurant=restaurant,
+                order=None,
+                session=None,
+                shift=shift,
+                customer=customer,
+                processed_by=by if getattr(by, "is_authenticated", False) else None,
+                amount=amount,
+                tip_amount=tip,
+                payment_method=method,
+                status="pending",
+                external_payment_id=external_id or "",
+                tendered=tendered,
+                change_given=change,
+                currency=currency or getattr(restaurant, "default_currency", None) or "GEL",
+                notes=notes or "",
+                gift_card=gift_card,
+                house_account=house_account,
+            )
+            payment.complete()
+        _audit(
+            "payment_collect",
+            restaurant,
+            by,
+            f"{payment.get_payment_method_display()} payment {payment.total_amount} ({payment.receipt_number})",
+            payment,
+            {"method": method, "amount": str(amount), "tip": str(tip), "standalone": True},
+            request=request,
+        )
+        return payment
 
     with transaction.atomic():
         if orders:
@@ -463,6 +509,8 @@ def record_payment(
             change_given=change,
             currency=currency or getattr(restaurant, "default_currency", None) or "GEL",
             notes=notes or "",
+            gift_card=gift_card,
+            house_account=house_account,
         )
 
         remaining = amount
@@ -566,7 +614,13 @@ def refund_payment(
             method = (
                 "cash"
                 if payment.payment_method == "cash"
-                else ("card_terminal" if payment.payment_method == "card_terminal" else "online")
+                else (
+                    "card_terminal"
+                    if payment.payment_method == "card_terminal"
+                    else (
+                        payment.payment_method if payment.payment_method in ("gift_card", "house_account") else "online"
+                    )
+                )
             )
         restaurant = payment.restaurant
         shift = current_shift(restaurant, lock=(method == "cash"))

@@ -44,6 +44,7 @@ from apps.orders.services import transition_order
 from apps.payments.initiate_helpers import (
     OrderInitiateResult,
     ReservationInitiateResult,
+    create_pending_gift_card,
     create_pending_order,
     create_pending_reservation,
 )
@@ -134,6 +135,8 @@ class FlittInitiatePaymentView(APIView):
                 return self._initiate_order(request, data["order_payload"], return_url)
             if target == FlittInitiatePaymentSerializer.TARGET_RESERVATION:
                 return self._initiate_reservation(request, data["reservation_payload"], return_url)
+            if target == FlittInitiatePaymentSerializer.TARGET_GIFT_CARD:
+                return self._initiate_gift_card(request, data["gift_card_payload"], return_url)
             # Session settle via Flitt is out of scope for v1 — BOG handles
             # the pay-QR flow for now. Return a clear 400 so the frontend
             # can fall back to BOG when the customer picked Flitt and the
@@ -227,6 +230,53 @@ class FlittInitiatePaymentView(APIView):
                     "order_number": result.order.order_number,
                     "amount": str(result.amount),
                     "currency": "GEL",
+                },
+            }
+        )
+
+    @transaction.atomic
+    def _initiate_gift_card(self, request: Request, payload: dict[str, Any], return_url: str) -> Response:
+        result = create_pending_gift_card(request, payload)
+        if not result.restaurant.accepts_flitt_payments or not result.restaurant.flitt_sub_merchant_id:
+            raise ValueError("This restaurant does not accept Flitt payments.")
+        flitt_order_id = str(uuid.uuid4())
+        external_id = f"gc-{result.card.pk}"
+        body = self._build_checkout_body(
+            flitt_order_id=flitt_order_id,
+            amount=result.amount,
+            description=f"Gift card {result.card.code}",
+            return_url=return_url,
+            callback_url=_callback_url(request),
+            external_order_id=external_id,
+        )
+        response = get_client().create_checkout(body)
+        inner = response.get("response") or {}
+        checkout_url = inner.get("checkout_url")
+        if not checkout_url:
+            raise FlittClientError("Flitt response missing checkout_url", payload=response)
+        txn = FlittTransaction.objects.create(
+            flitt_order_id=flitt_order_id,
+            flitt_payment_id=str(inner.get("payment_id") or ""),
+            flow_type=FlittTransaction.FLOW_GIFT_CARD,
+            gift_card=result.card,
+            initiated_by=request.user if request.user.is_authenticated else None,
+            amount=result.amount,
+            currency="GEL",
+            status=FlittTransaction.STATUS_PROCESSING,
+            checkout_url=checkout_url,
+            return_url=return_url,
+            callback_url=body["server_callback_url"],
+            request_payload=body,
+            response_payload=response,
+        )
+        return Response(
+            {
+                "success": True,
+                "data": {
+                    "provider": "flitt",
+                    "flitt_order_id": txn.flitt_order_id,
+                    "gift_card_id": str(result.card.pk),
+                    "redirect_url": checkout_url,
                 },
             }
         )
@@ -426,6 +476,20 @@ def _fan_out_flitt_status(txn: FlittTransaction) -> None:
 
 def _apply_success_side_effects(txn: FlittTransaction) -> None:
     """Promote the linked Order / Reservation to the next status."""
+    if txn.flow_type == FlittTransaction.FLOW_GIFT_CARD and txn.gift_card_id:
+        from ..initiate_helpers import gift_card_paid
+
+        try:
+            gift_card_paid(
+                txn.gift_card,
+                method="online_flitt",
+                external_id=f"flitt:{txn.flitt_order_id}",
+                amount=txn.amount,
+                currency=txn.currency,
+            )
+        except Exception:  # pragma: no cover
+            logger.exception("Gift card %s not activated after Flitt payment", txn.gift_card_id)
+        return
     if txn.order_id and txn.order:
         order: Order = txn.order
         if order.status == "pending_payment":

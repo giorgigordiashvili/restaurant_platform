@@ -284,6 +284,62 @@ def module_cards(request):
             "orders",
         )
 
+    if "gift_cards" in on and has_resource_permission(request, "cash", "read"):
+        from apps.giftcards import services as gift_services
+
+        gs = gift_services.summary(restaurant)
+        card(
+            "gift_cards",
+            _("Gift cards"),
+            "card_giftcard",
+            [
+                {
+                    "label": _("Outstanding balance"),
+                    "value": gs["outstanding"],
+                    "url": _url("giftcards_giftcard_changelist"),
+                },
+                {
+                    "label": _("Active cards"),
+                    "value": gs["active"],
+                    "url": _url("giftcards_giftcard_changelist") + "?status__exact=active",
+                },
+                {"label": _("Sold today"), "value": gs["sold_today"], "url": _url("giftcards_giftcard_changelist")},
+            ],
+            [
+                _link(_("Gift cards"), "giftcards_giftcard_changelist"),
+                _link(_("Sell a batch"), "giftcards_giftcardbatchpage_changelist"),
+            ],
+            "cash",
+        )
+
+    if "house_accounts" in on and has_resource_permission(request, "cash", "read"):
+        from apps.houseaccounts import services as ha_services
+
+        hs = ha_services.summary(restaurant)
+        card(
+            "house_accounts",
+            _("House accounts"),
+            "account_balance_wallet",
+            [
+                {
+                    "label": _("Outstanding"),
+                    "value": hs["outstanding"],
+                    "url": _url("houseaccounts_houseaccount_changelist"),
+                },
+                {"label": _("Accounts"), "value": hs["accounts"], "url": _url("houseaccounts_houseaccount_changelist")},
+                {
+                    "label": _("Overdue (30 d)"),
+                    "value": hs["overdue"],
+                    "url": _url("houseaccounts_houseaccount_changelist"),
+                },
+            ],
+            [
+                _link(_("Accounts"), "houseaccounts_houseaccount_changelist"),
+                _link(_("Statements"), "houseaccounts_houseaccountstatement_changelist"),
+            ],
+            "cash",
+        )
+
     if "waitlist" in on and has_resource_permission(request, "reservations", "read"):
         from apps.waitlist import services as waitlist_services
 

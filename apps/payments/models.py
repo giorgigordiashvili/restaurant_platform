@@ -175,13 +175,17 @@ class Payment(TimeStampedModel):
         ("online_bog", _("Online (Bank of Georgia)")),
         ("online_flitt", _("Online (Flitt)")),
         ("online_tbc", _("Online (TBC)")),
+        ("gift_card", _("Gift card")),
+        ("house_account", _("House account")),
         ("voucher", _("Voucher")),
         ("other", _("Other")),
         # Legacy values kept for rows written before the ledger existed.
         ("card", _("Card")),
         ("mobile", _("Mobile Payment")),
     ]
-    STAFF_METHODS = ("cash", "card_terminal", "voucher", "other")
+    STAFF_METHODS = ("cash", "card_terminal", "gift_card", "house_account", "voucher", "other")
+    # Methods that move no money at the till (no cash drawer, no card): a stored value or credit.
+    CREDIT_METHODS = ("gift_card", "house_account", "voucher")
     ONLINE_METHODS = ("online_bog", "online_flitt", "online_tbc", "card", "mobile")
 
     # Relationships
@@ -265,6 +269,22 @@ class Payment(TimeStampedModel):
         default="pending",
     )
 
+    gift_card = models.ForeignKey(
+        "giftcards.GiftCard",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="payments",
+        help_text=_("Sale of this card (no order) or a redemption against a bill."),
+    )
+    house_account = models.ForeignKey(
+        "houseaccounts.HouseAccount",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="payments",
+        help_text=_("Charge to this account (on a bill) or a settlement of it (no order)."),
+    )
     terminal = models.ForeignKey(
         "terminals.PaymentTerminal",
         on_delete=models.SET_NULL,
@@ -422,6 +442,8 @@ class Refund(TimeStampedModel):
         ("cash", _("Cash")),
         ("card_terminal", _("Card (terminal)")),
         ("online", _("Online provider")),
+        ("gift_card", _("Back to the gift card")),
+        ("house_account", _("Back to the house account")),
         ("voucher", _("Voucher")),
         ("other", _("Other")),
     ]
@@ -624,6 +646,7 @@ class BogTransaction(TimeStampedModel):
     FLOW_ORDER = "order"
     FLOW_RESERVATION = "reservation"
     FLOW_ADD_CARD = "add_card"
+    FLOW_GIFT_CARD = "gift_card"
     FLOW_SESSION_SETTLE = "session_settle"
     # Staff-recorded cash payment — no BOG round-trip, just a ledger entry
     # so the unpaid-orders guard on session close is satisfied and the
@@ -636,6 +659,7 @@ class BogTransaction(TimeStampedModel):
         (FLOW_ADD_CARD, "Add Card"),
         (FLOW_SESSION_SETTLE, "Session Settle"),
         (FLOW_CASH_SETTLE, "Cash Settle"),
+        (FLOW_GIFT_CARD, "Gift card purchase"),
     ]
 
     # BOG's own order_status.key values — stored verbatim so downstream code
@@ -689,6 +713,14 @@ class BogTransaction(TimeStampedModel):
         null=True,
         blank=True,
         related_name="bog_transactions",
+    )
+    gift_card = models.ForeignKey(
+        "giftcards.GiftCard",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        help_text="Online gift card purchase this transaction pays for.",
     )
     reservation = models.ForeignKey(
         "reservations.Reservation",
@@ -808,11 +840,13 @@ class FlittTransaction(TimeStampedModel):
     FLOW_RESERVATION = "reservation"
     FLOW_SESSION_SETTLE = "session_settle"
     FLOW_ADD_CARD = "add_card"
+    FLOW_GIFT_CARD = "gift_card"
     FLOW_CHOICES = [
         (FLOW_ORDER, "Order"),
         (FLOW_RESERVATION, "Reservation"),
         (FLOW_SESSION_SETTLE, "Session settle"),
         (FLOW_ADD_CARD, "Add card"),
+        (FLOW_GIFT_CARD, "Gift card purchase"),
     ]
 
     # Checkout status — mirrors Flitt's own `order_status` values.
@@ -864,6 +898,14 @@ class FlittTransaction(TimeStampedModel):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="flitt_transactions",
+    )
+    gift_card = models.ForeignKey(
+        "giftcards.GiftCard",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        help_text="Online gift card purchase this transaction pays for.",
     )
     reservation = models.ForeignKey(
         "reservations.Reservation",

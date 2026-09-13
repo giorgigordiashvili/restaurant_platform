@@ -921,6 +921,13 @@ class CustomerOrderCreateView(APIView):
                 # Reserves ingredients; raises InsufficientStock (409) and rolls
                 # the order back when the warehouse cannot cover it.
                 inventory_hooks.on_order_created(order)
+                if data.get("gift_card_code"):
+                    from apps.payments.initiate_helpers import apply_gift_card_to_order
+
+                    try:
+                        apply_gift_card_to_order(order, data["gift_card_code"], by=request.user)
+                    except ValueError as exc:
+                        raise serializers_module.ValidationError({"gift_card_code": str(exc)})
                 notification_hooks.on_order_created(order, by=request.user)
                 crm_hooks.on_order_created(order, consent=bool(data.get("marketing_opt_in")))
 

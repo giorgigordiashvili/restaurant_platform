@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-3 py-1.5 text-sm w-full" %}
+<form method="post" class="{{ base }} flex flex-col gap-4 md:w-1/2" data-testid="settle-form">
+  {% csrf_token %}
+  <div><h2 class="font-semibold text-lg">{{ title }}</h2><p class="text-sm text-base-500">{% translate "Balance due" %}: <b>{{ account.balance }}</b>{% if account.credit_limit %} · {% translate "limit" %} {{ account.credit_limit }}{% endif %}</p></div>
+  <label class="text-sm">{% translate "Amount" %}<input type="number" step="0.01" min="0.01" name="amount" value="{{ account.balance }}" class="{{ input }}"></label>
+  <label class="text-sm">{% translate "Method" %}<select name="method" class="{{ input }}"><option value="cash">{% translate "Cash" %}</option><option value="card_terminal">{% translate "Card (terminal)" %}</option><option value="other">{% translate "Bank transfer / other" %}</option></select></label>
+  <label class="text-sm">{% translate "Note" %}<input type="text" name="note" class="{{ input }}" maxlength="200"></label>
+  <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="writeoff" value="1">{% translate "Write off instead of receiving money" %}</label>
+  <div class="flex gap-2"><button type="submit" class="{{ btn }}">{% translate "Book" %}</button><a href="{{ back_url }}" class="{{ btn2 }}">{% translate "Back" %}</a></div>
+</form>
+{% endwith %}
+{% endblock %}

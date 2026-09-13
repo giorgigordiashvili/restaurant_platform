@@ -252,6 +252,15 @@ class Order(TimeStampedModel):
     delivery_instructions = models.CharField(max_length=300, blank=True, default="")
     delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     packaging_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    gift_card = models.ForeignKey(
+        "giftcards.GiftCard", on_delete=models.SET_NULL, null=True, blank=True, related_name="orders"
+    )
+    gift_card_applied = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        help_text=_("Paid from a gift card at checkout (a gift_card payment)."),
+    )
     scheduled_for = models.DateTimeField(
         null=True, blank=True, db_index=True, help_text=_("Pickup / delivery time the guest chose; empty = ASAP.")
     )
