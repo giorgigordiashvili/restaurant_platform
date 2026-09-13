@@ -70,11 +70,15 @@ class TerminalListView(APIView):
         return Response(TerminalSerializer(services.terminals_for(request.restaurant), many=True).data)
 
 
-@extend_schema(tags=[TAG], parameters=[OpenApiParameter("status", str), OpenApiParameter("shift", str)])
+@extend_schema(tags=[TAG])
 class TransactionListView(APIView):
     permission_classes = PERMS
     required_permission = ("cash", "read")
 
+    @extend_schema(
+        parameters=[OpenApiParameter("status", str), OpenApiParameter("order", str), OpenApiParameter("session", str)],
+        responses=TransactionSerializer(many=True),
+    )
     @require_restaurant
     def get(self, request):
         qs = TerminalTransaction.objects.filter(restaurant=request.restaurant).select_related(
