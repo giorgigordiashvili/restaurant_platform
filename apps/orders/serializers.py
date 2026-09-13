@@ -404,6 +404,7 @@ class OrderListSerializer(serializers.ModelSerializer):
             "table_session",
             "customer_name",
             "source",
+            "scheduled_for",
             "subtotal",
             "discount_amount",
             "total",
