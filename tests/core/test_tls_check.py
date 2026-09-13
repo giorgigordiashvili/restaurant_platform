@@ -109,3 +109,13 @@ class TestTlsCheckOperational:
         monkeypatch.setattr(core_views, "_tls_domain_allowed", boom)
         resp = client.get(TLS_CHECK_URL, {"domain": f"anything.{ADMIN_DOMAIN}"})
         assert resp.status_code == 403
+
+
+@pytest.mark.django_db
+def test_registered_custom_domain_is_allowed(client, restaurant, settings):
+    from apps.ordering.models import RestaurantDomain
+
+    settings.ADMIN_DOMAIN = "admin.aimenu.ge"
+    RestaurantDomain.objects.create(restaurant=restaurant, domain="order.example.ge")
+    assert client.get("/api/v1/tls-check/", {"domain": "ORDER.example.ge."}).status_code == 200
+    assert client.get("/api/v1/tls-check/", {"domain": "other.example.ge"}).status_code == 403

@@ -88,6 +88,13 @@ def _tls_domain_allowed(domain):
     Only two shapes qualify: the tenant-admin domain itself, and
     ``<slug>.<ADMIN_DOMAIN>`` where the slug belongs to an active restaurant.
     """
+    # A restaurant's own ordering domain (Online ordering -> Custom domain),
+    # served by the customer site behind the same Caddy.
+    from apps.ordering.domains import is_known
+
+    if is_known(domain):
+        return True
+
     admin_domain = getattr(settings, "ADMIN_DOMAIN", "")
     if not admin_domain:
         return False
