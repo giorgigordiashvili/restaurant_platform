@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-13 12:19+0400\n"
+"POT-Creation-Date: 2026-09-13 12:45+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Georgian\n"
@@ -195,6 +195,18 @@ msgstr "ვინ"
 
 msgid "system"
 msgstr "სისტემა"
+
+# Profile Settings
+#| msgid "Fiscal settings"
+msgid "Finish setting up"
+msgstr "დაასრულეთ მოწყობა"
+
+msgid "Steps done"
+msgstr "შესრულებული ნაბიჯები"
+
+#| msgid "Print bridge setup"
+msgid "Continue setup"
+msgstr "მოწყობის გაგრძელება"
 
 # Models - Orders
 msgid "Orders"
@@ -797,6 +809,10 @@ msgstr "ანგარიშები"
 msgid "Invitations"
 msgstr "მოწვევები"
 
+#| msgid "Setup guide"
+msgid "Setup wizard"
+msgstr "მოწყობის ოსტატი"
+
 msgid ""
 "Fill in this language, save, then pick the next tab. Option rows left blank "
 "keep showing their existing text."
@@ -840,6 +856,148 @@ msgstr "ყოველთვის ჩართულია."
 
 msgid "Save options"
 msgstr "პარამეტრების შენახვა"
+
+#, python-format
+msgid "Step %(n)s of %(total)s"
+msgstr "ნაბიჯი %(n)s / %(total)s"
+
+msgid "Finish later"
+msgstr "მოგვიანებით დავასრულებ"
+
+msgid ""
+"Tick what your restaurant needs. We'll walk through each one after the "
+"basics -- you decide on every step whether to set it up or skip it. "
+"Everything can be changed later under Settings → Modules."
+msgstr ""
+"მონიშნეთ, რა სჭირდება თქვენს რესტორანს. ძირითადი მონაცემების შემდეგ თითოეულს"
+" ცალ-ცალკე გავივლით — ყოველ ნაბიჯზე თქვენ წყვეტთ, მოაწყოთ თუ გამოტოვოთ. "
+"ყველაფრის შეცვლა შემდეგაც შეიძლება: პარამეტრები → მოდულები."
+
+msgid "Continue"
+msgstr "გაგრძელება"
+
+msgid ""
+"This is what guests see on your page and on receipts. Only the name is "
+"required."
+msgstr ""
+"ამას ხედავენ სტუმრები თქვენს გვერდზე და ჩეკებზე. სავალდებულოა მხოლოდ სახელი."
+
+msgid ""
+"A logo and a cover photo make your page look like yours. You can add them "
+"later from Restaurant settings."
+msgstr ""
+"ლოგო და ყდის ფოტო თქვენს გვერდს თქვენებურ იერს აძლევს. მათი დამატება "
+"შემდეგაც შეიძლება რესტორნის პარამეტრებიდან."
+
+#| msgid "Currency"
+msgid "Current:"
+msgstr "ამჟამინდელი:"
+
+#| msgid "Save and continue editing"
+msgid "Save & continue"
+msgstr "შენახვა და გაგრძელება"
+
+msgid "Skip for now"
+msgstr "ჯერ გამოტოვება"
+
+msgid ""
+"In the restaurant's timezone. A closing time earlier than the opening time "
+"means you close after midnight. The second pair is optional (e.g. lunch and "
+"dinner service)."
+msgstr ""
+"რესტორნის დროის სარტყელში. გახსნაზე ადრე დახურვის დრო ნიშნავს, რომ შუაღამის "
+"შემდეგ იხურებით. მეორე წყვილი არასავალდებულოა (მაგ. ლანჩი და ვახშამი)."
+
+msgid "Day"
+msgstr "დღე"
+
+msgid "Closed"
+msgstr "დახურულია"
+
+msgid "Open"
+msgstr "ღიაა"
+
+msgid "Close"
+msgstr "დახურვა"
+
+msgid "Open (2nd)"
+msgstr "გახსნა (მე-2)"
+
+msgid "Close (2nd)"
+msgstr "დახურვა (მე-2)"
+
+#| msgid "Currently goes to"
+msgid "Currently on."
+msgstr "ამჟამად ჩართულია."
+
+#| msgid "Your store id there."
+msgid "You skipped this earlier."
+msgstr "ეს ადრე გამოტოვეთ."
+
+#, python-format
+msgid "Also switches on: %(names)s."
+msgstr "ასევე ჩაირთვება: %(names)s."
+
+#, python-format
+msgid "Yes -- set up %(name)s"
+msgstr "დიახ — მოვაწყოთ: %(name)s"
+
+msgid "Turn on, set up later"
+msgstr "ჩართვა, მოწყობა მოგვიანებით"
+
+#, python-format
+msgid "Yes -- turn on %(name)s"
+msgstr "დიახ — ჩავრთოთ: %(name)s"
+
+msgid "Not now -- skip this one"
+msgstr "ახლა არა — გამოტოვება"
+
+msgid ""
+"Here is what your restaurant runs with. Switch anything on or off later "
+"under Settings → Modules."
+msgstr ""
+"აი, რითი მუშაობს თქვენი რესტორანი. ნებისმიერის ჩართვა ან გამორთვა შემდეგაც "
+"შეიძლება: პარამეტრები → მოდულები."
+
+#| msgid "Shown to guests on the menu."
+msgid "Nothing yet -- just the menu."
+msgstr "ჯერ არაფერი — მხოლოდ მენიუ."
+
+msgid "Skipped"
+msgstr "გამოტოვებულია"
+
+msgid "Next"
+msgstr "შემდეგი"
+
+msgid "Add your menu"
+msgstr "დაამატეთ მენიუ"
+
+msgid "categories, dishes, prices, photos."
+msgstr "კატეგორიები, კერძები, ფასები, ფოტოები."
+
+#| msgid "Invite to share tables"
+msgid "Invite your staff"
+msgstr "მოიწვიეთ თანამშრომლები"
+
+msgid "they sign in to the POS app with their own account."
+msgstr "ისინი POS აპლიკაციაში საკუთარი ანგარიშით შედიან."
+
+msgid "See your public page"
+msgstr "ნახეთ თქვენი საჯარო გვერდი"
+
+#| msgid "Open the menu"
+msgid "Open the POS"
+msgstr "POS-ის გახსნა"
+
+msgid "Go to my dashboard"
+msgstr "ჩემს პანელზე გადასვლა"
+
+msgid "Start the setup from the beginning?"
+msgstr "თავიდან დავიწყოთ მოწყობა?"
+
+#| msgid "Sort order"
+msgid "Start over"
+msgstr "თავიდან დაწყება"
 
 msgid "Shared venue"
 msgstr "საერთო სივრცე"
@@ -2048,9 +2206,6 @@ msgstr "აჩვენეთ ეს კოდი რესტორანში
 msgid "Suspended"
 msgstr "შეჩერებული"
 
-msgid "Closed"
-msgstr "დახურულია"
-
 msgid "Person or company on the account."
 msgstr "პირი ან კომპანია ანგარიშზე."
 
@@ -2166,9 +2321,6 @@ msgstr "ამონაწერი გაიგზავნა: {p0}."
 
 msgid "No phone / email on the account."
 msgstr "ანგარიშზე ტელეფონი / ელფოსტა არ არის."
-
-msgid "Open"
-msgstr "ღიაა"
 
 msgid "Opening balance"
 msgstr "საწყისი ბალანსი"
@@ -2730,9 +2882,6 @@ msgstr "ჩანს რესტორნის სახელად."
 msgid "Notification settings"
 msgstr "შეტყობინებების პარამეტრები"
 
-msgid "Skipped"
-msgstr "გამოტოვებულია"
-
 msgid "Reservation confirmation"
 msgstr "ჯავშნის დადასტურება"
 
@@ -3065,26 +3214,6 @@ msgstr "ონლაინ შეკვეთების შეჩერებ�
 
 msgid "Opening hours"
 msgstr "სამუშაო საათები"
-
-msgid ""
-"In the restaurant's timezone. A closing time earlier than the opening time "
-"means you close after midnight. The second pair is optional (e.g. lunch and "
-"dinner service)."
-msgstr ""
-"რესტორნის დროის სარტყელში. გახსნაზე ადრე დახურვის დრო ნიშნავს, რომ შუაღამის "
-"შემდეგ იხურებით. მეორე წყვილი არასავალდებულოა (მაგ. ლანჩი და ვახშამი)."
-
-msgid "Day"
-msgstr "დღე"
-
-msgid "Close"
-msgstr "დახურვა"
-
-msgid "Open (2nd)"
-msgstr "გახსნა (მე-2)"
-
-msgid "Close (2nd)"
-msgstr "დახურვა (მე-2)"
 
 msgid "Save hours"
 msgstr "საათების შენახვა"
@@ -4061,32 +4190,26 @@ msgstr "გაუქმებული შეკვეთები"
 msgid "Voided items"
 msgstr "ანულირებული პოზიციები"
 
-#, fuzzy
 #| msgid "Gift cards"
 msgid "Gift cards sold"
 msgstr "გაყიდული სასაჩუქრე ბარათები"
 
-#, fuzzy
 #| msgid "Gift card redeemed"
 msgid "Gift cards redeemed"
 msgstr "გამოყენებული სასაჩუქრე ბარათები"
 
-#, fuzzy
 #| msgid "Gift card"
 msgid "Gift card liability"
 msgstr "სასაჩუქრე ბარათების ვალდებულება"
 
-#, fuzzy
 #| msgid "Charged to house account"
 msgid "Charged to house accounts"
-msgstr "ჩაწერილი სახლის ანგარიშებზე"
+msgstr "დარიცხული სახლის ანგარიშებზე"
 
-#, fuzzy
 #| msgid "House account settled"
 msgid "House accounts settled"
 msgstr "დაფარული სახლის ანგარიშები"
 
-#, fuzzy
 #| msgid "House account statement"
 msgid "House accounts outstanding"
 msgstr "სახლის ანგარიშების დავალიანება"
@@ -4739,6 +4862,55 @@ msgstr "არასავალდებულო მეორე სერვ�
 msgid "Mark as closed for this day (overrides open/close times)"
 msgstr "ამ დღეს დახურულად მონიშვნა (გადაფარავს გახსნა/დახურვის დროს)"
 
+msgid "Front of house"
+msgstr "დარბაზი"
+
+msgid "Money"
+msgstr "ფული"
+
+#| msgid "CRM & marketing"
+msgid "Guests & marketing"
+msgstr "სტუმრები და მარკეტინგი"
+
+msgid "Back office"
+msgstr "ბექ-ოფისი"
+
+msgid "What do you need?"
+msgstr "რა გჭირდებათ?"
+
+#| msgid "Restaurant settings"
+msgid "Restaurant details"
+msgstr "რესტორნის მონაცემები"
+
+msgid "Logo & look"
+msgstr "ლოგო და იერსახე"
+
+#| msgid "All messages"
+msgid "All set"
+msgstr "ყველაფერი მზადაა"
+
+#| msgid "existing category"
+msgid "Cuisine / category"
+msgstr "სამზარეულო / კატეგორია"
+
+#| msgid "Setup guide"
+msgid "Setup"
+msgstr "მოწყობა"
+
+#, python-format
+msgid "%(module)s is on. When you are done here,"
+msgstr "%(module)s ჩართულია. როცა აქ დაასრულებთ,"
+
+msgid "continue the setup →"
+msgstr "გააგრძელეთ მოწყობა →"
+
+msgid "Setup complete. Welcome aboard!"
+msgstr "მოწყობა დასრულდა. კეთილი იყოს თქვენი მობრძანება!"
+
+msgid "You can pick the setup up again any time from Settings → Setup wizard."
+msgstr ""
+"მოწყობის გაგრძელება ნებისმიერ დროს შეგიძლიათ: პარამეტრები → მოწყობის ოსტატი."
+
 msgid "Physical terminal (cashier confirms)"
 msgstr "ფიზიკური ტერმინალი (მოლარე ადასტურებს)"
 
@@ -5222,9 +5394,6 @@ msgstr "ახალი QR ბმული შეიქმნა -- ხელა
 #~ msgid "Save and add another"
 #~ msgstr "შენახვა და ახლის დამატება"
 
-#~ msgid "Save and continue editing"
-#~ msgstr "შენახვა და რედაქტირების გაგრძელება"
-
 #~ msgid "Save and view"
 #~ msgstr "შენახვა და ნახვა"
 
@@ -5314,9 +5483,6 @@ msgstr "ახალი QR ბმული შეიქმნა -- ხელა
 
 #~ msgid "Capacity"
 #~ msgstr "ტევადობა"
-
-#~ msgid "Sort order"
-#~ msgstr "დალაგების რიგი"
 
 #~ msgid "Slug"
 #~ msgstr "სლაგი"
@@ -5472,9 +5638,6 @@ msgstr "ახალი QR ბმული შეიქმნა -- ხელა
 
 #~ msgid "There are no items yet."
 #~ msgstr "ჯერ არ არის ერთეულები."
-
-#~ msgid "Next"
-#~ msgstr "შემდეგი"
 
 #~ msgid "First"
 #~ msgstr "პირველი"

@@ -82,11 +82,16 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             "preferred_language",
             "referral_code",
         ]
+        # The model's UniqueValidator would answer first with a generic
+        # "unique" code; validate_email below reports the stable "email_taken".
+        extra_kwargs = {"email": {"validators": []}}
 
     def validate_email(self, value):
         """Validate email is unique (case-insensitive)."""
         if User.objects.filter(email__iexact=value).exists():
-            raise serializers.ValidationError("A user with this email already exists.")
+            raise serializers.ValidationError(
+                "An account with this email already exists. Sign in instead.", code="email_taken"
+            )
         return value.lower()
 
     def validate_referral_code(self, value):
@@ -199,6 +204,20 @@ class ChangePasswordSerializer(serializers.Serializer):
         return user
 
 
+class EmailCheckSerializer(serializers.Serializer):
+    """Request body for the pre-signup email check."""
+
+    email = serializers.EmailField(required=True)
+
+    def validate_email(self, value):
+        return value.lower().strip()
+
+
+class EmailCheckResultSerializer(serializers.Serializer):
+    exists = serializers.BooleanField()
+    has_restaurants = serializers.BooleanField()
+
+
 class PasswordResetRequestSerializer(serializers.Serializer):
     """Serializer for requesting password reset."""
 
@@ -239,7 +258,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
             # Check if account is locked
             if user.is_account_locked():
-                raise serializers.ValidationError({"detail": "Account is temporarily locked. Please try again later."})
+                raise serializers.ValidationError(
+                    {"detail": "Too many failed attempts. The account is locked for 30 minutes."},
+                    code="account_locked",
+                )
 
         except User.DoesNotExist:
             pass

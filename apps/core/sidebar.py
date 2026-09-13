@@ -91,6 +91,7 @@ ICONS = {
     "staffrole": "admin_panel_settings",
     "restaurant": "storefront",
     "restaurantmodules": "extension",
+    "restaurantsetup": "rocket_launch",
 }
 
 
@@ -180,6 +181,7 @@ def navigation(request):
                 for i in (
                     _model_item(site, "tenants", "restaurant", _("Restaurant settings")),
                     _model_item(site, "tenants", "restaurantmodules", _("Modules")),
+                    _model_item(site, "tenants", "restaurantsetup", _("Setup wizard")),
                 )
                 if i
             ],

@@ -8,6 +8,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
     ChangePasswordView,
+    EmailCheckView,
     FacebookSocialLoginView,
     GoogleSocialLoginView,
     LoginView,
@@ -22,6 +23,7 @@ app_name = "auth"
 urlpatterns = [
     # Registration
     path("register/", RegisterView.as_view(), name="register"),
+    path("email-check/", EmailCheckView.as_view(), name="email_check"),
     # Login/Logout
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),

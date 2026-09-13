@@ -2,6 +2,8 @@
 Pytest configuration and fixtures for the restaurant platform tests.
 """
 
+from django.utils import timezone
+
 from rest_framework.test import APIClient
 
 import pytest
@@ -98,6 +100,9 @@ def create_restaurant(db):
     from apps.tenants.models import Restaurant
 
     def _create_restaurant(owner, name="Test Restaurant", slug="test-restaurant", **kwargs):
+        # Fixture restaurants are "already configured": the first-login setup
+        # wizard (tests/tenants/test_setup.py) opts in by clearing this.
+        kwargs.setdefault("setup_completed_at", timezone.now())
         restaurant = Restaurant.objects.create(owner=owner, name=name, slug=slug, is_active=True, **kwargs)
         return restaurant
 
@@ -839,3 +844,12 @@ def modifier_with_translations(modifier_group):
     modifier.save()
 
     return modifier
+
+
+@pytest.fixture
+def api_envelope(settings):
+    """Run with the production exception handler (tests default to DRF's for readable failures)."""
+    rf = dict(settings.REST_FRAMEWORK)
+    rf["EXCEPTION_HANDLER"] = "apps.core.exceptions.custom_exception_handler"
+    settings.REST_FRAMEWORK = rf
+    yield

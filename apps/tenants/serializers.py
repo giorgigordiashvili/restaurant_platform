@@ -2,6 +2,8 @@
 Restaurant (tenant) serializers.
 """
 
+from django.db import transaction
+
 from rest_framework import serializers
 
 from parler_rest.serializers import TranslatableModelSerializer, TranslatedFieldsField
@@ -256,6 +258,12 @@ class RestaurantDetailSerializer(serializers.ModelSerializer):
 class RestaurantCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating a new restaurant."""
 
+    slug = serializers.SlugField(
+        required=False,
+        allow_blank=True,
+        max_length=100,
+        help_text="Optional. Left blank, it is derived from the name (Georgian and Cyrillic are transliterated).",
+    )
     category_id = serializers.PrimaryKeyRelatedField(
         queryset=RestaurantCategory.objects.filter(is_active=True),
         source="category",
@@ -280,14 +288,24 @@ class RestaurantCreateSerializer(serializers.ModelSerializer):
         ]
 
     def validate_slug(self, value):
-        """Ensure slug is unique."""
-        if Restaurant.objects.filter(slug=value).exists():
-            raise serializers.ValidationError("A restaurant with this slug already exists.")
+        """Ensure an explicitly requested slug is unique (blank = derived on save)."""
+        value = (value or "").strip().lower()
+        if value and Restaurant.objects.filter(slug=value).exists():
+            raise serializers.ValidationError("A restaurant with this slug already exists.", code="slug_taken")
         return value
 
+    def validate_name(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("Enter the restaurant's name.", code="required")
+        return value
+
+    @transaction.atomic
     def create(self, validated_data):
         """Create restaurant and set current user as owner."""
         user = self.context["request"].user
+        if not validated_data.get("slug"):
+            validated_data.pop("slug", None)
         restaurant = Restaurant.objects.create(owner=user, **validated_data)
 
         # Create default operating hours

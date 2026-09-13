@@ -1,0 +1,173 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+{% comment %}
+First-login setup wizard (apps.tenants.setup / setup_admin). One template,
+one block per step kind.
+{% endcomment %}
+{% block title %}{{ title }} | {{ site_title }}{% endblock %}
+{% block branding %}{% include "unfold/helpers/site_branding.html" %}{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-5" btn="inline-flex items-center gap-1 px-4 py-2 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center gap-1 px-4 py-2 rounded-default text-sm font-medium border border-base-300 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-3 py-1.5 text-sm w-full" %}
+<div class="mb-6 max-w-4xl mx-auto flex flex-col gap-4" data-testid="setup-wizard" data-step="{{ step.key }}">
+
+  <div class="flex items-center justify-between gap-4">
+    <div>
+      <p class="text-xs uppercase text-base-500">{% blocktranslate with n=progress.index total=progress.total %}Step {{ n }} of {{ total }}{% endblocktranslate %}</p>
+      <h1 class="text-xl font-semibold">{{ step.title }}</h1>
+    </div>
+    {% if can_manage and step.kind != "done" %}
+    <form method="post" action="{{ u.later }}">{% csrf_token %}<button type="submit" class="text-sm text-base-500 hover:underline">{% translate "Finish later" %}</button></form>
+    {% endif %}
+  </div>
+  <div class="h-1.5 rounded bg-base-100 dark:bg-base-800"><div class="h-1.5 rounded bg-primary-600" style="width: {{ progress.percent }}%"></div></div>
+  <ol class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-base-500">
+    {% for s in steps %}
+    <li class="{% if s.current %}text-primary-600 font-semibold{% elif s.done %}text-base-700 dark:text-base-300{% endif %}">
+      {% if s.url and not s.current %}<a href="{{ s.url }}" class="hover:underline">{{ forloop.counter }}. {{ s.title }}</a>{% else %}{{ forloop.counter }}. {{ s.title }}{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+
+  {% if step.kind == "welcome" %}
+  <form method="post" action="{{ u.select }}" class="{{ base }} flex flex-col gap-5" data-testid="setup-welcome">
+    {% csrf_token %}
+    <p class="text-sm text-base-500">{% translate "Tick what your restaurant needs. We'll walk through each one after the basics -- you decide on every step whether to set it up or skip it. Everything can be changed later under Settings → Modules." %}</p>
+    {% for g in groups %}
+    <div>
+      <h3 class="font-semibold mb-2">{{ g.title }}</h3>
+      <div class="grid gap-2 md:grid-cols-2">
+        {% for item in g.modules %}
+        <label class="flex items-start gap-3 rounded-default border border-base-200 dark:border-base-800 p-3 cursor-pointer hover:bg-base-50 dark:hover:bg-base-800">
+          <input type="checkbox" name="modules" value="{{ item.module.code }}" data-requires="{{ item.module.requires|join:',' }}" {% if item.checked %}checked{% endif %} class="mt-1">
+          <span class="material-symbols-outlined text-primary-600">{{ item.module.icon }}</span>
+          <span><span class="block font-medium text-sm">{{ item.module.title }}</span><span class="block text-xs text-base-500">{{ item.module.description }}</span></span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+    {% if can_manage %}<div><button type="submit" class="{{ btn }}">{% translate "Continue" %}</button></div>{% endif %}
+  </form>
+  <script>
+    document.querySelectorAll('[data-testid="setup-welcome"] input[name="modules"]').forEach(function (box) {
+      box.addEventListener('change', function () {
+        if (!box.checked) return;
+        (box.dataset.requires || '').split(',').filter(Boolean).forEach(function (code) {
+          var dep = document.querySelector('input[name="modules"][value="' + code + '"]');
+          if (dep && !dep.checked) { dep.checked = true; dep.dispatchEvent(new Event('change')); }
+        });
+      });
+    });
+  </script>
+
+  {% elif step.kind == "details" or step.kind == "branding" %}
+  <form method="post" action="{% if step.kind == 'details' %}{{ u.details }}{% else %}{{ u.branding }}{% endif %}" enctype="multipart/form-data" class="{{ base }} flex flex-col gap-4" data-testid="setup-{{ step.kind }}">
+    {% csrf_token %}
+    {% if step.kind == "details" %}<p class="text-sm text-base-500">{% translate "This is what guests see on your page and on receipts. Only the name is required." %}</p>
+    {% else %}<p class="text-sm text-base-500">{% translate "A logo and a cover photo make your page look like yours. You can add them later from Restaurant settings." %}</p>{% endif %}
+    {% if form.non_field_errors %}<p class="text-sm text-red-600">{{ form.non_field_errors|join:" " }}</p>{% endif %}
+    <div class="grid gap-4 md:grid-cols-2">
+      {% for field in form %}
+      <label class="text-sm {% if field.name == 'description' or field.name == 'address' %}md:col-span-2{% endif %}">
+        <span class="block font-medium mb-1">{{ field.label }}{% if field.field.required %} *{% endif %}</span>
+        {% if field.value and field.field.widget.input_type == "file" %}<span class="block text-xs text-base-500 mb-1">{% translate "Current:" %} {{ field.value }}</span>{% endif %}
+        {{ field }}
+        {% if field.help_text %}<span class="block text-xs text-base-500 mt-1">{{ field.help_text }}</span>{% endif %}
+        {% for e in field.errors %}<span class="block text-xs text-red-600 mt-1">{{ e }}</span>{% endfor %}
+      </label>
+      {% endfor %}
+    </div>
+    {% if can_manage %}
+    <div class="flex gap-3">
+      <button type="submit" class="{{ btn }}">{% translate "Save & continue" %}</button>
+      {% if step.kind == "branding" %}<button type="submit" name="skip" value="1" formnovalidate class="{{ btn2 }}">{% translate "Skip for now" %}</button>{% endif %}
+    </div>
+    {% endif %}
+  </form>
+
+  {% elif step.kind == "hours" %}
+  <form method="post" action="{{ u.hours }}" class="{{ base }} flex flex-col gap-3" data-testid="setup-hours">
+    {% csrf_token %}
+    <p class="text-sm text-base-500">{% translate "In the restaurant's timezone. A closing time earlier than the opening time means you close after midnight. The second pair is optional (e.g. lunch and dinner service)." %}</p>
+    <div class="overflow-x-auto"><table class="w-full text-sm">
+      <thead><tr class="text-left text-xs uppercase text-base-500"><th class="py-1 pr-3">{% translate "Day" %}</th><th class="py-1 pr-3">{% translate "Closed" %}</th><th class="py-1 pr-3">{% translate "Open" %}</th><th class="py-1 pr-3">{% translate "Close" %}</th><th class="py-1 pr-3">{% translate "Open (2nd)" %}</th><th class="py-1 pr-3">{% translate "Close (2nd)" %}</th></tr></thead>
+      <tbody>
+      {% for d in days %}
+      <tr class="border-t border-base-100 dark:border-base-800">
+        <td class="py-1 pr-3 font-medium">{{ d.label }}</td>
+        <td class="py-1 pr-3"><input type="checkbox" name="closed_{{ d.idx }}" value="1" {% if d.row.is_closed %}checked{% endif %}></td>
+        <td class="py-1 pr-3"><input type="time" name="open_{{ d.idx }}" value="{{ d.row.open_time|time:'H:i'|default:'09:00' }}" class="{{ input }}"></td>
+        <td class="py-1 pr-3"><input type="time" name="close_{{ d.idx }}" value="{{ d.row.close_time|time:'H:i'|default:'22:00' }}" class="{{ input }}"></td>
+        <td class="py-1 pr-3"><input type="time" name="open2_{{ d.idx }}" value="{{ d.row.open_time_2|time:'H:i'|default:'' }}" class="{{ input }}"></td>
+        <td class="py-1 pr-3"><input type="time" name="close2_{{ d.idx }}" value="{{ d.row.close_time_2|time:'H:i'|default:'' }}" class="{{ input }}"></td>
+      </tr>
+      {% endfor %}
+      </tbody></table></div>
+    {% if can_manage %}<div><button type="submit" class="{{ btn }}">{% translate "Save & continue" %}</button></div>{% endif %}
+  </form>
+
+  {% elif step.kind == "module" %}
+  <div class="{{ base }} flex flex-col gap-4" data-testid="setup-module-{{ module.code }}">
+    <div class="flex items-start gap-4">
+      <span class="material-symbols-outlined text-4xl text-primary-600">{{ module.icon }}</span>
+      <div>
+        <h2 class="text-lg font-semibold">{{ module.title }}</h2>
+        <p class="text-sm text-base-500">{{ module.description }}</p>
+        {% if enabled %}<p class="text-xs mt-1 text-green-700">{% translate "Currently on." %}</p>{% endif %}
+        {% if decision == "skipped" %}<p class="text-xs mt-1 text-base-500">{% translate "You skipped this earlier." %}</p>{% endif %}
+        {% if also_on %}<p class="text-xs mt-1 text-amber-600">{% blocktranslate with names=also_on|join:", " %}Also switches on: {{ names }}.{% endblocktranslate %}</p>{% endif %}
+      </div>
+    </div>
+    <form method="post" action="{{ enable_url }}" class="flex flex-col gap-3">
+      {% csrf_token %}
+      {% for opt in options %}
+        {% if opt.is_bool %}
+        <label class="flex items-start gap-2 text-sm"><input type="checkbox" name="{{ opt.name }}" value="1" {% if opt.value %}checked{% endif %} class="mt-1"><span>{{ opt.label }}{% if opt.help %}<span class="block text-xs text-base-500">{{ opt.help }}</span>{% endif %}</span></label>
+        {% else %}
+        <label class="text-sm">{{ opt.label }}<input type="text" name="{{ opt.name }}" value="{{ opt.value }}" class="{{ input }}">{% if opt.help %}<span class="block text-xs text-base-500">{{ opt.help }}</span>{% endif %}</label>
+        {% endif %}
+      {% endfor %}
+      {% if can_manage %}
+      <div class="flex flex-wrap gap-3 pt-2">
+        {% if landing %}
+        <button type="submit" class="{{ btn }}"><span class="material-symbols-outlined text-base">check</span>{% blocktranslate with name=module.title %}Yes -- set up {{ name }}{% endblocktranslate %}</button>
+        <button type="submit" name="stay" value="1" class="{{ btn2 }}">{% translate "Turn on, set up later" %}</button>
+        {% else %}
+        <button type="submit" class="{{ btn }}"><span class="material-symbols-outlined text-base">check</span>{% blocktranslate with name=module.title %}Yes -- turn on {{ name }}{% endblocktranslate %}</button>
+        {% endif %}
+      </div>
+      {% endif %}
+    </form>
+    {% if can_manage %}
+    <form method="post" action="{{ skip_url }}">{% csrf_token %}<button type="submit" class="text-sm text-base-500 hover:underline">{% translate "Not now -- skip this one" %}</button></form>
+    {% endif %}
+  </div>
+
+  {% elif step.kind == "done" %}
+  <div class="{{ base }} flex flex-col gap-4" data-testid="setup-done">
+    <p class="text-sm">{% translate "Here is what your restaurant runs with. Switch anything on or off later under Settings → Modules." %}</p>
+    <div class="grid gap-4 md:grid-cols-2">
+      <div><h3 class="font-semibold mb-2">{% translate "On" %}</h3><ul class="text-sm flex flex-col gap-1">{% for m in enabled %}<li class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-green-600">check_circle</span>{{ m.title }}</li>{% empty %}<li class="text-base-500">{% translate "Nothing yet -- just the menu." %}</li>{% endfor %}</ul></div>
+      <div><h3 class="font-semibold mb-2">{% translate "Skipped" %}</h3><ul class="text-sm flex flex-col gap-1">{% for m in skipped %}<li class="flex items-center gap-2 text-base-500"><span class="material-symbols-outlined text-base">radio_button_unchecked</span>{{ m.title }}</li>{% empty %}<li class="text-base-500">–</li>{% endfor %}</ul></div>
+    </div>
+    <div class="border-t border-base-200 dark:border-base-800 pt-4">
+      <h3 class="font-semibold mb-2">{% translate "Next" %}</h3>
+      <ul class="text-sm flex flex-col gap-1">
+        <li><a href="{{ menu_url }}" class="text-primary-600 hover:underline">{% translate "Add your menu" %}</a> — {% translate "categories, dishes, prices, photos." %}</li>
+        <li><a href="{{ staff_url }}" class="text-primary-600 hover:underline">{% translate "Invite your staff" %}</a> — {% translate "they sign in to the POS app with their own account." %}</li>
+        <li><a href="{{ public_url }}" target="_blank" rel="noreferrer" class="text-primary-600 hover:underline">{% translate "See your public page" %}</a> · <a href="{{ pos_url }}" target="_blank" rel="noreferrer" class="text-primary-600 hover:underline">{% translate "Open the POS" %}</a></li>
+      </ul>
+    </div>
+    {% if can_manage %}
+    <div class="flex flex-wrap gap-3">
+      {% if not finished %}<form method="post" action="{{ u.finish }}">{% csrf_token %}<button type="submit" class="{{ btn }}">{% translate "Go to my dashboard" %}</button></form>
+      {% else %}<a href="{% url 'tenant_admin:index' %}" class="{{ btn }}">{% translate "Go to my dashboard" %}</a>{% endif %}
+      <form method="post" action="{{ u.restart }}" onsubmit="return confirm('{% translate "Start the setup from the beginning?" %}')">{% csrf_token %}<button type="submit" class="{{ btn2 }}">{% translate "Start over" %}</button></form>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endwith %}
+{% endblock %}

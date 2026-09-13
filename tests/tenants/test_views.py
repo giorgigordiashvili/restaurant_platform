@@ -190,7 +190,7 @@ class TestRestaurantCreateView:
         response = api_client.post(self.url, data, format="json")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_create_restaurant_duplicate_slug(self, authenticated_client, restaurant):
+    def test_create_restaurant_duplicate_slug(self, authenticated_client, restaurant, api_envelope):
         """Test creating a restaurant with duplicate slug."""
         data = {
             "name": "Another Restaurant",
@@ -198,6 +198,21 @@ class TestRestaurantCreateView:
         }
         response = authenticated_client.post(self.url, data, format="json")
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data["error"]["codes"] == {"slug": ["slug_taken"]}
+
+    def test_create_restaurant_without_slug_derives_unique_one(self, authenticated_client, restaurant):
+        """No slug (the signup form's case): derived from the name and suffixed on collision."""
+        response = authenticated_client.post(self.url, {"name": restaurant.name, "slug": ""}, format="json")
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data["data"]["slug"] == f"{restaurant.slug}-1"
+        response = authenticated_client.post(self.url, {"name": "ბებოს სამზარეულო"}, format="json")
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data["data"]["slug"] == "bebos-samzareulo"
+
+    def test_create_restaurant_blank_name(self, authenticated_client, api_envelope):
+        response = authenticated_client.post(self.url, {"name": "   "}, format="json")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "name" in response.data["error"]["codes"]
 
 
 @pytest.mark.django_db

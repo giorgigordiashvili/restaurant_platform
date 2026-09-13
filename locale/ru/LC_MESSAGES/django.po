@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-13 12:19+0400\n"
+"POT-Creation-Date: 2026-09-13 12:45+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
@@ -195,6 +195,18 @@ msgstr "Кто"
 
 msgid "system"
 msgstr "система"
+
+# Profile Settings
+#| msgid "Fiscal settings"
+msgid "Finish setting up"
+msgstr "Завершите настройку"
+
+msgid "Steps done"
+msgstr "Шагов выполнено"
+
+#| msgid "Print bridge setup"
+msgid "Continue setup"
+msgstr "Продолжить настройку"
 
 # Models - Orders
 msgid "Orders"
@@ -792,6 +804,10 @@ msgstr "Отчёты"
 msgid "Invitations"
 msgstr "Приглашения"
 
+#| msgid "Setup guide"
+msgid "Setup wizard"
+msgstr "Мастер настройки"
+
 msgid ""
 "Fill in this language, save, then pick the next tab. Option rows left blank "
 "keep showing their existing text."
@@ -834,6 +850,148 @@ msgstr "Всегда включён."
 
 msgid "Save options"
 msgstr "Сохранить параметры"
+
+#, python-format
+msgid "Step %(n)s of %(total)s"
+msgstr "Шаг %(n)s из %(total)s"
+
+msgid "Finish later"
+msgstr "Закончить позже"
+
+msgid ""
+"Tick what your restaurant needs. We'll walk through each one after the "
+"basics -- you decide on every step whether to set it up or skip it. "
+"Everything can be changed later under Settings → Modules."
+msgstr ""
+"Отметьте, что нужно вашему ресторану. После основных данных мы пройдём по "
+"каждому пункту — на каждом шаге вы решаете, настроить его или пропустить. "
+"Всё можно изменить позже в разделе Настройки → Модули."
+
+msgid "Continue"
+msgstr "Продолжить"
+
+msgid ""
+"This is what guests see on your page and on receipts. Only the name is "
+"required."
+msgstr ""
+"Это видят гости на вашей странице и в чеках. Обязательно только название."
+
+msgid ""
+"A logo and a cover photo make your page look like yours. You can add them "
+"later from Restaurant settings."
+msgstr ""
+"Логотип и обложка делают страницу узнаваемой. Их можно добавить позже в "
+"настройках ресторана."
+
+#| msgid "Currency"
+msgid "Current:"
+msgstr "Сейчас:"
+
+#| msgid "Save and continue editing"
+msgid "Save & continue"
+msgstr "Сохранить и продолжить"
+
+msgid "Skip for now"
+msgstr "Пока пропустить"
+
+msgid ""
+"In the restaurant's timezone. A closing time earlier than the opening time "
+"means you close after midnight. The second pair is optional (e.g. lunch and "
+"dinner service)."
+msgstr ""
+"В часовом поясе ресторана. Время закрытия раньше открытия означает закрытие "
+"после полуночи. Вторая пара необязательна (например, обед и ужин)."
+
+msgid "Day"
+msgstr "День"
+
+msgid "Closed"
+msgstr "Закрыта"
+
+msgid "Open"
+msgstr "Открыто"
+
+msgid "Close"
+msgstr "Закрытие"
+
+msgid "Open (2nd)"
+msgstr "Открытие (2-е)"
+
+msgid "Close (2nd)"
+msgstr "Закрытие (2-е)"
+
+#| msgid "Currently goes to"
+msgid "Currently on."
+msgstr "Сейчас включено."
+
+#| msgid "Your store id there."
+msgid "You skipped this earlier."
+msgstr "Вы пропустили это ранее."
+
+#, python-format
+msgid "Also switches on: %(names)s."
+msgstr "Также включится: %(names)s."
+
+#, python-format
+msgid "Yes -- set up %(name)s"
+msgstr "Да — настроить: %(name)s"
+
+msgid "Turn on, set up later"
+msgstr "Включить, настроить позже"
+
+#, python-format
+msgid "Yes -- turn on %(name)s"
+msgstr "Да — включить: %(name)s"
+
+msgid "Not now -- skip this one"
+msgstr "Не сейчас — пропустить"
+
+msgid ""
+"Here is what your restaurant runs with. Switch anything on or off later "
+"under Settings → Modules."
+msgstr ""
+"Вот с чем работает ваш ресторан. Включить или выключить что угодно можно "
+"позже в разделе Настройки → Модули."
+
+#| msgid "Shown to guests on the menu."
+msgid "Nothing yet -- just the menu."
+msgstr "Пока ничего — только меню."
+
+msgid "Skipped"
+msgstr "Пропущено"
+
+msgid "Next"
+msgstr "Далее"
+
+msgid "Add your menu"
+msgstr "Добавьте меню"
+
+msgid "categories, dishes, prices, photos."
+msgstr "категории, блюда, цены, фото."
+
+#| msgid "Invite to share tables"
+msgid "Invite your staff"
+msgstr "Пригласите сотрудников"
+
+msgid "they sign in to the POS app with their own account."
+msgstr "они входят в POS-приложение под своим аккаунтом."
+
+msgid "See your public page"
+msgstr "Посмотреть публичную страницу"
+
+#| msgid "Open the menu"
+msgid "Open the POS"
+msgstr "Открыть POS"
+
+msgid "Go to my dashboard"
+msgstr "Перейти в панель"
+
+msgid "Start the setup from the beginning?"
+msgstr "Начать настройку заново?"
+
+#| msgid "Sort order"
+msgid "Start over"
+msgstr "Начать заново"
 
 msgid "Shared venue"
 msgstr "Общая площадка"
@@ -2040,9 +2198,6 @@ msgstr "Покажите этот код в ресторане или введи
 msgid "Suspended"
 msgstr "Приостановлен"
 
-msgid "Closed"
-msgstr "Закрыта"
-
 msgid "Person or company on the account."
 msgstr "Человек или компания на счёте."
 
@@ -2158,9 +2313,6 @@ msgstr "Выписка отправлена: {p0}."
 
 msgid "No phone / email on the account."
 msgstr "На счёте нет телефона / email."
-
-msgid "Open"
-msgstr "Открыто"
 
 msgid "Opening balance"
 msgstr "Начальный баланс"
@@ -2721,9 +2873,6 @@ msgstr "Отображается как название ресторана."
 msgid "Notification settings"
 msgstr "Настройки уведомлений"
 
-msgid "Skipped"
-msgstr "Пропущено"
-
 msgid "Reservation confirmation"
 msgstr "Подтверждение брони"
 
@@ -3057,26 +3206,6 @@ msgstr "Приостановить онлайн-заказы"
 
 msgid "Opening hours"
 msgstr "Часы работы"
-
-msgid ""
-"In the restaurant's timezone. A closing time earlier than the opening time "
-"means you close after midnight. The second pair is optional (e.g. lunch and "
-"dinner service)."
-msgstr ""
-"В часовом поясе ресторана. Время закрытия раньше открытия означает закрытие "
-"после полуночи. Вторая пара необязательна (например, обед и ужин)."
-
-msgid "Day"
-msgstr "День"
-
-msgid "Close"
-msgstr "Закрытие"
-
-msgid "Open (2nd)"
-msgstr "Открытие (2-е)"
-
-msgid "Close (2nd)"
-msgstr "Закрытие (2-е)"
 
 msgid "Save hours"
 msgstr "Сохранить часы"
@@ -4050,35 +4179,29 @@ msgstr "Отменённые заказы"
 msgid "Voided items"
 msgstr "Аннулированные позиции"
 
-#, fuzzy
 #| msgid "Gift cards"
 msgid "Gift cards sold"
 msgstr "Продано подарочных карт"
 
-#, fuzzy
 #| msgid "Gift card redeemed"
 msgid "Gift cards redeemed"
 msgstr "Использовано подарочных карт"
 
-#, fuzzy
 #| msgid "Gift card"
 msgid "Gift card liability"
 msgstr "Обязательства по подарочным картам"
 
-#, fuzzy
 #| msgid "Charged to house account"
 msgid "Charged to house accounts"
-msgstr "Записано на счета заведения"
+msgstr "Начислено на домашние счета"
 
-#, fuzzy
 #| msgid "House account settled"
 msgid "House accounts settled"
-msgstr "Оплачено по счетам заведения"
+msgstr "Погашено по домашним счетам"
 
-#, fuzzy
 #| msgid "House account statement"
 msgid "House accounts outstanding"
-msgstr "Задолженность по счетам заведения"
+msgstr "Задолженность по домашним счетам"
 
 msgid "Sales by day"
 msgstr "Продажи по дням"
@@ -4725,6 +4848,55 @@ msgstr "Необязательная вторая смена (напр. ужин
 msgid "Mark as closed for this day (overrides open/close times)"
 msgstr "Отметить как закрытый в этот день (перекрывает часы работы)"
 
+msgid "Front of house"
+msgstr "Зал"
+
+msgid "Money"
+msgstr "Деньги"
+
+#| msgid "CRM & marketing"
+msgid "Guests & marketing"
+msgstr "Гости и маркетинг"
+
+msgid "Back office"
+msgstr "Бэк-офис"
+
+msgid "What do you need?"
+msgstr "Что вам нужно?"
+
+#| msgid "Restaurant settings"
+msgid "Restaurant details"
+msgstr "Данные ресторана"
+
+msgid "Logo & look"
+msgstr "Логотип и оформление"
+
+#| msgid "All messages"
+msgid "All set"
+msgstr "Всё готово"
+
+#| msgid "existing category"
+msgid "Cuisine / category"
+msgstr "Кухня / категория"
+
+#| msgid "Setup guide"
+msgid "Setup"
+msgstr "Настройка"
+
+#, python-format
+msgid "%(module)s is on. When you are done here,"
+msgstr "%(module)s включено. Когда закончите здесь,"
+
+msgid "continue the setup →"
+msgstr "продолжите настройку →"
+
+msgid "Setup complete. Welcome aboard!"
+msgstr "Настройка завершена. Добро пожаловать!"
+
+msgid "You can pick the setup up again any time from Settings → Setup wizard."
+msgstr ""
+"Вернуться к настройке можно в любое время: Настройки → Мастер настройки."
+
 msgid "Physical terminal (cashier confirms)"
 msgstr "Физический терминал (подтверждает кассир)"
 
@@ -5207,9 +5379,6 @@ msgstr "Создана новая QR-ссылка -- перепечатайте 
 #~ msgid "Save and add another"
 #~ msgstr "Сохранить и добавить другой"
 
-#~ msgid "Save and continue editing"
-#~ msgstr "Сохранить и продолжить редактирование"
-
 #~ msgid "Save and view"
 #~ msgstr "Сохранить и просмотреть"
 
@@ -5299,9 +5468,6 @@ msgstr "Создана новая QR-ссылка -- перепечатайте 
 
 #~ msgid "Capacity"
 #~ msgstr "Вместимость"
-
-#~ msgid "Sort order"
-#~ msgstr "Порядок сортировки"
 
 #~ msgid "Slug"
 #~ msgstr "Слаг"
@@ -5457,9 +5623,6 @@ msgstr "Создана новая QR-ссылка -- перепечатайте 
 
 #~ msgid "There are no items yet."
 #~ msgstr "Пока нет элементов."
-
-#~ msgid "Next"
-#~ msgstr "Далее"
 
 #~ msgid "First"
 #~ msgstr "Первый"

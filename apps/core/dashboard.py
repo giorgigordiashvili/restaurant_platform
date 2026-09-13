@@ -47,6 +47,27 @@ def module_cards(request):
             }
         )
 
+    from apps.tenants import setup
+
+    if setup.is_deferred(restaurant) and has_resource_permission(request, "settings", "update"):
+        st = setup.state(restaurant)
+        prog = setup.progress(restaurant, st.get("current") or "welcome")
+        cards.append(
+            {
+                "code": "setup",
+                "title": _("Finish setting up"),
+                "icon": "rocket_launch",
+                "stats": [
+                    {
+                        "label": _("Steps done"),
+                        "value": f"{prog['index'] - 1}/{prog['total']}",
+                        "url": _url("tenants_restaurantsetup_changelist"),
+                    }
+                ],
+                "links": [_link(_("Continue setup"), "tenants_restaurantsetup_changelist")],
+            }
+        )
+
     if "ordering" in on and has_resource_permission(request, "orders", "read"):
         from apps.orders.models import Order
 

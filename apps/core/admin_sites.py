@@ -131,8 +131,9 @@ class TenantAdminSite(UnfoldAdminSite):
         # Reviews share the menu-manager bucket too.
         "review": "menu",
         "reviewreport": "menu",
-        # Modules page + hours inline live with settings.
+        # Modules page, setup wizard + hours inline live with settings.
         "restaurantmodules": "settings",
+        "restaurantsetup": "settings",
         "restauranthours": "settings",
         # Warehouse (hidden entirely until Restaurant.warehouse_enabled).
         "warehouseoverview": "warehouse",
@@ -206,10 +207,19 @@ class TenantAdminSite(UnfoldAdminSite):
         return self._filter_by_role_permissions(request, pruned)
 
     def index(self, request, extra_context=None):
-        from apps.core.dashboard import module_cards
+        from django.shortcuts import redirect
 
+        from apps.core.dashboard import module_cards
+        from apps.core.tenant_admin_base import has_resource_permission
+        from apps.tenants import setup
+
+        restaurant = getattr(request, "restaurant", None)
+        # First login: whoever may change settings (the owner) lands in the
+        # setup wizard until it is finished or put aside with "finish later".
+        if restaurant and setup.is_pending(restaurant) and has_resource_permission(request, "settings", "update"):
+            return redirect("tenant_admin:tenants_restaurantsetup_changelist")
         extra_context = dict(extra_context or {})
-        if getattr(request, "restaurant", None):
+        if restaurant:
             extra_context["module_cards"] = module_cards(request)
         return super().index(request, extra_context)
 

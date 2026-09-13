@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.http import Http404
 
 from rest_framework import status
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, Throttled
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
@@ -30,8 +30,13 @@ def custom_exception_handler(exc, context):
                 "code": get_error_code(exc),
                 "message": get_error_message(exc, response),
                 "details": get_error_details(response.data),
+                # {field: [code, ...]} so clients can map errors to their own
+                # localized copy instead of parsing English messages.
+                "codes": get_error_codes(exc),
             },
         }
+        if isinstance(exc, Throttled) and exc.wait is not None:
+            custom_response_data["error"]["retry_after"] = int(exc.wait)
         response.data = custom_response_data
     else:
         # Handle non-API exceptions
@@ -72,10 +77,34 @@ def custom_exception_handler(exc, context):
 
 
 def get_error_code(exc):
-    """Get error code from exception."""
+    """Get error code from exception (the detail's own code when it has one, e.g. no_active_account)."""
+    if hasattr(exc, "get_codes"):
+        try:
+            codes = exc.get_codes()
+        except Exception:  # pragma: no cover - defensive
+            codes = None
+        if isinstance(codes, str):
+            return codes
     if hasattr(exc, "default_code"):
         return exc.default_code
     return type(exc).__name__.lower()
+
+
+def _first_leaf(node):
+    """First human-readable string inside a (possibly nested) DRF error detail."""
+    if isinstance(node, dict):
+        for value in node.values():
+            found = _first_leaf(value)
+            if found:
+                return found
+    elif isinstance(node, (list, tuple)):
+        for value in node:
+            found = _first_leaf(value)
+            if found:
+                return found
+    elif node is not None:
+        return str(node)
+    return None
 
 
 def get_error_message(exc, response):
@@ -84,8 +113,35 @@ def get_error_message(exc, response):
         if isinstance(exc.detail, str):
             return exc.detail
         elif isinstance(exc.detail, dict) and "detail" in exc.detail:
-            return exc.detail["detail"]
+            return _first_leaf(exc.detail["detail"]) or response.status_text
+        # Field validation errors: surface the first concrete message rather
+        # than a bare "Bad Request" so a client with no field mapping can
+        # still tell the user what went wrong.
+        return _first_leaf(exc.detail) or response.status_text
     return response.status_text
+
+
+def get_error_codes(exc):
+    """{field: [code, ...]} for every ErrorDetail in the exception, or None."""
+    detail = getattr(exc, "detail", None)
+    if detail is None:
+        return None
+    out: dict[str, list[str]] = {}
+
+    def walk(node, key):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                walk(v, str(k))
+        elif isinstance(node, (list, tuple)):
+            for v in node:
+                walk(v, key)
+        else:
+            code = getattr(node, "code", None)
+            if code:
+                out.setdefault(key or "non_field_errors", []).append(str(code))
+
+    walk(detail, None)
+    return out or None
 
 
 def get_error_details(data):

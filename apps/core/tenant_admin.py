@@ -1502,6 +1502,7 @@ from apps.printing.tenant_admin import register_printing_admin  # noqa: E402
 from apps.promotions.tenant_admin import register_promotions_admin  # noqa: E402
 from apps.purchasing.tenant_admin import register_purchasing_admin  # noqa: E402
 from apps.reports.tenant_admin import register_reports_admin  # noqa: E402
+from apps.tenants.setup_admin import register_setup_admin  # noqa: E402
 from apps.terminals.tenant_admin import register_terminals_admin  # noqa: E402
 from apps.timekeeping.tenant_admin import register_timekeeping_admin  # noqa: E402
 from apps.waitlist.tenant_admin import register_waitlist_admin  # noqa: E402
@@ -1523,6 +1524,7 @@ register_terminals_admin(tenant_admin_site)
 register_waitlist_admin(tenant_admin_site)
 register_giftcards_admin(tenant_admin_site)
 register_houseaccounts_admin(tenant_admin_site)
+register_setup_admin(tenant_admin_site)
 
 # Restaurant Settings + Modules
 tenant_admin_site.register(Restaurant, RestaurantSettingsAdmin)

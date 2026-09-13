@@ -30,6 +30,8 @@ from .models import User
 from .serializers import (
     ChangePasswordSerializer,
     CustomTokenObtainPairSerializer,
+    EmailCheckResultSerializer,
+    EmailCheckSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetRequestSerializer,
     SocialLoginSerializer,
@@ -149,6 +151,33 @@ class TokenRefreshView(TokenRefreshView):
     """
 
     throttle_classes = [AuthRateThrottle]
+
+
+@extend_schema(tags=["Auth"], request=EmailCheckSerializer, responses={200: EmailCheckResultSerializer})
+class EmailCheckView(APIView):
+    """
+    Does an account with this email exist? Lets the signup forms switch to a
+    "sign in to continue" flow before the user types a password. One
+    identity serves both roles: a customer account can own restaurants and a
+    restaurant owner can order as a customer, so the check never blocks.
+    """
+
+    permission_classes = [AllowAny]
+    throttle_classes = [AuthRateThrottle]
+
+    def post(self, request):
+        serializer = EmailCheckSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = User.objects.filter(email__iexact=serializer.validated_data["email"]).first()
+        return Response(
+            {
+                "success": True,
+                "data": {
+                    "exists": user is not None,
+                    "has_restaurants": bool(user and user.owned_restaurants.exists()),
+                },
+            }
+        )
 
 
 @extend_schema(tags=["Auth"])

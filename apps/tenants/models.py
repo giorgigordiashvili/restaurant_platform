@@ -485,6 +485,12 @@ class Restaurant(TimeStampedModel):
         help_text=_("Average order preparation time in minutes"),
     )
 
+    # First-login setup wizard (apps.tenants.setup). NULL = the owner has not
+    # finished (or deferred) the wizard yet; the tenant dashboard redirects
+    # there. Existing restaurants were marked complete by the migration.
+    setup_completed_at = models.DateTimeField(null=True, blank=True)
+    setup_state = models.JSONField(default=dict, blank=True)
+
     class Meta:
         db_table = "restaurants"
         ordering = ["-created_at"]
@@ -518,7 +524,9 @@ class Restaurant(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            from apps.tenants.slugs import restaurant_slug
+
+            self.slug = restaurant_slug(self.name)
             # Ensure uniqueness
             base_slug = self.slug
             counter = 1
@@ -618,3 +626,12 @@ class RestaurantModules(Restaurant):
         proxy = True
         verbose_name = _("Modules")
         verbose_name_plural = _("Modules")
+
+
+class RestaurantSetup(Restaurant):
+    """Proxy for the first-login setup wizard page in the tenant admin."""
+
+    class Meta:
+        proxy = True
+        verbose_name = _("Setup wizard")
+        verbose_name_plural = _("Setup wizard")
