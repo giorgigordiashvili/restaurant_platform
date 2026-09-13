@@ -192,6 +192,21 @@ MODULES: tuple[Module, ...] = (
         hooks=("apps.delivery.hooks.on_module_toggled",),
     ),
     Module(
+        "waitlist",
+        _("Waitlist & walk-ins"),
+        _(
+            "Today's queue at the door: quoted waits, 'table ready' SMS, seat straight into a table, guests join from a QR."
+        ),
+        "hourglass_top",
+        "waitlist_enabled",
+        requires=("tables",),
+        recommends=("reservations", "notifications"),
+        app_labels=("waitlist",),
+        model_names=(("waitlist", "waitlistentry"), ("waitlist", "waitlistsettingspage")),
+        resources=("reservations",),
+        hooks=("apps.waitlist.hooks.on_module_toggled",),
+    ),
+    Module(
         "terminals",
         _("Card terminals & pay-by-link"),
         _(

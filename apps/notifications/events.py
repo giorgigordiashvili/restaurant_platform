@@ -48,6 +48,14 @@ EVENTS = (
         "Operations",
         False,
     ),
+    Event(
+        "waitlist.self_joined",
+        "Guest joined the waitlist",
+        "Someone joined today's queue from the QR at the door.",
+        "reservations",
+        "update",
+        "Reservations",
+    ),
     Event("reservation.new", "New reservation", "A guest booked a table.", "reservations", "update", "Reservations"),
     Event(
         "reservation.cancelled",

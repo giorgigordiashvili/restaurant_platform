@@ -284,6 +284,34 @@ def module_cards(request):
             "orders",
         )
 
+    if "waitlist" in on and has_resource_permission(request, "reservations", "read"):
+        from apps.waitlist import services as waitlist_services
+
+        ws = waitlist_services.summary(restaurant)
+        card(
+            "waitlist",
+            _("Waitlist"),
+            "hourglass_top",
+            [
+                {"label": _("Waiting now"), "value": ws["waiting"], "url": _url("waitlist_waitlistentry_changelist")},
+                {
+                    "label": _("Longest wait"),
+                    "value": f"{ws['longest_wait']} min",
+                    "url": _url("waitlist_waitlistentry_changelist"),
+                },
+                {
+                    "label": _("Seated today"),
+                    "value": ws["seated_today"],
+                    "url": _url("waitlist_waitlistentry_changelist") + "?status__exact=seated",
+                },
+            ],
+            [
+                _link(_("Today's queue"), "waitlist_waitlistentry_changelist"),
+                _link(_("Settings & door QR"), "waitlist_waitlistsettingspage_changelist"),
+            ],
+            "reservations",
+        )
+
     if "terminals" in on and has_resource_permission(request, "cash", "read"):
         from apps.terminals import services as terminal_services
 

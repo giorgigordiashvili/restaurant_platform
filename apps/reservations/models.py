@@ -312,11 +312,18 @@ class Reservation(TimeStampedModel):
 
         notification_hooks.on_reservation_cancelled(self, by=cancelled_by)
 
-    def mark_seated(self):
-        """Mark the customer as seated."""
+    def mark_seated(self, table=None, by=None):
+        """Mark the customer as seated; with a table, open (or join) that table's session too."""
         self.status = "seated"
         self.seated_at = timezone.now()
-        self.save(update_fields=["status", "seated_at", "updated_at"])
+        update = ["status", "seated_at", "updated_at"]
+        if table is not None:
+            from apps.tables.services import open_session
+
+            self.table = table
+            update.append("table")
+            open_session(table, by, party_size=self.party_size)
+        self.save(update_fields=update)
         from apps.crm import hooks as crm_hooks
 
         crm_hooks.on_reservation_done(self)

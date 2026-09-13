@@ -1,0 +1,15 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% block content %}
+{% if summary %}
+<div class="mb-4 grid gap-3 md:grid-cols-4" data-testid="waitlist-summary">
+  {% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" %}
+  <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Waiting now" %}</p><p class="text-2xl font-semibold">{{ summary.waiting }}</p></div>
+  <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Notified" %}</p><p class="text-2xl font-semibold">{{ summary.notified }}</p></div>
+  <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Longest wait" %}</p><p class="text-2xl font-semibold">{{ summary.longest_wait }} min</p></div>
+  <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Seated today" %}</p><p class="text-2xl font-semibold">{{ summary.seated_today }}</p><a class="text-xs underline" href="{{ settings_url }}">{% translate "Settings & door QR" %}</a></div>
+  {% endwith %}
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}

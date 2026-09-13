@@ -46,6 +46,8 @@ ICONS = {
     "payment": "payments",
     "discountreason": "sell",
     "deliveryplatformspage": "delivery_dining",
+    "waitlistentry": "hourglass_top",
+    "waitlistsettingspage": "qr_code_2",
     "paymentterminal": "contactless",
     "terminaltransaction": "credit_score",
     "terminalreconciliation": "balance",

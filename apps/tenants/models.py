@@ -338,6 +338,10 @@ class Restaurant(TimeStampedModel):
         default=False,
         help_text="CRM & marketing module: guest records, segments, SMS / email campaigns and automations.",
     )
+    waitlist_enabled = models.BooleanField(
+        default=False,
+        help_text="Waitlist module: today's walk-in queue, quoted waits, 'table ready' SMS, QR at the door.",
+    )
     terminals_enabled = models.BooleanField(
         default=False,
         help_text="Card terminals module: physical terminal confirmation, BOG / TBC pay-by-link and QR, ECR bridge.",

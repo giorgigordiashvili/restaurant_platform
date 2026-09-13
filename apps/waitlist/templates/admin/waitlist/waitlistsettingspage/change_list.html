@@ -1,0 +1,27 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-3 py-1.5 text-sm w-full" %}
+<div class="mb-6 grid gap-4 md:grid-cols-2" data-testid="waitlist-settings">
+  <form method="post" action="{{ save_url }}" class="{{ base }} flex flex-col gap-3">
+    {% csrf_token %}
+    <h3 class="font-semibold">{% translate "Waitlist rules" %}</h3>
+    <label class="text-sm">{% translate "Default quoted wait (minutes)" %}<input type="number" name="default_wait_minutes" value="{{ cfg.default_wait_minutes }}" min="1" max="240" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm">{% translate "No-show after notifying (minutes)" %}<input type="number" name="notify_expire_minutes" value="{{ cfg.notify_expire_minutes }}" min="1" max="120" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm">{% translate "Largest party" %}<input type="number" name="max_party_size" value="{{ cfg.max_party_size }}" min="1" max="50" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="allow_self_join" value="1" {% if cfg.allow_self_join %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "Guests can join from the QR at the door" %}</label>
+    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="sms_on_join" value="1" {% if cfg.sms_on_join %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "SMS when added (place in line + link)" %}</label>
+    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="sms_on_ready" value="1" {% if cfg.sms_on_ready %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "SMS when the table is ready" %}</label>
+    <p class="text-xs text-base-500">{% translate "Message texts live under Notifications (table ready, joined the waitlist)." %}</p>
+    {% if can_manage %}<div><button type="submit" class="{{ btn }}">{% translate "Save" %}</button> <a href="{{ queue_url }}" class="{{ btn2 }}">{% translate "Today's queue" %}</a></div>{% endif %}
+  </form>
+  <div class="{{ base }} flex flex-col items-center gap-3" data-testid="waitlist-qr">
+    <h3 class="font-semibold">{% translate "QR at the door" %}</h3>
+    <img src="data:image/png;base64,{{ qr_b64 }}" alt="QR" class="w-48 h-48">
+    <code class="select-all text-xs break-all">{{ join_url }}</code>
+    <p class="text-xs text-base-500 text-center">{% translate "Print it and put it by the entrance: guests scan, enter name, phone and party size, and follow their place in line on their phone." %}</p>
+    {% if can_manage %}<form method="post" action="{{ rotate_url }}">{% csrf_token %}<button type="submit" class="{{ btn2 }}">{% translate "Generate a new link" %}</button></form>{% endif %}
+  </div>
+</div>
+{% endwith %}
+{% endblock %}

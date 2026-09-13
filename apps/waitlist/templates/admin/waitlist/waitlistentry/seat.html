@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700" %}
+<form method="post" class="{{ base }} flex flex-col gap-4 md:w-2/3" data-testid="seat-form">
+  {% csrf_token %}
+  <div><h2 class="font-semibold text-lg">{{ title }}</h2><p class="text-sm text-base-500">{% translate "Pick a table; a table session opens and the guest is marked seated." %}</p></div>
+  <div class="grid gap-2 md:grid-cols-3">
+    {% for t in tables %}
+    <label class="flex items-center gap-2 rounded-default border p-2 text-sm {% if t.status != 'available' %}opacity-60{% endif %} {% if t.capacity < entry.party_size %}border-amber-300{% else %}border-base-200 dark:border-base-800{% endif %}">
+      <input type="radio" name="table_id" value="{{ t.pk }}" {% if t.status == 'available' and t.capacity >= entry.party_size and forloop.first %}checked{% endif %}>
+      <span><b>{{ t.number }}</b>{% if t.section %} · {{ t.section.name }}{% endif %} · {{ t.capacity }} {% translate "seats" %} · {{ t.get_status_display }}</span>
+    </label>
+    {% empty %}
+    <p class="text-sm text-base-500">{% translate "No tables yet." %}</p>
+    {% endfor %}
+  </div>
+  <div class="flex gap-2"><button type="submit" class="{{ btn }}">{% translate "Seat" %}</button><a href="{{ back_url }}" class="{{ btn2 }}">{% translate "Back" %}</a></div>
+</form>
+{% endwith %}
+{% endblock %}

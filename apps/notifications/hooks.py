@@ -178,6 +178,19 @@ def on_delivery_cancel_requested(order) -> None:
 
 
 @_safe
+def on_waitlist_self_joined(entry) -> None:
+    services.notify(
+        entry.restaurant,
+        "waitlist.self_joined",
+        title=f"Waitlist: {entry.name} · {entry.party_size}",
+        body=f"Joined from the door QR · quoted {entry.quoted_minutes} min",
+        data={"kind": "waitlist", "id": str(entry.pk)},
+        url=_admin("waitlist_waitlistentry_changelist"),
+        dedupe_key=f"waitlist.joined:{entry.pk}",
+    )
+
+
+@_safe
 def on_terminal_declined(tx) -> None:
     services.notify(
         tx.restaurant,

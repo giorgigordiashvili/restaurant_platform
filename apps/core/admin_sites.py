@@ -61,6 +61,9 @@ class TenantAdminSite(UnfoldAdminSite):
         "shiftsreport": "analytics",
         "reservationsreport": "analytics",
         "reviewsreport": "analytics",
+        # Waitlist
+        "waitlistentry": "reservations",
+        "waitlistsettingspage": "settings",
         # Terminals
         "paymentterminal": "cash",
         "terminaltransaction": "cash",

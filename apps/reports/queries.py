@@ -573,7 +573,16 @@ def reservations_report(restaurant, period) -> dict:
             for d in period.dates()
         ],
         "by_source": by_source,
+        "waitlist": _waitlist_section(restaurant, period),
     }
+
+
+def _waitlist_section(restaurant, period):
+    if not getattr(restaurant, "waitlist_enabled", False):
+        return None
+    from apps.waitlist import services as waitlist_services
+
+    return waitlist_services.report(restaurant, period.start_date, period.end_date)
 
 
 # ── reviews ───────────────────────────────────────────────────────────────

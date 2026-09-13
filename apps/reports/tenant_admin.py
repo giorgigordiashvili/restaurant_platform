@@ -698,6 +698,16 @@ class ReservationsReportAdmin(ReportAdminBase):
             kpi(_("Covers"), data["covers"], kind="int"),
             kpi(_("No-shows"), data["no_show"], kind="int"),
             kpi(_("No-show rate"), data["no_show_rate"], kind="percent"),
+            *(
+                [
+                    kpi(_("Walk-ins"), data["waitlist"]["walk_ins"], kind="int"),
+                    kpi(_("Walk-ins seated"), data["waitlist"]["seated"], kind="int"),
+                    kpi(_("Average wait (min)"), data["waitlist"]["avg_wait"], kind="text"),
+                    kpi(_("Waitlist abandon rate"), data["waitlist"]["abandon_rate"], kind="percent"),
+                ]
+                if data.get("waitlist")
+                else []
+            ),
             kpi(_("Cancelled"), data["cancelled"], kind="int"),
         ]
         by_day = data["by_day"]

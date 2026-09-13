@@ -1162,6 +1162,7 @@ class ReservationTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         "complete_reservations",
         "no_show_reservations",
         "cancel_reservations",
+        "to_waitlist",
     ]
 
     def get_queryset(self, request):
@@ -1194,6 +1195,23 @@ class ReservationTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
     @admin.action(description=_("Mark no-show"))
     def no_show_reservations(self, request, queryset):
         self._transition(request, queryset, ["pending", "confirmed"], "mark_no_show", "marked no-show")
+
+    @admin.action(description=_("Move to today's waitlist queue"))
+    def to_waitlist(self, request, queryset):
+        from apps.core.modules import is_enabled
+        from apps.waitlist import services as waitlist_services
+
+        if not is_enabled(request.restaurant, "waitlist"):
+            self.message_user(request, _("Turn on the Waitlist module first."), level=messages.ERROR)
+            return
+        n = 0
+        for r in queryset:
+            try:
+                waitlist_services.from_reservation(r, by=request.user)
+                n += 1
+            except waitlist_services.WaitlistError:
+                continue
+        self.message_user(request, _("{p0} reservation(s) added to today's queue.").format(p0=n))
 
     @admin.action(description=_("Cancel"))
     def cancel_reservations(self, request, queryset):
@@ -1484,6 +1502,7 @@ from apps.purchasing.tenant_admin import register_purchasing_admin  # noqa: E402
 from apps.reports.tenant_admin import register_reports_admin  # noqa: E402
 from apps.terminals.tenant_admin import register_terminals_admin  # noqa: E402
 from apps.timekeeping.tenant_admin import register_timekeeping_admin  # noqa: E402
+from apps.waitlist.tenant_admin import register_waitlist_admin  # noqa: E402
 
 register_inventory_admin(tenant_admin_site)
 register_payments_admin(tenant_admin_site)
@@ -1499,6 +1518,7 @@ register_audit_admin(tenant_admin_site)
 register_crm_admin(tenant_admin_site)
 register_ordering_admin(tenant_admin_site)
 register_terminals_admin(tenant_admin_site)
+register_waitlist_admin(tenant_admin_site)
 
 # Restaurant Settings + Modules
 tenant_admin_site.register(Restaurant, RestaurantSettingsAdmin)

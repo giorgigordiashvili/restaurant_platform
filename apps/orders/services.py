@@ -410,17 +410,9 @@ def _move_stock_records(source: Order, target: Order, item_ids) -> None:
 
 
 def _active_session(table, by):
-    from apps.tables.models import TableSession, TableSessionGuest
+    from apps.tables.services import open_session
 
-    session = table.sessions.filter(status="active").first()
-    if session is None:
-        session = TableSession.objects.create(
-            table=table, host=by if getattr(by, "is_authenticated", False) else None, guest_count=1
-        )
-        if session.host_id:
-            TableSessionGuest.objects.create(session=session, user=session.host, is_host=True)
-        table.set_occupied()
-    return session
+    return open_session(table, by)
 
 
 def move_order(order: Order, table, *, by) -> Order:

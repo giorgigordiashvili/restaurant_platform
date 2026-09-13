@@ -29,6 +29,10 @@ DEFAULT_TEMPLATES = {
     "order_on_the_way_en": "{restaurant}: order {order} is on its way. Track it: {tracking_url}",
     "pay_link_ka": "{restaurant}: გადასახდელია {amount} ₾. გადაიხადეთ ბარათით აქ: {url}",
     "pay_link_en": "{restaurant}: {amount} GEL to pay. Pay by card here: {url}",
+    "waitlist_joined_ka": "{restaurant}: თქვენ რიგში ხართ ({guests} სტუმარი), დაახლ. {minutes} წთ. თვალი ადევნეთ: {link}",
+    "waitlist_joined_en": "{restaurant}: you are on the list ({guests} guests), about {minutes} min. Follow it here: {link}",
+    "table_ready_ka": "{restaurant}: {name}, თქვენი მაგიდა მზადაა! გთხოვთ, მობრძანდეთ შესასვლელთან.",
+    "table_ready_en": "{restaurant}: {name}, your table is ready! Please come to the entrance.",
 }
 
 
@@ -133,6 +137,10 @@ class RestaurantNotificationSettings(TimeStampedModel):
     order_on_the_way_en = models.TextField(default=DEFAULT_TEMPLATES["order_on_the_way_en"])
     pay_link_ka = models.TextField(default=DEFAULT_TEMPLATES["pay_link_ka"])
     pay_link_en = models.TextField(default=DEFAULT_TEMPLATES["pay_link_en"])
+    waitlist_joined_ka = models.TextField(default=DEFAULT_TEMPLATES["waitlist_joined_ka"])
+    waitlist_joined_en = models.TextField(default=DEFAULT_TEMPLATES["waitlist_joined_en"])
+    table_ready_ka = models.TextField(default=DEFAULT_TEMPLATES["table_ready_ka"])
+    table_ready_en = models.TextField(default=DEFAULT_TEMPLATES["table_ready_en"])
 
     class Meta:
         db_table = "notification_settings"
@@ -168,6 +176,8 @@ class OutboundMessage(TimeStampedModel):
         ("order_ready", _("Order ready")),
         ("order_on_the_way", _("Order on its way")),
         ("pay_link", _("Payment link")),
+        ("waitlist_joined", _("Joined the waitlist")),
+        ("table_ready", _("Table ready")),
         ("test", _("Test message")),
         ("other", _("Other")),
     ]

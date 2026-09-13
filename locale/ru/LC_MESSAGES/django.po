@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-13 11:37+0400\n"
+"POT-Creation-Date: 2026-09-13 11:56+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
@@ -157,13 +157,19 @@ msgstr "Курьер назначен"
 msgid "Courier cancelled"
 msgstr "Курьер отменён"
 
-#| msgid "Card (terminal)"
 msgid "Card terminal sale"
 msgstr "Продажа через терминал"
 
-#| msgid "Card (terminal)"
 msgid "Card terminal refund"
 msgstr "Возврат через терминал"
+
+#| msgid "Mark seated"
+msgid "Walk-in seated"
+msgstr "Гость посажен"
+
+#| msgid "Walk-in"
+msgid "Walk-in notified"
+msgstr "Гость уведомлён"
 
 msgid "Audit Log"
 msgstr "Запись аудита"
@@ -304,31 +310,42 @@ msgstr "Платформы"
 msgid "Setup guide"
 msgstr "Руководство по настройке"
 
-#| msgid "Card (terminal)"
-msgid "Card terminals"
-msgstr "Карточные терминалы"
+#| msgid "Waitlisted"
+msgid "Waitlist"
+msgstr "Лист ожидания"
 
-#| msgid "Right now"
 msgid "Waiting now"
 msgstr "Ожидают сейчас"
 
-#| msgid "Delivery today"
+msgid "Longest wait"
+msgstr "Самое долгое ожидание"
+
+#| msgid "Sales today"
+msgid "Seated today"
+msgstr "Посажено сегодня"
+
+msgid "Today's queue"
+msgstr "Очередь на сегодня"
+
+#| msgid "Settings & hours"
+msgid "Settings & door QR"
+msgstr "Настройки и QR у входа"
+
+msgid "Card terminals"
+msgstr "Карточные терминалы"
+
 msgid "Declined today"
 msgstr "Отклонено сегодня"
 
-#| msgid "Printers offline"
 msgid "Bridges offline"
 msgstr "Мосты офлайн"
 
-#| msgid "Permissions"
 msgid "Terminals"
 msgstr "Терминалы"
 
-#| msgid "BOG Transactions"
 msgid "Transactions"
 msgstr "Транзакции"
 
-#| msgid "Notification"
 msgid "Reconciliation"
 msgstr "Сверка"
 
@@ -565,7 +582,16 @@ msgstr ""
 "Заказы Glovo и Wolt сразу на кухню, отправка меню, синхронизация "
 "«распродано», пауза магазина; Bolt Food скоро."
 
-#| msgid "Card (terminal)"
+msgid "Waitlist & walk-ins"
+msgstr "Лист ожидания и гости без брони"
+
+msgid ""
+"Today's queue at the door: quoted waits, 'table ready' SMS, seat straight "
+"into a table, guests join from a QR."
+msgstr ""
+"Очередь у входа на сегодня: ожидаемое время, SMS «стол готов», посадка сразу"
+" за стол, гости присоединяются по QR."
+
 msgid "Card terminals & pay-by-link"
 msgstr "Карточные терминалы и оплата по ссылке"
 
@@ -1004,6 +1030,16 @@ msgstr "Отметить завершённым"
 
 msgid "Mark no-show"
 msgstr "Не пришли"
+
+msgid "Move to today's waitlist queue"
+msgstr "Перенести в очередь на сегодня"
+
+msgid "Turn on the Waitlist module first."
+msgstr "Сначала включите модуль «Лист ожидания»."
+
+#, python-brace-format
+msgid "{p0} reservation(s) added to today's queue."
+msgstr "{p0} брони добавлено в очередь на сегодня."
 
 msgid " "
 msgstr " "
@@ -2388,9 +2424,15 @@ msgstr "Заказ готов"
 msgid "Order on its way"
 msgstr "Заказ в пути"
 
-#| msgid "Payment Pending"
 msgid "Payment link"
 msgstr "Ссылка на оплату"
+
+msgid "Joined the waitlist"
+msgstr "Встал в очередь"
+
+#| msgid "Order ready"
+msgid "Table ready"
+msgstr "Стол готов"
 
 msgid "Test message"
 msgstr "Тестовое сообщение"
@@ -3076,7 +3118,6 @@ msgstr "Онлайн (Банк Грузии)"
 msgid "Online (Flitt)"
 msgstr "Онлайн (Flitt)"
 
-#| msgid "Online (Flitt)"
 msgid "Online (TBC)"
 msgstr "Онлайн (TBC)"
 
@@ -3918,6 +3959,21 @@ msgstr "Неявки"
 msgid "No-show rate"
 msgstr "Доля неявок"
 
+#| msgid "Walk-in"
+msgid "Walk-ins"
+msgstr "Гости без брони"
+
+#| msgid "Mark seated"
+msgid "Walk-ins seated"
+msgstr "Посажено без брони"
+
+#| msgid "Average rating"
+msgid "Average wait (min)"
+msgstr "Среднее ожидание (мин)"
+
+msgid "Waitlist abandon rate"
+msgstr "Доля ушедших из очереди"
+
 msgid "Reservations & covers by day"
 msgstr "Брони и гости по дням"
 
@@ -4348,7 +4404,6 @@ msgstr "ECR-терминал через терминальный мост"
 msgid "—"
 msgstr "—"
 
-#| msgid "Online (Bank of Georgia)"
 msgid "Bank of Georgia ECR"
 msgstr "ECR Банка Грузии"
 
@@ -4364,7 +4419,6 @@ msgstr "Id терминала в банке (TID)."
 msgid "Bridge device: {\"device\": \"tcp://192.168.1.60:8000\"} or serial://."
 msgstr "Устройство моста: {\"device\": \"tcp://192.168.1.60:8000\"} или serial://."
 
-#| msgid "Pre-selected by default"
 msgid "Preselected in the POS."
 msgstr "Выбран по умолчанию в POS."
 
@@ -4374,52 +4428,42 @@ msgstr "Печатать чек при подтверждении оплаты."
 msgid "Give up waiting after this long."
 msgstr "Прекратить ожидание через это время."
 
-#| msgid "Card (terminal)"
 msgid "Card terminal"
 msgstr "Карточный терминал"
 
-#| msgid "Sales"
 msgid "Sale"
 msgstr "Продажа"
 
-#| msgid "Settings"
 msgid "Starting"
 msgstr "Запуск"
 
-#| msgid "Sent to supplier"
 msgid "Sent to terminal"
 msgstr "Отправлено на терминал"
 
-#| msgid "Awaiting confirmation"
 msgid "Waiting for confirmation"
 msgstr "Ожидает подтверждения"
 
 msgid "Approved"
 msgstr "Одобрено"
 
-#| msgid "Decline"
 msgid "Declined"
 msgstr "Отклонено"
 
-#| msgid "Time entry"
 msgid "Timed out"
 msgstr "Время истекло"
 
 msgid "Phone / email the link went to."
 msgstr "Телефон / email, куда ушла ссылка."
 
-#| msgid "Remove this translation"
 msgid "Terminal transaction"
 msgstr "Транзакция терминала"
 
-#| msgid "Flitt Transactions"
 msgid "Terminal transactions"
 msgstr "Транзакции терминала"
 
 msgid "Terminal reconciliation"
 msgstr "Сверка терминалов"
 
-#| msgid "Webhook token (shown once)"
 msgid "Bridge key (shown once)"
 msgstr "Ключ моста (показывается один раз)"
 
@@ -4437,7 +4481,6 @@ msgstr "оставьте поля пустыми, чтобы сохранить 
 msgid "How card payments reach the ledger"
 msgstr "Как карточные оплаты попадают в учёт"
 
-#| msgid "Card (terminal)"
 msgid "Physical terminal"
 msgstr "Физический терминал"
 
@@ -4461,7 +4504,6 @@ msgstr ""
 msgid "Register these callback URLs with the bank:"
 msgstr "Зарегистрируйте эти callback URL в банке:"
 
-#| msgid "Bridge"
 msgid "ECR bridge"
 msgstr "ECR-мост"
 
@@ -4481,14 +4523,12 @@ msgstr ""
 "Одобрено на терминале и записано в учёт. Разница означает, что оплата "
 "одобрена, но не записана (или записана вручную)."
 
-#| msgid "Card (terminal)"
 msgid "Terminal"
 msgstr "Терминал"
 
 msgid "Booked"
 msgstr "Записано"
 
-#| msgid "Clocked out"
 msgid "Booked amount"
 msgstr "Записанная сумма"
 
@@ -4501,14 +4541,12 @@ msgstr "Отклонено / истекло"
 msgid "Card payments booked without a terminal"
 msgstr "Карточные оплаты, записанные без терминала"
 
-#| msgid "Client id"
 msgid "BOG client id"
 msgstr "BOG client id"
 
 msgid "From the BOG Payment Manager merchant portal."
 msgstr "Из мерчант-портала BOG Payment Manager."
 
-#| msgid "Client secret"
 msgid "BOG client secret"
 msgstr "BOG client secret"
 
@@ -4518,15 +4556,12 @@ msgstr "TBC API-ключ"
 msgid "From developers.tbcbank.ge (TPAY)"
 msgstr "С developers.tbcbank.ge (TPAY)"
 
-#| msgid "Client id"
 msgid "TBC client id"
 msgstr "TBC client id"
 
-#| msgid "Client secret"
 msgid "TBC client secret"
 msgstr "TBC client secret"
 
-#| msgid "Bridge"
 msgid "Bridge device"
 msgstr "Устройство моста"
 
@@ -4547,7 +4582,6 @@ msgstr "TBC — оплата по ссылке (TPAY)"
 msgid "Keys"
 msgstr "Ключи"
 
-#| msgid "Decline"
 msgid "Online"
 msgstr "Онлайн"
 
@@ -4567,7 +4601,6 @@ msgstr "Новый ключ моста для {p0}: {p1} (показываетс
 msgid "Bill"
 msgstr "Счёт"
 
-#| msgid "Confirmed"
 msgid "Confirm approved"
 msgstr "Подтвердить одобрение"
 
@@ -4575,11 +4608,9 @@ msgstr "Подтвердить одобрение"
 msgid "Payment booked: {p0}."
 msgstr "Оплата записана: {p0}."
 
-#| msgid "Request cancelled."
 msgid "Transaction cancelled."
 msgstr "Транзакция отменена."
 
-#| msgid "Resend"
 msgid "Resend link"
 msgstr "Отправить ссылку снова"
 
@@ -4587,7 +4618,6 @@ msgid "No link or no phone / email on this transaction."
 msgstr "У этой транзакции нет ссылки или телефона / email."
 
 #, python-brace-format
-#| msgid "Request sent to {p0}."
 msgid "Link sent again to {p0}."
 msgstr "Ссылка отправлена снова: {p0}."
 
@@ -4603,7 +4633,6 @@ msgstr "Оплатить"
 msgid "Follow the terminal."
 msgstr "Следуйте указаниям терминала."
 
-#| msgid "Payment Collected"
 msgid "Payment not completed"
 msgstr "Оплата не завершена"
 
@@ -4700,6 +4729,146 @@ msgstr "Название площадки, если запрос её созда
 
 msgid "Shared venue request"
 msgstr "Запрос на общую площадку"
+
+msgid "Quoted wait when there is no history to estimate from."
+msgstr "Ожидание, которое называем, когда нет истории для оценки."
+
+msgid ""
+"A notified guest who does not show up within this time is marked no-show."
+msgstr "Уведомлённый гость, не пришедший за это время, помечается как неявка."
+
+msgid "Guests can join from the QR at the door."
+msgstr "Гости могут встать в очередь по QR у входа."
+
+msgid "Text the guest their place in line when added."
+msgstr "При добавлении отправлять гостю SMS с местом в очереди."
+
+#| msgid "The guest at the table who placed this order"
+msgid "Text the guest when the table is ready."
+msgstr "SMS гостю, когда стол готов."
+
+# Profile Settings
+#| msgid "Fiscal settings"
+msgid "Waitlist settings"
+msgstr "Настройки листа ожидания"
+
+#| msgid "Waiting now"
+msgid "Waiting"
+msgstr "Ожидает"
+
+msgid "Table ready · notified"
+msgstr "Стол готов · уведомлён"
+
+#| msgid "No-shows"
+msgid "No-show"
+msgstr "Неявка"
+
+#| msgid "Guest"
+msgid "Guest (QR)"
+msgstr "Гость (QR)"
+
+#| msgid "Reservation"
+msgid "From a reservation"
+msgstr "Из брони"
+
+#| msgid "Courier service saved."
+msgid "Local service day."
+msgstr "Локальный рабочий день."
+
+#| msgid "Waitlisted"
+msgid "Waitlist entry"
+msgstr "Запись в очереди"
+
+#| msgid "Verified"
+msgid "Notified"
+msgstr "Уведомлён"
+
+msgid "Pick a table; a table session opens and the guest is marked seated."
+msgstr ""
+"Выберите стол; откроется сессия стола, гость будет отмечен как посаженный."
+
+#| msgid "Seats"
+msgid "seats"
+msgstr "мест"
+
+#| msgid "No shared tables yet."
+msgid "No tables yet."
+msgstr "Столов пока нет."
+
+#| msgid "Seats"
+msgid "Seat"
+msgstr "Посадить"
+
+#| msgid "Waitlisted"
+msgid "Waitlist rules"
+msgstr "Правила очереди"
+
+#| msgid "Slot interval (minutes)"
+msgid "Default quoted wait (minutes)"
+msgstr "Ожидание по умолчанию (мин)"
+
+msgid "No-show after notifying (minutes)"
+msgstr "Неявка после уведомления (мин)"
+
+msgid "Largest party"
+msgstr "Максимальная компания"
+
+msgid "Guests can join from the QR at the door"
+msgstr "Гости могут встать в очередь по QR у входа"
+
+msgid "SMS when added (place in line + link)"
+msgstr "SMS при добавлении (место в очереди + ссылка)"
+
+#| msgid "When the order is ready"
+msgid "SMS when the table is ready"
+msgstr "SMS, когда стол готов"
+
+msgid ""
+"Message texts live under Notifications (table ready, joined the waitlist)."
+msgstr ""
+"Тексты сообщений — в разделе «Уведомления» (стол готов, встал в очередь)."
+
+msgid "QR at the door"
+msgstr "QR у входа"
+
+msgid ""
+"Print it and put it by the entrance: guests scan, enter name, phone and "
+"party size, and follow their place in line on their phone."
+msgstr ""
+"Распечатайте и поставьте у входа: гости сканируют, вводят имя, телефон и "
+"число гостей и следят за местом в очереди с телефона."
+
+#| msgid "Generated QR code image"
+msgid "Generate a new link"
+msgstr "Создать новую ссылку"
+
+#| msgid "Waiter"
+msgid "Waited"
+msgstr "Ждёт"
+
+msgid "Notify"
+msgstr "Уведомить"
+
+#| msgid "Guests now"
+msgid "Guest notified."
+msgstr "Гость уведомлён."
+
+#, python-brace-format
+#| msgid "{p0} assigned to {p1}."
+msgid "{p0} seated at table {p1}."
+msgstr "{p0} посажен за стол {p1}."
+
+#, python-brace-format
+#| msgid "Test {p0} sent to {p1}."
+msgid "Seat {p0} ({p1})"
+msgstr "Посадить {p0} ({p1})"
+
+#| msgid "Fiscal settings saved."
+msgid "Waitlist settings saved."
+msgstr "Настройки очереди сохранены."
+
+msgid "New QR link generated -- reprint the sign at the door."
+msgstr "Создана новая QR-ссылка -- перепечатайте табличку у входа."
 
 #~ msgid "Log in"
 #~ msgstr "Войти"

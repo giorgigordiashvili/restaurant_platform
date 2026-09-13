@@ -29,6 +29,8 @@ TEMPLATE_FIELDS = [
     ("order_ready", "Pickup order ready"),
     ("order_on_the_way", "Delivery on its way"),
     ("pay_link", "Payment link (card terminals)"),
+    ("waitlist_joined", "Joined the waitlist"),
+    ("table_ready", "Table ready (waitlist)"),
 ]
 
 

@@ -92,6 +92,7 @@ LOCAL_APPS = [
     "apps.crm",
     "apps.ordering",
     "apps.terminals",
+    "apps.waitlist",
 ]
 
 INSTALLED_APPS = UNFOLD_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
