@@ -338,6 +338,10 @@ class Restaurant(TimeStampedModel):
         default=False,
         help_text="CRM & marketing module: guest records, segments, SMS / email campaigns and automations.",
     )
+    online_ordering_enabled = models.BooleanField(
+        default=False,
+        help_text="Online ordering module: pickup and delivery from the restaurant's own page, zones, couriers.",
+    )
     timekeeping_enabled = models.BooleanField(
         default=False,
         help_text="Timekeeping module: clock in / out on the POS, weekly rota, hours report.",
@@ -515,19 +519,10 @@ class Restaurant(TimeStampedModel):
 
     @property
     def is_open_now(self) -> bool:
-        """Check if restaurant is currently open based on operating hours."""
-        from django.utils import timezone
+        """Open right now in the restaurant's own timezone (split shifts and past-midnight closing included)."""
+        from apps.tenants.hours import is_open_at
 
-        now = timezone.localtime()
-        day = now.weekday()
-
-        try:
-            hours = self.operating_hours.get(day_of_week=day)
-            if hours.is_closed:
-                return False
-            return hours.open_time <= now.time() <= hours.close_time
-        except RestaurantHours.DoesNotExist:
-            return False
+        return is_open_at(self)
 
     def get_today_hours(self):
         """Get today's operating hours."""
@@ -562,7 +557,9 @@ class RestaurantHours(TimeStampedModel):
     )
     day_of_week = models.PositiveSmallIntegerField(choices=DAY_CHOICES)
     open_time = models.TimeField()
-    close_time = models.TimeField()
+    close_time = models.TimeField(help_text=_("Earlier than the opening time = closes after midnight."))
+    open_time_2 = models.TimeField(null=True, blank=True, help_text=_("Optional second service (e.g. dinner)."))
+    close_time_2 = models.TimeField(null=True, blank=True)
     is_closed = models.BooleanField(
         default=False,
         help_text=_("Mark as closed for this day (overrides open/close times)"),

@@ -241,6 +241,20 @@ class Order(TimeStampedModel):
 
     # Delivery info (for delivery orders)
     delivery_address = models.TextField(blank=True)
+    address_json = models.JSONField(
+        default=dict, blank=True, help_text=_("Structured address: street, building, entrance, floor, apartment.")
+    )
+    delivery_lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    delivery_lng = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    delivery_zone = models.ForeignKey(
+        "ordering.DeliveryZone", on_delete=models.SET_NULL, null=True, blank=True, related_name="orders"
+    )
+    delivery_instructions = models.CharField(max_length=300, blank=True, default="")
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    packaging_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    scheduled_for = models.DateTimeField(
+        null=True, blank=True, db_index=True, help_text=_("Pickup / delivery time the guest chose; empty = ASAP.")
+    )
 
     # Timing
     estimated_ready_at = models.DateTimeField(null=True, blank=True)
@@ -381,7 +395,15 @@ class Order(TimeStampedModel):
 
         # Tip is customer-set; wallet is treated like a discount but kept
         # separate so refunds can identify wallet-funded amounts.
-        total = net + tax_added + self.service_charge + q(self.tip_amount or 0) - q(self.wallet_applied or 0)
+        total = (
+            net
+            + tax_added
+            + self.service_charge
+            + q(self.tip_amount or 0)
+            + q(self.delivery_fee or 0)
+            + q(self.packaging_fee or 0)
+            - q(self.wallet_applied or 0)
+        )
         self.total = max(q(total), Decimal("0"))
 
         self.save(
@@ -392,6 +414,8 @@ class Order(TimeStampedModel):
                 "service_charge",
                 "vat_rate",
                 "prices_include_vat",
+                "delivery_fee",
+                "packaging_fee",
                 "total",
                 "updated_at",
             ]

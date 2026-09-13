@@ -90,6 +90,7 @@ LOCAL_APPS = [
     "apps.purchasing",
     "apps.timekeeping",
     "apps.crm",
+    "apps.ordering",
 ]
 
 INSTALLED_APPS = UNFOLD_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -646,6 +647,27 @@ TWILIO_AUTH_TOKEN = config("TWILIO_AUTH_TOKEN", default="")
 TWILIO_FROM = config("TWILIO_FROM", default="")
 EXPO_ACCESS_TOKEN = config("EXPO_ACCESS_TOKEN", default="")
 # Embed URLs (YouTube / Vimeo "embed" links) for the onboarding videos shown in the tenant admin guide.
+# Courier hand-off (first-party delivery orders) -- per-restaurant keys live on the platform link; these are fallbacks.
+WOLT_DRIVE_API_KEY = config("WOLT_DRIVE_API_KEY", default="")
+WOLT_DRIVE_VENUE_ID = config("WOLT_DRIVE_VENUE_ID", default="")
+WOLT_DRIVE_CLIENT_SECRET = config("WOLT_DRIVE_CLIENT_SECRET", default="")
+WOLT_DRIVE_BASE_URL_PROD = config("WOLT_DRIVE_BASE_URL_PROD", default="https://daas-public-api.wolt.com")
+WOLT_DRIVE_BASE_URL_DEV = config(
+    "WOLT_DRIVE_BASE_URL_DEV", default="https://daas-public-api.development.dev.woltapi.com"
+)
+GLOVO_ODR_CLIENT_ID = config("GLOVO_ODR_CLIENT_ID", default="")
+GLOVO_ODR_CLIENT_SECRET = config("GLOVO_ODR_CLIENT_SECRET", default="")
+GLOVO_ODR_VENDOR_ID = config("GLOVO_ODR_VENDOR_ID", default="")
+GLOVO_ODR_CALLBACK_SECRET = config("GLOVO_ODR_CALLBACK_SECRET", default="")
+GLOVO_ODR_COUNTRY = config("GLOVO_ODR_COUNTRY", default="ge")
+GLOVO_ODR_BASE_URL_PROD = config("GLOVO_ODR_BASE_URL_PROD", default="https://ondemand-api-glovoapp.deliveryhero.io")
+GLOVO_ODR_BASE_URL_STAGE = config(
+    "GLOVO_ODR_BASE_URL_STAGE", default="https://api-infra-eu-central-1.stg.ondemandrider.net"
+)
+GLOVO_ODR_STS_URL = config("GLOVO_ODR_STS_URL", default="https://sts.deliveryhero.io/oauth2/token")
+# Custom domains: what a restaurant points its DNS at.
+PUBLIC_IP = config("PUBLIC_IP", default="")
+SITES_CNAME_TARGET = config("SITES_CNAME_TARGET", default="sites.aimenu.ge")
 DELIVERY_GUIDE_VIDEO_WOLT = config("DELIVERY_GUIDE_VIDEO_WOLT", default="")
 DELIVERY_GUIDE_VIDEO_GLOVO = config("DELIVERY_GUIDE_VIDEO_GLOVO", default="")
 WOLT_AUTH_URL_DEV = config(

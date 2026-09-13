@@ -74,9 +74,12 @@ class RestaurantHoursSerializer(serializers.ModelSerializer):
             "day_name",
             "open_time",
             "close_time",
+            "open_time_2",
+            "close_time_2",
             "is_closed",
         ]
         read_only_fields = ["id"]
+        extra_kwargs = {"open_time_2": {"required": False}, "close_time_2": {"required": False}}
 
     def get_day_name(self, obj):
         return obj.get_day_of_week_display()
@@ -406,6 +409,8 @@ class RestaurantHoursUpdateSerializer(serializers.Serializer):
                 defaults={
                     "open_time": hour_data["open_time"],
                     "close_time": hour_data["close_time"],
+                    "open_time_2": hour_data.get("open_time_2"),
+                    "close_time_2": hour_data.get("close_time_2"),
                     "is_closed": hour_data.get("is_closed", False),
                 },
             )

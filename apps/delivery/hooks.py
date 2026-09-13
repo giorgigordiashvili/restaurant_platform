@@ -30,7 +30,7 @@ def on_module_toggled(restaurant, enabled, *, by=None) -> None:
     try:
         from apps.delivery.models import RestaurantDeliveryPlatform
 
-        for code, _label in RestaurantDeliveryPlatform.PLATFORM_CHOICES:
+        for code in RestaurantDeliveryPlatform.MARKETPLACES:
             RestaurantDeliveryPlatform.objects.get_or_create(
                 restaurant=restaurant, platform=code, defaults={"is_enabled": False}
             )

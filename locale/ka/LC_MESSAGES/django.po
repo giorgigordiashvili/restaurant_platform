@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-12 23:03+0400\n"
+"POT-Creation-Date: 2026-09-13 11:04+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Georgian\n"
@@ -148,6 +148,18 @@ msgstr "განრიგი გამოქვეყნდა"
 msgid "Price changed"
 msgstr "ფასი შეიცვალა"
 
+#| msgid "Customer Request"
+msgid "Courier requested"
+msgstr "კურიერი გამოძახებულია"
+
+#| msgid "Tips (assigned)"
+msgid "Courier assigned"
+msgstr "კურიერი დანიშნულია"
+
+#| msgid "Order Cancelled"
+msgid "Courier cancelled"
+msgstr "კურიერი გაუქმებულია"
+
 msgid "Audit Log"
 msgstr "აუდიტის ჩანაწერი"
 
@@ -287,25 +299,65 @@ msgstr "პლატფორმები"
 msgid "Setup guide"
 msgstr "დაყენების გზამკვლევი"
 
-#| msgid "Guest SMS"
+#| msgid "Online provider"
+msgid "Online ordering"
+msgstr "ონლაინ შეკვეთა"
+
+# Dates and times
+#| msgid "Due today"
+msgid "Pickup today"
+msgstr "დღეს წასაღები"
+
+#| msgid "Deliver by"
+msgid "Delivery today"
+msgstr "დღეს მიტანა"
+
+msgid "Couriers on the road"
+msgstr "კურიერები გზაში"
+
+#| msgid "Paused until"
+msgid "Paused"
+msgstr "შეჩერებული"
+
+# Yes/No
+#| msgid "Yes"
+msgid "yes"
+msgstr "დიახ"
+
+#| msgid "Info"
+msgid "no"
+msgstr "არა"
+
+#| msgid "Settings"
+msgid "Settings & hours"
+msgstr "პარამეტრები და საათები"
+
+#| msgid "Deliveries"
+msgid "Delivery zones"
+msgstr "მიტანის ზონები"
+
+msgid "Deliveries"
+msgstr "მიწოდებები"
+
+#| msgid "Custom Role"
+msgid "Custom domain"
+msgstr "საკუთარი დომენი"
+
 msgid "Guests"
 msgstr "სტუმრები"
 
-#| msgid "Used in"
 msgid "Opted in"
 msgstr "თანხმობით"
 
 msgid "New (30 days)"
 msgstr "ახალი (30 დღე)"
 
-#| msgid "Customer Request"
 msgid "Customers"
 msgstr "სტუმრები"
 
 msgid "Campaigns"
 msgstr "კამპანიები"
 
-#| msgid "Account Information"
 msgid "Automations"
 msgstr "ავტომატიზაციები"
 
@@ -492,6 +544,19 @@ msgid ""
 msgstr ""
 "Glovo-სა და Wolt-ის შეკვეთები პირდაპირ სამზარეულოში, მენიუს გაგზავნა, "
 "„ამოწურულის“ სინქრონიზაცია, მაღაზიის შეჩერება; Bolt Food მალე."
+
+#| msgid "Days between ordering and delivery."
+msgid "Online ordering & delivery"
+msgstr "ონლაინ შეკვეთა და მიტანა"
+
+msgid ""
+"Pickup and delivery from your own page: opening hours, time slots, delivery "
+"zones with fees, own couriers or a Wolt Drive / Glovo courier, custom "
+"domain."
+msgstr ""
+"წასაღები და მიტანა თქვენივე გვერდიდან: სამუშაო საათები, დროის სლოტები, "
+"მიტანის ზონები საფასურით, საკუთარი კურიერები ან Wolt Drive / Glovo კურიერი, "
+"საკუთარი დომენი."
 
 msgid ""
 "VAT profile, sequential receipts and refund receipts, RS.ge waybill export. "
@@ -926,7 +991,6 @@ msgstr "თავისუფალი თეგები, მაგ. vip, corpo
 msgid "First contact: qr, web, pos, reservation…"
 msgstr "პირველი კონტაქტი: qr, web, pos, reservation…"
 
-#| msgid "Custom Role"
 msgid "Customer"
 msgstr "სტუმარი"
 
@@ -943,7 +1007,6 @@ msgid "Segment"
 msgstr "სეგმენტი"
 
 # Models - Payments
-#| msgid "Payments"
 msgid "Segments"
 msgstr "სეგმენტები"
 
@@ -954,7 +1017,6 @@ msgid "Scheduled"
 msgstr "დაგეგმილი"
 
 # Status choices - Order
-#| msgid "Pending"
 msgid "Sending"
 msgstr "იგზავნება"
 
@@ -964,7 +1026,6 @@ msgstr "გაგზავნილია"
 msgid "Cancelled"
 msgstr "გაუქმებული"
 
-#| msgid "Email"
 msgid "Email only."
 msgstr "მხოლოდ ელფოსტისთვის."
 
@@ -973,7 +1034,6 @@ msgid "Placeholders: {name} {restaurant} {code} {link} {unsubscribe}"
 msgstr "ჩანაცვლებები: {name} {restaurant} {code} {link} {unsubscribe}"
 
 #, python-brace-format
-#| msgid "A promo code needs a code."
 msgid "A promo code to include as {code}."
 msgstr "პრომო კოდი, რომელიც {code}-ად ჩაჯდება."
 
@@ -983,7 +1043,6 @@ msgstr "კამპანია"
 msgid "Birthday greeting"
 msgstr "დაბადების დღის მილოცვა"
 
-#| msgid "Review prompt"
 msgid "Review prompt after a visit"
 msgstr "შეფასების მოწვევა ვიზიტის შემდეგ"
 
@@ -996,7 +1055,6 @@ msgstr "შეფასების მოწვევა: საათი ვ�
 msgid "Win-back: days without a visit."
 msgstr "დაბრუნება: დღეები ვიზიტის გარეშე."
 
-#| msgid "Account Information"
 msgid "Automation"
 msgstr "ავტომატიზაცია"
 
@@ -1005,7 +1063,6 @@ msgstr ""
 "შეკვეთის ID შეფასებისთვის, წელი დაბადების დღისთვის, თვე დაბრუნებისთვის."
 
 # Form validation
-#| msgid "This code is already applied."
 msgid "This campaign was already sent."
 msgstr "ეს კამპანია უკვე გაგზავნილია."
 
@@ -1023,18 +1080,15 @@ msgstr "%(sent)d გაიგზავნა, %(failed)d ვერ, %(skipped)d 
 msgid "guests in this segment can receive this"
 msgstr "სტუმარს ამ სეგმენტში შეუძლია ამის მიღება:"
 
-#| msgid "Status"
 msgid "status"
 msgstr "სტატუსი"
 
 msgid "sent"
 msgstr "გაგზავნილი"
 
-#| msgid "Failed"
 msgid "failed"
 msgstr "ვერ გაიგზავნა"
 
-#| msgid "Skipped"
 msgid "skipped"
 msgstr "გამოტოვებული"
 
@@ -1047,7 +1101,6 @@ msgstr "ტესტის გაგზავნა"
 msgid "Send to everyone in the segment now?"
 msgstr "გავუგზავნოთ სეგმენტში ყველას ახლავე?"
 
-#| msgid "Open now"
 msgid "Send now"
 msgstr "ახლავე გაგზავნა"
 
@@ -1059,7 +1112,6 @@ msgstr ""
 " შეტყობინებას აქვს გამოწერის გაუქმების ბმული; მხოლოდ თანხმობის მქონე "
 "სტუმრებს ეგზავნება."
 
-#| msgid "Decline"
 msgid "Timeline"
 msgstr "ისტორია"
 
@@ -1078,7 +1130,6 @@ msgstr "თანხმობა"
 msgid "History"
 msgstr "ისტორია"
 
-#| msgid "Last login"
 msgid "Last visit"
 msgstr "ბოლო ვიზიტი"
 
@@ -1101,7 +1152,6 @@ msgstr "წესები სწორი JSON უნდა იყოს, მ�
 msgid "Rules must be a JSON object."
 msgstr "წესები JSON ობიექტი უნდა იყოს."
 
-#| msgid "Guest SMS"
 msgid "Guests now"
 msgstr "სტუმარი ახლა"
 
@@ -1117,11 +1167,9 @@ msgid "'%(name)s' is being sent to %(n)d guests."
 msgstr "„%(name)s“ ეგზავნება %(n)d სტუმარს."
 
 #, python-format
-#| msgid "%(number)s cancelled."
 msgid "'%(name)s' cancelled."
 msgstr "„%(name)s“ გაუქმებულია."
 
-#| msgid "This code is not valid."
 msgid "This link is not valid."
 msgstr "ეს ბმული არასწორია."
 
@@ -2303,6 +2351,19 @@ msgstr "მარკეტინგული ავტომატიზაც�
 msgid "Purchase order"
 msgstr "შესყიდვის შეკვეთა"
 
+#| msgid "Order Cancelled"
+msgid "Order accepted"
+msgstr "შეკვეთა მიღებულია"
+
+#| msgid "Order Created"
+msgid "Order ready"
+msgstr "შეკვეთა მზადაა"
+
+# Models - Orders
+#| msgid "Orders today"
+msgid "Order on its way"
+msgstr "შეკვეთა გზაშია"
+
 msgid "Test message"
 msgstr "სატესტო შეტყობინება"
 
@@ -2345,14 +2406,18 @@ msgid "Guest messages"
 msgstr "შეტყობინებები სტუმრებს"
 
 #, python-brace-format
+#| msgid ""
+#| "Confirmations and reminders for reservations; review prompts and campaigns "
+#| "once CRM is on. Placeholders: {name} {restaurant} {date} {time} {guests} "
+#| "{code} {link}"
 msgid ""
 "Confirmations and reminders for reservations; review prompts and campaigns "
 "once CRM is on. Placeholders: {name} {restaurant} {date} {time} {guests} "
-"{code} {link}"
+"{code} {link} {order} {tracking_url}"
 msgstr ""
-"ჯავშნის დადასტურებები და შეხსენებები; შეფასების მოწვევები და კამპანიები CRM-"
-"ის ჩართვისას. ჩანაცვლებები: {name} {restaurant} {date} {time} {guests} "
-"{code} {link}"
+"ჯავშნის დადასტურებები და შეხსენებები; შეფასების თხოვნები და კამპანიები CRM-"
+"ის ჩართვის შემდეგ. ჩასამატებელი: {name} {restaurant} {date} {time} {guests} "
+"{code} {link} {order} {tracking_url}"
 
 msgid "Send SMS to guests"
 msgstr "SMS-ის გაგზავნა სტუმრებს"
@@ -2415,6 +2480,487 @@ msgstr "ხელახლა გაგზავნა"
 msgid "Message to {p0} queued again."
 msgstr "შეტყობინება {p0}-ზე ხელახლა რიგშია."
 
+msgid "Own couriers"
+msgstr "საკუთარი კურიერები"
+
+msgid "Wolt Drive"
+msgstr "Wolt Drive"
+
+msgid "Glovo On-Demand"
+msgstr "Glovo On-Demand"
+
+msgid "When the order is accepted"
+msgstr "შეკვეთის მიღებისას"
+
+msgid "When the order is ready"
+msgstr "როცა შეკვეთა მზადაა"
+
+msgid "Manually from the POS"
+msgstr "ხელით POS-იდან"
+
+msgid "Guests can order for pickup."
+msgstr "სტუმრებს შეუძლიათ წასაღების შეკვეთა."
+
+msgid "Guests can order delivery (needs zones)."
+msgstr "სტუმრებს შეუძლიათ მიტანის შეკვეთა (საჭიროა ზონები)."
+
+msgid "Allow 'as soon as possible' orders."
+msgstr "დაუშვით შეკვეთები „რაც შეიძლება მალე“."
+
+msgid "Allow choosing a later time slot."
+msgstr "დაუშვით მოგვიანებით დროის არჩევა."
+
+#| msgid "Preparation time (min)"
+msgid "Preparation time promised to guests."
+msgstr "მომზადების დრო, რომელსაც სტუმრებს ჰპირდებით."
+
+msgid "Added to the lead time for delivery orders."
+msgstr "ემატება მიტანის შეკვეთების დროს."
+
+#| msgid "Nothing in this order is eligible for the code."
+msgid "Stop taking online orders this long before closing."
+msgstr "ონლაინ შეკვეთების მიღება წყდება დახურვამდე ამდენი ხნით ადრე."
+
+msgid "0 = never free."
+msgstr "0 = არასდროს უფასო."
+
+#| msgid "Pause orders"
+msgid "Per order."
+msgstr "თითო შეკვეთაზე."
+
+msgid "Charge the guest what Wolt / Glovo quote instead of the zone fee."
+msgstr "სტუმარს დაარიცხეთ Wolt / Glovo-ს ფასი ზონის საფასურის ნაცვლად."
+
+msgid "Online orders paused until then (kitchen slammed)."
+msgstr "ონლაინ შეკვეთები შეჩერებულია ამ დრომდე (სამზარეულო გადატვირთულია)."
+
+msgid "Online ordering settings"
+msgstr "ონლაინ შეკვეთის პარამეტრები"
+
+msgid "Radius"
+msgstr "რადიუსი"
+
+msgid "Polygon"
+msgstr "პოლიგონი"
+
+msgid "[[lat, lng], ...] for polygon zones."
+msgstr "[[lat, lng], ...] პოლიგონური ზონებისთვის."
+
+msgid "Lower = checked first (inner ring first)."
+msgstr "ნაკლები = პირველად მოწმდება (ჯერ შიდა რგოლი)."
+
+#| msgid "Delivery"
+msgid "Delivery zone"
+msgstr "მიტანის ზონა"
+
+msgid "bike / scooter / car"
+msgstr "ველოსიპედი / სკუტერი / მანქანა"
+
+msgid "On shift and taking deliveries."
+msgstr "ცვლაზეა და იღებს მიტანებს."
+
+msgid "Courier"
+msgstr "კურიერი"
+
+msgid "Couriers"
+msgstr "კურიერები"
+
+msgid "Not requested"
+msgstr "არ არის გამოძახებული"
+
+msgid "Quoted"
+msgstr "ფასი მიღებულია"
+
+#| msgid "Request declined."
+msgid "Requested"
+msgstr "გამოძახებული"
+
+#| msgid "Order cancelled by platform"
+msgid "Accepted by platform"
+msgstr "პლატფორმამ მიიღო"
+
+#| msgid "Clocked out"
+msgid "Picked up"
+msgstr "აღებულია"
+
+#| msgid "Deliveries"
+msgid "Delivered"
+msgstr "მიტანილია"
+
+msgid "What the courier platform charges us."
+msgstr "რას გვახდევინებს საკურიერო პლატფორმა."
+
+msgid "Delivery fee the guest paid."
+msgstr "მიტანის საფასური, რომელიც სტუმარმა გადაიხადა."
+
+msgid "Delivery"
+msgstr "მიწოდება"
+
+msgid "e.g. order.myrestaurant.ge"
+msgstr "მაგ. order.myrestaurant.ge"
+
+#| msgid "Custom Role"
+msgid "Custom domains"
+msgstr "საკუთარი დომენები"
+
+#| msgid "Rota shift"
+msgid "off shift"
+msgstr "ცვლის გარეშე"
+
+msgid "Assign"
+msgstr "დანიშვნა"
+
+msgid "No couriers yet -- add riders under Couriers first."
+msgstr "კურიერები ჯერ არ არის -- ჯერ დაამატეთ „კურიერებში“."
+
+msgid ""
+"Radius zones follow the 'radius km' field. For a polygon, draw it with the "
+"tool on the map (click points, close by clicking the first one); drag the "
+"vertices to adjust."
+msgstr ""
+"რადიუსული ზონა მიჰყვება ველს „რადიუსი კმ“. პოლიგონისთვის დახაზეთ რუკაზე "
+"ინსტრუმენტით (დააწკაპუნეთ წერტილებზე, დახურეთ პირველზე დაწკაპუნებით); "
+"წვეროები გადაათრიეთ შესასწორებლად."
+
+msgid ""
+"Rings are measured from the restaurant pin; polygons are drawn by hand. "
+"Zones are checked in 'sort' order, so put the cheapest inner ring first."
+msgstr ""
+"რგოლები იზომება რესტორნის ნიშნულიდან; პოლიგონები იხაზება ხელით. ზონები "
+"მოწმდება „რიგის“ მიხედვით, ამიტომ ყველაზე იაფი შიდა რგოლი პირველი დააყენეთ."
+
+msgid "Right now"
+msgstr "ახლა"
+
+#| msgid "Opened"
+msgid "Open"
+msgstr "ღიაა"
+
+msgid "Closed"
+msgstr "დახურულია"
+
+msgid "paused"
+msgstr "შეჩერებული"
+
+#| msgid "Opened"
+msgid "Opens"
+msgstr "იხსნება"
+
+msgid "Pickup"
+msgstr "წასაღები"
+
+#| msgid "of"
+msgid "off"
+msgstr "გამორთული"
+
+msgid "zones"
+msgstr "ზონა"
+
+msgid "Set the restaurant's map location in Settings first."
+msgstr "ჯერ პარამეტრებში მიუთითეთ რესტორნის ადგილი რუკაზე."
+
+msgid "Your own domain"
+msgstr "თქვენი საკუთარი დომენი"
+
+#| msgid "Only draft orders can be sent."
+msgid "Online orders are paused until"
+msgstr "ონლაინ შეკვეთები შეჩერებულია"
+
+#| msgid "Resume orders"
+msgid "Resume online orders"
+msgstr "ონლაინ შეკვეთების განახლება"
+
+#| msgid "{p0} paused for {p1} minutes."
+msgid "Pause for (minutes)"
+msgstr "შეჩერება (წუთი)"
+
+#| msgid "Send SMS to guests"
+msgid "Reason shown to guests"
+msgstr "სტუმრებისთვის ნაჩვენები მიზეზი"
+
+#| msgid "Kitchen display"
+msgid "Kitchen is very busy"
+msgstr "სამზარეულო ძალიან დატვირთულია"
+
+#| msgid "Pause orders"
+msgid "Pause online orders"
+msgstr "ონლაინ შეკვეთების შეჩერება"
+
+#| msgid "Open orders"
+msgid "Opening hours"
+msgstr "სამუშაო საათები"
+
+msgid ""
+"In the restaurant's timezone. A closing time earlier than the opening time "
+"means you close after midnight. The second pair is optional (e.g. lunch and "
+"dinner service)."
+msgstr ""
+"რესტორნის დროის სარტყელში. გახსნაზე ადრე დახურვის დრო ნიშნავს, რომ შუაღამის "
+"შემდეგ იხურებით. მეორე წყვილი არასავალდებულოა (მაგ. ლანჩი და ვახშამი)."
+
+msgid "Day"
+msgstr "დღე"
+
+#| msgid "Closed"
+msgid "Close"
+msgstr "დახურვა"
+
+#| msgid "Open now"
+msgid "Open (2nd)"
+msgstr "გახსნა (მე-2)"
+
+#| msgid "Closed"
+msgid "Close (2nd)"
+msgstr "დახურვა (მე-2)"
+
+#| msgid "Save options"
+msgid "Save hours"
+msgstr "საათების შენახვა"
+
+#| msgid "Book delivery"
+msgid "Pickup & delivery"
+msgstr "წასაღები და მიტანა"
+
+#| msgid "Pause orders"
+msgid "Pickup orders"
+msgstr "წასაღები შეკვეთები"
+
+#| msgid "Delivery platforms"
+msgid "Delivery orders"
+msgstr "მიტანის შეკვეთები"
+
+msgid "Allow 'as soon as possible'"
+msgstr "დაუშვით „რაც შეიძლება მალე“"
+
+msgid "Allow choosing a time slot"
+msgstr "დაუშვით დროის სლოტის არჩევა"
+
+#| msgid "Preparation time (min)"
+msgid "Preparation time (minutes)"
+msgstr "მომზადების დრო (წუთი)"
+
+msgid "Extra minutes for delivery"
+msgstr "დამატებითი წუთები მიტანისთვის"
+
+#| msgid "Time slot intervals (e.g., every 30 minutes)"
+msgid "Slot interval (minutes)"
+msgstr "სლოტის ინტერვალი (წუთი)"
+
+msgid "Days ahead guests may schedule"
+msgstr "რამდენი დღით ადრე შეუძლიათ სტუმრებს დაგეგმვა"
+
+msgid "Stop taking orders before closing (minutes)"
+msgstr "შეკვეთების მიღების შეწყვეტა დახურვამდე (წუთი)"
+
+msgid "Minimum order · pickup"
+msgstr "მინიმალური შეკვეთა · წასაღები"
+
+msgid "Minimum order · delivery"
+msgstr "მინიმალური შეკვეთა · მიტანა"
+
+msgid "Free delivery from (0 = never)"
+msgstr "უფასო მიტანა თანხიდან (0 = არასდროს)"
+
+msgid "Packaging fee per order"
+msgstr "შეფუთვის საფასური თითო შეკვეთაზე"
+
+msgid ""
+"Your own riders take deliveries from the POS, or hand the ride to Wolt Drive"
+" / Glovo: you keep the order and pay only the delivery."
+msgstr ""
+"თქვენი კურიერები მიტანებს POS-იდან იღებენ, ან გადაეცით მგზავრობა Wolt Drive "
+"/ Glovo-ს: შეკვეთა თქვენთან რჩება და მხოლოდ მიტანას იხდით."
+
+msgid "Default courier"
+msgstr "ნაგულისხმევი კურიერი"
+
+msgid "Request the courier automatically"
+msgstr "კურიერის ავტომატური გამოძახება"
+
+msgid "Charge guests the platform's quote instead of the zone fee"
+msgstr "სტუმრებს დაარიცხეთ პლატფორმის ფასი ზონის საფასურის ნაცვლად"
+
+#| msgid "Settings"
+msgid "Save settings"
+msgstr "პარამეტრების შენახვა"
+
+msgid "connected"
+msgstr "დაკავშირებულია"
+
+# Permissions
+#| msgid "Permission"
+msgid "keys missing"
+msgstr "გასაღებები აკლია"
+
+#| msgid "Sandbox (stage / development environment)"
+msgid "Sandbox / test environment"
+msgstr "სატესტო გარემო"
+
+msgid "Webhook URL to register with them"
+msgstr "Webhook URL მათთან დასარეგისტრირებლად"
+
+msgid "Clear keys"
+msgstr "გასაღებების წაშლა"
+
+msgid "Use your own web address for the ordering page"
+msgstr "გამოიყენეთ საკუთარი ვებ-მისამართი შეკვეთის გვერდისთვის"
+
+msgid ""
+"At your domain registrar add a DNS record for the address you want (e.g. "
+"order.myrestaurant.ge):"
+msgstr ""
+"დომენის რეგისტრატორთან დაამატეთ DNS ჩანაწერი სასურველი მისამართისთვის (მაგ. "
+"order.myrestaurant.ge):"
+
+msgid "or an A record"
+msgstr "ან A ჩანაწერი"
+
+msgid ""
+"Add the domain below and press Verify. DNS changes can take up to an hour to"
+" spread."
+msgstr ""
+"ქვემოთ დაამატეთ დომენი და დააჭირეთ „შემოწმებას“. DNS ცვლილებების გავრცელებას"
+" შეიძლება ერთ საათამდე დასჭირდეს."
+
+msgid ""
+"The HTTPS certificate is issued automatically on the first visit. The page "
+"shows only your restaurant -- no marketplace."
+msgstr ""
+"HTTPS სერტიფიკატი ავტომატურად გაიცემა პირველ ვიზიტზე. გვერდზე მხოლოდ თქვენი "
+"რესტორანი ჩანს -- მარკეტპლეისის გარეშე."
+
+msgid "Merchant API key"
+msgstr "მერჩანტის API გასაღები"
+
+msgid "Issued by Wolt Drive for your venue."
+msgstr "გაცემულია Wolt Drive-ის მიერ თქვენი ობიექტისთვის."
+
+msgid "Merchant id"
+msgstr "მერჩანტის id"
+
+#| msgid "Webhook token set."
+msgid "Webhook secret"
+msgstr "Webhook საიდუმლო"
+
+msgid "Wolt signs webhooks with it (JWT)."
+msgstr "Wolt ამით ხელს აწერს webhook-ებს (JWT)."
+
+msgid "Client id"
+msgstr "Client id"
+
+#| msgid "not set"
+msgid "Client secret"
+msgstr "Client secret"
+
+msgid "Callback secret"
+msgstr "Callback საიდუმლო"
+
+msgid "Signs the status callbacks (X-Signature-SHA256)."
+msgstr "ხელს აწერს სტატუსის callback-ებს (X-Signature-SHA256)."
+
+#| msgid "Counted"
+msgid "Country code"
+msgstr "ქვეყნის კოდი"
+
+msgid "ge"
+msgstr "ge"
+
+msgid "Venue id at Wolt Drive"
+msgstr "Venue id Wolt Drive-ზე"
+
+msgid "Vendor id at Glovo"
+msgstr "Vendor id Glovo-ზე"
+
+msgid "Delivery is on but you have no delivery zones yet -- add at least one."
+msgstr ""
+"მიტანა ჩართულია, მაგრამ მიტანის ზონები ჯერ არ გაქვთ -- დაამატეთ მინიმუმ "
+"ერთი."
+
+msgid "The courier service is not connected yet; fill in its keys below."
+msgstr ""
+"საკურიერო სერვისი ჯერ არ არის დაკავშირებული; ქვემოთ შეავსეთ მისი გასაღებები."
+
+#| msgid "Notification settings saved."
+msgid "Online ordering settings saved."
+msgstr "ონლაინ შეკვეთის პარამეტრები შენახულია."
+
+msgid "Opening hours saved."
+msgstr "სამუშაო საათები შენახულია."
+
+#, python-brace-format
+#| msgid "{p0} paused for {p1} minutes."
+msgid "Online orders paused for {p0} minutes."
+msgstr "ონლაინ შეკვეთები შეჩერებულია {p0} წუთით."
+
+#| msgid "This order is closed."
+msgid "Online orders resumed."
+msgstr "ონლაინ შეკვეთები განახლებულია."
+
+msgid "Saved, but some keys are still missing."
+msgstr "შენახულია, მაგრამ ზოგი გასაღები ჯერ აკლია."
+
+#| msgid "RS.ge service user"
+msgid "Courier service saved."
+msgstr "საკურიერო სერვისი შენახულია."
+
+msgid "Draw the zone on the map (at least three points)."
+msgstr "დახაზეთ ზონა რუკაზე (მინიმუმ სამი წერტილი)."
+
+msgid "Size"
+msgstr "ზომა"
+
+#, python-brace-format
+#| msgid "{p0} options saved."
+msgid "{p0} points"
+msgstr "{p0} წერტილი"
+
+msgid "On the road"
+msgstr "გზაში"
+
+msgid "ETA"
+msgstr "სავარაუდო დრო"
+
+#| msgid "Request declined."
+msgid "Request courier"
+msgstr "კურიერის გამოძახება"
+
+#, python-brace-format
+#| msgid "Request sent to {p0}."
+msgid "Courier requested for {p0}."
+msgstr "კურიერი გამოძახებულია {p0}-სთვის."
+
+#| msgid "Order Cancelled"
+msgid "Courier cancelled."
+msgstr "კურიერი გაუქმებულია."
+
+#, python-brace-format
+#| msgid "Test {p0} sent to {p1}."
+msgid "{p0} assigned to {p1}."
+msgstr "{p0} დაენიშნა {p1}-ს."
+
+#, python-brace-format
+msgid "Assign courier · {p0}"
+msgstr "კურიერის დანიშვნა · {p0}"
+
+msgid "Verified"
+msgstr "შემოწმებულია"
+
+#, python-brace-format
+msgid "{p0} points at us -- HTTPS will be issued on the first visit."
+msgstr "{p0} ჩვენზე მიუთითებს -- HTTPS პირველ ვიზიტზე გაიცემა."
+
+#, python-brace-format
+msgid "Saved. DNS is not pointing at us yet: {p0}"
+msgstr "შენახულია. DNS ჯერ ჩვენზე არ მიუთითებს: {p0}"
+
+msgid "Verify"
+msgstr "შემოწმება"
+
+#, python-brace-format
+#| msgid "{p0} saved."
+msgid "{p0} is verified."
+msgstr "{p0} შემოწმებულია."
+
 msgid "Manual"
 msgstr "ხელით"
 
@@ -2448,9 +2994,6 @@ msgstr "ადგილზე"
 
 msgid "Takeaway"
 msgstr "წასაღები"
-
-msgid "Delivery"
-msgstr "მიწოდება"
 
 msgid "Website"
 msgstr "ვებსაიტი"
@@ -2487,6 +3030,12 @@ msgstr "თანამშრომელი, რომელსაც ეს �
 
 msgid "Special requests or notes from customer"
 msgstr "სტუმრის სპეციალური მოთხოვნები ან შენიშვნები"
+
+msgid "Structured address: street, building, entrance, floor, apartment."
+msgstr "სტრუქტურირებული მისამართი: ქუჩა, შენობა, სადარბაზო, სართული, ბინა."
+
+msgid "Pickup / delivery time the guest chose; empty = ASAP."
+msgstr "სტუმრის არჩეული წასაღების / მიტანის დრო; ცარიელი = რაც შეიძლება მალე."
 
 msgid "Staff member who handled this order"
 msgstr "თანამშრომელი, რომელმაც შეკვეთა დაამუშავა"
@@ -3162,9 +3711,6 @@ msgstr "გაყიდვები დღეების მიხედვი�
 msgid "Orders by hour"
 msgstr "შეკვეთები საათების მიხედვით"
 
-msgid "Day"
-msgstr "დღე"
-
 msgid "Gross"
 msgstr "მთლიანი"
 
@@ -3179,6 +3725,17 @@ msgstr "თანხა"
 
 msgid "Hour"
 msgstr "საათი"
+
+#| msgid "Deliveries"
+msgid "Delivery fees"
+msgstr "მიტანის საფასურები"
+
+msgid "Packaging"
+msgstr "შეფუთვა"
+
+#| msgid "Labour cost"
+msgid "Courier cost"
+msgstr "კურიერის ღირებულება"
 
 msgid "Dishes sold"
 msgstr "გაყიდული კერძები"
@@ -3273,27 +3830,21 @@ msgstr "მარჟა"
 msgid "Purchases by supplier"
 msgstr "შესყიდვები მომწოდებლების მიხედვით"
 
-msgid "Deliveries"
-msgstr "მიწოდებები"
-
 msgid "Total"
 msgstr "ჯამი"
 
 msgid "New guests"
 msgstr "ახალი სტუმრები"
 
-#| msgid "Active sessions"
 msgid "Active guests"
 msgstr "აქტიური სტუმრები"
 
-#| msgid "Remaining"
 msgid "Returning"
 msgstr "დაბრუნებული"
 
 msgid "Top guests by spend"
 msgstr "ტოპ სტუმრები ხარჯით"
 
-#| msgid "Guest SMS"
 msgid "Guest"
 msgstr "სტუმარი"
 
@@ -3310,7 +3861,6 @@ msgid "Avg ticket"
 msgstr "საშ. ჩეკი"
 
 # Models - Audit
-#| msgid "Audit"
 msgid "Audience"
 msgstr "აუდიტორია"
 
@@ -3373,9 +3923,6 @@ msgstr "გახსნა"
 
 msgid "Opened"
 msgstr "გახსნილია"
-
-msgid "Closed"
-msgstr "დახურულია"
 
 msgid "Counted"
 msgstr "დათვლილი"
@@ -3798,6 +4345,13 @@ msgstr "მინიმალური თანხა დისტანცი�
 msgid "Average order preparation time in minutes"
 msgstr "შეკვეთის მომზადების საშუალო დრო წუთებში"
 
+#| msgid "Earlier than the start = the shift ends after midnight."
+msgid "Earlier than the opening time = closes after midnight."
+msgstr "გახსნის დროზე ადრე = შუაღამის შემდეგ იხურება."
+
+msgid "Optional second service (e.g. dinner)."
+msgstr "არასავალდებულო მეორე სერვისი (მაგ. ვახშამი)."
+
 msgid "Mark as closed for this day (overrides open/close times)"
 msgstr "ამ დღეს დახურულად მონიშვნა (გადაფარავს გახსნა/დახურვის დროს)"
 
@@ -4022,10 +4576,6 @@ msgstr "საერთო სივრცის მოთხოვნა"
 #~ msgid "Slug"
 #~ msgstr "სლაგი"
 
-# Yes/No
-#~ msgid "Yes"
-#~ msgstr "დიახ"
-
 #~ msgid "No"
 #~ msgstr "არა"
 
@@ -4038,9 +4588,6 @@ msgstr "საერთო სივრცის მოთხოვნა"
 # Pagination
 #~ msgid "Show all"
 #~ msgstr "ყველას ჩვენება"
-
-#~ msgid "of"
-#~ msgstr "-დან"
 
 #~ msgid "results"
 #~ msgstr "შედეგი"
@@ -4066,9 +4613,6 @@ msgstr "საერთო სივრცის მოთხოვნა"
 
 #~ msgid "Error"
 #~ msgstr "შეცდომა"
-
-#~ msgid "Info"
-#~ msgstr "ინფორმაცია"
 
 #~ msgid "Save Language"
 #~ msgstr "ენის შენახვა"
@@ -4140,10 +4684,6 @@ msgstr "საერთო სივრცის მოთხოვნა"
 
 #~ msgid "false"
 #~ msgstr "არა"
-
-# Permissions
-#~ msgid "Permission"
-#~ msgstr "უფლება"
 
 #~ msgid "Permissions"
 #~ msgstr "უფლებები"

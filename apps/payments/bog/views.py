@@ -40,9 +40,9 @@ from apps.orders.models import Order, OrderItem, OrderItemModifier, OrderStatusH
 from apps.orders.services import transition_order
 from apps.reservations.models import Reservation
 from apps.reservations.serializers import ReservationDetailSerializer
-from apps.tables.models import Table
 from apps.tenants.models import Restaurant
 
+from ..initiate_helpers import create_pending_order
 from ..models import BogTransaction, Payment, PaymentMethod
 from .client import BogClientError, get_client
 from .serializers import (
@@ -260,120 +260,9 @@ class InitiatePaymentView(APIView):
 
     @transaction.atomic
     def _initiate_order(self, request: Request, payload: dict[str, Any], return_url: str) -> Response:
-        restaurant = _resolve_restaurant(payload["restaurant_slug"])
-
-        # Belt-and-braces for the master ordering switch — the customer site
-        # already hides all order UI when this flag is off, but block here
-        # too so raw API clients can't bypass it.
-        if not restaurant.accepts_remote_orders:
-            raise ValueError("Ordering is disabled at this restaurant.")
-        if payload.get("order_type", "dine_in") != "dine_in" and not restaurant.accepts_takeaway:
-            raise ValueError("This restaurant only takes dine-in orders.")
-
-        table = None
-        if payload.get("table_id"):
-            try:
-                table = Table.objects.get(id=payload["table_id"], restaurant=restaurant)
-            except Table.DoesNotExist as exc:
-                raise ValueError("Table not found") from exc
-
-        session_id = payload.get("table_session")
-        if session_id:
-            from apps.tables.models import TableSession
-
-            try:
-                session_obj = TableSession.objects.get(id=session_id, table__restaurant=restaurant)
-            except TableSession.DoesNotExist as exc:
-                raise ValueError("Table session not found.") from exc
-            if session_obj.status != "active":
-                raise ValueError("This table session has ended. Scan a new QR to start over.")
-
-        order = Order.objects.create(
-            restaurant=restaurant,
-            table=table,
-            table_session_id=session_id,
-            customer=request.user if request.user.is_authenticated else None,
-            order_type=payload.get("order_type", "dine_in"),
-            tip_amount=payload.get("tip_amount", 0),
-            status="pending_payment",
-            customer_name=payload.get("customer_name", ""),
-            customer_phone=payload.get("customer_phone", ""),
-            customer_email=payload.get("customer_email", ""),
-            customer_notes=payload.get("customer_notes", ""),
-            delivery_address=payload.get("delivery_address", ""),
-        )
-
-        for item_payload in payload["items"]:
-            menu_item: MenuItem = item_payload["menu_item_id"]
-            if menu_item.restaurant_id != restaurant.id:
-                raise ValueError("One or more items don't belong to this restaurant.")
-
-            order_item = OrderItem.objects.create(
-                order=order,
-                menu_item=menu_item,
-                item_name=menu_item.safe_translation_getter("name", default=f"Item {menu_item.pk}"),
-                item_description=menu_item.safe_translation_getter("description", default=""),
-                unit_price=menu_item.price,
-                quantity=item_payload.get("quantity", 1),
-                total_price=menu_item.price * item_payload.get("quantity", 1),
-                preparation_station=menu_item.preparation_station,
-                special_instructions=item_payload.get("special_instructions", ""),
-            )
-
-            for modifier in item_payload.get("modifier_ids", []):
-                if modifier.group.restaurant_id != restaurant.id:
-                    raise ValueError("One or more modifiers don't belong to this restaurant.")
-                OrderItemModifier.objects.create(
-                    order_item=order_item,
-                    modifier=modifier,
-                    modifier_name=modifier.safe_translation_getter("name", default=f"Modifier {modifier.pk}"),
-                    price_adjustment=modifier.price_adjustment,
-                )
-
-            order_item.recalculate_total()
-
-        order.calculate_totals()
-        from apps.promotions import hooks as promotion_hooks
-
-        promotion_hooks.on_order_items_changed(order, channel=order.source)
-        if data.get("promo_code"):
-            from apps.promotions import services as promotion_services
-
-            try:
-                promotion_services.redeem_code(order, data["promo_code"], by=request.user, channel=order.source)
-            except promotion_services.PromotionError as exc:
-                return Response(
-                    {"success": False, "error": {"code": exc.code, "message": exc.message}},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-        # Hold the ingredients now (InsufficientStock -> 409, order rolls back).
-        inventory_hooks.on_order_created(order)
-        notification_hooks.on_order_created(order)
-
-        # Apply a platform-loyalty tier discount when the customer is
-        # authenticated, carries a tier with non-zero discount, and the
-        # restaurant has opted into the program. The discount is written
-        # to `order.discount_amount`; calculate_totals reruns so
-        # `order.total` (and therefore the BOG charge below) reflects it.
-        try:
-            from apps.loyalty.services import current_user_tier
-            from apps.orders.services import apply_loyalty_tier_discount
-
-            if request.user.is_authenticated and restaurant.accepts_platform_loyalty:
-                apply_loyalty_tier_discount(order, current_user_tier(request.user))
-        except Exception:
-            logger.exception("Failed to apply platform loyalty discount")
-
-        OrderStatusHistory.objects.create(
-            order=order,
-            from_status="",
-            to_status="pending_payment",
-            notes="Order awaiting BOG payment confirmation.",
-        )
-
-        amount = order.total
-        if amount <= 0:
-            raise ValueError("Order total must be greater than zero.")
+        result = create_pending_order(request, payload)
+        order = result.order
+        amount = result.amount
 
         bog_payload = {
             "callback_url": _callback_url(request),
@@ -382,7 +271,7 @@ class InitiatePaymentView(APIView):
             "purchase_units": {
                 "currency": "GEL",
                 "total_amount": float(amount),
-                "basket": _build_basket(order),
+                "basket": result.basket,
             },
             "redirect_urls": _redirect_urls(return_url, order.order_number),
         }
@@ -451,7 +340,7 @@ class InitiatePaymentView(APIView):
         orders = list(session_obj.orders.prefetch_related("bog_transactions", "settle_transactions").all())
         from apps.payments import services as ledger
 
-        unpaid_orders = ledger.unpaid_orders(session)
+        unpaid_orders = ledger.unpaid_orders(session_obj)
         if not unpaid_orders:
             raise ValueError("All orders on this table are already paid.")
 

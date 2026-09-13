@@ -72,7 +72,7 @@ class _LinkView(APIView):
     permission_classes = PERMS
 
     def _link(self, request, code):
-        if code not in dict(RestaurantDeliveryPlatform.PLATFORM_CHOICES):
+        if code not in RestaurantDeliveryPlatform.MARKETPLACES:
             return None
         link, _ = RestaurantDeliveryPlatform.objects.get_or_create(
             restaurant=request.restaurant, platform=code, defaults={"is_enabled": False}
@@ -91,7 +91,7 @@ class PlatformListView(APIView):
     @require_restaurant
     def get(self, request):
         links = []
-        for code, _label in RestaurantDeliveryPlatform.PLATFORM_CHOICES:
+        for code in RestaurantDeliveryPlatform.MARKETPLACES:
             link, _ = RestaurantDeliveryPlatform.objects.get_or_create(
                 restaurant=request.restaurant, platform=code, defaults={"is_enabled": False}
             )

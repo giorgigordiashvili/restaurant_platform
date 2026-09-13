@@ -198,3 +198,42 @@ class TestReservationsReviews:
         r = queries.reviews_report(restaurant, period)
         assert r["count"] == 3 and r["average"] == Decimal("3.33")
         assert r["distribution"][5] == 1 and r["distribution"][1] == 1
+
+
+@pytest.mark.django_db
+def test_online_orders_section(restaurant, period, data, menu_item):
+    from decimal import Decimal as D
+
+    from apps.ordering.models import Delivery
+    from apps.orders.models import Order
+
+    o = Order.objects.filter(restaurant=restaurant, order_type="takeaway").first()
+    assert o is not None
+    o.source = "web"
+    o.delivery_fee = D("0")
+    o.packaging_fee = D("1.00")
+    o.save()
+    o.calculate_totals()
+    d = Order.objects.create(
+        restaurant=restaurant,
+        order_type="delivery",
+        status="completed",
+        source="web",
+        subtotal=D("30"),
+        total=D("36"),
+        delivery_fee=D("6"),
+        created_at=o.created_at,
+        completed_at=o.created_at,
+    )
+    Order.objects.filter(pk=d.pk).update(created_at=o.created_at)
+    Delivery.objects.create(
+        restaurant=restaurant,
+        order=d,
+        provider="wolt_drive",
+        status="delivered",
+        cost=D("4.50"),
+        delivered_at=o.created_at,
+    )
+    rows = {r["order_type"]: r for r in queries.online_orders(restaurant, period)}
+    assert rows["takeaway"]["packaging"] == D("1.00") and rows["takeaway"]["orders"] == 1
+    assert rows["delivery"]["delivery_fees"] == D("6.00") and rows["delivery"]["courier_cost"] == D("4.50")

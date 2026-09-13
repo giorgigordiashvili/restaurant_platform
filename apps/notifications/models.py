@@ -21,6 +21,12 @@ DEFAULT_TEMPLATES = {
     "reservation_reminder_en": "{restaurant}: reminder, your reservation is on {date} at {time}. See you soon!",
     "review_prompt_ka": "{restaurant}: გმადლობთ სტუმრობისთვის! გაგვიზიარეთ შთაბეჭდილება: {link}",
     "review_prompt_en": "{restaurant}: thank you for visiting! Tell us how it was: {link}",
+    "order_accepted_ka": "{restaurant}: თქვენი შეკვეთა {order} მიღებულია, მზად იქნება დაახლოებით {time}-ზე. {link}",
+    "order_accepted_en": "{restaurant}: your order {order} is accepted and will be ready around {time}. {link}",
+    "order_ready_ka": "{restaurant}: თქვენი შეკვეთა {order} მზადაა, გელოდებით!",
+    "order_ready_en": "{restaurant}: your order {order} is ready for pickup!",
+    "order_on_the_way_ka": "{restaurant}: შეკვეთა {order} გზაშია. თვალი ადევნეთ: {tracking_url}",
+    "order_on_the_way_en": "{restaurant}: order {order} is on its way. Track it: {tracking_url}",
 }
 
 
@@ -117,6 +123,12 @@ class RestaurantNotificationSettings(TimeStampedModel):
     reservation_reminder_en = models.TextField(default=DEFAULT_TEMPLATES["reservation_reminder_en"])
     review_prompt_ka = models.TextField(default=DEFAULT_TEMPLATES["review_prompt_ka"])
     review_prompt_en = models.TextField(default=DEFAULT_TEMPLATES["review_prompt_en"])
+    order_accepted_ka = models.TextField(default=DEFAULT_TEMPLATES["order_accepted_ka"])
+    order_accepted_en = models.TextField(default=DEFAULT_TEMPLATES["order_accepted_en"])
+    order_ready_ka = models.TextField(default=DEFAULT_TEMPLATES["order_ready_ka"])
+    order_ready_en = models.TextField(default=DEFAULT_TEMPLATES["order_ready_en"])
+    order_on_the_way_ka = models.TextField(default=DEFAULT_TEMPLATES["order_on_the_way_ka"])
+    order_on_the_way_en = models.TextField(default=DEFAULT_TEMPLATES["order_on_the_way_en"])
 
     class Meta:
         db_table = "notification_settings"
@@ -148,6 +160,9 @@ class OutboundMessage(TimeStampedModel):
         ("campaign", _("Marketing campaign")),
         ("automation", _("Marketing automation")),
         ("purchase_order", _("Purchase order")),
+        ("order_accepted", _("Order accepted")),
+        ("order_ready", _("Order ready")),
+        ("order_on_the_way", _("Order on its way")),
         ("test", _("Test message")),
         ("other", _("Other")),
     ]

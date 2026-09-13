@@ -192,6 +192,27 @@ MODULES: tuple[Module, ...] = (
         hooks=("apps.delivery.hooks.on_module_toggled",),
     ),
     Module(
+        "online_ordering",
+        _("Online ordering & delivery"),
+        _(
+            "Pickup and delivery from your own page: opening hours, time slots, delivery zones with fees, own couriers or a Wolt Drive / Glovo courier, custom domain."
+        ),
+        "storefront",
+        "online_ordering_enabled",
+        requires=("ordering",),
+        recommends=("notifications", "payments"),
+        app_labels=("ordering",),
+        model_names=(
+            ("ordering", "onlineorderingsettingspage"),
+            ("ordering", "deliveryzone"),
+            ("ordering", "courier"),
+            ("ordering", "delivery"),
+            ("ordering", "restaurantdomain"),
+        ),
+        resources=("orders", "settings"),
+        hooks=("apps.ordering.hooks.on_module_toggled",),
+    ),
+    Module(
         "fiscal",
         _("Fiscal & VAT"),
         _(

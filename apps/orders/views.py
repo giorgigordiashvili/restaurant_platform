@@ -878,40 +878,63 @@ class CustomerOrderCreateView(APIView):
                     status=status.HTTP_404_NOT_FOUND,
                 )
 
-        with transaction.atomic():
-            order = Order.objects.create(
-                restaurant=restaurant,
-                table=table,
-                table_session=session,
-                customer=request.user if request.user.is_authenticated else None,
-                order_type=data.get("order_type", "dine_in"),
-                customer_name=data.get("customer_name", ""),
-                customer_phone=data.get("customer_phone", ""),
-                customer_email=data.get("customer_email", ""),
-                customer_notes=data.get("customer_notes", ""),
-                delivery_address=data.get("delivery_address", ""),
-                tip_amount=data.get("tip_amount", 0),
-                source="qr" if session is not None else "web",
-            )
-            _add_items(order, data["items"])
-            order.calculate_totals()
-            promotion_hooks.on_order_items_changed(order, channel=order.source)
-            if data.get("promo_code"):
-                try:
-                    promotion_services.redeem_code(order, data["promo_code"], by=request.user, channel=order.source)
-                except promotion_services.PromotionError as exc:
-                    raise serializers_module.ValidationError({"promo_code": exc.message})
-            # Reserves ingredients; raises InsufficientStock (409) and rolls
-            # the order back when the warehouse cannot cover it.
-            inventory_hooks.on_order_created(order)
-            notification_hooks.on_order_created(order, by=request.user)
-            crm_hooks.on_order_created(order, consent=bool(data.get("marketing_opt_in")))
+        from apps.ordering import services as ordering_services
 
-            OrderStatusHistory.objects.create(
-                order=order,
-                from_status="",
-                to_status="pending",
-                notes="Order created by customer",
+        try:
+            with transaction.atomic():
+                order = Order.objects.create(
+                    restaurant=restaurant,
+                    table=table,
+                    table_session=session,
+                    customer=request.user if request.user.is_authenticated else None,
+                    order_type=data.get("order_type", "dine_in"),
+                    customer_name=data.get("customer_name", ""),
+                    customer_phone=data.get("customer_phone", ""),
+                    customer_email=data.get("customer_email", ""),
+                    customer_notes=data.get("customer_notes", ""),
+                    delivery_address=data.get("delivery_address", ""),
+                    tip_amount=data.get("tip_amount", 0),
+                    source="qr" if session is not None else "web",
+                )
+                _add_items(order, data["items"])
+                order.calculate_totals()
+                if order.order_type != "dine_in":
+                    fulfilment = ordering_services.validate_fulfilment(
+                        restaurant,
+                        order.order_type,
+                        subtotal=order.subtotal,
+                        scheduled_for=data.get("scheduled_for"),
+                        lat=data.get("lat"),
+                        lng=data.get("lng"),
+                        address=data.get("delivery_address", ""),
+                        address_json=data.get("address") or {},
+                        instructions=data.get("delivery_instructions", ""),
+                    )
+                    ordering_services.apply_fulfilment(order, fulfilment)
+                    order.calculate_totals()
+                promotion_hooks.on_order_items_changed(order, channel=order.source)
+                if data.get("promo_code"):
+                    try:
+                        promotion_services.redeem_code(order, data["promo_code"], by=request.user, channel=order.source)
+                    except promotion_services.PromotionError as exc:
+                        raise serializers_module.ValidationError({"promo_code": exc.message})
+                # Reserves ingredients; raises InsufficientStock (409) and rolls
+                # the order back when the warehouse cannot cover it.
+                inventory_hooks.on_order_created(order)
+                notification_hooks.on_order_created(order, by=request.user)
+                crm_hooks.on_order_created(order, consent=bool(data.get("marketing_opt_in")))
+
+                OrderStatusHistory.objects.create(
+                    order=order,
+                    from_status="",
+                    to_status="pending",
+                    notes="Order created by customer",
+                )
+
+        except ordering_services.FulfilmentError as exc:
+            return Response(
+                {"success": False, "error": {"code": exc.code, "message": exc.message, **exc.extra}},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         return Response(

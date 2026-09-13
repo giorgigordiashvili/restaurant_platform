@@ -1,0 +1,14 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% block content %}
+<div class="mb-4 rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4 text-sm" data-testid="domain-help">
+  <h3 class="font-semibold">{% translate "Use your own web address for the ordering page" %}</h3>
+  <ol class="list-decimal ml-5 mt-2 flex flex-col gap-1">
+    <li>{% translate "At your domain registrar add a DNS record for the address you want (e.g. order.myrestaurant.ge):" %}
+      <ul class="list-disc ml-5"><li>CNAME → <code class="select-all">{{ cname }}</code></li>{% if ip %}<li>{% translate "or an A record" %} → <code class="select-all">{{ ip }}</code></li>{% endif %}</ul></li>
+    <li>{% translate "Add the domain below and press Verify. DNS changes can take up to an hour to spread." %}</li>
+    <li>{% translate "The HTTPS certificate is issued automatically on the first visit. The page shows only your restaurant -- no marketplace." %}</li>
+  </ol>
+</div>
+{{ block.super }}
+{% endblock %}

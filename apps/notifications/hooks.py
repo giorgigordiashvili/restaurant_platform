@@ -178,6 +178,20 @@ def on_delivery_cancel_requested(order) -> None:
 
 
 @_safe
+def on_delivery_failed(delivery) -> None:
+    order = delivery.order
+    services.notify(
+        order.restaurant,
+        "delivery.failed",
+        title=f"Courier failed for #{order.order_number}",
+        body=(delivery.error or "The courier platform rejected the request.")[:140],
+        data={"kind": "order", "id": str(order.pk)},
+        url=_admin("orders_order_change", object_id=order.pk),
+        dedupe_key=f"delivery.failed:{delivery.pk}",
+    )
+
+
+@_safe
 def on_module_toggled(restaurant, enabled, *, by=None) -> None:
     if enabled:
         services.settings_for(restaurant)

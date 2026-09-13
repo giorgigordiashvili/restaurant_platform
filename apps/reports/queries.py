@@ -174,6 +174,40 @@ def sales_by_type(restaurant, period) -> list[dict]:
     ]
 
 
+def online_orders(restaurant, period) -> list[dict]:
+    """First-party pickup / delivery orders from the restaurant's own page: counts, fees collected, courier cost."""
+    from apps.ordering.models import Delivery
+
+    qs = sales_orders(restaurant, period).filter(source__in=("web", "qr"), order_type__in=("takeaway", "delivery"))
+    rows = qs.values("order_type").annotate(
+        orders=Count("id"),
+        gross=_sum("total"),
+        delivery_fees=_sum("delivery_fee"),
+        packaging=_sum("packaging_fee"),
+        scheduled=Count("id", filter=Q(scheduled_for__isnull=False)),
+    )
+    courier_cost = {
+        r["order__order_type"]: r["cost"]
+        for r in _in_period(Delivery.objects.filter(restaurant=restaurant, status="delivered"), period, "delivered_at")
+        .values("order__order_type")
+        .annotate(cost=_sum("cost"))
+    }
+    labels = {"takeaway": "Pickup", "delivery": "Delivery"}
+    return [
+        {
+            "order_type": r["order_type"],
+            "label": str(labels.get(r["order_type"], r["order_type"])),
+            "orders": r["orders"],
+            "scheduled": r["scheduled"],
+            "gross": money(r["gross"]),
+            "delivery_fees": money(r["delivery_fees"]),
+            "packaging": money(r["packaging"]),
+            "courier_cost": money(courier_cost.get(r["order_type"])),
+        }
+        for r in rows.order_by("order_type")
+    ]
+
+
 def sales_by_method(restaurant, period) -> list[dict]:
     """Payments taken in the period by method, plus an 'unrecorded' row so the table reconciles to sales."""
     rows = (

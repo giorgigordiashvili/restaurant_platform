@@ -1,0 +1,18 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-2 py-1 text-sm w-full" %}
+<form method="post" class="{{ base }} flex flex-col gap-4 md:w-1/2" data-testid="assign-courier">
+  {% csrf_token %}
+  <div><h2 class="font-semibold text-lg">{{ title }}</h2>
+    <p class="text-sm text-base-500">{{ delivery.order.customer_name }} · {{ delivery.order.delivery_address }}{% if delivery.order.scheduled_for %} · {{ delivery.order.scheduled_for|date:"d.m H:i" }}{% endif %}</p></div>
+  {% if couriers %}
+  <label class="text-sm">{% translate "Courier" %}<select name="courier_id" class="{{ input }}">{% for c in couriers %}<option value="{{ c.pk }}" {% if not c.is_available %}disabled{% endif %}>{{ c.name }}{% if c.vehicle %} · {{ c.vehicle }}{% endif %}{% if not c.is_available %} ({% translate "off shift" %}){% endif %}</option>{% endfor %}</select></label>
+  <div class="flex gap-2"><button type="submit" class="{{ btn }}">{% translate "Assign" %}</button><a href="{{ back_url }}" class="{{ btn2 }}">{% translate "Back" %}</a></div>
+  {% else %}
+  <p class="text-sm">{% translate "No couriers yet -- add riders under Couriers first." %}</p>
+  <a href="{{ back_url }}" class="{{ btn2 }}">{% translate "Back" %}</a>
+  {% endif %}
+</form>
+{% endwith %}
+{% endblock %}

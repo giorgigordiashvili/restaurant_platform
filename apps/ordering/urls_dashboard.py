@@ -1,0 +1,41 @@
+from django.urls import path
+
+from .views import (
+    AssignCourierView,
+    CancelCourierView,
+    CourierDetailView,
+    CourierListView,
+    CourierUpdateView,
+    DeliveryListView,
+    DomainDetailView,
+    DomainListView,
+    DomainVerifyView,
+    MyCourierView,
+    OrderDeliveryView,
+    PauseView,
+    RequestCourierView,
+    SettingsView,
+    SummaryView,
+    ZoneDetailView,
+    ZoneListView,
+)
+
+urlpatterns = [
+    path("summary/", SummaryView.as_view(), name="ordering-summary"),
+    path("settings/", SettingsView.as_view(), name="ordering-settings"),
+    path("pause/", PauseView.as_view(), name="ordering-pause"),
+    path("zones/", ZoneListView.as_view(), name="ordering-zones"),
+    path("zones/<uuid:zone_id>/", ZoneDetailView.as_view(), name="ordering-zone"),
+    path("couriers/", CourierListView.as_view(), name="ordering-couriers"),
+    path("couriers/me/", MyCourierView.as_view(), name="ordering-courier-me"),
+    path("couriers/<uuid:courier_id>/", CourierDetailView.as_view(), name="ordering-courier"),
+    path("deliveries/", DeliveryListView.as_view(), name="ordering-deliveries"),
+    path("orders/<uuid:order_id>/delivery/", OrderDeliveryView.as_view(), name="ordering-order-delivery"),
+    path("orders/<uuid:order_id>/delivery/request/", RequestCourierView.as_view(), name="ordering-request"),
+    path("orders/<uuid:order_id>/delivery/assign/", AssignCourierView.as_view(), name="ordering-assign"),
+    path("orders/<uuid:order_id>/delivery/update/", CourierUpdateView.as_view(), name="ordering-update"),
+    path("orders/<uuid:order_id>/delivery/cancel/", CancelCourierView.as_view(), name="ordering-cancel"),
+    path("domains/", DomainListView.as_view(), name="ordering-domains"),
+    path("domains/<uuid:domain_id>/", DomainDetailView.as_view(), name="ordering-domain"),
+    path("domains/<uuid:domain_id>/verify/", DomainVerifyView.as_view(), name="ordering-domain-verify"),
+]

@@ -11,7 +11,7 @@
 
   <form method="post" action="{{ save_url }}" class="{{ base }} grid gap-4 md:grid-cols-2">
     {% csrf_token %}
-    <div class="md:col-span-2"><h3 class="font-semibold">{% translate "Guest messages" %}</h3><p class="text-xs text-base-500">{% translate "Confirmations and reminders for reservations; review prompts and campaigns once CRM is on. Placeholders: {name} {restaurant} {date} {time} {guests} {code} {link}" %}</p></div>
+    <div class="md:col-span-2"><h3 class="font-semibold">{% translate "Guest messages" %}</h3><p class="text-xs text-base-500">{% translate "Confirmations and reminders for reservations; review prompts and campaigns once CRM is on. Placeholders: {name} {restaurant} {date} {time} {guests} {code} {link} {order} {tracking_url}" %}</p></div>
     <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="guest_sms" value="1" {% if cfg.guest_sms %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "Send SMS to guests" %}</label>
     <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="guest_email" value="1" {% if cfg.guest_email %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "Send email to guests" %}</label>
     <label class="text-sm md:col-span-2">{% translate "Sender name" %}<input type="text" name="sender_name" value="{{ cfg.sender_name }}" class="{{ input }}" maxlength="60" placeholder="{{ request.restaurant.name }}" {% if not can_manage %}disabled{% endif %}></label>

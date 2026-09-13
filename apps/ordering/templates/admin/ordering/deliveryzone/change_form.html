@@ -1,0 +1,67 @@
+{% extends "admin/change_form.html" %}
+{% load i18n static %}
+{% block extrahead %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'ordering/leaflet.css' %}">
+<link rel="stylesheet" href="{% static 'ordering/leaflet.draw.css' %}">
+<script src="{% static 'ordering/leaflet.js' %}"></script>
+<script src="{% static 'ordering/leaflet.draw.js' %}"></script>
+{% endblock %}
+{% block after_field_sets %}
+<div class="mb-6 rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" data-testid="zone-editor">
+  <p class="text-sm text-base-500 mb-2">{% translate "Radius zones follow the 'radius km' field. For a polygon, draw it with the tool on the map (click points, close by clicking the first one); drag the vertices to adjust." %}</p>
+  <div id="zone-map" style="height:420px" class="rounded-default"></div>
+  <script type="application/json" id="zone-data">{{ map_json|safe }}</script>
+  <script>
+  (function(){
+    var data = JSON.parse(document.getElementById('zone-data').textContent);
+    var editingId = "{{ editing_id }}";
+    var kindEl = document.getElementById('id_kind');
+    var radiusEl = document.getElementById('id_radius_km');
+    var polyEl = document.getElementById('id_polygon');
+    var map = L.map('zone-map').setView(data.center, 12);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; OpenStreetMap'}).addTo(map);
+    if (data.has_location) { L.marker(data.center).addTo(map).bindPopup(data.restaurant); }
+    var others = L.featureGroup().addTo(map);
+    data.zones.forEach(function(z){
+      if (z.id === editingId) return;
+      var layer = z.kind === 'polygon' && z.polygon.length >= 3
+        ? L.polygon(z.polygon, {color: '#9ca3af', weight: 1, fillOpacity: 0.05, interactive: false})
+        : L.circle(data.center, {radius: z.radius_km * 1000, color: '#9ca3af', weight: 1, fillOpacity: 0.03, interactive: false});
+      others.addLayer(layer);
+    });
+    var drawn = new L.FeatureGroup().addTo(map);
+    var circle = null;
+    function parsePoly(){ try { var v = JSON.parse(polyEl.value || '[]'); return Array.isArray(v) ? v : []; } catch(e){ return []; } }
+    var existing = parsePoly();
+    if (existing.length >= 3) { drawn.addLayer(L.polygon(existing, {color:'#2563eb'})); map.fitBounds(drawn.getBounds().pad(0.2)); }
+    function syncPolygon(){
+      var layers = drawn.getLayers();
+      if (!layers.length) { polyEl.value = '[]'; return; }
+      var latlngs = layers[0].getLatLngs()[0].map(function(p){ return [Number(p.lat.toFixed(6)), Number(p.lng.toFixed(6))]; });
+      polyEl.value = JSON.stringify(latlngs);
+    }
+    function refreshCircle(){
+      if (circle) { map.removeLayer(circle); circle = null; }
+      if (kindEl.value === 'radius') {
+        var km = parseFloat(radiusEl.value || '0');
+        if (km > 0) { circle = L.circle(data.center, {radius: km * 1000, color:'#2563eb', fillOpacity: 0.08}).addTo(map); map.fitBounds(circle.getBounds().pad(0.2)); }
+      }
+    }
+    var drawControl = new L.Control.Draw({
+      draw: {polygon: {allowIntersection: false, showArea: false}, polyline: false, rectangle: false, circle: false, marker: false, circlemarker: false},
+      edit: {featureGroup: drawn, remove: true}
+    });
+    function toggleDraw(){
+      if (kindEl.value === 'polygon') { map.addControl(drawControl); } else { try { map.removeControl(drawControl); } catch(e){} }
+      refreshCircle();
+    }
+    map.on(L.Draw.Event.CREATED, function(e){ drawn.clearLayers(); drawn.addLayer(e.layer); syncPolygon(); });
+    map.on(L.Draw.Event.EDITED, syncPolygon);
+    map.on(L.Draw.Event.DELETED, syncPolygon);
+    kindEl.addEventListener('change', toggleDraw);
+    radiusEl.addEventListener('input', refreshCircle);
+    toggleDraw();
+  })();
+  </script>
+</div>
+{% endblock %}

@@ -31,6 +31,14 @@ EVENTS = (
         "update",
         "Orders",
     ),
+    Event(
+        "delivery.failed",
+        "Courier request failed",
+        "Wolt Drive / Glovo could not take a delivery; dispatch it another way.",
+        "orders",
+        "update",
+        "Orders",
+    ),
     Event("reservation.new", "New reservation", "A guest booked a table.", "reservations", "update", "Reservations"),
     Event(
         "reservation.cancelled",

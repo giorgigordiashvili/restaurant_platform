@@ -284,6 +284,37 @@ def module_cards(request):
             "orders",
         )
 
+    if "online_ordering" in on and has_resource_permission(request, "orders", "read"):
+        from apps.ordering import services as ordering_services
+
+        osum = ordering_services.summary(restaurant)
+        card(
+            "online_ordering",
+            _("Online ordering"),
+            "storefront",
+            [
+                {"label": _("Pickup today"), "value": osum["pickup_today"], "url": _url("orders_order_changelist")},
+                {"label": _("Delivery today"), "value": osum["delivery_today"], "url": _url("orders_order_changelist")},
+                {
+                    "label": _("Couriers on the road"),
+                    "value": osum["in_flight"],
+                    "url": _url("ordering_delivery_changelist"),
+                },
+                {
+                    "label": _("Paused"),
+                    "value": _("yes") if osum["paused"] else _("no"),
+                    "url": _url("ordering_onlineorderingsettingspage_changelist"),
+                },
+            ],
+            [
+                _link(_("Settings & hours"), "ordering_onlineorderingsettingspage_changelist"),
+                _link(_("Delivery zones"), "ordering_deliveryzone_changelist"),
+                _link(_("Deliveries"), "ordering_delivery_changelist"),
+                _link(_("Custom domain"), "ordering_restaurantdomain_changelist"),
+            ],
+            "orders",
+        )
+
     if "crm" in on and has_resource_permission(request, "crm", "read"):
         from apps.crm import services as crm_services
 

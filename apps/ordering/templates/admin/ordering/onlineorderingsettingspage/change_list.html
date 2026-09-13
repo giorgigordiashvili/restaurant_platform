@@ -1,0 +1,89 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" btn="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium text-white bg-primary-600 hover:bg-primary-700" btn2="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700 hover:bg-base-100 dark:hover:bg-base-800" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-3 py-1.5 text-sm w-full" %}
+<div class="mb-6 flex flex-col gap-4" data-testid="ordering-settings">
+  <div class="grid gap-3 md:grid-cols-4">
+    <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Right now" %}</p><p class="text-sm mt-1 font-semibold">{% if open_now %}{% translate "Open" %}{% else %}{% translate "Closed" %}{% endif %}{% if paused %} · <span class="text-amber-600">{% translate "paused" %}</span>{% endif %}</p>{% if public.next_opening and not open_now %}<p class="text-xs text-base-500">{% translate "Opens" %} {{ public.next_opening|slice:"11:16" }}</p>{% endif %}</div>
+    <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Pickup" %}</p><p class="text-sm mt-1">{% if public.pickup %}✓ {% translate "on" %}{% else %}– {% translate "off" %}{% endif %}</p></div>
+    <div class="{{ base }} {% if cfg.delivery_enabled and not zones_count %}border-amber-300{% endif %}"><p class="text-xs uppercase text-base-500">{% translate "Delivery" %}</p><p class="text-sm mt-1">{% if public.delivery %}✓ {% translate "on" %}{% else %}– {% translate "off" %}{% endif %} · <a class="underline" href="{{ zones_url }}">{{ zones_count }} {% translate "zones" %}</a></p>{% if not has_location %}<p class="text-xs text-amber-600">{% translate "Set the restaurant's map location in Settings first." %}</p>{% endif %}</div>
+    <div class="{{ base }}"><p class="text-xs uppercase text-base-500">{% translate "Your own domain" %}</p><p class="text-sm mt-1"><a class="underline" href="{{ domains_url }}">{% translate "Custom domain" %}</a></p></div>
+  </div>
+
+  {% if can_manage %}
+  <div class="{{ base }} flex flex-wrap items-end gap-3" data-testid="pause">
+    {% if paused %}
+      <form method="post" action="{{ resume_url }}">{% csrf_token %}<p class="text-sm mb-2">{% translate "Online orders are paused until" %} {{ cfg.paused_until|date:"H:i" }}{% if cfg.pause_reason %} · {{ cfg.pause_reason }}{% endif %}</p><button type="submit" class="{{ btn }}">{% translate "Resume online orders" %}</button></form>
+    {% else %}
+      <form method="post" action="{{ pause_url }}" class="flex flex-wrap items-end gap-3">{% csrf_token %}
+        <label class="text-sm">{% translate "Pause for (minutes)" %}<input type="number" name="minutes" value="30" min="1" max="1440" class="{{ input }}"></label>
+        <label class="text-sm flex-1">{% translate "Reason shown to guests" %}<input type="text" name="reason" maxlength="120" class="{{ input }}" placeholder="{% translate 'Kitchen is very busy' %}"></label>
+        <button type="submit" class="{{ btn2 }}">{% translate "Pause online orders" %}</button>
+      </form>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <form method="post" action="{{ hours_url }}" class="{{ base }}" data-testid="hours-form">
+    {% csrf_token %}
+    <h3 class="font-semibold">{% translate "Opening hours" %}</h3>
+    <p class="text-xs text-base-500 mb-2">{% translate "In the restaurant's timezone. A closing time earlier than the opening time means you close after midnight. The second pair is optional (e.g. lunch and dinner service)." %}</p>
+    <div class="overflow-x-auto"><table class="w-full text-sm">
+      <thead><tr class="text-left text-xs uppercase text-base-500"><th class="py-1 pr-3">{% translate "Day" %}</th><th class="py-1 pr-3">{% translate "Closed" %}</th><th class="py-1 pr-3">{% translate "Open" %}</th><th class="py-1 pr-3">{% translate "Close" %}</th><th class="py-1 pr-3">{% translate "Open (2nd)" %}</th><th class="py-1 pr-3">{% translate "Close (2nd)" %}</th></tr></thead>
+      <tbody>
+      {% for d in days %}
+      <tr class="border-t border-base-100 dark:border-base-800">
+        <td class="py-1 pr-3 font-medium">{{ d.label }}</td>
+        <td class="py-1 pr-3"><input type="checkbox" name="closed_{{ d.idx }}" value="1" {% if d.row.is_closed %}checked{% endif %} {% if not can_manage %}disabled{% endif %}></td>
+        <td class="py-1 pr-3"><input type="time" name="open_{{ d.idx }}" value="{{ d.row.open_time|time:'H:i'|default:'09:00' }}" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></td>
+        <td class="py-1 pr-3"><input type="time" name="close_{{ d.idx }}" value="{{ d.row.close_time|time:'H:i'|default:'22:00' }}" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></td>
+        <td class="py-1 pr-3"><input type="time" name="open2_{{ d.idx }}" value="{{ d.row.open_time_2|time:'H:i'|default:'' }}" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></td>
+        <td class="py-1 pr-3"><input type="time" name="close2_{{ d.idx }}" value="{{ d.row.close_time_2|time:'H:i'|default:'' }}" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></td>
+      </tr>
+      {% endfor %}
+      </tbody></table></div>
+    {% if can_manage %}<div class="mt-3"><button type="submit" class="{{ btn }}">{% translate "Save hours" %}</button></div>{% endif %}
+  </form>
+
+  <form method="post" action="{{ save_url }}" class="{{ base }} grid gap-4 md:grid-cols-3" data-testid="settings-form">
+    {% csrf_token %}
+    <div class="md:col-span-3"><h3 class="font-semibold">{% translate "Pickup & delivery" %}</h3></div>
+    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="pickup_enabled" value="1" {% if cfg.pickup_enabled %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "Pickup orders" %}</label>
+    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="delivery_enabled" value="1" {% if cfg.delivery_enabled %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "Delivery orders" %}</label>
+    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="asap_enabled" value="1" {% if cfg.asap_enabled %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "Allow 'as soon as possible'" %}</label>
+    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="scheduling_enabled" value="1" {% if cfg.scheduling_enabled %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "Allow choosing a time slot" %}</label>
+    <label class="text-sm">{% translate "Preparation time (minutes)" %}<input type="number" name="lead_minutes" value="{{ cfg.lead_minutes }}" min="5" max="240" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm">{% translate "Extra minutes for delivery" %}<input type="number" name="delivery_extra_minutes" value="{{ cfg.delivery_extra_minutes }}" min="0" max="180" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm">{% translate "Slot interval (minutes)" %}<input type="number" name="slot_interval_minutes" value="{{ cfg.slot_interval_minutes }}" min="5" max="120" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm">{% translate "Days ahead guests may schedule" %}<input type="number" name="max_days_ahead" value="{{ cfg.max_days_ahead }}" min="0" max="30" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm">{% translate "Stop taking orders before closing (minutes)" %}<input type="number" name="cutoff_minutes_before_close" value="{{ cfg.cutoff_minutes_before_close }}" min="0" max="180" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm">{% translate "Minimum order · pickup" %}<input type="number" step="0.01" name="min_order_pickup" value="{{ cfg.min_order_pickup }}" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm">{% translate "Minimum order · delivery" %}<input type="number" step="0.01" name="min_order_delivery" value="{{ cfg.min_order_delivery }}" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm">{% translate "Free delivery from (0 = never)" %}<input type="number" step="0.01" name="free_delivery_over" value="{{ cfg.free_delivery_over }}" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <label class="text-sm">{% translate "Packaging fee per order" %}<input type="number" step="0.01" name="packaging_fee" value="{{ cfg.packaging_fee }}" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+    <div class="md:col-span-3 border-t border-base-200 dark:border-base-800 pt-3"><h3 class="font-semibold">{% translate "Couriers" %}</h3><p class="text-xs text-base-500">{% translate "Your own riders take deliveries from the POS, or hand the ride to Wolt Drive / Glovo: you keep the order and pay only the delivery." %}</p></div>
+    <label class="text-sm">{% translate "Default courier" %}<select name="courier_provider" class="{{ input }}" {% if not can_manage %}disabled{% endif %}>{% for value, label in provider_choices %}<option value="{{ value }}" {% if cfg.courier_provider == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+    <label class="text-sm">{% translate "Request the courier automatically" %}<select name="auto_request_courier_on" class="{{ input }}" {% if not can_manage %}disabled{% endif %}>{% for value, label in auto_choices %}<option value="{{ value }}" {% if cfg.auto_request_courier_on == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="pass_platform_fee_to_guest" value="1" {% if cfg.pass_platform_fee_to_guest %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "Charge guests the platform's quote instead of the zone fee" %}</label>
+    {% if can_manage %}<div class="md:col-span-3"><button type="submit" class="{{ btn }}">{% translate "Save settings" %}</button></div>{% endif %}
+  </form>
+
+  <div class="grid gap-4 md:grid-cols-2">
+  {% for c in couriers %}
+    <form method="post" action="{{ c.save_url }}" class="{{ base }} flex flex-col gap-3" data-testid="courier-{{ c.code }}">
+      {% csrf_token %}
+      <div class="flex items-center justify-between"><h3 class="font-semibold">{{ c.label }}</h3><span class="text-xs {% if c.configured and c.link.is_enabled %}text-green-600{% else %}text-base-500{% endif %}">{% if c.configured and c.link.is_enabled %}{% translate "connected" %}{% elif c.link.is_enabled %}{% translate "keys missing" %}{% else %}{% translate "off" %}{% endif %}</span></div>
+      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_enabled" value="1" {% if c.link.is_enabled %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "Enabled" %}</label>
+      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="sandbox" value="1" {% if c.link.sandbox %}checked{% endif %} {% if not can_manage %}disabled{% endif %}>{% translate "Sandbox / test environment" %}</label>
+      <label class="text-sm">{{ c.store_label }}<input type="text" name="store_external_id" value="{{ c.link.store_external_id }}" class="{{ input }}" {% if not can_manage %}disabled{% endif %}></label>
+      {% for f in c.fields %}
+      <label class="text-sm">{{ f.label }}{% if f.is_set %} <span class="text-xs text-green-600">({% translate "set" %})</span>{% endif %}<input type="{% if f.secret %}password{% else %}text{% endif %}" name="{{ f.name }}" class="{{ input }}" placeholder="{% if f.is_set %}••••••{% endif %}" autocomplete="off" {% if not can_manage %}disabled{% endif %}>{% if f.hint %}<span class="block text-xs text-base-500">{{ f.hint }}</span>{% endif %}</label>
+      {% endfor %}
+      <p class="text-xs text-base-500">{% translate "Webhook URL to register with them" %}: <code class="select-all">{{ c.webhook_url }}</code></p>
+      {% if can_manage %}<div class="flex items-center gap-3"><button type="submit" class="{{ btn2 }}">{% translate "Save" %}</button><label class="text-xs flex items-center gap-1"><input type="checkbox" name="clear_credentials" value="1">{% translate "Clear keys" %}</label></div>{% endif %}
+    </form>
+  {% endfor %}
+  </div>
+</div>
+{% endwith %}
+{% endblock %}

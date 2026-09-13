@@ -148,6 +148,7 @@ class OrderSerializer(serializers.ModelSerializer):
     balance = serializers.SerializerMethodField()
     is_paid = serializers.SerializerMethodField()
     payments = serializers.SerializerMethodField()
+    delivery = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -164,6 +165,14 @@ class OrderSerializer(serializers.ModelSerializer):
             "customer_email",
             "customer_notes",
             "delivery_address",
+            "address_json",
+            "delivery_lat",
+            "delivery_lng",
+            "delivery_instructions",
+            "delivery_fee",
+            "packaging_fee",
+            "scheduled_for",
+            "delivery",
             "subtotal",
             "tax_amount",
             "service_charge",
@@ -224,6 +233,27 @@ class OrderSerializer(serializers.ModelSerializer):
 
         return str(max((obj.total or Decimal("0")) - self._paid(obj), Decimal("0")))
 
+    def get_delivery(self, obj):
+        """Courier summary for delivery orders (None otherwise)."""
+        if obj.order_type != "delivery":
+            return None
+        try:
+            d = obj.delivery
+        except Exception:  # noqa: BLE001 - RelatedObjectDoesNotExist
+            return None
+        return {
+            "id": str(d.pk),
+            "provider": d.provider,
+            "status": d.status,
+            "courier_name": d.courier_name,
+            "courier_phone": d.courier_phone,
+            "tracking_url": d.tracking_url,
+            "pickup_eta": d.pickup_eta.isoformat() if d.pickup_eta else None,
+            "dropoff_eta": d.dropoff_eta.isoformat() if d.dropoff_eta else None,
+            "cost": str(d.cost),
+            "error": d.error[:200],
+        }
+
     def get_is_paid(self, obj):
         from decimal import Decimal
 
@@ -260,6 +290,13 @@ class OrderCreateSerializer(serializers.Serializer):
     customer_email = serializers.EmailField(required=False, allow_blank=True)
     customer_notes = serializers.CharField(required=False, allow_blank=True)
     delivery_address = serializers.CharField(required=False, allow_blank=True)
+    address = serializers.DictField(
+        required=False, default=dict, help_text="street / building / entrance / floor / apartment"
+    )
+    lat = serializers.FloatField(required=False, allow_null=True)
+    lng = serializers.FloatField(required=False, allow_null=True)
+    delivery_instructions = serializers.CharField(max_length=300, required=False, allow_blank=True, default="")
+    scheduled_for = serializers.DateTimeField(required=False, allow_null=True)
     tip_amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0, required=False, default=0)
     promo_code = serializers.CharField(max_length=30, required=False, allow_blank=True)
     marketing_opt_in = serializers.BooleanField(required=False, default=False)
@@ -417,7 +454,12 @@ class KitchenOrderSerializer(serializers.ModelSerializer):
         return (obj.platform_data or {}).get("order_code", "") if obj.source in ("glovo", "wolt", "bolt_food") else ""
 
     def get_pickup_eta(self, obj):
-        return (obj.platform_data or {}).get("pickup_eta") if obj.source in ("glovo", "wolt", "bolt_food") else None
+        if obj.source in ("glovo", "wolt", "bolt_food"):
+            return (obj.platform_data or {}).get("pickup_eta")
+        if obj.order_type in ("takeaway", "delivery"):
+            eta = obj.scheduled_for or obj.estimated_ready_at
+            return eta.isoformat() if eta else None
+        return None
 
     def get_items(self, obj):
         # Walk the prefetch instead of re-querying per ticket.

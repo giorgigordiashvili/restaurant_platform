@@ -120,9 +120,11 @@ urlpatterns = [
     path("api/v1/dashboard/purchasing/", include("apps.purchasing.urls_dashboard")),
     path("api/v1/dashboard/timekeeping/", include("apps.timekeeping.urls_dashboard")),
     path("api/v1/dashboard/crm/", include("apps.crm.urls_dashboard")),
+    path("api/v1/dashboard/ordering/", include("apps.ordering.urls_dashboard")),
     path("api/v1/crm/", include("apps.crm.urls")),
     path("api/v1/promotions/", include("apps.promotions.urls")),
     path("api/v1/delivery/", include("apps.delivery.urls")),
+    path("api/v1/ordering/", include("apps.ordering.urls")),
     path("api/v1/print-bridge/", include("apps.printing.urls_bridge")),
     # Admin API (platform-wide, staff only)
     path("api/v1/admin/audit/", include("apps.audit.urls")),

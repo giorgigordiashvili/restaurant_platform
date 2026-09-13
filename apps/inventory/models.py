@@ -530,7 +530,17 @@ class StockAdjustment(TimeStampedModel):
 
 
 class RestaurantDeliveryPlatform(TimeStampedModel):
-    PLATFORM_CHOICES = [("glovo", "Glovo"), ("wolt", "Wolt"), ("bolt_food", "Bolt Food")]
+    # Marketplace integrations (orders come *from* the platform) and courier
+    # hand-off services (we send our own delivery orders *to* the platform).
+    MARKETPLACES = ("glovo", "wolt", "bolt_food")
+    COURIERS = ("wolt_drive", "glovo_odr")
+    PLATFORM_CHOICES = [
+        ("glovo", "Glovo"),
+        ("wolt", "Wolt"),
+        ("bolt_food", "Bolt Food"),
+        ("wolt_drive", "Wolt Drive (courier)"),
+        ("glovo_odr", "Glovo On-Demand (courier)"),
+    ]
 
     restaurant = models.ForeignKey("tenants.Restaurant", on_delete=models.CASCADE, related_name="delivery_platforms")
     platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES)

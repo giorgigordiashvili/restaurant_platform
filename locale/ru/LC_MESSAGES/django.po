@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-12 23:03+0400\n"
+"POT-Creation-Date: 2026-09-13 11:04+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
@@ -148,6 +148,18 @@ msgstr "График опубликован"
 msgid "Price changed"
 msgstr "Цена изменена"
 
+#| msgid "Customer Request"
+msgid "Courier requested"
+msgstr "Курьер вызван"
+
+#| msgid "Tips (assigned)"
+msgid "Courier assigned"
+msgstr "Курьер назначен"
+
+#| msgid "Order Cancelled"
+msgid "Courier cancelled"
+msgstr "Курьер отменён"
+
 msgid "Audit Log"
 msgstr "Запись аудита"
 
@@ -287,25 +299,65 @@ msgstr "Платформы"
 msgid "Setup guide"
 msgstr "Руководство по настройке"
 
-#| msgid "Guest SMS"
+#| msgid "Online provider"
+msgid "Online ordering"
+msgstr "Онлайн-заказ"
+
+# Dates and times
+#| msgid "Due today"
+msgid "Pickup today"
+msgstr "Самовывоз сегодня"
+
+#| msgid "Deliver by"
+msgid "Delivery today"
+msgstr "Доставка сегодня"
+
+msgid "Couriers on the road"
+msgstr "Курьеры в пути"
+
+#| msgid "Paused until"
+msgid "Paused"
+msgstr "Пауза"
+
+# Yes/No
+#| msgid "Yes"
+msgid "yes"
+msgstr "да"
+
+#| msgid "Info"
+msgid "no"
+msgstr "нет"
+
+#| msgid "Settings"
+msgid "Settings & hours"
+msgstr "Настройки и часы"
+
+#| msgid "Deliveries"
+msgid "Delivery zones"
+msgstr "Зоны доставки"
+
+msgid "Deliveries"
+msgstr "Поставки"
+
+#| msgid "Custom Role"
+msgid "Custom domain"
+msgstr "Свой домен"
+
 msgid "Guests"
 msgstr "Гости"
 
-#| msgid "Used in"
 msgid "Opted in"
 msgstr "С согласием"
 
 msgid "New (30 days)"
 msgstr "Новые (30 дней)"
 
-#| msgid "Customer Request"
 msgid "Customers"
 msgstr "Клиенты"
 
 msgid "Campaigns"
 msgstr "Кампании"
 
-#| msgid "Account Information"
 msgid "Automations"
 msgstr "Автоматизации"
 
@@ -488,6 +540,19 @@ msgid ""
 msgstr ""
 "Заказы Glovo и Wolt сразу на кухню, отправка меню, синхронизация "
 "«распродано», пауза магазина; Bolt Food скоро."
+
+#| msgid "Days between ordering and delivery."
+msgid "Online ordering & delivery"
+msgstr "Онлайн-заказ и доставка"
+
+msgid ""
+"Pickup and delivery from your own page: opening hours, time slots, delivery "
+"zones with fees, own couriers or a Wolt Drive / Glovo courier, custom "
+"domain."
+msgstr ""
+"Самовывоз и доставка с вашей собственной страницы: часы работы, слоты "
+"времени, зоны доставки с тарифами, свои курьеры или курьер Wolt Drive / "
+"Glovo, свой домен."
 
 msgid ""
 "VAT profile, sequential receipts and refund receipts, RS.ge waybill export. "
@@ -920,7 +985,6 @@ msgstr "Свободные теги, напр. vip, corporate, vegan."
 msgid "First contact: qr, web, pos, reservation…"
 msgstr "Первый контакт: qr, web, pos, reservation…"
 
-#| msgid "Custom Role"
 msgid "Customer"
 msgstr "Клиент"
 
@@ -937,7 +1001,6 @@ msgid "Segment"
 msgstr "Сегмент"
 
 # Models - Payments
-#| msgid "Payments"
 msgid "Segments"
 msgstr "Сегменты"
 
@@ -948,7 +1011,6 @@ msgid "Scheduled"
 msgstr "По графику"
 
 # Status choices - Order
-#| msgid "Pending"
 msgid "Sending"
 msgstr "Отправляется"
 
@@ -958,7 +1020,6 @@ msgstr "Отправлено"
 msgid "Cancelled"
 msgstr "Отменён"
 
-#| msgid "Email"
 msgid "Email only."
 msgstr "Только для email."
 
@@ -967,7 +1028,6 @@ msgid "Placeholders: {name} {restaurant} {code} {link} {unsubscribe}"
 msgstr "Подстановки: {name} {restaurant} {code} {link} {unsubscribe}"
 
 #, python-brace-format
-#| msgid "A promo code needs a code."
 msgid "A promo code to include as {code}."
 msgstr "Промокод, подставляемый как {code}."
 
@@ -977,7 +1037,6 @@ msgstr "Кампания"
 msgid "Birthday greeting"
 msgstr "Поздравление с днём рождения"
 
-#| msgid "Review prompt"
 msgid "Review prompt after a visit"
 msgstr "Просьба об отзыве после визита"
 
@@ -990,7 +1049,6 @@ msgstr "Просьба об отзыве: часов после визита."
 msgid "Win-back: days without a visit."
 msgstr "Возврат: дней без визита."
 
-#| msgid "Account Information"
 msgid "Automation"
 msgstr "Автоматизация"
 
@@ -998,7 +1056,6 @@ msgid "Order id for review prompts, year for birthdays, month for win-backs."
 msgstr "ID заказа для отзывов, год для дней рождения, месяц для возвратов."
 
 # Form validation
-#| msgid "This code is already applied."
 msgid "This campaign was already sent."
 msgstr "Эта кампания уже отправлена."
 
@@ -1016,18 +1073,15 @@ msgstr "%(sent)d отправлено, %(failed)d ошибок, %(skipped)d пр
 msgid "guests in this segment can receive this"
 msgstr "гостей в этом сегменте могут получить это"
 
-#| msgid "Status"
 msgid "status"
 msgstr "статус"
 
 msgid "sent"
 msgstr "отправлено"
 
-#| msgid "Failed"
 msgid "failed"
 msgstr "ошибок"
 
-#| msgid "Skipped"
 msgid "skipped"
 msgstr "пропущено"
 
@@ -1040,7 +1094,6 @@ msgstr "Отправить тест"
 msgid "Send to everyone in the segment now?"
 msgstr "Отправить всем в сегменте сейчас?"
 
-#| msgid "Open now"
 msgid "Send now"
 msgstr "Отправить сейчас"
 
@@ -1051,7 +1104,6 @@ msgstr ""
 "Или задайте «Запланировано на» выше и сохраните, чтобы отправить позже. В "
 "каждом сообщении есть ссылка для отписки; пишем только гостям с согласием."
 
-#| msgid "Decline"
 msgid "Timeline"
 msgstr "История"
 
@@ -1070,7 +1122,6 @@ msgstr "Согласие"
 msgid "History"
 msgstr "История"
 
-#| msgid "Last login"
 msgid "Last visit"
 msgstr "Последний визит"
 
@@ -1093,7 +1144,6 @@ msgstr "Правила должны быть корректным JSON, напр
 msgid "Rules must be a JSON object."
 msgstr "Правила должны быть JSON-объектом."
 
-#| msgid "Guest SMS"
 msgid "Guests now"
 msgstr "Гостей сейчас"
 
@@ -1109,11 +1159,9 @@ msgid "'%(name)s' is being sent to %(n)d guests."
 msgstr "«%(name)s» отправляется %(n)d гостям."
 
 #, python-format
-#| msgid "%(number)s cancelled."
 msgid "'%(name)s' cancelled."
 msgstr "«%(name)s» отменена."
 
-#| msgid "This code is not valid."
 msgid "This link is not valid."
 msgstr "Эта ссылка недействительна."
 
@@ -2294,6 +2342,19 @@ msgstr "Маркетинговая автоматизация"
 msgid "Purchase order"
 msgstr "Заказ поставщику"
 
+#| msgid "Order Cancelled"
+msgid "Order accepted"
+msgstr "Заказ принят"
+
+#| msgid "Order Created"
+msgid "Order ready"
+msgstr "Заказ готов"
+
+# Models - Orders
+#| msgid "Orders today"
+msgid "Order on its way"
+msgstr "Заказ в пути"
+
 msgid "Test message"
 msgstr "Тестовое сообщение"
 
@@ -2336,14 +2397,18 @@ msgid "Guest messages"
 msgstr "Сообщения гостям"
 
 #, python-brace-format
+#| msgid ""
+#| "Confirmations and reminders for reservations; review prompts and campaigns "
+#| "once CRM is on. Placeholders: {name} {restaurant} {date} {time} {guests} "
+#| "{code} {link}"
 msgid ""
 "Confirmations and reminders for reservations; review prompts and campaigns "
 "once CRM is on. Placeholders: {name} {restaurant} {date} {time} {guests} "
-"{code} {link}"
+"{code} {link} {order} {tracking_url}"
 msgstr ""
 "Подтверждения и напоминания о бронях; просьбы об отзыве и кампании после "
 "включения CRM. Подстановки: {name} {restaurant} {date} {time} {guests} "
-"{code} {link}"
+"{code} {link} {order} {tracking_url}"
 
 msgid "Send SMS to guests"
 msgstr "Отправлять SMS гостям"
@@ -2406,6 +2471,485 @@ msgstr "Отправить повторно"
 msgid "Message to {p0} queued again."
 msgstr "Сообщение для {p0} снова в очереди."
 
+msgid "Own couriers"
+msgstr "Свои курьеры"
+
+msgid "Wolt Drive"
+msgstr "Wolt Drive"
+
+msgid "Glovo On-Demand"
+msgstr "Glovo On-Demand"
+
+msgid "When the order is accepted"
+msgstr "Когда заказ принят"
+
+msgid "When the order is ready"
+msgstr "Когда заказ готов"
+
+msgid "Manually from the POS"
+msgstr "Вручную из POS"
+
+msgid "Guests can order for pickup."
+msgstr "Гости могут заказать самовывоз."
+
+msgid "Guests can order delivery (needs zones)."
+msgstr "Гости могут заказать доставку (нужны зоны)."
+
+msgid "Allow 'as soon as possible' orders."
+msgstr "Разрешить заказы «как можно скорее»."
+
+msgid "Allow choosing a later time slot."
+msgstr "Разрешить выбор слота на позже."
+
+#| msgid "Preparation time (min)"
+msgid "Preparation time promised to guests."
+msgstr "Время приготовления, обещанное гостям."
+
+msgid "Added to the lead time for delivery orders."
+msgstr "Добавляется ко времени заказов с доставкой."
+
+#| msgid "Nothing in this order is eligible for the code."
+msgid "Stop taking online orders this long before closing."
+msgstr "Прекращать приём онлайн-заказов за столько минут до закрытия."
+
+msgid "0 = never free."
+msgstr "0 = никогда не бесплатно."
+
+#| msgid "Pause orders"
+msgid "Per order."
+msgstr "За заказ."
+
+msgid "Charge the guest what Wolt / Glovo quote instead of the zone fee."
+msgstr "Брать с гостя цену Wolt / Glovo вместо тарифа зоны."
+
+msgid "Online orders paused until then (kitchen slammed)."
+msgstr "Онлайн-заказы приостановлены до этого времени (кухня перегружена)."
+
+msgid "Online ordering settings"
+msgstr "Настройки онлайн-заказа"
+
+msgid "Radius"
+msgstr "Радиус"
+
+msgid "Polygon"
+msgstr "Полигон"
+
+msgid "[[lat, lng], ...] for polygon zones."
+msgstr "[[lat, lng], ...] для полигональных зон."
+
+msgid "Lower = checked first (inner ring first)."
+msgstr "Меньше = проверяется первой (сначала внутреннее кольцо)."
+
+#| msgid "Delivery"
+msgid "Delivery zone"
+msgstr "Зона доставки"
+
+msgid "bike / scooter / car"
+msgstr "велосипед / скутер / машина"
+
+msgid "On shift and taking deliveries."
+msgstr "На смене и берёт доставки."
+
+msgid "Courier"
+msgstr "Курьер"
+
+msgid "Couriers"
+msgstr "Курьеры"
+
+msgid "Not requested"
+msgstr "Не вызван"
+
+msgid "Quoted"
+msgstr "Есть расчёт"
+
+#| msgid "Request declined."
+msgid "Requested"
+msgstr "Вызван"
+
+#| msgid "Order cancelled by platform"
+msgid "Accepted by platform"
+msgstr "Принят платформой"
+
+#| msgid "Clocked out"
+msgid "Picked up"
+msgstr "Забран"
+
+#| msgid "Deliveries"
+msgid "Delivered"
+msgstr "Доставлен"
+
+msgid "What the courier platform charges us."
+msgstr "Сколько с нас берёт курьерская платформа."
+
+msgid "Delivery fee the guest paid."
+msgstr "Плата за доставку, которую заплатил гость."
+
+msgid "Delivery"
+msgstr "Доставка"
+
+msgid "e.g. order.myrestaurant.ge"
+msgstr "напр. order.myrestaurant.ge"
+
+#| msgid "Custom Role"
+msgid "Custom domains"
+msgstr "Свои домены"
+
+#| msgid "Rota shift"
+msgid "off shift"
+msgstr "не на смене"
+
+msgid "Assign"
+msgstr "Назначить"
+
+msgid "No couriers yet -- add riders under Couriers first."
+msgstr "Курьеров пока нет -- сначала добавьте их в разделе «Курьеры»."
+
+msgid ""
+"Radius zones follow the 'radius km' field. For a polygon, draw it with the "
+"tool on the map (click points, close by clicking the first one); drag the "
+"vertices to adjust."
+msgstr ""
+"Зона-радиус следует полю «радиус км». Полигон нарисуйте инструментом на "
+"карте (кликайте точки, замкните кликом по первой); вершины можно "
+"перетаскивать."
+
+msgid ""
+"Rings are measured from the restaurant pin; polygons are drawn by hand. "
+"Zones are checked in 'sort' order, so put the cheapest inner ring first."
+msgstr ""
+"Кольца отмеряются от метки ресторана; полигоны рисуются вручную. Зоны "
+"проверяются по полю «порядок», поэтому самое дешёвое внутреннее кольцо "
+"ставьте первым."
+
+msgid "Right now"
+msgstr "Сейчас"
+
+#| msgid "Opened"
+msgid "Open"
+msgstr "Открыто"
+
+msgid "Closed"
+msgstr "Закрыта"
+
+msgid "paused"
+msgstr "пауза"
+
+#| msgid "Opened"
+msgid "Opens"
+msgstr "Откроется"
+
+msgid "Pickup"
+msgstr "Самовывоз"
+
+#| msgid "of"
+msgid "off"
+msgstr "выкл"
+
+msgid "zones"
+msgstr "зон"
+
+msgid "Set the restaurant's map location in Settings first."
+msgstr "Сначала укажите расположение ресторана на карте в Настройках."
+
+msgid "Your own domain"
+msgstr "Ваш собственный домен"
+
+#| msgid "Only draft orders can be sent."
+msgid "Online orders are paused until"
+msgstr "Онлайн-заказы приостановлены до"
+
+#| msgid "Resume orders"
+msgid "Resume online orders"
+msgstr "Возобновить онлайн-заказы"
+
+#| msgid "{p0} paused for {p1} minutes."
+msgid "Pause for (minutes)"
+msgstr "Пауза на (минут)"
+
+#| msgid "Send SMS to guests"
+msgid "Reason shown to guests"
+msgstr "Причина, которую увидят гости"
+
+#| msgid "Kitchen display"
+msgid "Kitchen is very busy"
+msgstr "Кухня очень загружена"
+
+#| msgid "Pause orders"
+msgid "Pause online orders"
+msgstr "Приостановить онлайн-заказы"
+
+#| msgid "Open orders"
+msgid "Opening hours"
+msgstr "Часы работы"
+
+msgid ""
+"In the restaurant's timezone. A closing time earlier than the opening time "
+"means you close after midnight. The second pair is optional (e.g. lunch and "
+"dinner service)."
+msgstr ""
+"В часовом поясе ресторана. Время закрытия раньше открытия означает закрытие "
+"после полуночи. Вторая пара необязательна (например, обед и ужин)."
+
+msgid "Day"
+msgstr "День"
+
+#| msgid "Closed"
+msgid "Close"
+msgstr "Закрытие"
+
+#| msgid "Open now"
+msgid "Open (2nd)"
+msgstr "Открытие (2-е)"
+
+#| msgid "Closed"
+msgid "Close (2nd)"
+msgstr "Закрытие (2-е)"
+
+#| msgid "Save options"
+msgid "Save hours"
+msgstr "Сохранить часы"
+
+#| msgid "Book delivery"
+msgid "Pickup & delivery"
+msgstr "Самовывоз и доставка"
+
+#| msgid "Pause orders"
+msgid "Pickup orders"
+msgstr "Заказы на самовывоз"
+
+#| msgid "Delivery platforms"
+msgid "Delivery orders"
+msgstr "Заказы с доставкой"
+
+msgid "Allow 'as soon as possible'"
+msgstr "Разрешить «как можно скорее»"
+
+msgid "Allow choosing a time slot"
+msgstr "Разрешить выбор слота времени"
+
+#| msgid "Preparation time (min)"
+msgid "Preparation time (minutes)"
+msgstr "Время приготовления (минут)"
+
+msgid "Extra minutes for delivery"
+msgstr "Дополнительные минуты на доставку"
+
+#| msgid "Time slot intervals (e.g., every 30 minutes)"
+msgid "Slot interval (minutes)"
+msgstr "Интервал слотов (минут)"
+
+msgid "Days ahead guests may schedule"
+msgstr "На сколько дней вперёд гости могут планировать"
+
+msgid "Stop taking orders before closing (minutes)"
+msgstr "Прекращать приём заказов до закрытия (минут)"
+
+msgid "Minimum order · pickup"
+msgstr "Минимальный заказ · самовывоз"
+
+msgid "Minimum order · delivery"
+msgstr "Минимальный заказ · доставка"
+
+msgid "Free delivery from (0 = never)"
+msgstr "Бесплатная доставка от (0 = никогда)"
+
+msgid "Packaging fee per order"
+msgstr "Плата за упаковку за заказ"
+
+msgid ""
+"Your own riders take deliveries from the POS, or hand the ride to Wolt Drive"
+" / Glovo: you keep the order and pay only the delivery."
+msgstr ""
+"Ваши курьеры берут доставки из POS, или передайте поездку Wolt Drive / "
+"Glovo: заказ остаётся у вас, вы платите только за доставку."
+
+msgid "Default courier"
+msgstr "Курьер по умолчанию"
+
+msgid "Request the courier automatically"
+msgstr "Вызывать курьера автоматически"
+
+msgid "Charge guests the platform's quote instead of the zone fee"
+msgstr "Брать с гостей цену платформы вместо тарифа зоны"
+
+#| msgid "Settings"
+msgid "Save settings"
+msgstr "Сохранить настройки"
+
+msgid "connected"
+msgstr "подключено"
+
+# Permissions
+#| msgid "Permission"
+msgid "keys missing"
+msgstr "нет ключей"
+
+#| msgid "Sandbox (stage / development environment)"
+msgid "Sandbox / test environment"
+msgstr "Тестовая среда"
+
+msgid "Webhook URL to register with them"
+msgstr "Webhook URL для регистрации у них"
+
+msgid "Clear keys"
+msgstr "Очистить ключи"
+
+msgid "Use your own web address for the ordering page"
+msgstr "Используйте свой веб-адрес для страницы заказа"
+
+msgid ""
+"At your domain registrar add a DNS record for the address you want (e.g. "
+"order.myrestaurant.ge):"
+msgstr ""
+"У регистратора домена добавьте DNS-запись для нужного адреса (напр. "
+"order.myrestaurant.ge):"
+
+msgid "or an A record"
+msgstr "или A-запись"
+
+msgid ""
+"Add the domain below and press Verify. DNS changes can take up to an hour to"
+" spread."
+msgstr ""
+"Добавьте домен ниже и нажмите «Проверить». Изменения DNS могут "
+"распространяться до часа."
+
+msgid ""
+"The HTTPS certificate is issued automatically on the first visit. The page "
+"shows only your restaurant -- no marketplace."
+msgstr ""
+"HTTPS-сертификат выдаётся автоматически при первом визите. На странице "
+"только ваш ресторан -- без маркетплейса."
+
+msgid "Merchant API key"
+msgstr "API-ключ мерчанта"
+
+msgid "Issued by Wolt Drive for your venue."
+msgstr "Выдан Wolt Drive для вашей точки."
+
+msgid "Merchant id"
+msgstr "Id мерчанта"
+
+#| msgid "Webhook token set."
+msgid "Webhook secret"
+msgstr "Секрет webhook"
+
+msgid "Wolt signs webhooks with it (JWT)."
+msgstr "Wolt подписывает им webhook-и (JWT)."
+
+msgid "Client id"
+msgstr "Client id"
+
+#| msgid "not set"
+msgid "Client secret"
+msgstr "Client secret"
+
+msgid "Callback secret"
+msgstr "Секрет callback"
+
+msgid "Signs the status callbacks (X-Signature-SHA256)."
+msgstr "Подписывает callback-и статуса (X-Signature-SHA256)."
+
+#| msgid "Counted"
+msgid "Country code"
+msgstr "Код страны"
+
+msgid "ge"
+msgstr "ge"
+
+msgid "Venue id at Wolt Drive"
+msgstr "Venue id в Wolt Drive"
+
+msgid "Vendor id at Glovo"
+msgstr "Vendor id в Glovo"
+
+msgid "Delivery is on but you have no delivery zones yet -- add at least one."
+msgstr "Доставка включена, но зон доставки ещё нет -- добавьте хотя бы одну."
+
+msgid "The courier service is not connected yet; fill in its keys below."
+msgstr "Курьерский сервис ещё не подключён; заполните его ключи ниже."
+
+#| msgid "Notification settings saved."
+msgid "Online ordering settings saved."
+msgstr "Настройки онлайн-заказа сохранены."
+
+msgid "Opening hours saved."
+msgstr "Часы работы сохранены."
+
+#, python-brace-format
+#| msgid "{p0} paused for {p1} minutes."
+msgid "Online orders paused for {p0} minutes."
+msgstr "Онлайн-заказы приостановлены на {p0} минут."
+
+#| msgid "This order is closed."
+msgid "Online orders resumed."
+msgstr "Онлайн-заказы возобновлены."
+
+msgid "Saved, but some keys are still missing."
+msgstr "Сохранено, но некоторых ключей всё ещё нет."
+
+#| msgid "RS.ge service user"
+msgid "Courier service saved."
+msgstr "Курьерский сервис сохранён."
+
+msgid "Draw the zone on the map (at least three points)."
+msgstr "Нарисуйте зону на карте (минимум три точки)."
+
+msgid "Size"
+msgstr "Размер"
+
+#, python-brace-format
+#| msgid "{p0} options saved."
+msgid "{p0} points"
+msgstr "{p0} точек"
+
+msgid "On the road"
+msgstr "В пути"
+
+msgid "ETA"
+msgstr "Ожидаемое время"
+
+#| msgid "Request declined."
+msgid "Request courier"
+msgstr "Вызвать курьера"
+
+#, python-brace-format
+#| msgid "Request sent to {p0}."
+msgid "Courier requested for {p0}."
+msgstr "Курьер вызван для {p0}."
+
+#| msgid "Order Cancelled"
+msgid "Courier cancelled."
+msgstr "Курьер отменён."
+
+#, python-brace-format
+#| msgid "Test {p0} sent to {p1}."
+msgid "{p0} assigned to {p1}."
+msgstr "{p0} назначен курьеру {p1}."
+
+#, python-brace-format
+msgid "Assign courier · {p0}"
+msgstr "Назначить курьера · {p0}"
+
+msgid "Verified"
+msgstr "Проверен"
+
+#, python-brace-format
+msgid "{p0} points at us -- HTTPS will be issued on the first visit."
+msgstr "{p0} указывает на нас -- HTTPS будет выдан при первом визите."
+
+#, python-brace-format
+msgid "Saved. DNS is not pointing at us yet: {p0}"
+msgstr "Сохранено. DNS ещё не указывает на нас: {p0}"
+
+msgid "Verify"
+msgstr "Проверить"
+
+#, python-brace-format
+#| msgid "{p0} saved."
+msgid "{p0} is verified."
+msgstr "{p0} проверен."
+
 msgid "Manual"
 msgstr "Вручную"
 
@@ -2439,9 +2983,6 @@ msgstr "В зале"
 
 msgid "Takeaway"
 msgstr "Навынос"
-
-msgid "Delivery"
-msgstr "Доставка"
 
 msgid "Website"
 msgstr "Сайт"
@@ -2478,6 +3019,13 @@ msgstr "Сотрудник, обслуживший заказ (для распр
 
 msgid "Special requests or notes from customer"
 msgstr "Особые пожелания или заметки гостя"
+
+msgid "Structured address: street, building, entrance, floor, apartment."
+msgstr "Структурированный адрес: улица, дом, подъезд, этаж, квартира."
+
+msgid "Pickup / delivery time the guest chose; empty = ASAP."
+msgstr ""
+"Время самовывоза / доставки, выбранное гостем; пусто = как можно скорее."
 
 msgid "Staff member who handled this order"
 msgstr "Сотрудник, обработавший заказ"
@@ -3152,9 +3700,6 @@ msgstr "Продажи по дням"
 msgid "Orders by hour"
 msgstr "Заказы по часам"
 
-msgid "Day"
-msgstr "День"
-
 msgid "Gross"
 msgstr "Брутто"
 
@@ -3169,6 +3714,17 @@ msgstr "Сумма"
 
 msgid "Hour"
 msgstr "Час"
+
+#| msgid "Deliveries"
+msgid "Delivery fees"
+msgstr "Плата за доставку"
+
+msgid "Packaging"
+msgstr "Упаковка"
+
+#| msgid "Labour cost"
+msgid "Courier cost"
+msgstr "Стоимость курьера"
 
 msgid "Dishes sold"
 msgstr "Продано блюд"
@@ -3263,27 +3819,21 @@ msgstr "Маржа"
 msgid "Purchases by supplier"
 msgstr "Закупки по поставщикам"
 
-msgid "Deliveries"
-msgstr "Поставки"
-
 msgid "Total"
 msgstr "Итого"
 
 msgid "New guests"
 msgstr "Новые гости"
 
-#| msgid "Active sessions"
 msgid "Active guests"
 msgstr "Активные гости"
 
-#| msgid "Remaining"
 msgid "Returning"
 msgstr "Вернувшиеся"
 
 msgid "Top guests by spend"
 msgstr "Топ гостей по тратам"
 
-#| msgid "Guest SMS"
 msgid "Guest"
 msgstr "Гость"
 
@@ -3300,7 +3850,6 @@ msgid "Avg ticket"
 msgstr "Ср. чек"
 
 # Models - Audit
-#| msgid "Audit"
 msgid "Audience"
 msgstr "Аудитория"
 
@@ -3363,9 +3912,6 @@ msgstr "Открыл"
 
 msgid "Opened"
 msgstr "Открыта"
-
-msgid "Closed"
-msgstr "Закрыта"
 
 msgid "Counted"
 msgstr "Подсчитано"
@@ -3785,6 +4331,13 @@ msgstr "Минимальная сумма удалённого заказа"
 msgid "Average order preparation time in minutes"
 msgstr "Среднее время приготовления заказа в минутах"
 
+#| msgid "Earlier than the start = the shift ends after midnight."
+msgid "Earlier than the opening time = closes after midnight."
+msgstr "Раньше времени открытия = закрытие после полуночи."
+
+msgid "Optional second service (e.g. dinner)."
+msgstr "Необязательная вторая смена (напр. ужин)."
+
 msgid "Mark as closed for this day (overrides open/close times)"
 msgstr "Отметить как закрытый в этот день (перекрывает часы работы)"
 
@@ -4009,10 +4562,6 @@ msgstr "Запрос на общую площадку"
 #~ msgid "Slug"
 #~ msgstr "Слаг"
 
-# Yes/No
-#~ msgid "Yes"
-#~ msgstr "Да"
-
 #~ msgid "No"
 #~ msgstr "Нет"
 
@@ -4025,9 +4574,6 @@ msgstr "Запрос на общую площадку"
 # Pagination
 #~ msgid "Show all"
 #~ msgstr "Показать все"
-
-#~ msgid "of"
-#~ msgstr "из"
 
 #~ msgid "results"
 #~ msgstr "результатов"
@@ -4053,9 +4599,6 @@ msgstr "Запрос на общую площадку"
 
 #~ msgid "Error"
 #~ msgstr "Ошибка"
-
-#~ msgid "Info"
-#~ msgstr "Информация"
 
 #~ msgid "Save Language"
 #~ msgstr "Сохранить язык"
@@ -4127,10 +4670,6 @@ msgstr "Запрос на общую площадку"
 
 #~ msgid "false"
 #~ msgstr "нет"
-
-# Permissions
-#~ msgid "Permission"
-#~ msgstr "Разрешение"
 
 #~ msgid "Permissions"
 #~ msgstr "Разрешения"

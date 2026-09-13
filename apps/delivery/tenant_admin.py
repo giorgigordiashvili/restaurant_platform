@@ -73,7 +73,9 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
         base = getattr(settings, "PUBLIC_API_BASE_URL", "").rstrip("/")
         now = timezone.now()
         cards = []
-        for code, label in RestaurantDeliveryPlatform.PLATFORM_CHOICES:
+        labels = dict(RestaurantDeliveryPlatform.PLATFORM_CHOICES)
+        for code in RestaurantDeliveryPlatform.MARKETPLACES:
+            label = labels[code]
             link, _created = RestaurantDeliveryPlatform.objects.get_or_create(
                 restaurant=restaurant, platform=code, defaults={"is_enabled": False}
             )
@@ -154,7 +156,7 @@ class DeliveryPlatformsTenantAdmin(ModuleEnabledMixin, TenantModelAdmin):
     def _link(self, request, code, *, implemented=False):
         if (
             not getattr(request, "restaurant", None)
-            or code not in dict(RestaurantDeliveryPlatform.PLATFORM_CHOICES)
+            or code not in RestaurantDeliveryPlatform.MARKETPLACES
             or not has_resource_permission(request, "settings", "update")
         ):
             raise PermissionDenied

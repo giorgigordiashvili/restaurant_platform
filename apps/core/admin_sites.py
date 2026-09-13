@@ -61,6 +61,12 @@ class TenantAdminSite(UnfoldAdminSite):
         "shiftsreport": "analytics",
         "reservationsreport": "analytics",
         "reviewsreport": "analytics",
+        # Online ordering
+        "onlineorderingsettingspage": "settings",
+        "deliveryzone": "settings",
+        "courier": "staff",
+        "delivery": "orders",
+        "restaurantdomain": "settings",
         # Delivery
         "deliveryplatformspage": "settings",
         "deliveryplatformevent": "orders",

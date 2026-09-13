@@ -25,6 +25,9 @@ TEMPLATE_FIELDS = [
     ("reservation_confirmation", "Reservation confirmation"),
     ("reservation_reminder", "Reservation reminder"),
     ("review_prompt", "Review prompt (CRM)"),
+    ("order_accepted", "Online order accepted"),
+    ("order_ready", "Pickup order ready"),
+    ("order_on_the_way", "Delivery on its way"),
 ]
 
 

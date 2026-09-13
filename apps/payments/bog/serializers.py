@@ -99,6 +99,13 @@ class OrderPayloadSerializer(serializers.Serializer):
     customer_email = serializers.EmailField(required=False, allow_blank=True, default="")
     customer_notes = serializers.CharField(required=False, allow_blank=True, default="")
     delivery_address = serializers.CharField(required=False, allow_blank=True, default="")
+    address = serializers.DictField(required=False, default=dict)
+    lat = serializers.FloatField(required=False, allow_null=True)
+    lng = serializers.FloatField(required=False, allow_null=True)
+    delivery_instructions = serializers.CharField(max_length=300, required=False, allow_blank=True, default="")
+    scheduled_for = serializers.DateTimeField(required=False, allow_null=True)
+    promo_code = serializers.CharField(max_length=30, required=False, allow_blank=True, default="")
+    marketing_opt_in = serializers.BooleanField(required=False, default=False)
     tip_amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0, required=False, default=0)
     # Customer-supplied wallet credit to apply at checkout. Clamped server-side
     # to min(wallet_balance, subtotal − discount) — over-asking is silently

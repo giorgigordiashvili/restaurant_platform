@@ -1,0 +1,32 @@
+{% extends "admin/change_list.html" %}
+{% load i18n static %}
+{% block extrahead %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'ordering/leaflet.css' %}">
+<script src="{% static 'ordering/leaflet.js' %}"></script>
+{% endblock %}
+{% block content %}
+<div class="mb-4 rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" data-testid="zones-map">
+  <p class="text-sm text-base-500 mb-2">{% translate "Rings are measured from the restaurant pin; polygons are drawn by hand. Zones are checked in 'sort' order, so put the cheapest inner ring first." %}</p>
+  <div id="zones-map" style="height:360px" class="rounded-default"></div>
+  <script type="application/json" id="zones-data">{{ map_json|safe }}</script>
+  <script>
+  (function(){
+    var data = JSON.parse(document.getElementById('zones-data').textContent);
+    var map = L.map('zones-map').setView(data.center, 12);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; OpenStreetMap'}).addTo(map);
+    if (data.has_location) { L.marker(data.center).addTo(map).bindPopup(data.restaurant); }
+    var group = L.featureGroup().addTo(map);
+    data.zones.forEach(function(z){
+      var color = z.color || (z.is_active ? '#2563eb' : '#9ca3af');
+      var layer = z.kind === 'polygon' && z.polygon.length >= 3
+        ? L.polygon(z.polygon, {color: color, weight: 2, fillOpacity: 0.12})
+        : L.circle(data.center, {radius: z.radius_km * 1000, color: color, weight: 2, fillOpacity: 0.08});
+      layer.bindTooltip(z.name + ' · ' + z.fee);
+      group.addLayer(layer);
+    });
+    if (data.zones.length) { map.fitBounds(group.getBounds().pad(0.1)); }
+  })();
+  </script>
+</div>
+{{ block.super }}
+{% endblock %}

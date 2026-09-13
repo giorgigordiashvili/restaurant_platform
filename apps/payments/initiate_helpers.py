@@ -64,9 +64,9 @@ class SessionSettleInitiateResult:
 
 
 def build_order_basket(order: Order) -> list[dict[str, Any]]:
-    """Translate OrderItem rows into a provider-agnostic basket."""
+    """Translate OrderItem rows (+ delivery / packaging fee lines) into a provider-agnostic basket."""
     basket: list[dict[str, Any]] = []
-    for item in order.items.all():
+    for item in order.items.exclude(status="cancelled"):
         basket.append(
             {
                 "product_id": str(item.menu_item_id or item.id),
@@ -76,6 +76,18 @@ def build_order_basket(order: Order) -> list[dict[str, Any]]:
                 "total_price": float(item.total_price),
             }
         )
+    for key, label in (("delivery_fee", "Delivery"), ("packaging_fee", "Packaging")):
+        amount = Decimal(getattr(order, key, 0) or 0)
+        if amount > 0:
+            basket.append(
+                {
+                    "product_id": key,
+                    "description": label,
+                    "quantity": 1,
+                    "unit_price": float(amount),
+                    "total_price": float(amount),
+                }
+            )
     return basket
 
 
@@ -106,16 +118,22 @@ def create_pending_order(request, payload: dict[str, Any]) -> OrderInitiateResul
     """
     Build an Order(pending_payment) from an OrderPayloadSerializer-validated
     payload. Does NOT talk to any payment provider — returns everything the
-    caller needs to build the provider-specific request.
+    caller needs to build the provider-specific request. Used by BOG and Flitt.
 
     Raises ``ValueError`` on input violations (unknown restaurant, ordering
-    disabled, cross-restaurant menu items, etc.) — caller translates to 400.
+    disabled, closed / out of zone, cross-restaurant menu items, promo code
+    problems ...) — caller translates to 400.
     """
+    from apps.notifications import hooks as notification_hooks
+    from apps.ordering import services as ordering_services
+    from apps.promotions import hooks as promotion_hooks
+
     restaurant = _resolve_restaurant(payload["restaurant_slug"])
 
     if not restaurant.accepts_remote_orders:
         raise ValueError("Ordering is disabled at this restaurant.")
-    if payload.get("order_type", "dine_in") != "dine_in" and not restaurant.accepts_takeaway:
+    order_type = payload.get("order_type", "dine_in")
+    if order_type != "dine_in" and not restaurant.accepts_takeaway:
         raise ValueError("This restaurant only takes dine-in orders.")
 
     table = None
@@ -133,13 +151,15 @@ def create_pending_order(request, payload: dict[str, Any]) -> OrderInitiateResul
             raise ValueError("Table session not found.") from exc
         if session_obj.status != "active":
             raise ValueError("This table session has ended. Scan a new QR to start over.")
+        if table is None:
+            table = session_obj.table
 
     order = Order.objects.create(
         restaurant=restaurant,
         table=table,
         table_session_id=session_id,
         customer=request.user if request.user.is_authenticated else None,
-        order_type=payload.get("order_type", "dine_in"),
+        order_type=order_type,
         tip_amount=payload.get("tip_amount", 0),
         status="pending_payment",
         customer_name=payload.get("customer_name", ""),
@@ -147,6 +167,7 @@ def create_pending_order(request, payload: dict[str, Any]) -> OrderInitiateResul
         customer_email=payload.get("customer_email", ""),
         customer_notes=payload.get("customer_notes", ""),
         delivery_address=payload.get("delivery_address", ""),
+        source="qr" if session_id else "web",
     )
 
     for item_payload in payload["items"]:
@@ -167,6 +188,8 @@ def create_pending_order(request, payload: dict[str, Any]) -> OrderInitiateResul
         )
 
         for modifier in item_payload.get("modifier_ids", []):
+            if modifier.group.restaurant_id != restaurant.id:
+                raise ValueError("One or more modifiers don't belong to this restaurant.")
             OrderItemModifier.objects.create(
                 order_item=order_item,
                 modifier=modifier,
@@ -177,21 +200,50 @@ def create_pending_order(request, payload: dict[str, Any]) -> OrderInitiateResul
         order_item.recalculate_total()
 
     order.calculate_totals()
+
+    # Pickup / delivery rules: hours, slots, zones, fees, minimums (raises FulfilmentError -> ValueError).
+    if order_type != "dine_in":
+        fulfilment = ordering_services.validate_fulfilment(
+            restaurant,
+            order_type,
+            subtotal=order.subtotal,
+            scheduled_for=payload.get("scheduled_for"),
+            lat=payload.get("lat"),
+            lng=payload.get("lng"),
+            address=payload.get("delivery_address", ""),
+            address_json=payload.get("address") or {},
+            instructions=payload.get("delivery_instructions", ""),
+        )
+        ordering_services.apply_fulfilment(order, fulfilment)
+        order.calculate_totals()
+
+    # Happy hours / promo codes before stock, like the cash order path.
+    promotion_hooks.on_order_items_changed(order, channel=order.source)
+    if payload.get("promo_code"):
+        from apps.promotions import services as promotion_services
+
+        try:
+            promotion_services.redeem_code(order, payload["promo_code"], by=request.user, channel=order.source)
+        except promotion_services.PromotionError as exc:
+            raise ValueError(exc.message) from exc
+
     # Hold the ingredients now (InsufficientStock -> 409, order rolls back).
     inventory_hooks.on_order_created(order)
+    notification_hooks.on_order_created(order)
+    try:
+        from apps.crm import hooks as crm_hooks
 
-    # Apply a platform-loyalty tier discount when the customer is
-    # authenticated, carries a tier with non-zero discount, and the
-    # restaurant has opted into the program.
+        crm_hooks.on_order_created(order, consent=bool(payload.get("marketing_opt_in")))
+    except Exception:  # pragma: no cover - never blocks checkout
+        logger.exception("CRM hook failed")
+
+    # Platform-loyalty tier discount (authenticated customer, restaurant opted in).
     try:
         from apps.loyalty.services import current_user_tier
+        from apps.orders.services import apply_loyalty_tier_discount
 
         if request.user.is_authenticated and restaurant.accepts_platform_loyalty:
-            tier = current_user_tier(request.user)
-            if tier and tier.discount_percent > 0:
-                pct = Decimal(tier.discount_percent) / Decimal(100)
-                order.discount_amount = (order.subtotal * pct).quantize(Decimal("0.01"))
-                order.calculate_totals()
+            apply_loyalty_tier_discount(order, current_user_tier(request.user))
     except Exception:
         logger.exception("Failed to apply platform loyalty discount")
 

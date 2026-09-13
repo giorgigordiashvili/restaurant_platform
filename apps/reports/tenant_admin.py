@@ -185,6 +185,11 @@ class SalesReportAdmin(ReportAdminBase):
             "by_hour": self._cached(request, "sales_by_hour", period, lambda: queries.sales_by_hour(r, period)),
             "by_type": self._cached(request, "sales_by_type", period, lambda: queries.sales_by_type(r, period)),
             "by_method": self._cached(request, "sales_by_method", period, lambda: queries.sales_by_method(r, period)),
+            "online": (
+                self._cached(request, "sales_online", period, lambda: queries.online_orders(r, period))
+                if getattr(r, "online_ordering_enabled", False)
+                else []
+            ),
         }
 
     def page(self, request, period, data):
@@ -253,6 +258,26 @@ class SalesReportAdmin(ReportAdminBase):
                 money=("net",),
             ),
         ]
+        if data.get("online"):
+            tables.insert(
+                2,
+                Table(
+                    "online",
+                    "Online orders (own page)",
+                    [
+                        ("label", _("Type")),
+                        ("orders", _("Orders")),
+                        ("scheduled", _("Scheduled")),
+                        ("gross", _("Gross")),
+                        ("delivery_fees", _("Delivery fees")),
+                        ("packaging", _("Packaging")),
+                        ("courier_cost", _("Courier cost")),
+                    ],
+                    data["online"],
+                    money=("gross", "delivery_fees", "packaging", "courier_cost"),
+                    note="Courier cost = what Wolt Drive / Glovo charged for delivered orders.",
+                ),
+            )
         return {"kpis": kpis, "charts": chart_list, "tables": tables}
 
 

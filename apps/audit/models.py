@@ -55,6 +55,9 @@ class AuditLog(TimeStampedModel):
         ("clock_edit", _("Time entry edited")),
         ("rota_publish", _("Rota published")),
         ("price_change", _("Price changed")),
+        ("courier_requested", _("Courier requested")),
+        ("courier_assigned", _("Courier assigned")),
+        ("courier_cancelled", _("Courier cancelled")),
     ]
 
     # Actor
