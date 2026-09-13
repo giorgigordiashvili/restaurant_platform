@@ -58,6 +58,8 @@ class AuditLog(TimeStampedModel):
         ("courier_requested", _("Courier requested")),
         ("courier_assigned", _("Courier assigned")),
         ("courier_cancelled", _("Courier cancelled")),
+        ("terminal_sale", _("Card terminal sale")),
+        ("terminal_refund", _("Card terminal refund")),
     ]
 
     # Actor

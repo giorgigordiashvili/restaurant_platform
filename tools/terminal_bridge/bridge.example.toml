@@ -1,0 +1,5 @@
+[bridge]
+server_url = "https://admin.aimenu.ge"
+key = "PASTE-THE-BRIDGE-KEY-FROM-THE-DASHBOARD"
+protocol = "sim"   # bog | tbc | sim
+device = "tcp://192.168.1.60:8000"

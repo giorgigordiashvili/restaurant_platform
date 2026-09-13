@@ -50,6 +50,12 @@ class FakeSession:
         status, body = self.queue.pop(0) if self.queue else (202, {"transactionId": "tx-auto"})
         return FakeResponse(status, body)
 
+    def post(self, url, **kwargs):
+        return self.request("POST", url, **kwargs)
+
+    def get(self, url, **kwargs):
+        return self.request("GET", url, **kwargs)
+
 
 @pytest.fixture
 def glovo_fixture():

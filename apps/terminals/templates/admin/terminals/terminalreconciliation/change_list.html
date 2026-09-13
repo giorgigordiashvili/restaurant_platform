@@ -1,0 +1,26 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% block content %}
+{% with base="rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4" input="border border-base-200 dark:border-base-700 bg-white dark:bg-base-900 rounded-default px-3 py-1.5 text-sm" %}
+<div class="mb-6 flex flex-col gap-4" data-testid="terminal-reconciliation">
+  <form method="get" class="{{ base }} flex items-end gap-3">
+    <label class="text-sm">{% translate "Day" %}<br><input type="date" name="day" value="{{ day|date:'Y-m-d' }}" class="{{ input }}"></label>
+    <button type="submit" class="inline-flex items-center px-3 py-1.5 rounded-default text-sm font-medium border border-base-300 dark:border-base-700">{% translate "Show" %}</button>
+    <span class="text-sm text-base-500">{% translate "Approved at the terminal vs booked in the ledger. Differences mean a payment was approved but not booked (or booked by hand)." %}</span>
+  </form>
+  <div class="{{ base }} overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead><tr class="text-left text-xs uppercase text-base-500"><th class="py-1 pr-3">{% translate "Terminal" %}</th><th class="py-1 pr-3">{% translate "Approved" %}</th><th class="py-1 pr-3">{% translate "Amount" %}</th><th class="py-1 pr-3">{% translate "Tips" %}</th><th class="py-1 pr-3">{% translate "Booked" %}</th><th class="py-1 pr-3">{% translate "Booked amount" %}</th><th class="py-1 pr-3">{% translate "Difference" %}</th></tr></thead>
+      <tbody>
+      {% for r in report.rows %}
+      <tr class="border-t border-base-100 dark:border-base-800 {% if r.difference != 0 %}text-amber-700{% endif %}"><td class="py-1 pr-3 font-medium">{{ r.terminal }}</td><td class="py-1 pr-3">{{ r.approved_count }}</td><td class="py-1 pr-3">{{ r.approved_amount }}</td><td class="py-1 pr-3">{{ r.tips }}</td><td class="py-1 pr-3">{{ r.booked_count }}</td><td class="py-1 pr-3">{{ r.booked_amount }}</td><td class="py-1 pr-3">{{ r.difference }}</td></tr>
+      {% empty %}
+      <tr><td colspan="7" class="py-2 text-base-500">{% translate "No terminal payments on this day." %}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <p class="text-xs text-base-500 mt-3">{% translate "Declined / timed out" %}: {{ report.declined }} · {% translate "Card payments booked without a terminal" %}: {{ report.untracked_count }} ({{ report.untracked_amount }})</p>
+  </div>
+</div>
+{% endwith %}
+{% endblock %}

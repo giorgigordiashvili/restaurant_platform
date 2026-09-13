@@ -284,6 +284,39 @@ def module_cards(request):
             "orders",
         )
 
+    if "terminals" in on and has_resource_permission(request, "cash", "read"):
+        from apps.terminals import services as terminal_services
+
+        ts = terminal_services.summary(restaurant)
+        card(
+            "terminals",
+            _("Card terminals"),
+            "contactless",
+            [
+                {
+                    "label": _("Waiting now"),
+                    "value": ts["awaiting"],
+                    "url": _url("terminals_terminaltransaction_changelist") + "?status__exact=awaiting_confirm",
+                },
+                {
+                    "label": _("Declined today"),
+                    "value": ts["declined_today"],
+                    "url": _url("terminals_terminaltransaction_changelist") + "?status__exact=declined",
+                },
+                {
+                    "label": _("Bridges offline"),
+                    "value": ts["offline_bridges"],
+                    "url": _url("terminals_paymentterminal_changelist"),
+                },
+            ],
+            [
+                _link(_("Terminals"), "terminals_paymentterminal_changelist"),
+                _link(_("Transactions"), "terminals_terminaltransaction_changelist"),
+                _link(_("Reconciliation"), "terminals_terminalreconciliation_changelist"),
+            ],
+            "cash",
+        )
+
     if "online_ordering" in on and has_resource_permission(request, "orders", "read"):
         from apps.ordering import services as ordering_services
 

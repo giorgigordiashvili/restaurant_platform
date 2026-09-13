@@ -61,6 +61,10 @@ class TenantAdminSite(UnfoldAdminSite):
         "shiftsreport": "analytics",
         "reservationsreport": "analytics",
         "reviewsreport": "analytics",
+        # Terminals
+        "paymentterminal": "cash",
+        "terminaltransaction": "cash",
+        "terminalreconciliation": "cash",
         # Online ordering
         "onlineorderingsettingspage": "settings",
         "deliveryzone": "settings",

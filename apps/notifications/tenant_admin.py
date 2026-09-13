@@ -28,6 +28,7 @@ TEMPLATE_FIELDS = [
     ("order_accepted", "Online order accepted"),
     ("order_ready", "Pickup order ready"),
     ("order_on_the_way", "Delivery on its way"),
+    ("pay_link", "Payment link (card terminals)"),
 ]
 
 

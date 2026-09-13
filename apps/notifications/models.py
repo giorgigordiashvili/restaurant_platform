@@ -27,6 +27,8 @@ DEFAULT_TEMPLATES = {
     "order_ready_en": "{restaurant}: your order {order} is ready for pickup!",
     "order_on_the_way_ka": "{restaurant}: შეკვეთა {order} გზაშია. თვალი ადევნეთ: {tracking_url}",
     "order_on_the_way_en": "{restaurant}: order {order} is on its way. Track it: {tracking_url}",
+    "pay_link_ka": "{restaurant}: გადასახდელია {amount} ₾. გადაიხადეთ ბარათით აქ: {url}",
+    "pay_link_en": "{restaurant}: {amount} GEL to pay. Pay by card here: {url}",
 }
 
 
@@ -129,6 +131,8 @@ class RestaurantNotificationSettings(TimeStampedModel):
     order_ready_en = models.TextField(default=DEFAULT_TEMPLATES["order_ready_en"])
     order_on_the_way_ka = models.TextField(default=DEFAULT_TEMPLATES["order_on_the_way_ka"])
     order_on_the_way_en = models.TextField(default=DEFAULT_TEMPLATES["order_on_the_way_en"])
+    pay_link_ka = models.TextField(default=DEFAULT_TEMPLATES["pay_link_ka"])
+    pay_link_en = models.TextField(default=DEFAULT_TEMPLATES["pay_link_en"])
 
     class Meta:
         db_table = "notification_settings"
@@ -163,6 +167,7 @@ class OutboundMessage(TimeStampedModel):
         ("order_accepted", _("Order accepted")),
         ("order_ready", _("Order ready")),
         ("order_on_the_way", _("Order on its way")),
+        ("pay_link", _("Payment link")),
         ("test", _("Test message")),
         ("other", _("Other")),
     ]

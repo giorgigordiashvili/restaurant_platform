@@ -192,6 +192,24 @@ MODULES: tuple[Module, ...] = (
         hooks=("apps.delivery.hooks.on_module_toggled",),
     ),
     Module(
+        "terminals",
+        _("Card terminals & pay-by-link"),
+        _(
+            "Card payments the POS can follow: cashier confirmation on a physical terminal, Bank of Georgia / TBC pay-by-link with a QR at the table, ECR terminals through the terminal bridge."
+        ),
+        "contactless",
+        "terminals_enabled",
+        requires=("cash",),
+        app_labels=("terminals",),
+        model_names=(
+            ("terminals", "paymentterminal"),
+            ("terminals", "terminaltransaction"),
+            ("terminals", "terminalreconciliation"),
+        ),
+        resources=("cash",),
+        hooks=("apps.terminals.hooks.on_module_toggled",),
+    ),
+    Module(
         "online_ordering",
         _("Online ordering & delivery"),
         _(

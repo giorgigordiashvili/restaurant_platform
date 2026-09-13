@@ -178,6 +178,18 @@ def on_delivery_cancel_requested(order) -> None:
 
 
 @_safe
+def on_terminal_declined(tx) -> None:
+    services.notify(
+        tx.restaurant,
+        "terminal.declined",
+        title=f"Card payment {tx.get_status_display().lower()} · {tx.total} {tx.currency}",
+        body=(tx.error or tx.terminal.name)[:140],
+        data={"kind": "order", "id": str(tx.order_id)} if tx.order_id else None,
+        dedupe_key=f"terminal.declined:{tx.pk}",
+    )
+
+
+@_safe
 def on_delivery_failed(delivery) -> None:
     order = delivery.order
     services.notify(

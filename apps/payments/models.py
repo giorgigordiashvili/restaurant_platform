@@ -174,6 +174,7 @@ class Payment(TimeStampedModel):
         ("card_terminal", _("Card (terminal)")),
         ("online_bog", _("Online (Bank of Georgia)")),
         ("online_flitt", _("Online (Flitt)")),
+        ("online_tbc", _("Online (TBC)")),
         ("voucher", _("Voucher")),
         ("other", _("Other")),
         # Legacy values kept for rows written before the ledger existed.
@@ -181,7 +182,7 @@ class Payment(TimeStampedModel):
         ("mobile", _("Mobile Payment")),
     ]
     STAFF_METHODS = ("cash", "card_terminal", "voucher", "other")
-    ONLINE_METHODS = ("online_bog", "online_flitt", "card", "mobile")
+    ONLINE_METHODS = ("online_bog", "online_flitt", "online_tbc", "card", "mobile")
 
     # Relationships
     restaurant = models.ForeignKey(
@@ -262,6 +263,15 @@ class Payment(TimeStampedModel):
         max_length=20,
         choices=STATUS_CHOICES,
         default="pending",
+    )
+
+    terminal = models.ForeignKey(
+        "terminals.PaymentTerminal",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="payments",
+        help_text=_("The card terminal / pay-by-link that took this payment."),
     )
 
     # External payment info (for card payments via Stripe, etc.)

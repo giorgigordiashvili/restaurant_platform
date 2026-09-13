@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-13 11:04+0400\n"
+"POT-Creation-Date: 2026-09-13 11:37+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Georgian\n"
@@ -148,17 +148,22 @@ msgstr "განრიგი გამოქვეყნდა"
 msgid "Price changed"
 msgstr "ფასი შეიცვალა"
 
-#| msgid "Customer Request"
 msgid "Courier requested"
 msgstr "კურიერი გამოძახებულია"
 
-#| msgid "Tips (assigned)"
 msgid "Courier assigned"
 msgstr "კურიერი დანიშნულია"
 
-#| msgid "Order Cancelled"
 msgid "Courier cancelled"
 msgstr "კურიერი გაუქმებულია"
+
+#| msgid "Card (terminal)"
+msgid "Card terminal sale"
+msgstr "ბარათით გადახდა ტერმინალზე"
+
+#| msgid "Card (terminal)"
+msgid "Card terminal refund"
+msgstr "ბარათზე დაბრუნება ტერმინალზე"
 
 msgid "Audit Log"
 msgstr "აუდიტის ჩანაწერი"
@@ -299,47 +304,66 @@ msgstr "პლატფორმები"
 msgid "Setup guide"
 msgstr "დაყენების გზამკვლევი"
 
-#| msgid "Online provider"
+#| msgid "Card (terminal)"
+msgid "Card terminals"
+msgstr "ბარათის ტერმინალები"
+
+#| msgid "Right now"
+msgid "Waiting now"
+msgstr "ახლა ელოდება"
+
+#| msgid "Delivery today"
+msgid "Declined today"
+msgstr "დღეს უარყოფილი"
+
+#| msgid "Printers offline"
+msgid "Bridges offline"
+msgstr "ხიდები ოფლაინ"
+
+#| msgid "Permissions"
+msgid "Terminals"
+msgstr "ტერმინალები"
+
+#| msgid "BOG Transactions"
+msgid "Transactions"
+msgstr "ტრანზაქციები"
+
+#| msgid "Notification"
+msgid "Reconciliation"
+msgstr "შედარება"
+
 msgid "Online ordering"
 msgstr "ონლაინ შეკვეთა"
 
 # Dates and times
-#| msgid "Due today"
 msgid "Pickup today"
 msgstr "დღეს წასაღები"
 
-#| msgid "Deliver by"
 msgid "Delivery today"
 msgstr "დღეს მიტანა"
 
 msgid "Couriers on the road"
 msgstr "კურიერები გზაში"
 
-#| msgid "Paused until"
 msgid "Paused"
 msgstr "შეჩერებული"
 
 # Yes/No
-#| msgid "Yes"
 msgid "yes"
 msgstr "დიახ"
 
-#| msgid "Info"
 msgid "no"
 msgstr "არა"
 
-#| msgid "Settings"
 msgid "Settings & hours"
 msgstr "პარამეტრები და საათები"
 
-#| msgid "Deliveries"
 msgid "Delivery zones"
 msgstr "მიტანის ზონები"
 
 msgid "Deliveries"
 msgstr "მიწოდებები"
 
-#| msgid "Custom Role"
 msgid "Custom domain"
 msgstr "საკუთარი დომენი"
 
@@ -545,7 +569,19 @@ msgstr ""
 "Glovo-სა და Wolt-ის შეკვეთები პირდაპირ სამზარეულოში, მენიუს გაგზავნა, "
 "„ამოწურულის“ სინქრონიზაცია, მაღაზიის შეჩერება; Bolt Food მალე."
 
-#| msgid "Days between ordering and delivery."
+#| msgid "Card (terminal)"
+msgid "Card terminals & pay-by-link"
+msgstr "ბარათის ტერმინალები და ბმულით გადახდა"
+
+msgid ""
+"Card payments the POS can follow: cashier confirmation on a physical "
+"terminal, Bank of Georgia / TBC pay-by-link with a QR at the table, ECR "
+"terminals through the terminal bridge."
+msgstr ""
+"ბარათით გადახდები, რომლებსაც POS თვალს ადევნებს: მოლარის დადასტურება ფიზიკურ"
+" ტერმინალზე, საქართველოს ბანკის / TBC-ის ბმულით გადახდა QR-ით მაგიდასთან, "
+"ECR ტერმინალები ტერმინალის ხიდით."
+
 msgid "Online ordering & delivery"
 msgstr "ონლაინ შეკვეთა და მიტანა"
 
@@ -2351,18 +2387,19 @@ msgstr "მარკეტინგული ავტომატიზაც�
 msgid "Purchase order"
 msgstr "შესყიდვის შეკვეთა"
 
-#| msgid "Order Cancelled"
 msgid "Order accepted"
 msgstr "შეკვეთა მიღებულია"
 
-#| msgid "Order Created"
 msgid "Order ready"
 msgstr "შეკვეთა მზადაა"
 
 # Models - Orders
-#| msgid "Orders today"
 msgid "Order on its way"
 msgstr "შეკვეთა გზაშია"
+
+#| msgid "Payment Pending"
+msgid "Payment link"
+msgstr "გადახდის ბმული"
 
 msgid "Test message"
 msgstr "სატესტო შეტყობინება"
@@ -2406,10 +2443,6 @@ msgid "Guest messages"
 msgstr "შეტყობინებები სტუმრებს"
 
 #, python-brace-format
-#| msgid ""
-#| "Confirmations and reminders for reservations; review prompts and campaigns "
-#| "once CRM is on. Placeholders: {name} {restaurant} {date} {time} {guests} "
-#| "{code} {link}"
 msgid ""
 "Confirmations and reminders for reservations; review prompts and campaigns "
 "once CRM is on. Placeholders: {name} {restaurant} {date} {time} {guests} "
@@ -2510,21 +2543,18 @@ msgstr "დაუშვით შეკვეთები „რაც შეი
 msgid "Allow choosing a later time slot."
 msgstr "დაუშვით მოგვიანებით დროის არჩევა."
 
-#| msgid "Preparation time (min)"
 msgid "Preparation time promised to guests."
 msgstr "მომზადების დრო, რომელსაც სტუმრებს ჰპირდებით."
 
 msgid "Added to the lead time for delivery orders."
 msgstr "ემატება მიტანის შეკვეთების დროს."
 
-#| msgid "Nothing in this order is eligible for the code."
 msgid "Stop taking online orders this long before closing."
 msgstr "ონლაინ შეკვეთების მიღება წყდება დახურვამდე ამდენი ხნით ადრე."
 
 msgid "0 = never free."
 msgstr "0 = არასდროს უფასო."
 
-#| msgid "Pause orders"
 msgid "Per order."
 msgstr "თითო შეკვეთაზე."
 
@@ -2549,7 +2579,6 @@ msgstr "[[lat, lng], ...] პოლიგონური ზონების�
 msgid "Lower = checked first (inner ring first)."
 msgstr "ნაკლები = პირველად მოწმდება (ჯერ შიდა რგოლი)."
 
-#| msgid "Delivery"
 msgid "Delivery zone"
 msgstr "მიტანის ზონა"
 
@@ -2571,19 +2600,15 @@ msgstr "არ არის გამოძახებული"
 msgid "Quoted"
 msgstr "ფასი მიღებულია"
 
-#| msgid "Request declined."
 msgid "Requested"
 msgstr "გამოძახებული"
 
-#| msgid "Order cancelled by platform"
 msgid "Accepted by platform"
 msgstr "პლატფორმამ მიიღო"
 
-#| msgid "Clocked out"
 msgid "Picked up"
 msgstr "აღებულია"
 
-#| msgid "Deliveries"
 msgid "Delivered"
 msgstr "მიტანილია"
 
@@ -2599,11 +2624,9 @@ msgstr "მიწოდება"
 msgid "e.g. order.myrestaurant.ge"
 msgstr "მაგ. order.myrestaurant.ge"
 
-#| msgid "Custom Role"
 msgid "Custom domains"
 msgstr "საკუთარი დომენები"
 
-#| msgid "Rota shift"
 msgid "off shift"
 msgstr "ცვლის გარეშე"
 
@@ -2632,7 +2655,6 @@ msgstr ""
 msgid "Right now"
 msgstr "ახლა"
 
-#| msgid "Opened"
 msgid "Open"
 msgstr "ღიაა"
 
@@ -2642,14 +2664,12 @@ msgstr "დახურულია"
 msgid "paused"
 msgstr "შეჩერებული"
 
-#| msgid "Opened"
 msgid "Opens"
 msgstr "იხსნება"
 
 msgid "Pickup"
 msgstr "წასაღები"
 
-#| msgid "of"
 msgid "off"
 msgstr "გამორთული"
 
@@ -2662,31 +2682,24 @@ msgstr "ჯერ პარამეტრებში მიუთითეთ 
 msgid "Your own domain"
 msgstr "თქვენი საკუთარი დომენი"
 
-#| msgid "Only draft orders can be sent."
 msgid "Online orders are paused until"
 msgstr "ონლაინ შეკვეთები შეჩერებულია"
 
-#| msgid "Resume orders"
 msgid "Resume online orders"
 msgstr "ონლაინ შეკვეთების განახლება"
 
-#| msgid "{p0} paused for {p1} minutes."
 msgid "Pause for (minutes)"
 msgstr "შეჩერება (წუთი)"
 
-#| msgid "Send SMS to guests"
 msgid "Reason shown to guests"
 msgstr "სტუმრებისთვის ნაჩვენები მიზეზი"
 
-#| msgid "Kitchen display"
 msgid "Kitchen is very busy"
 msgstr "სამზარეულო ძალიან დატვირთულია"
 
-#| msgid "Pause orders"
 msgid "Pause online orders"
 msgstr "ონლაინ შეკვეთების შეჩერება"
 
-#| msgid "Open orders"
 msgid "Opening hours"
 msgstr "სამუშაო საათები"
 
@@ -2701,31 +2714,24 @@ msgstr ""
 msgid "Day"
 msgstr "დღე"
 
-#| msgid "Closed"
 msgid "Close"
 msgstr "დახურვა"
 
-#| msgid "Open now"
 msgid "Open (2nd)"
 msgstr "გახსნა (მე-2)"
 
-#| msgid "Closed"
 msgid "Close (2nd)"
 msgstr "დახურვა (მე-2)"
 
-#| msgid "Save options"
 msgid "Save hours"
 msgstr "საათების შენახვა"
 
-#| msgid "Book delivery"
 msgid "Pickup & delivery"
 msgstr "წასაღები და მიტანა"
 
-#| msgid "Pause orders"
 msgid "Pickup orders"
 msgstr "წასაღები შეკვეთები"
 
-#| msgid "Delivery platforms"
 msgid "Delivery orders"
 msgstr "მიტანის შეკვეთები"
 
@@ -2735,14 +2741,12 @@ msgstr "დაუშვით „რაც შეიძლება მალე
 msgid "Allow choosing a time slot"
 msgstr "დაუშვით დროის სლოტის არჩევა"
 
-#| msgid "Preparation time (min)"
 msgid "Preparation time (minutes)"
 msgstr "მომზადების დრო (წუთი)"
 
 msgid "Extra minutes for delivery"
 msgstr "დამატებითი წუთები მიტანისთვის"
 
-#| msgid "Time slot intervals (e.g., every 30 minutes)"
 msgid "Slot interval (minutes)"
 msgstr "სლოტის ინტერვალი (წუთი)"
 
@@ -2780,7 +2784,6 @@ msgstr "კურიერის ავტომატური გამოძ�
 msgid "Charge guests the platform's quote instead of the zone fee"
 msgstr "სტუმრებს დაარიცხეთ პლატფორმის ფასი ზონის საფასურის ნაცვლად"
 
-#| msgid "Settings"
 msgid "Save settings"
 msgstr "პარამეტრების შენახვა"
 
@@ -2788,11 +2791,9 @@ msgid "connected"
 msgstr "დაკავშირებულია"
 
 # Permissions
-#| msgid "Permission"
 msgid "keys missing"
 msgstr "გასაღებები აკლია"
 
-#| msgid "Sandbox (stage / development environment)"
 msgid "Sandbox / test environment"
 msgstr "სატესტო გარემო"
 
@@ -2838,7 +2839,6 @@ msgstr "გაცემულია Wolt Drive-ის მიერ თქვე�
 msgid "Merchant id"
 msgstr "მერჩანტის id"
 
-#| msgid "Webhook token set."
 msgid "Webhook secret"
 msgstr "Webhook საიდუმლო"
 
@@ -2848,7 +2848,6 @@ msgstr "Wolt ამით ხელს აწერს webhook-ებს (JWT)."
 msgid "Client id"
 msgstr "Client id"
 
-#| msgid "not set"
 msgid "Client secret"
 msgstr "Client secret"
 
@@ -2858,7 +2857,6 @@ msgstr "Callback საიდუმლო"
 msgid "Signs the status callbacks (X-Signature-SHA256)."
 msgstr "ხელს აწერს სტატუსის callback-ებს (X-Signature-SHA256)."
 
-#| msgid "Counted"
 msgid "Country code"
 msgstr "ქვეყნის კოდი"
 
@@ -2880,7 +2878,6 @@ msgid "The courier service is not connected yet; fill in its keys below."
 msgstr ""
 "საკურიერო სერვისი ჯერ არ არის დაკავშირებული; ქვემოთ შეავსეთ მისი გასაღებები."
 
-#| msgid "Notification settings saved."
 msgid "Online ordering settings saved."
 msgstr "ონლაინ შეკვეთის პარამეტრები შენახულია."
 
@@ -2888,18 +2885,15 @@ msgid "Opening hours saved."
 msgstr "სამუშაო საათები შენახულია."
 
 #, python-brace-format
-#| msgid "{p0} paused for {p1} minutes."
 msgid "Online orders paused for {p0} minutes."
 msgstr "ონლაინ შეკვეთები შეჩერებულია {p0} წუთით."
 
-#| msgid "This order is closed."
 msgid "Online orders resumed."
 msgstr "ონლაინ შეკვეთები განახლებულია."
 
 msgid "Saved, but some keys are still missing."
 msgstr "შენახულია, მაგრამ ზოგი გასაღები ჯერ აკლია."
 
-#| msgid "RS.ge service user"
 msgid "Courier service saved."
 msgstr "საკურიერო სერვისი შენახულია."
 
@@ -2910,7 +2904,6 @@ msgid "Size"
 msgstr "ზომა"
 
 #, python-brace-format
-#| msgid "{p0} options saved."
 msgid "{p0} points"
 msgstr "{p0} წერტილი"
 
@@ -2920,21 +2913,17 @@ msgstr "გზაში"
 msgid "ETA"
 msgstr "სავარაუდო დრო"
 
-#| msgid "Request declined."
 msgid "Request courier"
 msgstr "კურიერის გამოძახება"
 
 #, python-brace-format
-#| msgid "Request sent to {p0}."
 msgid "Courier requested for {p0}."
 msgstr "კურიერი გამოძახებულია {p0}-სთვის."
 
-#| msgid "Order Cancelled"
 msgid "Courier cancelled."
 msgstr "კურიერი გაუქმებულია."
 
 #, python-brace-format
-#| msgid "Test {p0} sent to {p1}."
 msgid "{p0} assigned to {p1}."
 msgstr "{p0} დაენიშნა {p1}-ს."
 
@@ -2957,7 +2946,6 @@ msgid "Verify"
 msgstr "შემოწმება"
 
 #, python-brace-format
-#| msgid "{p0} saved."
 msgid "{p0} is verified."
 msgstr "{p0} შემოწმებულია."
 
@@ -3098,6 +3086,10 @@ msgstr "ონლაინ (საქართველოს ბანკი)"
 msgid "Online (Flitt)"
 msgstr "ონლაინ (Flitt)"
 
+#| msgid "Online (Flitt)"
+msgid "Online (TBC)"
+msgstr "ონლაინ (TBC)"
+
 msgid "Voucher"
 msgstr "ვაუჩერი"
 
@@ -3119,6 +3111,9 @@ msgstr "თანამშრომელი, რომელმაც გად
 
 msgid "Amount + tip"
 msgstr "თანხა + ჩაი"
+
+msgid "The card terminal / pay-by-link that took this payment."
+msgstr "ტერმინალი / გადახდის ბმული, რომლითაც ეს გადახდა შესრულდა."
 
 msgid "Payment ID from external provider (Stripe, etc.)"
 msgstr "გადახდის ID გარე პროვაიდერისგან (Stripe და ა.შ.)"
@@ -3726,14 +3721,12 @@ msgstr "თანხა"
 msgid "Hour"
 msgstr "საათი"
 
-#| msgid "Deliveries"
 msgid "Delivery fees"
 msgstr "მიტანის საფასურები"
 
 msgid "Packaging"
 msgstr "შეფუთვა"
 
-#| msgid "Labour cost"
 msgid "Courier cost"
 msgstr "კურიერის ღირებულება"
 
@@ -4345,7 +4338,6 @@ msgstr "მინიმალური თანხა დისტანცი�
 msgid "Average order preparation time in minutes"
 msgstr "შეკვეთის მომზადების საშუალო დრო წუთებში"
 
-#| msgid "Earlier than the start = the shift ends after midnight."
 msgid "Earlier than the opening time = closes after midnight."
 msgstr "გახსნის დროზე ადრე = შუაღამის შემდეგ იხურება."
 
@@ -4354,6 +4346,283 @@ msgstr "არასავალდებულო მეორე სერვ�
 
 msgid "Mark as closed for this day (overrides open/close times)"
 msgstr "ამ დღეს დახურულად მონიშვნა (გადაფარავს გახსნა/დახურვის დროს)"
+
+msgid "Physical terminal (cashier confirms)"
+msgstr "ფიზიკური ტერმინალი (მოლარე ადასტურებს)"
+
+msgid "Bank of Georgia pay-by-link / QR"
+msgstr "საქართველოს ბანკი — ბმული / QR"
+
+msgid "TBC pay-by-link / QR (TPAY)"
+msgstr "TBC — ბმული / QR (TPAY)"
+
+msgid "ECR terminal via the terminal bridge"
+msgstr "ECR ტერმინალი ტერმინალის ხიდით"
+
+msgid "—"
+msgstr "—"
+
+#| msgid "Online (Bank of Georgia)"
+msgid "Bank of Georgia ECR"
+msgstr "საქართველოს ბანკის ECR"
+
+msgid "TBC ECR"
+msgstr "TBC ECR"
+
+msgid "E.g. 'Till 1', 'Bar terminal', 'QR at the table'."
+msgstr "მაგ. „სალარო 1“, „ბარის ტერმინალი“, „QR მაგიდასთან“."
+
+msgid "The bank's terminal id (TID)."
+msgstr "ბანკის ტერმინალის id (TID)."
+
+msgid "Bridge device: {\"device\": \"tcp://192.168.1.60:8000\"} or serial://."
+msgstr "ხიდის მოწყობილობა: {\"device\": \"tcp://192.168.1.60:8000\"} ან serial://."
+
+#| msgid "Pre-selected by default"
+msgid "Preselected in the POS."
+msgstr "POS-ში წინასწარ არჩეული."
+
+msgid "Print a receipt when the payment is approved."
+msgstr "ჩეკის ბეჭდვა გადახდის დადასტურებისას."
+
+msgid "Give up waiting after this long."
+msgstr "ამდენი ხნის შემდეგ ლოდინი წყდება."
+
+#| msgid "Card (terminal)"
+msgid "Card terminal"
+msgstr "ბარათის ტერმინალი"
+
+#| msgid "Sales"
+msgid "Sale"
+msgstr "გაყიდვა"
+
+#| msgid "Settings"
+msgid "Starting"
+msgstr "იწყება"
+
+#| msgid "Sent to supplier"
+msgid "Sent to terminal"
+msgstr "გაგზავნილია ტერმინალზე"
+
+#| msgid "Awaiting confirmation"
+msgid "Waiting for confirmation"
+msgstr "დადასტურების მოლოდინში"
+
+msgid "Approved"
+msgstr "დადასტურებული"
+
+#| msgid "Decline"
+msgid "Declined"
+msgstr "უარყოფილი"
+
+#| msgid "Time entry"
+msgid "Timed out"
+msgstr "დრო ამოიწურა"
+
+msgid "Phone / email the link went to."
+msgstr "ტელეფონი / ელფოსტა, სადაც ბმული გაიგზავნა."
+
+#| msgid "Remove this translation"
+msgid "Terminal transaction"
+msgstr "ტერმინალის ტრანზაქცია"
+
+#| msgid "Flitt Transactions"
+msgid "Terminal transactions"
+msgstr "ტერმინალის ტრანზაქციები"
+
+msgid "Terminal reconciliation"
+msgstr "ტერმინალის შედარება"
+
+#| msgid "Webhook token (shown once)"
+msgid "Bridge key (shown once)"
+msgstr "ხიდის გასაღები (ჩანს ერთხელ)"
+
+msgid ""
+"Put it into bridge.toml on the till PC: server_url, key, protocol, device."
+msgstr ""
+"ჩაწერეთ bridge.toml-ში სალაროს კომპიუტერზე: server_url, key, protocol, "
+"device."
+
+msgid "Keys already saved"
+msgstr "უკვე შენახული გასაღებები"
+
+msgid "leave the fields empty to keep them."
+msgstr "დატოვეთ ველები ცარიელი, რომ შეინარჩუნოთ."
+
+msgid "How card payments reach the ledger"
+msgstr "როგორ აღირიცხება ბარათით გადახდები"
+
+#| msgid "Card (terminal)"
+msgid "Physical terminal"
+msgstr "ფიზიკური ტერმინალი"
+
+msgid ""
+"the cashier keys the amount into the bank's terminal and taps 'Approved' in "
+"the POS; the payment is booked with the card's last digits."
+msgstr ""
+"მოლარე თანხას ბანკის ტერმინალზე კრეფს და POS-ში „დადასტურებულს“ აჭერს; "
+"გადახდა ბარათის ბოლო ციფრებით აღირიცხება."
+
+msgid "Pay-by-link / QR"
+msgstr "ბმული / QR"
+
+msgid ""
+"the POS shows a QR (or texts a link); the guest pays on their phone through "
+"Bank of Georgia or TBC and the POS confirms automatically."
+msgstr ""
+"POS აჩვენებს QR-ს (ან ბმულს აგზავნის); სტუმარი ტელეფონით იხდის საქართველოს "
+"ბანკის ან TBC-ის მეშვეობით და POS ავტომატურად ადასტურებს."
+
+msgid "Register these callback URLs with the bank:"
+msgstr "დაარეგისტრირეთ ეს callback URL-ები ბანკში:"
+
+#| msgid "Bridge"
+msgid "ECR bridge"
+msgstr "ECR ხიდი"
+
+msgid ""
+"a small program on the till PC drives the terminal directly (amount appears "
+"on it, result comes back). Needs the bank's ECR kit; the bridge key is shown"
+" once when you add the terminal."
+msgstr ""
+"პატარა პროგრამა სალაროს კომპიუტერზე ტერმინალს პირდაპირ მართავს (თანხა მასზე "
+"ჩნდება, შედეგი ბრუნდება). საჭიროა ბანკის ECR კომპლექტი; ხიდის გასაღები "
+"ტერმინალის დამატებისას ერთხელ ჩანს."
+
+msgid ""
+"Approved at the terminal vs booked in the ledger. Differences mean a payment"
+" was approved but not booked (or booked by hand)."
+msgstr ""
+"ტერმინალზე დადასტურებული და აღრიცხული. სხვაობა ნიშნავს, რომ გადახდა "
+"დადასტურდა, მაგრამ არ აღირიცხა (ან ხელით აღირიცხა)."
+
+#| msgid "Card (terminal)"
+msgid "Terminal"
+msgstr "ტერმინალი"
+
+msgid "Booked"
+msgstr "აღრიცხული"
+
+#| msgid "Clocked out"
+msgid "Booked amount"
+msgstr "აღრიცხული თანხა"
+
+msgid "No terminal payments on this day."
+msgstr "ამ დღეს ტერმინალით გადახდები არ არის."
+
+msgid "Declined / timed out"
+msgstr "უარყოფილი / დრო ამოიწურა"
+
+msgid "Card payments booked without a terminal"
+msgstr "ტერმინალის გარეშე აღრიცხული ბარათით გადახდები"
+
+#| msgid "Client id"
+msgid "BOG client id"
+msgstr "BOG client id"
+
+msgid "From the BOG Payment Manager merchant portal."
+msgstr "BOG Payment Manager-ის მერჩანტის პორტალიდან."
+
+#| msgid "Client secret"
+msgid "BOG client secret"
+msgstr "BOG client secret"
+
+msgid "TBC API key"
+msgstr "TBC API გასაღები"
+
+msgid "From developers.tbcbank.ge (TPAY)"
+msgstr "developers.tbcbank.ge-დან (TPAY)"
+
+#| msgid "Client id"
+msgid "TBC client id"
+msgstr "TBC client id"
+
+#| msgid "Client secret"
+msgid "TBC client secret"
+msgstr "TBC client secret"
+
+#| msgid "Bridge"
+msgid "Bridge device"
+msgstr "ხიდის მოწყობილობა"
+
+msgid ""
+"tcp://192.168.1.60:8000 or serial:///dev/ttyUSB0:115200 (ECR bridge only)."
+msgstr ""
+"tcp://192.168.1.60:8000 ან serial:///dev/ttyUSB0:115200 (მხოლოდ ECR ხიდი)."
+
+msgid "Pick the ECR protocol (bank) for a bridge terminal."
+msgstr "აირჩიეთ ECR პროტოკოლი (ბანკი) ხიდის ტერმინალისთვის."
+
+msgid "Bank of Georgia pay-by-link"
+msgstr "საქართველოს ბანკი — ბმულით გადახდა"
+
+msgid "TBC pay-by-link (TPAY)"
+msgstr "TBC — ბმულით გადახდა (TPAY)"
+
+msgid "Keys"
+msgstr "გასაღებები"
+
+#| msgid "Decline"
+msgid "Online"
+msgstr "ონლაინ"
+
+#, python-brace-format
+msgid "Bridge key for {p0}: {p1} — copy it into bridge.toml (shown once)."
+msgstr ""
+"ხიდის გასაღები {p0}-სთვის: {p1} — ჩააკოპირეთ bridge.toml-ში (ჩანს ერთხელ)."
+
+msgid "Rotate bridge key"
+msgstr "ხიდის გასაღების შეცვლა"
+
+#, python-brace-format
+msgid "New bridge key for {p0}: {p1} (shown once)."
+msgstr "ახალი ხიდის გასაღები {p0}-სთვის: {p1} (ჩანს ერთხელ)."
+
+msgid "Bill"
+msgstr "ანგარიში"
+
+#| msgid "Confirmed"
+msgid "Confirm approved"
+msgstr "დადასტურება (დამტკიცებულია)"
+
+#, python-brace-format
+msgid "Payment booked: {p0}."
+msgstr "გადახდა აღირიცხა: {p0}."
+
+#| msgid "Request cancelled."
+msgid "Transaction cancelled."
+msgstr "ტრანზაქცია გაუქმებულია."
+
+#| msgid "Resend"
+msgid "Resend link"
+msgstr "ბმულის ხელახლა გაგზავნა"
+
+msgid "No link or no phone / email on this transaction."
+msgstr "ამ ტრანზაქციას ბმული ან ტელეფონი / ელფოსტა არ აქვს."
+
+#, python-brace-format
+#| msgid "Request sent to {p0}."
+msgid "Link sent again to {p0}."
+msgstr "ბმული ხელახლა გაიგზავნა: {p0}."
+
+msgid "Paid"
+msgstr "გადახდილი"
+
+msgid "Thank you!"
+msgstr "გმადლობთ!"
+
+msgid "Pay now"
+msgstr "გადახდა"
+
+msgid "Follow the terminal."
+msgstr "მიჰყევით ტერმინალს."
+
+#| msgid "Payment Collected"
+msgid "Payment not completed"
+msgstr "გადახდა არ დასრულებულა"
+
+msgid "Ask the staff for a new link."
+msgstr "სთხოვეთ პერსონალს ახალი ბმული."
 
 msgid "Admin"
 msgstr "ადმინი"
@@ -4534,9 +4803,6 @@ msgstr "საერთო სივრცის მოთხოვნა"
 #~ msgid "Favorite"
 #~ msgstr "რჩეული"
 
-#~ msgid "Paid"
-#~ msgstr "გადახდილი"
-
 #~ msgid "Unpaid"
 #~ msgstr "გადაუხდელი"
 
@@ -4684,9 +4950,6 @@ msgstr "საერთო სივრცის მოთხოვნა"
 
 #~ msgid "false"
 #~ msgstr "არა"
-
-#~ msgid "Permissions"
-#~ msgstr "უფლებები"
 
 #~ msgid "Add permission"
 #~ msgstr "უფლების დამატება"

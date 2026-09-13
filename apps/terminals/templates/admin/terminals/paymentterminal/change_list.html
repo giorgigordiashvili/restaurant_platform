@@ -1,0 +1,13 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% block content %}
+<div class="mb-4 rounded-default border border-base-200 dark:border-base-800 bg-white dark:bg-base-900 p-4 text-sm" data-testid="terminals-help">
+  <h3 class="font-semibold">{% translate "How card payments reach the ledger" %}</h3>
+  <ul class="list-disc ml-5 mt-2 flex flex-col gap-1">
+    <li><b>{% translate "Physical terminal" %}</b> — {% translate "the cashier keys the amount into the bank's terminal and taps 'Approved' in the POS; the payment is booked with the card's last digits." %}</li>
+    <li><b>{% translate "Pay-by-link / QR" %}</b> — {% translate "the POS shows a QR (or texts a link); the guest pays on their phone through Bank of Georgia or TBC and the POS confirms automatically." %} {% translate "Register these callback URLs with the bank:" %} <code class="select-all">{{ bog_callback }}</code> · <code class="select-all">{{ tbc_callback }}</code></li>
+    <li><b>{% translate "ECR bridge" %}</b> — {% translate "a small program on the till PC drives the terminal directly (amount appears on it, result comes back). Needs the bank's ECR kit; the bridge key is shown once when you add the terminal." %} <code>pip install -r tools/terminal_bridge/requirements.txt && python aimenu_terminal_bridge.py</code></li>
+  </ul>
+</div>
+{{ block.super }}
+{% endblock %}

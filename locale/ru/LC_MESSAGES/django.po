@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: restaurant_platform 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-13 11:04+0400\n"
+"POT-Creation-Date: 2026-09-13 11:37+0400\n"
 "PO-Revision-Date: 2024-12-03 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
@@ -148,17 +148,22 @@ msgstr "График опубликован"
 msgid "Price changed"
 msgstr "Цена изменена"
 
-#| msgid "Customer Request"
 msgid "Courier requested"
 msgstr "Курьер вызван"
 
-#| msgid "Tips (assigned)"
 msgid "Courier assigned"
 msgstr "Курьер назначен"
 
-#| msgid "Order Cancelled"
 msgid "Courier cancelled"
 msgstr "Курьер отменён"
+
+#| msgid "Card (terminal)"
+msgid "Card terminal sale"
+msgstr "Продажа через терминал"
+
+#| msgid "Card (terminal)"
+msgid "Card terminal refund"
+msgstr "Возврат через терминал"
 
 msgid "Audit Log"
 msgstr "Запись аудита"
@@ -299,47 +304,66 @@ msgstr "Платформы"
 msgid "Setup guide"
 msgstr "Руководство по настройке"
 
-#| msgid "Online provider"
+#| msgid "Card (terminal)"
+msgid "Card terminals"
+msgstr "Карточные терминалы"
+
+#| msgid "Right now"
+msgid "Waiting now"
+msgstr "Ожидают сейчас"
+
+#| msgid "Delivery today"
+msgid "Declined today"
+msgstr "Отклонено сегодня"
+
+#| msgid "Printers offline"
+msgid "Bridges offline"
+msgstr "Мосты офлайн"
+
+#| msgid "Permissions"
+msgid "Terminals"
+msgstr "Терминалы"
+
+#| msgid "BOG Transactions"
+msgid "Transactions"
+msgstr "Транзакции"
+
+#| msgid "Notification"
+msgid "Reconciliation"
+msgstr "Сверка"
+
 msgid "Online ordering"
 msgstr "Онлайн-заказ"
 
 # Dates and times
-#| msgid "Due today"
 msgid "Pickup today"
 msgstr "Самовывоз сегодня"
 
-#| msgid "Deliver by"
 msgid "Delivery today"
 msgstr "Доставка сегодня"
 
 msgid "Couriers on the road"
 msgstr "Курьеры в пути"
 
-#| msgid "Paused until"
 msgid "Paused"
 msgstr "Пауза"
 
 # Yes/No
-#| msgid "Yes"
 msgid "yes"
 msgstr "да"
 
-#| msgid "Info"
 msgid "no"
 msgstr "нет"
 
-#| msgid "Settings"
 msgid "Settings & hours"
 msgstr "Настройки и часы"
 
-#| msgid "Deliveries"
 msgid "Delivery zones"
 msgstr "Зоны доставки"
 
 msgid "Deliveries"
 msgstr "Поставки"
 
-#| msgid "Custom Role"
 msgid "Custom domain"
 msgstr "Свой домен"
 
@@ -541,7 +565,19 @@ msgstr ""
 "Заказы Glovo и Wolt сразу на кухню, отправка меню, синхронизация "
 "«распродано», пауза магазина; Bolt Food скоро."
 
-#| msgid "Days between ordering and delivery."
+#| msgid "Card (terminal)"
+msgid "Card terminals & pay-by-link"
+msgstr "Карточные терминалы и оплата по ссылке"
+
+msgid ""
+"Card payments the POS can follow: cashier confirmation on a physical "
+"terminal, Bank of Georgia / TBC pay-by-link with a QR at the table, ECR "
+"terminals through the terminal bridge."
+msgstr ""
+"Карточные оплаты, за которыми следит POS: подтверждение кассиром на "
+"физическом терминале, оплата по ссылке Банка Грузии / TBC с QR у стола, ECR-"
+"терминалы через терминальный мост."
+
 msgid "Online ordering & delivery"
 msgstr "Онлайн-заказ и доставка"
 
@@ -2342,18 +2378,19 @@ msgstr "Маркетинговая автоматизация"
 msgid "Purchase order"
 msgstr "Заказ поставщику"
 
-#| msgid "Order Cancelled"
 msgid "Order accepted"
 msgstr "Заказ принят"
 
-#| msgid "Order Created"
 msgid "Order ready"
 msgstr "Заказ готов"
 
 # Models - Orders
-#| msgid "Orders today"
 msgid "Order on its way"
 msgstr "Заказ в пути"
+
+#| msgid "Payment Pending"
+msgid "Payment link"
+msgstr "Ссылка на оплату"
 
 msgid "Test message"
 msgstr "Тестовое сообщение"
@@ -2397,10 +2434,6 @@ msgid "Guest messages"
 msgstr "Сообщения гостям"
 
 #, python-brace-format
-#| msgid ""
-#| "Confirmations and reminders for reservations; review prompts and campaigns "
-#| "once CRM is on. Placeholders: {name} {restaurant} {date} {time} {guests} "
-#| "{code} {link}"
 msgid ""
 "Confirmations and reminders for reservations; review prompts and campaigns "
 "once CRM is on. Placeholders: {name} {restaurant} {date} {time} {guests} "
@@ -2501,21 +2534,18 @@ msgstr "Разрешить заказы «как можно скорее»."
 msgid "Allow choosing a later time slot."
 msgstr "Разрешить выбор слота на позже."
 
-#| msgid "Preparation time (min)"
 msgid "Preparation time promised to guests."
 msgstr "Время приготовления, обещанное гостям."
 
 msgid "Added to the lead time for delivery orders."
 msgstr "Добавляется ко времени заказов с доставкой."
 
-#| msgid "Nothing in this order is eligible for the code."
 msgid "Stop taking online orders this long before closing."
 msgstr "Прекращать приём онлайн-заказов за столько минут до закрытия."
 
 msgid "0 = never free."
 msgstr "0 = никогда не бесплатно."
 
-#| msgid "Pause orders"
 msgid "Per order."
 msgstr "За заказ."
 
@@ -2540,7 +2570,6 @@ msgstr "[[lat, lng], ...] для полигональных зон."
 msgid "Lower = checked first (inner ring first)."
 msgstr "Меньше = проверяется первой (сначала внутреннее кольцо)."
 
-#| msgid "Delivery"
 msgid "Delivery zone"
 msgstr "Зона доставки"
 
@@ -2562,19 +2591,15 @@ msgstr "Не вызван"
 msgid "Quoted"
 msgstr "Есть расчёт"
 
-#| msgid "Request declined."
 msgid "Requested"
 msgstr "Вызван"
 
-#| msgid "Order cancelled by platform"
 msgid "Accepted by platform"
 msgstr "Принят платформой"
 
-#| msgid "Clocked out"
 msgid "Picked up"
 msgstr "Забран"
 
-#| msgid "Deliveries"
 msgid "Delivered"
 msgstr "Доставлен"
 
@@ -2590,11 +2615,9 @@ msgstr "Доставка"
 msgid "e.g. order.myrestaurant.ge"
 msgstr "напр. order.myrestaurant.ge"
 
-#| msgid "Custom Role"
 msgid "Custom domains"
 msgstr "Свои домены"
 
-#| msgid "Rota shift"
 msgid "off shift"
 msgstr "не на смене"
 
@@ -2624,7 +2647,6 @@ msgstr ""
 msgid "Right now"
 msgstr "Сейчас"
 
-#| msgid "Opened"
 msgid "Open"
 msgstr "Открыто"
 
@@ -2634,14 +2656,12 @@ msgstr "Закрыта"
 msgid "paused"
 msgstr "пауза"
 
-#| msgid "Opened"
 msgid "Opens"
 msgstr "Откроется"
 
 msgid "Pickup"
 msgstr "Самовывоз"
 
-#| msgid "of"
 msgid "off"
 msgstr "выкл"
 
@@ -2654,31 +2674,24 @@ msgstr "Сначала укажите расположение ресторан�
 msgid "Your own domain"
 msgstr "Ваш собственный домен"
 
-#| msgid "Only draft orders can be sent."
 msgid "Online orders are paused until"
 msgstr "Онлайн-заказы приостановлены до"
 
-#| msgid "Resume orders"
 msgid "Resume online orders"
 msgstr "Возобновить онлайн-заказы"
 
-#| msgid "{p0} paused for {p1} minutes."
 msgid "Pause for (minutes)"
 msgstr "Пауза на (минут)"
 
-#| msgid "Send SMS to guests"
 msgid "Reason shown to guests"
 msgstr "Причина, которую увидят гости"
 
-#| msgid "Kitchen display"
 msgid "Kitchen is very busy"
 msgstr "Кухня очень загружена"
 
-#| msgid "Pause orders"
 msgid "Pause online orders"
 msgstr "Приостановить онлайн-заказы"
 
-#| msgid "Open orders"
 msgid "Opening hours"
 msgstr "Часы работы"
 
@@ -2693,31 +2706,24 @@ msgstr ""
 msgid "Day"
 msgstr "День"
 
-#| msgid "Closed"
 msgid "Close"
 msgstr "Закрытие"
 
-#| msgid "Open now"
 msgid "Open (2nd)"
 msgstr "Открытие (2-е)"
 
-#| msgid "Closed"
 msgid "Close (2nd)"
 msgstr "Закрытие (2-е)"
 
-#| msgid "Save options"
 msgid "Save hours"
 msgstr "Сохранить часы"
 
-#| msgid "Book delivery"
 msgid "Pickup & delivery"
 msgstr "Самовывоз и доставка"
 
-#| msgid "Pause orders"
 msgid "Pickup orders"
 msgstr "Заказы на самовывоз"
 
-#| msgid "Delivery platforms"
 msgid "Delivery orders"
 msgstr "Заказы с доставкой"
 
@@ -2727,14 +2733,12 @@ msgstr "Разрешить «как можно скорее»"
 msgid "Allow choosing a time slot"
 msgstr "Разрешить выбор слота времени"
 
-#| msgid "Preparation time (min)"
 msgid "Preparation time (minutes)"
 msgstr "Время приготовления (минут)"
 
 msgid "Extra minutes for delivery"
 msgstr "Дополнительные минуты на доставку"
 
-#| msgid "Time slot intervals (e.g., every 30 minutes)"
 msgid "Slot interval (minutes)"
 msgstr "Интервал слотов (минут)"
 
@@ -2772,7 +2776,6 @@ msgstr "Вызывать курьера автоматически"
 msgid "Charge guests the platform's quote instead of the zone fee"
 msgstr "Брать с гостей цену платформы вместо тарифа зоны"
 
-#| msgid "Settings"
 msgid "Save settings"
 msgstr "Сохранить настройки"
 
@@ -2780,11 +2783,9 @@ msgid "connected"
 msgstr "подключено"
 
 # Permissions
-#| msgid "Permission"
 msgid "keys missing"
 msgstr "нет ключей"
 
-#| msgid "Sandbox (stage / development environment)"
 msgid "Sandbox / test environment"
 msgstr "Тестовая среда"
 
@@ -2830,7 +2831,6 @@ msgstr "Выдан Wolt Drive для вашей точки."
 msgid "Merchant id"
 msgstr "Id мерчанта"
 
-#| msgid "Webhook token set."
 msgid "Webhook secret"
 msgstr "Секрет webhook"
 
@@ -2840,7 +2840,6 @@ msgstr "Wolt подписывает им webhook-и (JWT)."
 msgid "Client id"
 msgstr "Client id"
 
-#| msgid "not set"
 msgid "Client secret"
 msgstr "Client secret"
 
@@ -2850,7 +2849,6 @@ msgstr "Секрет callback"
 msgid "Signs the status callbacks (X-Signature-SHA256)."
 msgstr "Подписывает callback-и статуса (X-Signature-SHA256)."
 
-#| msgid "Counted"
 msgid "Country code"
 msgstr "Код страны"
 
@@ -2869,7 +2867,6 @@ msgstr "Доставка включена, но зон доставки ещё �
 msgid "The courier service is not connected yet; fill in its keys below."
 msgstr "Курьерский сервис ещё не подключён; заполните его ключи ниже."
 
-#| msgid "Notification settings saved."
 msgid "Online ordering settings saved."
 msgstr "Настройки онлайн-заказа сохранены."
 
@@ -2877,18 +2874,15 @@ msgid "Opening hours saved."
 msgstr "Часы работы сохранены."
 
 #, python-brace-format
-#| msgid "{p0} paused for {p1} minutes."
 msgid "Online orders paused for {p0} minutes."
 msgstr "Онлайн-заказы приостановлены на {p0} минут."
 
-#| msgid "This order is closed."
 msgid "Online orders resumed."
 msgstr "Онлайн-заказы возобновлены."
 
 msgid "Saved, but some keys are still missing."
 msgstr "Сохранено, но некоторых ключей всё ещё нет."
 
-#| msgid "RS.ge service user"
 msgid "Courier service saved."
 msgstr "Курьерский сервис сохранён."
 
@@ -2899,7 +2893,6 @@ msgid "Size"
 msgstr "Размер"
 
 #, python-brace-format
-#| msgid "{p0} options saved."
 msgid "{p0} points"
 msgstr "{p0} точек"
 
@@ -2909,21 +2902,17 @@ msgstr "В пути"
 msgid "ETA"
 msgstr "Ожидаемое время"
 
-#| msgid "Request declined."
 msgid "Request courier"
 msgstr "Вызвать курьера"
 
 #, python-brace-format
-#| msgid "Request sent to {p0}."
 msgid "Courier requested for {p0}."
 msgstr "Курьер вызван для {p0}."
 
-#| msgid "Order Cancelled"
 msgid "Courier cancelled."
 msgstr "Курьер отменён."
 
 #, python-brace-format
-#| msgid "Test {p0} sent to {p1}."
 msgid "{p0} assigned to {p1}."
 msgstr "{p0} назначен курьеру {p1}."
 
@@ -2946,7 +2935,6 @@ msgid "Verify"
 msgstr "Проверить"
 
 #, python-brace-format
-#| msgid "{p0} saved."
 msgid "{p0} is verified."
 msgstr "{p0} проверен."
 
@@ -3088,6 +3076,10 @@ msgstr "Онлайн (Банк Грузии)"
 msgid "Online (Flitt)"
 msgstr "Онлайн (Flitt)"
 
+#| msgid "Online (Flitt)"
+msgid "Online (TBC)"
+msgstr "Онлайн (TBC)"
+
 msgid "Voucher"
 msgstr "Ваучер"
 
@@ -3109,6 +3101,9 @@ msgstr "Сотрудник, принявший оплату"
 
 msgid "Amount + tip"
 msgstr "Сумма + чаевые"
+
+msgid "The card terminal / pay-by-link that took this payment."
+msgstr "Терминал / ссылка, через которые прошла эта оплата."
 
 msgid "Payment ID from external provider (Stripe, etc.)"
 msgstr "ID платежа у внешнего провайдера (Stripe и т.д.)"
@@ -3715,14 +3710,12 @@ msgstr "Сумма"
 msgid "Hour"
 msgstr "Час"
 
-#| msgid "Deliveries"
 msgid "Delivery fees"
 msgstr "Плата за доставку"
 
 msgid "Packaging"
 msgstr "Упаковка"
 
-#| msgid "Labour cost"
 msgid "Courier cost"
 msgstr "Стоимость курьера"
 
@@ -4331,7 +4324,6 @@ msgstr "Минимальная сумма удалённого заказа"
 msgid "Average order preparation time in minutes"
 msgstr "Среднее время приготовления заказа в минутах"
 
-#| msgid "Earlier than the start = the shift ends after midnight."
 msgid "Earlier than the opening time = closes after midnight."
 msgstr "Раньше времени открытия = закрытие после полуночи."
 
@@ -4340,6 +4332,283 @@ msgstr "Необязательная вторая смена (напр. ужин
 
 msgid "Mark as closed for this day (overrides open/close times)"
 msgstr "Отметить как закрытый в этот день (перекрывает часы работы)"
+
+msgid "Physical terminal (cashier confirms)"
+msgstr "Физический терминал (подтверждает кассир)"
+
+msgid "Bank of Georgia pay-by-link / QR"
+msgstr "Банк Грузии — ссылка / QR"
+
+msgid "TBC pay-by-link / QR (TPAY)"
+msgstr "TBC — ссылка / QR (TPAY)"
+
+msgid "ECR terminal via the terminal bridge"
+msgstr "ECR-терминал через терминальный мост"
+
+msgid "—"
+msgstr "—"
+
+#| msgid "Online (Bank of Georgia)"
+msgid "Bank of Georgia ECR"
+msgstr "ECR Банка Грузии"
+
+msgid "TBC ECR"
+msgstr "TBC ECR"
+
+msgid "E.g. 'Till 1', 'Bar terminal', 'QR at the table'."
+msgstr "Напр. «Касса 1», «Терминал бара», «QR у стола»."
+
+msgid "The bank's terminal id (TID)."
+msgstr "Id терминала в банке (TID)."
+
+msgid "Bridge device: {\"device\": \"tcp://192.168.1.60:8000\"} or serial://."
+msgstr "Устройство моста: {\"device\": \"tcp://192.168.1.60:8000\"} или serial://."
+
+#| msgid "Pre-selected by default"
+msgid "Preselected in the POS."
+msgstr "Выбран по умолчанию в POS."
+
+msgid "Print a receipt when the payment is approved."
+msgstr "Печатать чек при подтверждении оплаты."
+
+msgid "Give up waiting after this long."
+msgstr "Прекратить ожидание через это время."
+
+#| msgid "Card (terminal)"
+msgid "Card terminal"
+msgstr "Карточный терминал"
+
+#| msgid "Sales"
+msgid "Sale"
+msgstr "Продажа"
+
+#| msgid "Settings"
+msgid "Starting"
+msgstr "Запуск"
+
+#| msgid "Sent to supplier"
+msgid "Sent to terminal"
+msgstr "Отправлено на терминал"
+
+#| msgid "Awaiting confirmation"
+msgid "Waiting for confirmation"
+msgstr "Ожидает подтверждения"
+
+msgid "Approved"
+msgstr "Одобрено"
+
+#| msgid "Decline"
+msgid "Declined"
+msgstr "Отклонено"
+
+#| msgid "Time entry"
+msgid "Timed out"
+msgstr "Время истекло"
+
+msgid "Phone / email the link went to."
+msgstr "Телефон / email, куда ушла ссылка."
+
+#| msgid "Remove this translation"
+msgid "Terminal transaction"
+msgstr "Транзакция терминала"
+
+#| msgid "Flitt Transactions"
+msgid "Terminal transactions"
+msgstr "Транзакции терминала"
+
+msgid "Terminal reconciliation"
+msgstr "Сверка терминалов"
+
+#| msgid "Webhook token (shown once)"
+msgid "Bridge key (shown once)"
+msgstr "Ключ моста (показывается один раз)"
+
+msgid ""
+"Put it into bridge.toml on the till PC: server_url, key, protocol, device."
+msgstr ""
+"Впишите в bridge.toml на кассовом ПК: server_url, key, protocol, device."
+
+msgid "Keys already saved"
+msgstr "Уже сохранённые ключи"
+
+msgid "leave the fields empty to keep them."
+msgstr "оставьте поля пустыми, чтобы сохранить их."
+
+msgid "How card payments reach the ledger"
+msgstr "Как карточные оплаты попадают в учёт"
+
+#| msgid "Card (terminal)"
+msgid "Physical terminal"
+msgstr "Физический терминал"
+
+msgid ""
+"the cashier keys the amount into the bank's terminal and taps 'Approved' in "
+"the POS; the payment is booked with the card's last digits."
+msgstr ""
+"кассир вводит сумму на терминале банка и нажимает «Одобрено» в POS; оплата "
+"записывается с последними цифрами карты."
+
+msgid "Pay-by-link / QR"
+msgstr "Ссылка / QR"
+
+msgid ""
+"the POS shows a QR (or texts a link); the guest pays on their phone through "
+"Bank of Georgia or TBC and the POS confirms automatically."
+msgstr ""
+"POS показывает QR (или отправляет ссылку); гость платит с телефона через "
+"Банк Грузии или TBC, и POS подтверждает автоматически."
+
+msgid "Register these callback URLs with the bank:"
+msgstr "Зарегистрируйте эти callback URL в банке:"
+
+#| msgid "Bridge"
+msgid "ECR bridge"
+msgstr "ECR-мост"
+
+msgid ""
+"a small program on the till PC drives the terminal directly (amount appears "
+"on it, result comes back). Needs the bank's ECR kit; the bridge key is shown"
+" once when you add the terminal."
+msgstr ""
+"небольшая программа на кассовом ПК управляет терминалом напрямую (сумма "
+"появляется на нём, результат возвращается). Нужен ECR-комплект банка; ключ "
+"моста показывается один раз при добавлении терминала."
+
+msgid ""
+"Approved at the terminal vs booked in the ledger. Differences mean a payment"
+" was approved but not booked (or booked by hand)."
+msgstr ""
+"Одобрено на терминале и записано в учёт. Разница означает, что оплата "
+"одобрена, но не записана (или записана вручную)."
+
+#| msgid "Card (terminal)"
+msgid "Terminal"
+msgstr "Терминал"
+
+msgid "Booked"
+msgstr "Записано"
+
+#| msgid "Clocked out"
+msgid "Booked amount"
+msgstr "Записанная сумма"
+
+msgid "No terminal payments on this day."
+msgstr "В этот день оплат через терминал нет."
+
+msgid "Declined / timed out"
+msgstr "Отклонено / истекло"
+
+msgid "Card payments booked without a terminal"
+msgstr "Карточные оплаты, записанные без терминала"
+
+#| msgid "Client id"
+msgid "BOG client id"
+msgstr "BOG client id"
+
+msgid "From the BOG Payment Manager merchant portal."
+msgstr "Из мерчант-портала BOG Payment Manager."
+
+#| msgid "Client secret"
+msgid "BOG client secret"
+msgstr "BOG client secret"
+
+msgid "TBC API key"
+msgstr "TBC API-ключ"
+
+msgid "From developers.tbcbank.ge (TPAY)"
+msgstr "С developers.tbcbank.ge (TPAY)"
+
+#| msgid "Client id"
+msgid "TBC client id"
+msgstr "TBC client id"
+
+#| msgid "Client secret"
+msgid "TBC client secret"
+msgstr "TBC client secret"
+
+#| msgid "Bridge"
+msgid "Bridge device"
+msgstr "Устройство моста"
+
+msgid ""
+"tcp://192.168.1.60:8000 or serial:///dev/ttyUSB0:115200 (ECR bridge only)."
+msgstr ""
+"tcp://192.168.1.60:8000 или serial:///dev/ttyUSB0:115200 (только ECR-мост)."
+
+msgid "Pick the ECR protocol (bank) for a bridge terminal."
+msgstr "Выберите ECR-протокол (банк) для терминала с мостом."
+
+msgid "Bank of Georgia pay-by-link"
+msgstr "Банк Грузии — оплата по ссылке"
+
+msgid "TBC pay-by-link (TPAY)"
+msgstr "TBC — оплата по ссылке (TPAY)"
+
+msgid "Keys"
+msgstr "Ключи"
+
+#| msgid "Decline"
+msgid "Online"
+msgstr "Онлайн"
+
+#, python-brace-format
+msgid "Bridge key for {p0}: {p1} — copy it into bridge.toml (shown once)."
+msgstr ""
+"Ключ моста для {p0}: {p1} — скопируйте в bridge.toml (показывается один "
+"раз)."
+
+msgid "Rotate bridge key"
+msgstr "Сменить ключ моста"
+
+#, python-brace-format
+msgid "New bridge key for {p0}: {p1} (shown once)."
+msgstr "Новый ключ моста для {p0}: {p1} (показывается один раз)."
+
+msgid "Bill"
+msgstr "Счёт"
+
+#| msgid "Confirmed"
+msgid "Confirm approved"
+msgstr "Подтвердить одобрение"
+
+#, python-brace-format
+msgid "Payment booked: {p0}."
+msgstr "Оплата записана: {p0}."
+
+#| msgid "Request cancelled."
+msgid "Transaction cancelled."
+msgstr "Транзакция отменена."
+
+#| msgid "Resend"
+msgid "Resend link"
+msgstr "Отправить ссылку снова"
+
+msgid "No link or no phone / email on this transaction."
+msgstr "У этой транзакции нет ссылки или телефона / email."
+
+#, python-brace-format
+#| msgid "Request sent to {p0}."
+msgid "Link sent again to {p0}."
+msgstr "Ссылка отправлена снова: {p0}."
+
+msgid "Paid"
+msgstr "Оплачено"
+
+msgid "Thank you!"
+msgstr "Спасибо!"
+
+msgid "Pay now"
+msgstr "Оплатить"
+
+msgid "Follow the terminal."
+msgstr "Следуйте указаниям терминала."
+
+#| msgid "Payment Collected"
+msgid "Payment not completed"
+msgstr "Оплата не завершена"
+
+msgid "Ask the staff for a new link."
+msgstr "Попросите у персонала новую ссылку."
 
 msgid "Admin"
 msgstr "Админ"
@@ -4520,9 +4789,6 @@ msgstr "Запрос на общую площадку"
 #~ msgid "Favorite"
 #~ msgstr "Избранное"
 
-#~ msgid "Paid"
-#~ msgstr "Оплачено"
-
 #~ msgid "Unpaid"
 #~ msgstr "Не оплачено"
 
@@ -4670,9 +4936,6 @@ msgstr "Запрос на общую площадку"
 
 #~ msgid "false"
 #~ msgstr "нет"
-
-#~ msgid "Permissions"
-#~ msgstr "Разрешения"
 
 #~ msgid "Add permission"
 #~ msgstr "Добавить разрешение"

@@ -338,6 +338,10 @@ class Restaurant(TimeStampedModel):
         default=False,
         help_text="CRM & marketing module: guest records, segments, SMS / email campaigns and automations.",
     )
+    terminals_enabled = models.BooleanField(
+        default=False,
+        help_text="Card terminals module: physical terminal confirmation, BOG / TBC pay-by-link and QR, ECR bridge.",
+    )
     online_ordering_enabled = models.BooleanField(
         default=False,
         help_text="Online ordering module: pickup and delivery from the restaurant's own page, zones, couriers.",

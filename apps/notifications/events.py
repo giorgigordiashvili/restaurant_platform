@@ -39,6 +39,15 @@ EVENTS = (
         "update",
         "Orders",
     ),
+    Event(
+        "terminal.declined",
+        "Card payment declined",
+        "A terminal / pay-by-link payment was declined or timed out.",
+        "cash",
+        "create",
+        "Operations",
+        False,
+    ),
     Event("reservation.new", "New reservation", "A guest booked a table.", "reservations", "update", "Reservations"),
     Event(
         "reservation.cancelled",

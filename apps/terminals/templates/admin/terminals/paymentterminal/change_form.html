@@ -1,0 +1,12 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+{% block form_before %}
+{% if bridge_key_once %}
+<div class="mb-4 rounded-default border border-amber-300 bg-amber-50 dark:bg-base-900 p-4 text-sm" data-testid="bridge-key-once">
+  <p class="font-semibold">{% translate "Bridge key (shown once)" %}</p>
+  <code class="select-all text-base">{{ bridge_key_once }}</code>
+  <p class="text-xs text-base-500 mt-1">{% translate "Put it into bridge.toml on the till PC: server_url, key, protocol, device." %}</p>
+</div>
+{% endif %}
+{% if keys_set %}<p class="mb-3 text-xs text-base-500">{% translate "Keys already saved" %}: {{ keys_set|join:", " }} — {% translate "leave the fields empty to keep them." %}</p>{% endif %}
+{% endblock %}
