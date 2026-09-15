@@ -29,6 +29,7 @@ from typing import Any
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from rest_framework import status
@@ -449,9 +450,16 @@ class FlittStatusView(APIView):
         # sat on "payment is processing" forever. Accept either id.
         txn = FlittTransaction.objects.filter(flitt_order_id=flitt_order_id).first()
         if txn is None:
-            # external_order_id is indexed but not unique (a retried checkout
-            # reuses the order number), so take the newest.
-            txn = FlittTransaction.objects.filter(external_order_id=flitt_order_id).order_by("-created_at").first()
+            # Unlike BogTransaction there is no external_order_id column here,
+            # so resolve through the relations. Newest first: retrying a
+            # checkout reuses the order number across several transactions.
+            txn = (
+                FlittTransaction.objects.filter(
+                    Q(order__order_number=flitt_order_id) | Q(reservation__confirmation_code=flitt_order_id)
+                )
+                .order_by("-created_at")
+                .first()
+            )
         if txn is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(
