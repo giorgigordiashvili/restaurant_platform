@@ -187,7 +187,14 @@ def _callback_url(request: Request) -> str:
     """
     override = getattr(settings, "BOG_WEBHOOK_URL", "") or ""
     if override:
-        return override.rstrip("/")
+        # Keep the trailing slash. Stripping it made BOG POST to
+        # /api/v1/payments/bog/webhook, which Django's APPEND_SLASH answers
+        # with a 301 — and BOG does not follow redirects on a callback, so
+        # the webhook silently never ran. Payments still completed via the
+        # frontend status poll, but anything that depended on the webhook
+        # firing (settlement, side effects) was left hanging.
+        url = override.strip()
+        return url if url.endswith("/") else f"{url}/"
     return request.build_absolute_uri("/api/v1/payments/bog/webhook/")
 
 

@@ -34,6 +34,9 @@ urlpatterns = [
     path("bog/initiate/", InitiatePaymentView.as_view(), name="bog-initiate"),
     path("bog/status/<str:bog_order_id>/", BogStatusView.as_view(), name="bog-status"),
     path("bog/webhook/", BogWebhookView.as_view(), name="bog-webhook"),
+    # Slash-less alias: acquirers normalise callback URLs unpredictably and
+    # APPEND_SLASH answers a POST with a 301 they will not follow.
+    path("bog/webhook", BogWebhookView.as_view(), name="bog-webhook-noslash"),
     # Flitt (pay.flitt.com) integration — second provider, with native split.
     path("flitt/initiate/", FlittInitiatePaymentView.as_view(), name="flitt-initiate"),
     path(
@@ -42,4 +45,7 @@ urlpatterns = [
         name="flitt-status",
     ),
     path("flitt/webhook/", FlittWebhookView.as_view(), name="flitt-webhook"),
+    # Slash-less alias: acquirers normalise callback URLs unpredictably and
+    # APPEND_SLASH answers a POST with a 301 they will not follow.
+    path("flitt/webhook", FlittWebhookView.as_view(), name="flitt-webhook-noslash"),
 ]
