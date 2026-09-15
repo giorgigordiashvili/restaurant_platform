@@ -27,14 +27,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
     total_orders = serializers.SerializerMethodField()
     total_spent = serializers.SerializerMethodField()
 
-    #: Statuses that mean the guest actually paid and was served.
-    COUNTED_STATUSES = ("confirmed", "preparing", "ready", "served", "completed")
+    #: Statuses excluded from the totals. `pending_payment` never got past
+    #: the card, and `cancelled` was refunded or never charged. Everything
+    #: else — including plain `pending`, which means paid and waiting on the
+    #: restaurant to confirm — is money the guest has actually spent.
+    EXCLUDED_STATUSES = ("pending_payment", "cancelled")
 
     def _counted_orders(self, obj):
         user = getattr(obj, "user", None)
         if user is None:
             return None
-        return Order.objects.filter(customer=user, status__in=self.COUNTED_STATUSES)
+        return Order.objects.filter(customer=user).exclude(status__in=self.EXCLUDED_STATUSES)
 
     def get_total_orders(self, obj) -> int:
         qs = self._counted_orders(obj)
