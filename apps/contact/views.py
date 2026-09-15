@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 # Public email the visitor-facing form submits to. Configurable via env so
 # the address can change without a code deploy.
-CONTACT_RECIPIENT = getattr(settings, "CONTACT_RECIPIENT_EMAIL", "info@telos.ge")
+CONTACT_RECIPIENT = getattr(settings, "CONTACT_RECIPIENT_EMAIL", "info@aimenu.ge")
 
 
 class ContactFormThrottle(AnonRateThrottle):
@@ -83,7 +83,7 @@ class ContactCreateView(generics.CreateAPIView):
                 "Message:\n"
                 f"{data['message']}\n"
             )
-            # Reply-To set to the submitter so replies from info@telos.ge
+            # Reply-To set to the submitter so replies from the support inbox
             # go straight back to the person who filled the form.
             EmailMessage(
                 subject=subject,

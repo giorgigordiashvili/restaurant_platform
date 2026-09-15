@@ -671,7 +671,9 @@ class InitiateAddCardView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        method_intent_id = uuid.uuid4().hex
+        # Canonical dashed UUID v4: BOG rejects the bare .hex form on the
+        # Idempotency-Key header with 400 "Should be UUID v4".
+        method_intent_id = str(uuid.uuid4())
         external_order_id = f"addcard-{method_intent_id}"
         bog_payload = {
             "callback_url": _callback_url(request),

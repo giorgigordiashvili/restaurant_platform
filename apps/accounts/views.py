@@ -361,7 +361,7 @@ class FacebookSocialLoginView(SocialLoginView):
 #   4. Delete the SocialAccount row that links that Facebook user to our
 #      User record — unlinks the Facebook login. The underlying User
 #      account keeps its email/password/orders/reservations because those
-#      are first-party data owned by Telos LLC, not by Facebook. Full
+#      are first-party data owned by AI menu LLC, not by Facebook. Full
 #      account deletion is a separate self-service flow via /profile.
 #   5. Return JSON { url, confirmation_code } per Meta's spec — the user
 #      visits that URL to check their deletion status.
