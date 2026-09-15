@@ -512,18 +512,17 @@ class Restaurant(TimeStampedModel):
 
     def clean(self):
         super().clean()
-        # Opt-in provider flags demand a payout identifier — otherwise a
-        # "checkout with BOG" button would render with no way to route the
-        # restaurant's share, and the initiate call would 500 in production.
-        if self.accepts_bog_payments and not self.bog_payout_iban.strip():
-            raise ValidationError({"bog_payout_iban": ("BOG payout IBAN is required when BOG payments are enabled.")})
-        # Flitt deliberately does NOT demand a sub-merchant id. A restaurant
-        # can be onboarded to Flitt before it has its own sub-merchant — the
-        # payment then settles entirely into the platform's account and the
-        # restaurant's share is recorded as a RestaurantDebit to be paid out
-        # off-platform (see apps.payments.flitt.views._attempt_settlement).
-        # Without this, a restaurant cannot take card payments at all while
-        # it waits on Flitt onboarding.
+        # Neither provider demands a payout identifier up front. Both degrade
+        # to "no split, everything lands in the platform account":
+        #   * BOG  — apps.payments.bog.views._split_config returns None when
+        #     the IBAN is blank, which BOG treats as pay-the-master-account.
+        #   * Flitt — settlement is skipped and the restaurant's share is
+        #     written as a RestaurantDebit.
+        # Requiring the identifier here made the onboarding window unusable:
+        # a restaurant cannot take a single card payment while it waits for
+        # the bank to issue an IBAN or Flitt to issue a sub-merchant id.
+        # The money owed is tracked either way, so nothing is lost — it just
+        # has to be paid out off-platform until onboarding completes.
 
     def save(self, *args, **kwargs):
         if not self.slug:

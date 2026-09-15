@@ -442,9 +442,17 @@ class FlittStatusView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request: Request, flitt_order_id: str) -> Response:
-        try:
-            txn = FlittTransaction.objects.get(flitt_order_id=flitt_order_id)
-        except FlittTransaction.DoesNotExist:
+        # The return page polls with whatever `ref` the redirect carried, and
+        # _redirect_urls puts the EXTERNAL id there (Order.order_number /
+        # Reservation.confirmation_code) — not the Flitt UUID. Looking up only
+        # by flitt_order_id 404'd every poll, so a guest who paid successfully
+        # sat on "payment is processing" forever. Accept either id.
+        txn = FlittTransaction.objects.filter(flitt_order_id=flitt_order_id).first()
+        if txn is None:
+            # external_order_id is indexed but not unique (a retried checkout
+            # reuses the order number), so take the newest.
+            txn = FlittTransaction.objects.filter(external_order_id=flitt_order_id).order_by("-created_at").first()
+        if txn is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(
             {
