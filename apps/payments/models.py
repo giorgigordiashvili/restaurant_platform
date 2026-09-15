@@ -872,10 +872,17 @@ class FlittTransaction(TimeStampedModel):
     SETTLEMENT_PENDING = "pending"
     SETTLEMENT_SETTLED = "settled"
     SETTLEMENT_ERROR = "error"
+    # Paid, but no split was possible (a sub-merchant id is missing on either
+    # leg). The platform holds the full amount and owes the restaurant its
+    # share — tracked as a RestaurantDebit. Distinct from ERROR because it is
+    # not retryable: Celery must not keep hammering a settlement that can
+    # never succeed until the restaurant is onboarded.
+    SETTLEMENT_UNSPLIT = "unsplit"
     SETTLEMENT_CHOICES = [
         (SETTLEMENT_NOT_STARTED, "Not started"),
         (SETTLEMENT_PENDING, "Pending retry"),
         (SETTLEMENT_SETTLED, "Settled"),
+        (SETTLEMENT_UNSPLIT, "Unsplit — platform holds full amount"),
         (SETTLEMENT_ERROR, "Error"),
     ]
 

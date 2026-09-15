@@ -48,7 +48,7 @@ from apps.payments.initiate_helpers import (
     create_pending_order,
     create_pending_reservation,
 )
-from apps.payments.models import FlittTransaction
+from apps.payments.models import FlittTransaction, RestaurantDebit
 from apps.payments.splits import compute_split
 
 from .client import FlittClient, FlittClientError, get_client
@@ -184,7 +184,7 @@ class FlittInitiatePaymentView(APIView):
     @transaction.atomic
     def _initiate_order(self, request: Request, payload: dict[str, Any], return_url: str) -> Response:
         result: OrderInitiateResult = create_pending_order(request, payload)
-        if not result.restaurant.accepts_flitt_payments or not result.restaurant.flitt_sub_merchant_id:
+        if not result.restaurant.accepts_flitt_payments:
             raise ValueError("This restaurant does not accept Flitt payments.")
 
         flitt_order_id = str(uuid.uuid4())
@@ -237,7 +237,7 @@ class FlittInitiatePaymentView(APIView):
     @transaction.atomic
     def _initiate_gift_card(self, request: Request, payload: dict[str, Any], return_url: str) -> Response:
         result = create_pending_gift_card(request, payload)
-        if not result.restaurant.accepts_flitt_payments or not result.restaurant.flitt_sub_merchant_id:
+        if not result.restaurant.accepts_flitt_payments:
             raise ValueError("This restaurant does not accept Flitt payments.")
         flitt_order_id = str(uuid.uuid4())
         external_id = f"gc-{result.card.pk}"
@@ -284,7 +284,7 @@ class FlittInitiatePaymentView(APIView):
     @transaction.atomic
     def _initiate_reservation(self, request: Request, payload: dict[str, Any], return_url: str) -> Response:
         result: ReservationInitiateResult = create_pending_reservation(request, payload)
-        if not result.restaurant.accepts_flitt_payments or not result.restaurant.flitt_sub_merchant_id:
+        if not result.restaurant.accepts_flitt_payments:
             raise ValueError("This restaurant does not accept Flitt payments.")
 
         flitt_order_id = str(uuid.uuid4())
@@ -541,14 +541,40 @@ def _attempt_settlement(txn: FlittTransaction) -> None:
         return
     platform_sub = getattr(settings, "FLITT_PLATFORM_SUB_MERCHANT_ID", "")
     if not platform_sub or not restaurant.flitt_sub_merchant_id:
+        # No split is possible without both legs, so the payment simply stays
+        # where Flitt put it: the platform's own merchant account. The
+        # restaurant's share then has to be paid out off-platform, which is
+        # what RestaurantDebit exists to track — see the BOG refund path.
+        #
+        # This is the correct behaviour while onboarding (a restaurant that
+        # has not been given a Flitt sub-merchant yet can still take card
+        # payments) but it means aimenu is holding money it does not own.
+        # SETTLEMENT_UNSPLIT marks those so they can be reconciled, and is
+        # deliberately NOT the retry state — Celery must not keep retrying a
+        # settlement that can never succeed.
         logger.warning(
-            "Flitt settlement skipped for %s — missing sub-merchant ids (platform=%r restaurant=%r).",
+            "Flitt payment %s left unsplit — missing sub-merchant ids "
+            "(platform=%r restaurant=%r). Full amount %s %s is held by the "
+            "platform and owed to %s.",
             txn.flitt_order_id,
             platform_sub,
             restaurant.flitt_sub_merchant_id,
+            txn.amount,
+            txn.currency or "GEL",
+            restaurant,
         )
-        txn.settlement_status = FlittTransaction.SETTLEMENT_ERROR
-        txn.settlement_error = "Missing sub-merchant ids"
+        split = compute_split(txn.amount, restaurant)
+        RestaurantDebit.objects.get_or_create(
+            source=RestaurantDebit.SOURCE_MANUAL,
+            notes=f"Unsplit Flitt payment {txn.flitt_order_id}",
+            defaults={
+                "restaurant": restaurant,
+                "amount": split.restaurant_amount,
+                "currency": txn.currency or "GEL",
+            },
+        )
+        txn.settlement_status = FlittTransaction.SETTLEMENT_UNSPLIT
+        txn.settlement_error = "No sub-merchant — full amount held by platform, owed to restaurant"
         txn.save(update_fields=["settlement_status", "settlement_error", "updated_at"])
         return
 

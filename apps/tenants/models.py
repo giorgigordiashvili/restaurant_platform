@@ -517,10 +517,13 @@ class Restaurant(TimeStampedModel):
         # restaurant's share, and the initiate call would 500 in production.
         if self.accepts_bog_payments and not self.bog_payout_iban.strip():
             raise ValidationError({"bog_payout_iban": ("BOG payout IBAN is required when BOG payments are enabled.")})
-        if self.accepts_flitt_payments and not self.flitt_sub_merchant_id.strip():
-            raise ValidationError(
-                {"flitt_sub_merchant_id": ("Flitt sub-merchant id is required when Flitt payments are enabled.")}
-            )
+        # Flitt deliberately does NOT demand a sub-merchant id. A restaurant
+        # can be onboarded to Flitt before it has its own sub-merchant — the
+        # payment then settles entirely into the platform's account and the
+        # restaurant's share is recorded as a RestaurantDebit to be paid out
+        # off-platform (see apps.payments.flitt.views._attempt_settlement).
+        # Without this, a restaurant cannot take card payments at all while
+        # it waits on Flitt onboarding.
 
     def save(self, *args, **kwargs):
         if not self.slug:

@@ -418,7 +418,9 @@ BOG_WEBHOOK_URL = config("BOG_WEBHOOK_URL", default="")
 # sub-merchant id during onboarding; we never hold their signing secret.
 # ---------------------------------------------------------------------------
 FLITT_MERCHANT_ID = config("FLITT_MERCHANT_ID", default="")
-FLITT_SECRET_KEY = config("FLITT_SECRET_KEY", default="")
+# Flitt's merchant portal calls this the "Payment key"; accept either name
+# so the value can be copied straight out of the portal without renaming.
+FLITT_SECRET_KEY = config("FLITT_SECRET_KEY", default="") or config("FLITT_PAYMENT_KEY", default="")
 FLITT_API_URL = config("FLITT_API_URL", default="https://pay.flitt.com")
 # The platform's *own* Flitt sub-merchant id — the receiver for our 5 %
 # leg on every split. Configure this once per environment.
