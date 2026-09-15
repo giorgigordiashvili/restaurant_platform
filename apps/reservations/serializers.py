@@ -3,6 +3,7 @@ Serializers for reservations.
 """
 
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 from django.utils import timezone
 
@@ -136,8 +137,7 @@ class ReservationListSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_deposit_amount(self, obj) -> str | None:
-        txn = _latest_payment_txn(obj)
-        return str(txn.amount) if txn else None
+        return _deposit_amount(obj)
 
     def get_payment_status(self, obj) -> str | None:
         txn = _latest_payment_txn(obj)
@@ -160,6 +160,28 @@ class ReservationListSerializer(serializers.ModelSerializer):
             "subtotal": str(order.subtotal) if order.subtotal is not None else None,
             "items_count": order.items.count(),
         }
+
+
+def _deposit_amount(reservation) -> str | None:
+    """
+    The booking deposit alone, not the whole card charge.
+
+    A reservation with a pre-order is charged deposit + food in one
+    transaction, so `txn.amount` is the total. Returning that as
+    `deposit_amount` made the detail modal render the full 70.00 as the
+    deposit and then add the 60.00 food total on top of it for a 130.00
+    "grand total" — the food was counted twice.
+    """
+    txn = _latest_payment_txn(reservation)
+    if txn is None:
+        return None
+    charged = Decimal(str(txn.amount or 0))
+    order = reservation.orders.order_by("-created_at").first()
+    food = Decimal(str(order.total)) if order is not None and order.total is not None else Decimal("0")
+    deposit = charged - food
+    if deposit < 0:
+        deposit = Decimal("0")
+    return f"{deposit:.2f}"
 
 
 def _latest_payment_txn(reservation):
@@ -274,8 +296,7 @@ class ReservationDetailSerializer(serializers.ModelSerializer):
         ]
 
     def get_deposit_amount(self, obj) -> str | None:
-        txn = _latest_payment_txn(obj)
-        return str(txn.amount) if txn else None
+        return _deposit_amount(obj)
 
     def get_deposit_currency(self, obj) -> str | None:
         txn = _latest_payment_txn(obj)
