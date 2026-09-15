@@ -39,7 +39,12 @@ def _iter_signable_values(payload: dict[str, Any]) -> list[str]:
     values: list[str] = []
     for key in sorted(payload):
         value = payload[key]
-        if key == "signature":
+        # `signature` is obviously excluded. `response_signature_string` is
+        # the gotcha: Flitt echoes the plaintext it signed back inside the
+        # callback body, and including it in the recomputation guarantees a
+        # mismatch. Every inbound webhook failed verification until this was
+        # excluded.
+        if key in ("signature", "response_signature_string"):
             continue
         if value in (None, ""):
             continue

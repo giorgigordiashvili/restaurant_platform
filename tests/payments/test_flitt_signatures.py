@@ -71,3 +71,34 @@ def test_sign_matches_flitts_documented_worked_example():
     }
     expected = hashlib.sha1(b"test|100|USD|1396424|test order|test123").hexdigest()
     assert sign(payload, "test") == expected
+
+
+def test_sign_excludes_response_signature_string_echoed_by_callbacks():
+    """
+    Flitt callbacks echo the plaintext they signed back as
+    `response_signature_string`. Including it in the recomputation
+    guarantees a mismatch — every inbound webhook failed verification in
+    production until it was excluded.
+    """
+    payload = {"merchant_id": 42, "order_id": "ord-1"}
+    with_echo = {
+        **payload,
+        "response_signature_string": "secret|42|ord-1",
+        "signature": "whatever",
+    }
+    assert sign(with_echo, SECRET) == sign(payload, SECRET)
+
+
+def test_verify_accepts_a_realistic_callback_body():
+    """End-to-end: sign a callback the way Flitt does, then verify it."""
+    callback = {
+        "order_id": "c7ced54c-a0d1-4f1e-9a2b-000000000000",
+        "merchant_id": 4058379,
+        "amount": 2500,
+        "currency": "GEL",
+        "order_status": "approved",
+        "response_status": "success",
+    }
+    sig = sign(callback, SECRET)
+    inbound = {**callback, "signature": sig, "response_signature_string": "echoed|plaintext"}
+    assert verify(inbound, sig, SECRET) is True

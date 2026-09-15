@@ -381,7 +381,16 @@ class FlittWebhookView(APIView):
 
         received_signature = body.get("signature") or ""
         if not verify(body, received_signature, settings.FLITT_SECRET_KEY):
-            logger.warning("Flitt webhook signature verification failed")
+            # Log enough to diagnose without ever printing the secret or the
+            # computed signature: the field names are what actually differs
+            # when Flitt changes its callback shape, and response_signature_
+            # string (when present) shows the exact plaintext they signed.
+            logger.warning(
+                "Flitt webhook signature verification failed — order_id=%s fields=%s echoed=%r",
+                body.get("order_id"),
+                sorted(body.keys()),
+                body.get("response_signature_string"),
+            )
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         flitt_order_id = body.get("order_id") or ""
