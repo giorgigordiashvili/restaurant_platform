@@ -2,17 +2,50 @@
 Serializers for the accounts app.
 """
 
+from decimal import Decimal
+
 from django.contrib.auth.password_validation import validate_password
+from django.db.models import Sum
 
 from rest_framework import serializers
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from apps.orders.models import Order
 
 from .models import User, UserProfile
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for user profile."""
+
+    # UserProfile.total_orders / total_spent are columns that nothing has ever
+    # written — every profile reported 0 no matter how much the customer had
+    # spent. Rather than add an increment hook (which would leave all existing
+    # data wrong), derive them from the orders themselves. Correct immediately
+    # for historical rows, and it cannot drift out of sync.
+    total_orders = serializers.SerializerMethodField()
+    total_spent = serializers.SerializerMethodField()
+
+    #: Statuses that mean the guest actually paid and was served.
+    COUNTED_STATUSES = ("confirmed", "preparing", "ready", "served", "completed")
+
+    def _counted_orders(self, obj):
+        user = getattr(obj, "user", None)
+        if user is None:
+            return None
+        return Order.objects.filter(customer=user, status__in=self.COUNTED_STATUSES)
+
+    def get_total_orders(self, obj) -> int:
+        qs = self._counted_orders(obj)
+        return qs.count() if qs is not None else 0
+
+    def get_total_spent(self, obj) -> str:
+        qs = self._counted_orders(obj)
+        if qs is None:
+            return "0.00"
+        total = qs.aggregate(s=Sum("total"))["s"] or Decimal("0")
+        return f"{total:.2f}"
 
     class Meta:
         model = UserProfile
