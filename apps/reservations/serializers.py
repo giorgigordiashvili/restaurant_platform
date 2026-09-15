@@ -136,11 +136,11 @@ class ReservationListSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_deposit_amount(self, obj) -> str | None:
-        txn = _latest_bog_txn(obj)
+        txn = _latest_payment_txn(obj)
         return str(txn.amount) if txn else None
 
     def get_payment_status(self, obj) -> str | None:
-        txn = _latest_bog_txn(obj)
+        txn = _latest_payment_txn(obj)
         return txn.status if txn else None
 
     def get_pre_order_summary(self, obj):
@@ -162,12 +162,29 @@ class ReservationListSerializer(serializers.ModelSerializer):
         }
 
 
-def _latest_bog_txn(reservation):
-    """Return the most recent BogTransaction for a reservation, if any."""
-    try:
-        return reservation.bog_transactions.order_by("-created_at").first()
-    except Exception:
-        return None
+def _latest_payment_txn(reservation):
+    """
+    Most recent card transaction for a reservation, from EITHER acquirer.
+
+    This used to look at bog_transactions only, so a reservation paid through
+    Flitt reported deposit_amount=None and payment_status=None — the
+    /profile/reservations card then showed nothing about payment at all.
+    """
+    latest = None
+    for related in ("bog_transactions", "flitt_transactions"):
+        try:
+            txn = getattr(reservation, related).order_by("-created_at").first()
+        except Exception:
+            txn = None
+        if txn is None:
+            continue
+        if latest is None or txn.created_at > latest.created_at:
+            latest = txn
+    return latest
+
+
+# Back-compat alias — several callers still reference the old name.
+_latest_bog_txn = _latest_payment_txn
 
 
 class ReservationDetailSerializer(serializers.ModelSerializer):
@@ -257,19 +274,19 @@ class ReservationDetailSerializer(serializers.ModelSerializer):
         ]
 
     def get_deposit_amount(self, obj) -> str | None:
-        txn = _latest_bog_txn(obj)
+        txn = _latest_payment_txn(obj)
         return str(txn.amount) if txn else None
 
     def get_deposit_currency(self, obj) -> str | None:
-        txn = _latest_bog_txn(obj)
+        txn = _latest_payment_txn(obj)
         return txn.currency if txn else None
 
     def get_payment_status(self, obj) -> str | None:
-        txn = _latest_bog_txn(obj)
+        txn = _latest_payment_txn(obj)
         return txn.status if txn else None
 
     def get_payment_code_description(self, obj) -> str:
-        txn = _latest_bog_txn(obj)
+        txn = _latest_payment_txn(obj)
         return txn.code_description if txn else ""
 
     pre_order = serializers.SerializerMethodField()
